@@ -1,0 +1,27 @@
+# Dependencias principales
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+sqlalchemy==2.0.23
+pydantic==2.5.0
+pydantic-settings==2.0.3
+
+# Base de datos
+psycopg2-binary==2.9.7
+alembic==1.13.1
+
+# Para testing
+pytest==7.4.3
+httpx==0.25.1
+pytest-asyncio==0.21.1
+
+# Para formateo y tipado
+ruff==0.3.4
+black==24.3.0
+mypy==1.7.1
+
+# Para seguridad
+python-jose==1.7.0
+passlib==1.7.4
+
+# Para logging y utilidades
+structlog==24.1.0

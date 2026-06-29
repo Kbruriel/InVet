@@ -1,0 +1,67 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "invet"
+version = "0.1.0"
+description = "Backend del sistema veterinario InVet"
+readme = "README.md"
+authors = [{name = "InVet Team"}]
+license = {text = "MIT"}
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi==0.104.1",
+    "uvicorn[standard]==0.24.0",
+    "sqlalchemy==2.0.23",
+    "psycopg2-binary==2.9.7",
+    "alembic==1.13.1",
+    "pydantic==2.5.0",
+    "pydantic-settings==2.0.3",
+    "passlib[bcrypt]==1.7.4",
+    "python-jose[cryptography]==1.7.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest==7.4.3",
+    "httpx==0.25.1",
+    "mypy==1.7.1",
+    "ruff==0.1.9",
+    "black==23.12.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/invet/invet"
+Repository = "https://github.com/invet/invet"
+
+[tool.setuptools.packages.find]
+where = ["."]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+    "E", # pycodestyle errors
+    "W", # pycodestyle warnings
+    "F", # pyflakes
+    "I", # isort
+    "C", # mccabe
+    "B", # flake8-bugbear
+    "UP", # pyupgrade
+]
+ignore = ["E501", "B008"]
+
+[tool.pytest.ini_options]
+minversion = "7.4.3"
+testpaths = [
+    "app/tests",
+]
+addopts = "-v"

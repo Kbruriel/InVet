@@ -1,0 +1,1 @@
+# Empty schemas directory - will be populated later
