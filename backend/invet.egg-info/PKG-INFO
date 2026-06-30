@@ -1,0 +1,88 @@
+Metadata-Version: 2.4
+Name: invet
+Version: 0.1.0
+Summary: Backend del sistema veterinario InVet
+Author: InVet Team
+License: MIT
+Project-URL: Homepage, https://github.com/invet/invet
+Project-URL: Repository, https://github.com/invet/invet
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: OS Independent
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi==0.104.1
+Requires-Dist: uvicorn[standard]==0.24.0
+Requires-Dist: sqlalchemy==2.0.23
+Requires-Dist: psycopg2-binary==2.9.7
+Requires-Dist: alembic==1.13.1
+Requires-Dist: pydantic==2.5.0
+Requires-Dist: pydantic-settings==2.0.3
+Requires-Dist: passlib[bcrypt]==1.7.4
+Requires-Dist: python-jose[cryptography]==1.7.0
+Provides-Extra: dev
+Requires-Dist: pytest==7.4.3; extra == "dev"
+Requires-Dist: httpx==0.25.1; extra == "dev"
+Requires-Dist: mypy==1.7.1; extra == "dev"
+Requires-Dist: ruff==0.1.9; extra == "dev"
+Requires-Dist: black==23.12.1; extra == "dev"
+
+# InVet - Sistema Veterinario y Estéticas
+
+## Backend Setup
+
+### Base de Datos
+
+La aplicación usa PostgreSQL como base de datos principal con una arquitectura basada en Clean Architecture:
+
+- **SQLAlchemy 2.0** para el ORM
+- **Alembic** para migraciones de base de datos 
+- **Base de datos en capa Infrastructure**
+
+### Estructura de Modelos
+
+Los modelos se encuentran en `app/infrastructure/database/models/` y están organizados siguiendo Clean Architecture:
+
+- `User`: Usuarios del sistema (clientes, veterinarios, administradores)
+- `Clinic`: Clínicas o sucursales
+- `Veterinarian`: Veterinarios que trabajan en clínicas
+- `Owner`: Propietarios de mascotas
+- `Pet`: Mascotas registradas
+
+### Base de Datos
+
+Configuración de base de datos:
+
+```python
+# Ejemplo de conexión desde app/core/database.py
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
+engine = create_engine(
+    settings.DATABASE_URL,
+    pool_pre_ping=True,
+    pool_recycle=3600
+)
+
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+```
+
+### Migraciones
+
+Para crear nuevas migraciones:
+
+```bash
+# Generar nueva migración (auto-generar desde modelos existentes)
+alembic revision --autogenerate -m "Descripción de la migración"
+
+# Aplicar migraciones
+alembic upgrade head
+```
+
+### Pruebas de Base de Datos
+
+Las pruebas unitarias para la base de datos se encuentran en `app/tests/` y usan SQLite en memoria:
+
+```bash
+pytest app/tests/test_database.py
+```
