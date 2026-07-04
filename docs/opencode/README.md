@@ -9,6 +9,8 @@ Esta carpeta contiene la documentación operativa para ejecutar InVet por slices
 /implement-backend-task BE-00X
 /implement-frontend-task FE-00X
 /qa-task QA-00X
+/review-slice BE-00X
+/implement-findings BE-00X
 /clean-architecture-review
 /security-review
 /run-checks
@@ -23,6 +25,8 @@ Esta carpeta contiene la documentación operativa para ejecutar InVet por slices
 - `03_task_prompt_contracts.md`: contrato de prompts por comando.
 - `04_agent_contracts.md`: responsabilidades de agentes.
 - `05_done_gates_by_command.md`: gates de cierre.
+- `11_chatgpt_project_context.md`: contexto consolidado para usar el proyecto en ChatGPT.
+- `templates`: plantillas Markdown para resultados, hallazgos y correcciones.
 - `tasks/backend`: tareas backend.
 - `tasks/frontend`: tareas frontend.
 - `tasks/qa`: tareas QA.

@@ -31,25 +31,31 @@ Stack obligatorio:
 
 Arquitectura obligatoria:
 - `app/api`: routers, dependencias HTTP, schemas de request/response.
-- `app/application`: casos de uso, DTOs, orquestación y transacciones.
+- `app/application`: casos de uso, DTOs, orquestacion y transacciones.
 - `app/domain`: entidades, value objects, reglas e interfaces/ports.
 - `app/infrastructure`: ORM SQLAlchemy, repositorios, email, storage e integraciones.
-- `app/core`: configuración, seguridad, errores, permisos y logging.
+- `app/core`: configuracion, seguridad, errores, permisos y logging.
 - `app/tests`: pruebas.
 
 Reglas:
-- Los routers no contienen lógica de negocio.
+- Los routers no contienen logica de negocio.
 - El dominio no depende de FastAPI, SQLAlchemy ni proveedores externos.
 - Los modelos ORM no se exponen en respuestas.
 - Usar schemas separados para create, update, read, public read y admin read.
-- Validar permisos y pertenencia a clínica, sucursal, empresa o propietario desde backend.
+- Validar permisos y pertenencia a clinica, sucursal, empresa o propietario desde backend.
 - Prevenir IDOR/BOLA.
-- Registrar auditoría en acciones críticas.
+- Registrar auditoria en acciones criticas.
+- Trabajar contra el checklist generado por `/plan-task` en `docs/opencode/plans/BE-00X-plan.md`.
+- No marcar una tarea como completada hasta que sus criterios de aceptacion esten verificados.
 
 Al implementar `BE-00X`:
-1. Lee `docs/opencode/tasks/backend/BE-00X.md`.
-2. Verifica dependencias del slice.
-3. Implementa entidad/use case/repositorio/schema/router/migración/pruebas según aplique.
-4. Mantén API versionada bajo `/api/v1`.
-5. Actualiza OpenAPI si aplica.
-6. Deja evidencia de tests o pendientes explícitos.
+1. Lee `docs/opencode/plans/BE-00X-plan.md`.
+2. Lee `docs/opencode/tasks/backend/BE-00X.md`.
+3. Verifica dependencias del slice y estado de tareas previas.
+4. Selecciona tareas pendientes del plan aplicables a backend.
+5. Implementa entidad/use case/repositorio/schema/router/migracion/pruebas segun aplique.
+6. Mantiene API versionada bajo `/api/v1`.
+7. Actualiza OpenAPI si aplica.
+8. Ejecuta o documenta pruebas para los criterios de aceptacion aplicables.
+9. Cambia `- [ ]` a `- [x]` en el plan solo para tareas backend completadas.
+10. Deja pendientes explicitos para tareas que no se puedan completar.

@@ -19,6 +19,8 @@ docs/opencode/**/*.md
 /implement-backend-task
 /implement-frontend-task
 /qa-task
+/review-slice
+/implement-findings
 /clean-architecture-review
 /security-review
 /run-checks
@@ -33,6 +35,8 @@ invet-product-planner
 invet-backend-implementer
 invet-frontend-implementer
 invet-qa-validator
+invet-slice-reviewer
+invet-findings-implementer
 invet-clean-architecture-reviewer
 invet-security-reviewer
 invet-check-runner

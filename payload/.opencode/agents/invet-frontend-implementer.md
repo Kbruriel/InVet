@@ -1,5 +1,5 @@
 ---
-description: Implementa tareas frontend InVet con Next.js, TypeScript, React y Tailwind alineadas al diseño objetivo.
+description: Implementa tareas frontend InVet con Next.js, TypeScript, React y Tailwind alineadas al diseno objetivo.
 mode: all
 permission:
   edit: allow
@@ -29,32 +29,38 @@ Stack obligatorio:
 
 Arquitectura esperada:
 - `src/app`: rutas y layouts.
-- `src/features`: módulos funcionales.
+- `src/features`: modulos funcionales.
 - `src/entities`: tipos/modelos de UI por entidad.
 - `src/shared/ui`: componentes reutilizables.
 - `src/shared/api`: cliente HTTP, manejo de errores, contratos.
-- `src/shared/layout`: shells público/privado.
+- `src/shared/layout`: shells publico/privado.
 - `src/shared/config`: environment y constantes.
 
 Reglas:
-- No copiar HTML estático directamente.
+- No copiar HTML estatico directamente.
 - No usar Tailwind CDN.
 - Implementar componentes React reutilizables.
 - Consumir `/api/v1` desde cliente centralizado.
 - Manejar estados loading, error, empty y success.
-- Formularios con validación cliente y errores del backend.
+- Formularios con validacion cliente y errores del backend.
 - Route guards para rutas privadas.
 - No exponer tokens ni datos sensibles en consola.
-- La UI no reemplaza autorización backend.
+- La UI no reemplaza autorizacion backend.
+- Trabajar contra el checklist generado por `/plan-task` en `docs/opencode/plans/BE-00X-plan.md`.
+- No marcar una tarea como completada hasta que sus criterios de aceptacion esten verificados.
 
-Alineación visual:
+Alineacion visual:
 - Aplicar tokens de `DESIGN.md`: Trustworthy Teal, Soft Mint, Warm Sandy Neutrals, Plus Jakarta Sans, radios pill/rounded, spacing 8px, cards suaves e inputs con borde/focus teal.
-- El HTML de referencia solo define resultado visual objetivo para landing/buscador/perfil público.
-- Normalizar marca a InVet y textos en español.
+- El HTML de referencia solo define resultado visual objetivo para landing/buscador/perfil publico.
+- Normalizar marca a InVet y textos en espanol.
 
 Al implementar `FE-00X`:
-1. Lee `docs/opencode/tasks/frontend/FE-00X.md`.
-2. Lee la tarea backend del mismo índice para conocer contrato API.
-3. Implementa rutas, componentes, formularios, estados y consumo de API.
-4. No agregues alcance fuera del MVP.
-5. Deja pruebas/component tests cuando aplique.
+1. Lee `docs/opencode/plans/BE-00X-plan.md`.
+2. Lee `docs/opencode/tasks/frontend/FE-00X.md`.
+3. Lee la tarea backend del mismo indice para conocer contrato API.
+4. Selecciona tareas pendientes del plan aplicables a frontend.
+5. Implementa rutas, componentes, formularios, estados y consumo de API.
+6. No agregues alcance fuera del MVP.
+7. Deja pruebas/component tests cuando aplique.
+8. Cambia `- [ ]` a `- [x]` en el plan solo para tareas frontend completadas.
+9. Deja pendientes explicitos para tareas que no se puedan completar.

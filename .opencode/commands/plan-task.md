@@ -13,7 +13,7 @@ Instrucciones:
    - `docs/opencode/tasks/backend/BE-00X.md`
    - `docs/opencode/tasks/frontend/FE-00X.md`
    - `docs/opencode/tasks/qa/QA-00X.md`
-4. Produce un plan de ejecución con:
+4. Produce un plan de ejecucion con:
    - Objetivo del slice.
    - Alcance MVP.
    - Fuera de alcance.
@@ -23,4 +23,11 @@ Instrucciones:
    - Pruebas QA.
    - Riesgos de seguridad/IDOR/BOLA.
    - Definition of Done.
-5. No implementes código en este comando.
+5. Guarda el plan en `docs/opencode/plans/BE-00X-plan.md`.
+6. El plan debe incluir un checklist numerado de tareas generadas para backend, frontend y QA usando este formato por tarea:
+   - `- [ ] Numero de tarea`
+   - `Objetivo: ...`
+   - `Criterios de aceptacion: ...`
+   - `Paralelismo[P]: Si/No`
+7. Cada tarea debe tener un unico objetivo y criterios de aceptacion verificables.
+8. No implementes codigo fuente en este comando.

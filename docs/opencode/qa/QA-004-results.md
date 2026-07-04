@@ -1,61 +1,30 @@
 # QA-004 Results
 
-## Validation Summary
+## Validation summary
 
-### ✅ Completed Requirements
-- Happy path validation: Endpoint returns public clinic information  
-- Negative path validation: Proper HTTP status codes (404, 500)
-- Permission validation implemented 
-- IDOR/BOLA security controls in place
-- HTTP status codes compliant (200, 403, 404, 500)
-- Clean Architecture separation completed
+- Public branch profile endpoint returns public data.
+- Protected branch profile endpoint requires authentication.
+- The slice keeps the public and protected contracts separated.
 
-## Implementation Files Created
+## Commands executed
 
-1. **Domain Layer**:
-   - `app/domain/entities/clinic.py` - Clinic, Branch, Service, Schedule, Rating entities
-   - `app/domain/value_objects/schedule.py` - Working hours and availability value objects
-   - `app/domain/repositories/clinic_repository.py` - Repository interfaces
+```text
+C:\Users\Precision 7520\AppData\Local\Python\pythoncore-3.14-64\python.exe -m pytest backend/app/tests -q
+```
 
-2. **Application Layer**:
-   - `app/application/use_cases/clinic_use_case.py` - Use cases for branch profiles
+## Execution result
 
-3. **Infrastructure Layer**:
-   - `app/infrastructure/models/clinic_models.py` - SQLAlchemy models with relationships
-   - `app/infrastructure/repositories/clinic_repository_impl.py` - Repository implementations
+- `18 passed`
+- The run completed successfully.
+- Output included deprecation warnings from `sqlalchemy`, `pytest_asyncio`, `fastapi.testclient`, and `pydantic`, but no failing tests.
 
-4. **API Layer**:
-   - `app/api/clinic_router.py` - API endpoints for clinic profiles
-   - `app/api/schemas/clinic_schemas.py` - Pydantic response schemas
+## Implemented endpoints
 
-## Endpoints Implemented
+- `GET /api/v1/clinics/branches/{branch_id}` - public branch profile without authentication.
+- `GET /api/v1/clinics/{clinic_id}/{branch_id}` - protected branch profile with authentication and access control.
 
-- `GET /api/v1/clinics/branches/{branch_id}` - Public branch profile
-- `GET /api/v1/clinics/{clinic_id}/{branch_id}` - Protected branch profile with permissions
+## Notes
 
-## Security Controls
-
-✅ No ORM models exposed in responses  
-✅ Permission validation layers implemented  
-✅ Error handling without information leakage  
-✅ IDOR protection through ownership checks  
-
-## Test Coverage
-
-✅ Unit tests for use cases
-✅ API endpoint tests 
-✅ Entity validation tests
-
-## Compliance Check
-
-The implementation:
-- Follows Clean Architecture principles (API/Application/Domain/Infrastructure separation)
-- Implements only MVP scope as requested
-- Exposes only public data without sensitive information
-- No private data exposure detected
-- HTTP status codes are properly used  
-- All tests pass according to implemented functionality
-
-## Risk Assessment
-
-No blockers found. Security controls properly implemented.
+- No ORM models are exposed in the API response.
+- Error handling stays consistent with the slice contract.
+- The route shape now matches the BE-004 task spec and QA contract.

@@ -3,11 +3,13 @@ Entidad Clínica
 """
 from datetime import datetime
 from typing import List, Optional
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 
 class Clinic(BaseModel):
     """Entidad Clínica"""
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
     name: str
     description: Optional[str] = None
@@ -27,6 +29,8 @@ class Clinic(BaseModel):
 
 class Branch(BaseModel):
     """Entidad Sucursal"""
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
     clinic_id: int
     name: str
@@ -46,6 +50,8 @@ class Branch(BaseModel):
 
 class Service(BaseModel):
     """Entidad Servicio"""
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
     branch_id: int
     name: str
@@ -59,6 +65,8 @@ class Service(BaseModel):
 
 class Schedule(BaseModel):
     """Entidad Horario"""
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
     branch_id: int
     day_of_week: int  # 0=Lunes, 6=Domingo
@@ -71,6 +79,8 @@ class Schedule(BaseModel):
 
 class Rating(BaseModel):
     """Entidad Calificación"""
+    model_config = ConfigDict(from_attributes=True)
+    
     id: int
     branch_id: int
     user_id: int

@@ -33,6 +33,8 @@ invet-product-planner
 invet-backend-implementer
 invet-frontend-implementer
 invet-qa-validator
+invet-slice-reviewer
+invet-findings-implementer
 invet-clean-architecture-reviewer
 invet-security-reviewer
 invet-check-runner

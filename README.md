@@ -7,6 +7,8 @@ Este paquete instala **agentes OpenCode**, **comandos slash** y **documentación
 /implement-backend-task BE-001
 /implement-frontend-task FE-001
 /qa-task QA-001
+/review-slice BE-001
+/implement-findings BE-001
 /clean-architecture-review
 /security-review
 /run-checks

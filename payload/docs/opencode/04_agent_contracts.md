@@ -1,28 +1,36 @@
-# 04 — Contratos de agentes
+# 04 - Contratos de agentes
 
 ## invet-product-planner
 
-Planifica slices sin escribir código. Mantiene alcance MVP y evita introducir funcionalidades fuera de alcance.
+Genera `docs/opencode/plans/BE-00X-plan.md` con checklist numerado, objetivos, criterios de aceptacion medibles y `Paralelismo[P]`. No escribe codigo fuente.
 
 ## invet-backend-implementer
 
-Implementa FastAPI + SQLAlchemy + Alembic + Pytest con Clean Architecture.
+Implementa tareas backend pendientes del plan, verifica criterios de aceptacion y marca como completadas solo las tareas verificadas.
 
 ## invet-frontend-implementer
 
-Implementa Next.js + TypeScript + React + Tailwind local, respetando tokens visuales y contratos API.
+Implementa tareas frontend pendientes del plan, respeta contratos API y sistema visual, verifica criterios de aceptacion y marca como completadas solo las tareas verificadas.
 
 ## invet-qa-validator
 
-Valida calidad funcional, regresión, permisos e integración por slice.
+Valida calidad funcional usando objetivos y criterios de aceptacion del plan, crea o ajusta pruebas cuando hace falta, ejecuta pruebas disponibles, documenta evidencia y marca tareas QA verificadas.
+
+## invet-slice-reviewer
+
+Revisa plan e implementacion de BE/FE/QA y documenta hallazgos en Markdown.
+
+## invet-findings-implementer
+
+Implementa hallazgos de review o QA, genera checklist de correcciones y documenta el cierre.
 
 ## invet-clean-architecture-reviewer
 
-Revisa separación de capas backend y modularidad frontend. No modifica código.
+Revisa separacion de capas backend y modularidad frontend. No modifica codigo.
 
 ## invet-security-reviewer
 
-Revisa OWASP, IDOR/BOLA, tokens, permisos, logs y exposición de datos. No modifica código.
+Revisa OWASP, IDOR/BOLA, tokens, permisos, logs y exposicion de datos. No modifica codigo.
 
 ## invet-check-runner
 
@@ -30,7 +38,7 @@ Ejecuta checks disponibles sin modificar archivos.
 
 ## invet-docs-updater
 
-Actualiza documentación Markdown y estado del slice.
+Actualiza documentacion Markdown y estado del slice.
 
 ## invet-orchestrator
 

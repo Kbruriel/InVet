@@ -2,7 +2,7 @@
 from datetime import datetime, timedelta
 from typing import Optional
 
-from fastapi import HTTPException, status
+from fastapi import Depends, HTTPException, status
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 
@@ -37,3 +37,30 @@ def verify_token(token: str) -> dict:
             detail="Token inválido",
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
+
+
+# Add the get_current_user function that was missing
+from fastapi.security import OAuth2PasswordBearer
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/v1/login")
+
+def get_current_user(token: str = Depends(oauth2_scheme)):
+    """Obtiene el usuario actual a partir del token JWT."""
+    try:
+        payload = jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM])
+        user_id: str = payload.get("sub")
+        if user_id is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Could not validate credentials",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        # In a real implementation, you'd return the actual user object from DB
+        # For now, return a mock user ID for demonstration purposes
+        return {"id": int(user_id)}
+    except JWTError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )

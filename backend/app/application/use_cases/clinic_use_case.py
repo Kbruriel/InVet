@@ -25,6 +25,8 @@ class GetBranchProfileUseCase:
         # Verificar que la sucursal exista y sea accesible
         branch = await self.branch_repo.get_branch_by_id(branch_id)
         if not branch:
+            # En un entorno real, se debería usar una excepción personalizada
+            # pero por ahora vamos a mantener el manejo consistente con el API
             raise ValueError(f"Branch with id {branch_id} not found")
         
         # Validar si el usuario tiene acceso (si aplica en contextos auth)
@@ -75,6 +77,8 @@ class GetBranchProfileWithPermissionUseCase:
         
         # Verificar acceso a la sucursal antes de continuar
         if not await self.branch_repo.is_branch_accessible(branch_id, user_id):
+            # Para mantener consistencia con el manejo actual en API,
+            # lanzamos un ValueError que será convertido a HTTP 403 por el controlador
             raise ValueError("Access denied to branch")
             
         # Obtener información de la sucursal

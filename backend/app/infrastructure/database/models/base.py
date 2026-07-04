@@ -1,11 +1,9 @@
 """Modelo base para las entidades de la base de datos."""
 from typing import Any
-from sqlalchemy import Column
-from sqlalchemy.orm import declarative_base, declared_attr
+
 from sqlalchemy.ext.hybrid import hybrid_property
 
-# Usar Base declarative como clase base para los modelos ORM
-Base = declarative_base()
+from app.infrastructure.database.session import Base
 
 
 class BaseModel:
