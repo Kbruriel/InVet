@@ -3,12 +3,14 @@ Modelos del dominio - Entidades y value objects
 """
 from datetime import datetime
 from typing import Optional
+
 from pydantic import BaseModel, EmailStr
 
 
 # Modelo base para entidades del dominio
 class DomainModel(BaseModel):
     """Base model for domain entities"""
+
     pass
 
 

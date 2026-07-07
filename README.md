@@ -1,6 +1,6 @@
-# InVet — Paquete instalable OpenCode secuencial
+# InVet - Paquete instalable OpenCode secuencial
 
-Este paquete instala **agentes OpenCode**, **comandos slash** y **documentación Markdown** para ejecutar el MVP de InVet con flujo secuencial por slice:
+Este paquete instala agentes OpenCode, comandos slash y documentacion Markdown para ejecutar el MVP de InVet con flujo secuencial por slice:
 
 ```text
 /plan-task BE-001
@@ -15,7 +15,25 @@ Este paquete instala **agentes OpenCode**, **comandos slash** y **documentación
 /update-docs
 ```
 
-## Qué instala
+## Importante: skills vs agentes
+
+Los archivos `invet-*-implementer` son agentes OpenCode, no skills Codex.
+
+Si aparece este error:
+
+```text
+Skill "invet-backend-implementer" not found. Available skills: customize-opencode
+```
+
+usa el comando slash correspondiente:
+
+```text
+/implement-backend-task BE-001
+```
+
+La skill `customize-opencode` sirve para instalar o modificar la configuracion OpenCode. Los agentes se invocan indirectamente desde los comandos en `.opencode/commands`.
+
+## Que instala
 
 ```text
 .opencode/
@@ -30,7 +48,7 @@ docs/opencode/
   templates/
 ```
 
-## Instalación rápida
+## Instalacion rapida
 
 Desde la carpeta descomprimida del paquete:
 
@@ -38,7 +56,7 @@ Desde la carpeta descomprimida del paquete:
 .\install-invet-opencode-agents.ps1 -Root "C:\ruta\al\repo-invet" -Force
 ```
 
-Desde la raíz del repo, si copiaste el paquete ahí:
+Desde la raiz del repo, si copiaste el paquete ahi:
 
 ```powershell
 .\install-invet-opencode-agents.ps1 -Force
@@ -52,12 +70,12 @@ Validar sin escribir:
 
 ## Reglas principales
 
-- Cada slice debe usar el mismo índice para backend, frontend y QA: `BE-00X`, `FE-00X`, `QA-00X`.
+- Cada slice debe usar el mismo indice para backend, frontend y QA: `BE-00X`, `FE-00X`, `QA-00X`.
 - Backend define contrato y reglas primero.
 - Frontend consume el contrato del mismo slice.
-- QA valida backend + frontend + permisos + regresión.
-- Las revisiones de arquitectura, seguridad, checks y documentación son obligatorias antes de pasar al siguiente slice.
-- El MVP no incluye productos, marketplace, carrito, checkout en línea, pasarela de pago de servicios, facturación electrónica ni timbrado fiscal.
+- QA valida backend, frontend, permisos y regresion.
+- Las revisiones de arquitectura, seguridad, checks y documentacion son obligatorias antes de pasar al siguiente slice.
+- El MVP no incluye productos, marketplace, carrito, checkout en linea, pasarela de pago de servicios, facturacion electronica ni timbrado fiscal.
 
 ## Primer comando recomendado
 

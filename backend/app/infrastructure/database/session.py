@@ -1,7 +1,8 @@
 """Manejo de sesiones de base de datos."""
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import Session, sessionmaker
+
 from app.core.config import settings
 
 # Crear motor de base de datos
@@ -9,7 +10,7 @@ engine = create_engine(
     settings.DATABASE_URL,
     pool_pre_ping=True,
     pool_recycle=3600,
-    echo=False  # Cambiar a True para debugging
+    echo=False,  # Cambiar a True para debugging
 )
 
 # Crear la clase de sesión local

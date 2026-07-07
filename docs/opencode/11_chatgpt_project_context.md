@@ -43,6 +43,11 @@ General rules:
 - QA validates the full slice.
 - Reviews, checks, and documentation must be closed before advancing.
 
+Skill usage rule:
+- The available Codex skill is `customize-opencode`.
+- `invet-backend-implementer`, `invet-frontend-implementer`, and the other `invet-*` names are OpenCode agents, not Codex skills.
+- Invoke them through slash commands such as `/implement-backend-task BE-00X`, not as `Skill invet-backend-implementer`.
+
 ## Relevant repository structure
 
 ```text
@@ -279,6 +284,7 @@ When using this project as context in ChatGPT:
 - `docs/opencode/02_be_fe_qa_task_matrix.md`
 - `docs/opencode/03_task_prompt_contracts.md`
 - `docs/opencode/04_agent_contracts.md`
+- `docs/opencode/12_troubleshooting_skills_vs_agents.md`
 - The specific slice files:
   - `docs/opencode/tasks/backend/BE-00X.md`
   - `docs/opencode/tasks/frontend/FE-00X.md`
