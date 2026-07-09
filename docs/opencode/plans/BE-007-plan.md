@@ -17,31 +17,25 @@ Implementar CRUD para propietarios, mascotas y expediente básico inicial.
 
 ## Entidades y reglas de negocio
 1. **Owner** (Propietario):
-   - Identificador único (UUID).
-   - Nombre completo.
-   - Correo electrónico.
-   - Teléfono de contacto.
-   - Dirección postal (opcional).
-   - Fecha de creación, actualización.
-   - Asociado a un tenant/empresa/sucursal.
+    - Identificador único (UUID).
+    - Nombre completo.
+    - Correo electrónico.
+    - Teléfono de contacto.
+    - Dirección postal (opcional).
+    - Fecha de creación, actualización.
+    - Asociado a un tenant/empresa/sucursal.
 2. **Pet** (Mascota):
-   - Identificador único (UUID).
-   - Nombre.
-   - Especie.
-   - Raza.
-   - Sexo.
-   - Fecha de nacimiento.
-   - Color.
-   - Peso (opcional).
-   - Historial médico básico (opcional).
-   - Fecha de creación, actualización.
-   - Asociado a un owner.
-3. **Medical History** (Historial Médico):
-   - Identificador único (UUID).
-   - Descripción breve de tratamiento.
-   - Fecha de registro.
-   - Tipo de evento.
-   - Asociado a pet.
+    - Identificador único (UUID).
+    - Nombre.
+    - Especie.
+    - Raza.
+    - Sexo.
+    - Fecha de nacimiento.
+    - Color.
+    - Peso (opcional).
+    - Historial médico básico (opcional).
+    - Fecha de creación, actualización.
+    - Asociado a un owner.
 
 Reglas:
 - Un owner puede tener múltiples pets.
@@ -132,15 +126,15 @@ Reglas:
 
 ## Componentes frontend esperados
 1. `src/features/owners`:
-   - Listado: `/owners`.
-   - Detalle: `/owners/{id}`.
-   - Creación: `/owners/new`.
-   - Edición: `/owners/{id}/edit`.
+    - Listado: `/owners`.
+    - Detalle: `/owners/{id}`.
+    - Creación: `/owners/new`.
+    - Edición: `/owners/{id}/edit`.
 2. `src/features/pets`:
-   - Listado: `/pets`.
-   - Detalle: `/pets/{id}`.
-   - Creación: `/pets/new`.
-   - Edición: `/pets/{id}/edit`.
+    - Listado: `/pets`.
+    - Detalle: `/pets/{id}`.
+    - Creación: `/pets/new`.
+    - Edición: `/pets/{id}/edit`.
 3. Formularios de edición con validaciones.
 4. Componentes de estado (`loading`, `error`, `empty`, `success`).
 5. Uso del cliente API centralizado para consumir el backend.
@@ -148,54 +142,55 @@ Reglas:
 ## Pruebas QA
 1. Happy path CRUD para owner y pet.
 2. Negative paths:
-   - Input inválido en POST/PUT.
-   - Acceso a datos ajeno sin permisos (IDOR).
+    - Input inválido en POST/PUT.
+    - Acceso a datos ajeno sin permisos (IDOR).
 3. Permisos por rol: Owner vs Staff.
 4. Estados UI:
-   - Loading, error, success.
+    - Loading, error, success.
 5. Paginación para listados.
 6. Regresión del flujo principal.
 
 ## Riesgos de seguridad/IDOR/BOLA
 1. IDOR:
-   - Verificar que acceso a `/owners/{id}` y `/pets/{id}` no permita ver registros ajenos.
+    - Verificar que acceso a `/owners/{id}` y `/pets/{id}` no permita ver registros ajenos.
 2. BOLA (Binding of Anomalous Line):
-   - Asegurar que el backend no se auto-enlace con datos de usuario sin verificación previa.
+    - Asegurar que el backend no se auto-enlace con datos de usuario sin verificación previa.
 3. Error handling:
-   - No filtrar información interna en respuestas HTTP en error.
+    - No filtrar información interna en respuestas HTTP en error.
 
 ## Checklist de tareas
 
-- [ ] 1. Revisar entidades relacionadas con propietarios y mascotas
-- [ ] 2. Crear/value objects para Owner
-- [ ] 3. Crear/value objects para Pet
-- [ ] 4. Crear/value objects para MedicalHistory (si aplica)
-- [ ] 5. Implementar casos de uso CRUD para Owner
-- [ ] 6. Implementar casos de uso CRUD para Pet
-- [ ] 7. Crear interfaces de repositorio/ports para Owner
-- [ ] 8. Crear interfaces de repositorio/ports para Pet
-- [ ] 9. Implementar repositorios SQLAlchemy para Owner
-- [ ] 10. Implementar repositorios SQLAlchemy para Pet
-- [ ] 11. Crear schemas Pydantic para Owner (entrada y salida)
-- [ ] 12. Crear schemas Pydantic para Pet (entrada y salida)
-- [ ] 13. Crear/ajustar routers FastAPI para Owner
-- [ ] 14. Crear/ajustar routers FastAPI para Pet
-- [ ] 15. Validar permisos de ownership en rutas
-- [ ] 16. Implementar migraciones Alembic para Owner, Pet (si aplica)
-- [ ] 17. Agregar pruebas Pytest para repositorios y casos de uso
-- [ ] 18. Agregar pruebas HTTPX para los endpoints
-- [ ] 19. Crear rutas frontend para Owner
-- [ ] 20. Crear rutas frontend para Pet
-- [ ] 21. Implementar componentes UI de listado, detalle y CRUD para Owner
-- [ ] 22. Implementar componentes UI de listado, detalle y CRUD para Pet
-- [ ] 23. Integrar cliente API en frontend para llamadas a BE-007
-- [ ] 24. Implementar estados UX para listados, loading, error, success
-- [ ] 25. Validar IDOR/BOLA en endpoints de backend y UI
-- [ ] 26. Validar permisos por rol (Owner vs Staff)
-- [ ] 27. Testing QA: happy path
-- [ ] 28. Testing QA: negative paths e IDOR
-- [ ] 29. Testing QA: validación de estados UI
-- [ ] 30. Documentación del contrato de BE-007 (openapi)
+### Backend
+- [x] 1. Revisar entidades relacionadas con propietarios y mascotas
+- [x] 2. Crear/value objects para Owner
+- [x] 3. Crear/value objects para Pet
+- [x] 4. Implementar casos de uso CRUD para Owner
+- [x] 5. Implementar casos de uso CRUD para Pet
+- [x] 6. Crear interfaces de repositorio/ports para Owner
+- [x] 7. Crear interfaces de repositorio/ports para Pet
+- [x] 8. Implementar repositorios SQLAlchemy para Owner
+- [x] 9. Implementar repositorios SQLAlchemy para Pet
+- [x] 10. Crear schemas Pydantic para Owner (entrada y salida)
+- [x] 11. Crear schemas Pydantic para Pet (entrada y salida)
+- [x] 12. Crear/ajustar routers FastAPI para Owner
+- [x] 13. Crear/ajustar routers FastAPI para Pet
+- [x] 14. Validar permisos de ownership en rutas
+
+### Frontend
+- [ ] 18. Crear rutas frontend para Owner
+- [ ] 19. Crear rutas frontend para Pet
+- [ ] 20. Implementar componentes UI de listado, detalle y CRUD para Owner
+- [ ] 21. Implementar componentes UI de listado, detalle y CRUD para Pet
+- [ ] 22. Integrar cliente API en frontend para llamadas a BE-007
+- [ ] 23. Implementar estados UX para listados, loading, error, success
+
+### QA
+- [ ] 24. Validar IDOR/BOLA en endpoints de backend y UI
+- [ ] 25. Validar permisos por rol (Owner vs Staff)
+- [ ] 26. Testing QA: happy path
+- [ ] 27. Testing QA: negative paths e IDOR
+- [ ] 28. Testing QA: validación de estados UI
+- [ ] 29. Documentación del contrato de BE-007 (openapi)
 
 ## Definition of Done
 - [x] Código backend implementado.
