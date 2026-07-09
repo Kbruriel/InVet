@@ -6,6 +6,7 @@ agent: invet-clean-architecture-reviewer
 Ejecuta revisión de arquitectura limpia sobre los cambios actuales.
 
 Instrucciones:
+0. Ejecuta de forma autonoma. Pregunta al usuario solo si falta informacion bloqueante o hay una decision critica de alcance arquitectonico.
 1. Revisa `git diff` y archivos modificados.
 2. Valida backend por capas: API, application, domain, infrastructure, core, tests.
 3. Valida que los routers no tengan lógica de negocio.

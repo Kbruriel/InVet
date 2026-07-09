@@ -6,6 +6,7 @@ agent: invet-qa-validator
 Valida la tarea QA indicada por `$ARGUMENTS`.
 
 Instrucciones:
+0. Ejecuta de forma autonoma. Pregunta al usuario solo si falta informacion bloqueante, hay una decision critica de aceptacion/alcance o se requiere una accion destructiva.
 1. Normaliza el argumento a `QA-00X` e identifica `BE-00X` y `FE-00X`.
 2. Lee:
    - `docs/opencode/plans/BE-00X-plan.md`

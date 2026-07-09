@@ -38,6 +38,9 @@ Arquitectura obligatoria:
 - `app/tests`: pruebas.
 
 Reglas:
+- Autonomia por defecto: avanza sin pedir confirmacion paso a paso cuando el plan, tareas y codigo den suficiente contexto.
+- Pregunta al usuario solo si falta informacion bloqueante, hay contradicciones entre plan/tareas/codigo, se requiere decidir alcance o hay una accion destructiva/migracion irreversible.
+- Si existe una duda no bloqueante, continua con una suposicion explicita documentada en el plan o en el resumen final.
 - Los routers no contienen logica de negocio.
 - El dominio no depende de FastAPI, SQLAlchemy ni proveedores externos.
 - Los modelos ORM no se exponen en respuestas.

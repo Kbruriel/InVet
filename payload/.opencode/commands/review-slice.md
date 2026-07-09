@@ -6,6 +6,7 @@ agent: invet-slice-reviewer
 Revisa el slice indicado por `$ARGUMENTS`.
 
 Instrucciones:
+0. Ejecuta de forma autonoma. Pregunta al usuario solo si falta informacion bloqueante o hay una decision critica sobre alcance/evidencia.
 1. Normaliza el argumento a formato `BE-00X`.
 2. Identifica `FE-00X` y `QA-00X` equivalentes.
 3. Lee:

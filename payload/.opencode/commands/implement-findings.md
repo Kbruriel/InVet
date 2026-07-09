@@ -6,6 +6,7 @@ agent: invet-findings-implementer
 Implementa los hallazgos indicados por `$ARGUMENTS`.
 
 Instrucciones:
+0. Ejecuta de forma autonoma. Pregunta al usuario solo si el hallazgo es ambiguo, falta informacion bloqueante, cambia el alcance o se requiere una accion destructiva/migracion irreversible.
 1. Acepta un indice `BE-00X` o la ruta de un archivo de hallazgos.
 2. Lee `docs/opencode/reviews/BE-00X-review.md` y las tareas relacionadas.
 3. Corrige la implementacion necesaria en backend, frontend o QA.
