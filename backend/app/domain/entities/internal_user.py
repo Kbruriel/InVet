@@ -26,7 +26,7 @@ class InternalUser(BaseModel):
 
 class InternalUserCreate(BaseModel):
     """Schema para crear un usuario interno"""
-    
+
     branch_id: int
     name: str
     last_name: str
@@ -38,7 +38,7 @@ class InternalUserCreate(BaseModel):
 
 class InternalUserUpdate(BaseModel):
     """Schema para actualizar un usuario interno"""
-    
+
     name: Optional[str] = None
     last_name: Optional[str] = None
     email: Optional[str] = None

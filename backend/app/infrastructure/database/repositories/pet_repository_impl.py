@@ -48,6 +48,14 @@ class PetRepositoryImpl(PetRepository):
             return True
         return False
 
-    def get_pets_by_owner(self, owner_id: int, skip: int = 0, limit: int = 100) -> List[Pet]:
+    def get_pets_by_owner(
+        self, owner_id: int, skip: int = 0, limit: int = 100
+    ) -> List[Pet]:
         """Obtiene mascotas por propietario."""
-        return self.db.query(Pet).filter(Pet.owner_id == owner_id).offset(skip).limit(limit).all()
+        return (
+            self.db.query(Pet)
+            .filter(Pet.owner_id == owner_id)
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )

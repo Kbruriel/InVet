@@ -5,6 +5,7 @@ from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
 from app.infrastructure.database.models.base import Base
+from app.infrastructure.models.clinic_models import BranchDB  # noqa: F401
 
 
 class Veterinarian(Base):
@@ -24,13 +25,4 @@ class Veterinarian(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Relación con sucursal
-    branch = relationship("Branch", back_populates="veterinarians")
-
-
-# Relación inversa en la tabla de sucursal
-from app.infrastructure.database.models.branch import Branch
-
-Branch.veterinarians = relationship(
-    "Veterinarian", order_by=Veterinarian.id, back_populates="branch"
-)
+    branch = relationship("BranchDB")

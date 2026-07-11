@@ -7,6 +7,7 @@ from pydantic import BaseModel, EmailStr
 
 class OwnerBase(BaseModel):
     """Esquema base para propietarios."""
+
     first_name: str
     last_name: str
     email: EmailStr
@@ -20,16 +21,19 @@ class OwnerBase(BaseModel):
 
 class OwnerCreate(OwnerBase):
     """Esquema para crear propietarios."""
+
     pass
 
 
 class OwnerUpdate(OwnerBase):
     """Esquema para actualizar propietarios."""
+
     pass
 
 
 class Owner(OwnerBase):
     """Esquema para retornar propietarios."""
+
     id: int
     is_active: bool
     created_at: datetime

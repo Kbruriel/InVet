@@ -6,10 +6,11 @@ from typing import List, Optional
 from sqlalchemy.orm import Session
 
 from app.domain.entities.service import Service, ServiceCreate, ServiceUpdate
+from app.domain.repositories.service_repo import ServiceRepository
 from app.infrastructure.database.models.service import Service as ServiceDB
 
 
-class ServiceRepositoryImpl:
+class ServiceRepositoryImpl(ServiceRepository):
     """Implementación del repositorio de servicios"""
 
     def __init__(self, db: Session):
@@ -28,7 +29,9 @@ class ServiceRepositoryImpl:
         db_service = self.db.query(ServiceDB).filter(ServiceDB.id == service_id).first()
         return self._db_to_domain(db_service) if db_service else None
 
-    def get_services(self, branch_id: int, skip: int = 0, limit: int = 100) -> List[Service]:
+    def get_services(
+        self, branch_id: int, skip: int = 0, limit: int = 100
+    ) -> List[Service]:
         """Obtiene una lista de servicios para una sucursal"""
         db_services = (
             self.db.query(ServiceDB)
@@ -39,7 +42,9 @@ class ServiceRepositoryImpl:
         )
         return [self._db_to_domain(db_service) for db_service in db_services]
 
-    def update_service(self, service_id: int, service_data: ServiceUpdate) -> Optional[Service]:
+    def update_service(
+        self, service_id: int, service_data: ServiceUpdate
+    ) -> Optional[Service]:
         """Actualiza un servicio existente"""
         db_service = self.db.query(ServiceDB).filter(ServiceDB.id == service_id).first()
         if not db_service:
@@ -74,5 +79,5 @@ class ServiceRepositoryImpl:
             price=db_service.price,
             is_active=db_service.is_active,
             created_at=db_service.created_at,
-            updated_at=db_service.updated_at
+            updated_at=db_service.updated_at,
         )

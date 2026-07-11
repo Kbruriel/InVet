@@ -34,6 +34,8 @@ class PetRepository(ABC):
         pass
 
     @abstractmethod
-    def get_pets_by_owner(self, owner_id: int, skip: int = 0, limit: int = 100) -> List[Pet]:
+    def get_pets_by_owner(
+        self, owner_id: int, skip: int = 0, limit: int = 100
+    ) -> List[Pet]:
         """Obtiene mascotas por propietario."""
         pass

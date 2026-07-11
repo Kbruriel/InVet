@@ -48,6 +48,14 @@ class OwnerRepositoryImpl(OwnerRepository):
             return True
         return False
 
-    def get_owners_by_clinic(self, clinic_id: int, skip: int = 0, limit: int = 100) -> List[Owner]:
+    def get_owners_by_clinic(
+        self, clinic_id: int, skip: int = 0, limit: int = 100
+    ) -> List[Owner]:
         """Obtiene propietarios por clínica."""
-        return self.db.query(Owner).filter(Owner.clinic_id == clinic_id).offset(skip).limit(limit).all()
+        return (
+            self.db.query(Owner)
+            .filter(Owner.clinic_id == clinic_id)
+            .offset(skip)
+            .limit(limit)
+            .all()
+        )

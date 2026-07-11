@@ -9,9 +9,9 @@ from pydantic import BaseModel, ConfigDict
 
 class VeterinarianBase(BaseModel):
     """Base de esquema para veterinarios"""
-    
+
     model_config = ConfigDict(from_attributes=True)
-    
+
     name: str
     last_name: str
     specialty: str
@@ -23,19 +23,19 @@ class VeterinarianBase(BaseModel):
 
 class VeterinarianCreate(VeterinarianBase):
     """Esquema para crear un veterinario"""
-    
+
     branch_id: int
 
 
 class VeterinarianUpdate(VeterinarianBase):
     """Esquema para actualizar un veterinario"""
-    
+
     pass
 
 
 class VeterinarianResponse(VeterinarianBase):
     """Esquema de respuesta para veterinarios"""
-    
+
     id: int
     branch_id: int
     created_at: datetime

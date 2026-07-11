@@ -1,4 +1,4 @@
-﻿"""Configuración central de la aplicación."""
+"""Configuración central de la aplicación."""
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     POSTGRES_USER: str = "postgres"
     POSTGRES_PASSWORD: str = "postgres"
     POSTGRES_DB: str = "invet"
-    DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/invet"
+    DATABASE_URL: str = "postgresql+psycopg://postgres:postgres@localhost:5432/invet"
 
     SECRET_KEY: str = "secret-key-for-dev"
     ALGORITHM: str = "HS256"

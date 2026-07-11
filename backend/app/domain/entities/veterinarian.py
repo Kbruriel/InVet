@@ -27,7 +27,7 @@ class Veterinarian(BaseModel):
 
 class VeterinarianCreate(BaseModel):
     """Schema para crear un veterinario"""
-    
+
     branch_id: int
     name: str
     last_name: str
@@ -40,7 +40,7 @@ class VeterinarianCreate(BaseModel):
 
 class VeterinarianUpdate(BaseModel):
     """Schema para actualizar un veterinario"""
-    
+
     name: Optional[str] = None
     last_name: Optional[str] = None
     specialty: Optional[str] = None

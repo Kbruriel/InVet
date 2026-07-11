@@ -33,7 +33,9 @@ class PetUseCase:
         # Aquí se podría agregar lógica de validación para evitar eliminaciones
         # cuando la mascota tiene historial de tratamiento
         return self.pet_repository.delete_pet(pet_id)
-    
-    def get_pets_by_owner(self, owner_id: int, skip: int = 0, limit: int = 100) -> List[Pet]:
+
+    def get_pets_by_owner(
+        self, owner_id: int, skip: int = 0, limit: int = 100
+    ) -> List[Pet]:
         """Obtiene mascotas por propietario."""
         return self.pet_repository.get_pets_by_owner(owner_id, skip, limit)

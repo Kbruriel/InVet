@@ -25,7 +25,7 @@ class Service(BaseModel):
 
 class ServiceCreate(BaseModel):
     """Schema para crear un servicio"""
-    
+
     branch_id: int
     name: str
     description: Optional[str] = None
@@ -36,7 +36,7 @@ class ServiceCreate(BaseModel):
 
 class ServiceUpdate(BaseModel):
     """Schema para actualizar un servicio"""
-    
+
     name: Optional[str] = None
     description: Optional[str] = None
     duration: Optional[int] = None

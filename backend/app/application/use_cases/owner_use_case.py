@@ -33,7 +33,9 @@ class OwnerUseCase:
         # Aquí se podría agregar lógica de validación para evitar eliminaciones
         # cuando el owner tiene mascotas asociadas
         return self.owner_repository.delete_owner(owner_id)
-    
-    def get_owners_by_clinic(self, clinic_id: int, skip: int = 0, limit: int = 100) -> List[Owner]:
+
+    def get_owners_by_clinic(
+        self, clinic_id: int, skip: int = 0, limit: int = 100
+    ) -> List[Owner]:
         """Obtiene propietarios por clínica."""
         return self.owner_repository.get_owners_by_clinic(clinic_id, skip, limit)

@@ -13,8 +13,8 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 
-from app.infrastructure.database import Base
 from app.infrastructure.database.models.clinic import Clinic as ClinicDB
+from app.infrastructure.database.session import Base
 
 
 class BranchDB(Base):

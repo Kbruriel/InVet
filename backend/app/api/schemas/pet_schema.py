@@ -7,6 +7,7 @@ from pydantic import BaseModel
 
 class PetBase(BaseModel):
     """Esquema base para mascotas."""
+
     owner_id: int
     name: str
     species: str
@@ -19,16 +20,19 @@ class PetBase(BaseModel):
 
 class PetCreate(PetBase):
     """Esquema para crear mascotas."""
+
     pass
 
 
 class PetUpdate(PetBase):
     """Esquema para actualizar mascotas."""
+
     pass
 
 
 class Pet(PetBase):
     """Esquema para retornar mascotas."""
+
     id: int
     is_active: bool
     created_at: datetime

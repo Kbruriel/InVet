@@ -10,8 +10,8 @@ from alembic import context
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from app.core.config import settings
-from app.infrastructure.database.models import Base  # noqa: F401
+from app.core.config import settings  # noqa: E402
+from app.infrastructure.database.models import Base  # noqa: E402, F401
 
 config = context.config
 
