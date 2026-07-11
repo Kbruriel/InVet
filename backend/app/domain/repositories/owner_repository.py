@@ -35,7 +35,7 @@ class OwnerRepository(ABC):
 
     @abstractmethod
     def get_owners_by_clinic(
-        self, clinic_id: int, skip: int = 0, limit: int = 100
+        self, clinic_id: int, skip: int = 0, limit: Optional[int] = 100
     ) -> List[Owner]:
         """Obtiene propietarios por clínica."""
         pass

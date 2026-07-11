@@ -4,6 +4,8 @@ from typing import Optional
 
 from pydantic import BaseModel
 
+from app.api.schemas.clinic_schemas import PaginationMeta
+
 
 class PetBase(BaseModel):
     """Esquema base para mascotas."""
@@ -16,6 +18,7 @@ class PetBase(BaseModel):
     gender: Optional[str] = None  # 'male', 'female'
     weight: Optional[str] = None
     date_of_birth: Optional[datetime] = None
+    has_medical_history: bool = False
 
 
 class PetCreate(PetBase):
@@ -40,3 +43,10 @@ class Pet(PetBase):
 
     class Config:
         from_attributes = True
+
+
+class PaginatedPetsResponse(BaseModel):
+    """Respuesta paginada de mascotas."""
+
+    items: list[Pet]
+    pagination: PaginationMeta

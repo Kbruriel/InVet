@@ -4,6 +4,8 @@ from typing import Optional
 
 from pydantic import BaseModel, EmailStr
 
+from app.api.schemas.clinic_schemas import PaginationMeta
+
 
 class OwnerBase(BaseModel):
     """Esquema base para propietarios."""
@@ -11,6 +13,7 @@ class OwnerBase(BaseModel):
     first_name: str
     last_name: str
     email: EmailStr
+    clinic_id: Optional[int] = None
     phone: Optional[str] = None
     address: Optional[str] = None
     city: Optional[str] = None
@@ -41,3 +44,10 @@ class Owner(OwnerBase):
 
     class Config:
         from_attributes = True
+
+
+class PaginatedOwnersResponse(BaseModel):
+    """Respuesta paginada de propietarios."""
+
+    items: list[Owner]
+    pagination: PaginationMeta

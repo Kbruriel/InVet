@@ -16,12 +16,11 @@ class PetUseCase:
         return self.pet_repository.get_pet(pet_id)
 
     def get_pets(self, skip: int = 0, limit: int = 100) -> List[Pet]:
-        """Obtiene múltiples mascotas con paginación."""
+        """Obtiene multiples mascotas con paginacion."""
         return self.pet_repository.get_pets(skip, limit)
 
     def create_pet(self, pet_data: dict) -> Pet:
         """Crea una nueva mascota."""
-        # Aquí se podría agregar lógica de validación
         return self.pet_repository.create_pet(pet_data)
 
     def update_pet(self, pet_id: int, pet_data: dict) -> Optional[Pet]:
@@ -30,12 +29,15 @@ class PetUseCase:
 
     def delete_pet(self, pet_id: int) -> bool:
         """Elimina una mascota."""
-        # Aquí se podría agregar lógica de validación para evitar eliminaciones
-        # cuando la mascota tiene historial de tratamiento
+        pet = self.pet_repository.get_pet(pet_id)
+        if pet and getattr(pet, "has_medical_history", False):
+            raise ValueError(
+                "No se puede eliminar la mascota porque tiene historial medico"
+            )
         return self.pet_repository.delete_pet(pet_id)
 
     def get_pets_by_owner(
-        self, owner_id: int, skip: int = 0, limit: int = 100
+        self, owner_id: int, skip: int = 0, limit: Optional[int] = 100
     ) -> List[Pet]:
         """Obtiene mascotas por propietario."""
         return self.pet_repository.get_pets_by_owner(owner_id, skip, limit)

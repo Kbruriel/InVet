@@ -8,6 +8,7 @@ from app.api.v1.owner_router import router as owner_router
 from app.api.v1.pet_router import router as pet_router
 from app.api.v1.service_router import router as service_router
 from app.api.v1.veterinarian_router import router as veterinarian_router
+from app.api.v1.appointment_router import router as appointment_router
 
 router = APIRouter()
 
@@ -24,3 +25,4 @@ router.include_router(veterinarian_router)
 router.include_router(internal_user_router)
 router.include_router(owner_router)
 router.include_router(pet_router)
+router.include_router(appointment_router)
