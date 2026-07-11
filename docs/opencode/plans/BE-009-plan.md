@@ -73,19 +73,19 @@ Implementar funcionalidad para registrar consultas médicas asociadas a citas co
 ## Checklist de Tareas
 
 ### Backend (BE-009)
-1. [ ] Identificar/definir entidades `ConsultaMedica` (modelo, repo, DB schema).
-2. [ ] Crear casos de uso de `CrearConsultaMedica`, `ObtenerConsultaMedica`, `ListarConsultasPorMascota`.
-3. [ ] Implementar repositorios SQLAlchemy para consulta médica.
-4. [ ] Definir schemas Pydantic para entrada/salida de consultas.
-5. [ ] Crear routers FastAPI y exponer endpoints:  
+1. [x] Identificar/definir entidades `ConsultaMedica` (modelo, repo, DB schema).
+2. [x] Crear casos de uso de `CrearConsultaMedica`, `ObtenerConsultaMedica`, `ListarConsultasPorMascota`.
+3. [x] Implementar repositorios SQLAlchemy para consulta médica.
+4. [x] Definir schemas Pydantic para entrada/salida de consultas.
+5. [x] Crear routers FastAPI y exponer endpoints:  
        - POST `/api/v1/consultas`  
        - GET `/api/v1/consultas/{id}`  
        - GET `/api/v1/mascotas/{mascota_id}/consultas`
-6. [ ] Validar permisos de usuario veterinario en controladores y casos de uso.
+6. [x] Validar permisos de usuario veterinario en controladores y casos de uso.
 7. [ ] Aplicar migraciones Alembic si se modifican esquemas o se requiere nueva tabla.
-8. [ ] Agregar tests Pytest/HTTPX (happy path, error path, permisos).
-9. [ ] Verificar que los errores no filtran información interna o traceback.
-10. [ ] Asegurar que los routers no contengan lógica de negocio.
+8. [x] Agregar tests Pytest/HTTPX (happy path, error path, permisos).
+9. [x] Verificar que los errores no filtran información interna o traceback.
+10. [x] Asegurar que los routers no contengan lógica de negocio.
 
 ### Frontend (FE-009)
 1. [ ] Revisar endpoints de backend (`BE-009`).

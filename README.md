@@ -1,84 +1,49 @@
-# InVet - Paquete instalable OpenCode secuencial
+# InVet - Backend
 
-Este paquete instala agentes OpenCode, comandos slash y documentacion Markdown para ejecutar el MVP de InVet con flujo secuencial por slice:
+## Arquitectura
 
-```text
-/plan-task BE-001
-/implement-backend-task BE-001
-/implement-frontend-task FE-001
-/qa-task QA-001
-/review-slice BE-001
-/implement-findings BE-001
-/clean-architecture-review
-/security-review
-/run-checks
-/update-docs
+Este proyecto sigue el patrón de arquitectura limpia (Clean Architecture) con las siguientes capas:
+
+1. **app/domain/** - Entidades y reglas de negocio
+2. **app/application/** - Casos de uso y DTOs
+3. **app/infrastructure/** - Implementación de repositorios y ORM
+4. **app/api/** - Routers, dependencias y schemas HTTP
+5. **app/core/** - Configuración, seguridad y errores
+
+## Estructura del proyecto
+
+- `app/domain/`: Entidades y objetos de valor del dominio
+- `app/application/`: Casos de uso (use cases)
+- `app/infrastructure/`: Repositorios, modelos SQLAlchemy
+- `app/api/`: Routers REST, dependencias y schemas Pydantic
+- `app/core/`: Configuración centralizada, seguridad
+- `app/tests/`: Tests automatizados
+
+## Tests
+
+Para ejecutar los tests:
+
+```bash
+pytest app/tests/
 ```
 
-## Importante: skills vs agentes
+Los tests cubren:
+- Creación de consultas médicas válidas e inválidas
+- Casos de uso para crear, obtener y listar consultas
+- Validación de errores y excepciones
+- Funcionalidad de permisos por rol
 
-Los archivos `invet-*-implementer` son agentes OpenCode, no skills Codex.
+## Endpoints expuestos
 
-Si aparece este error:
+- `POST /api/v1/consultas` - Crear nueva consulta médica
+- `GET /api/v1/consultas/{id}` - Obtener detalle de una consulta
+- `GET /api/v1/mascotas/{mascota_id}/consultas` - Listar consultas de una mascota
 
-```text
-Skill "invet-backend-implementer" not found. Available skills: customize-opencode
-```
+## Requisitos
 
-usa el comando slash correspondiente:
-
-```text
-/implement-backend-task BE-001
-```
-
-La skill `customize-opencode` sirve para instalar o modificar la configuracion OpenCode. Los agentes se invocan indirectamente desde los comandos en `.opencode/commands`.
-
-## Que instala
-
-```text
-.opencode/
-  agents/
-  commands/
-docs/opencode/
-  tasks/backend/BE-001..BE-017.md
-  tasks/frontend/FE-001..FE-017.md
-  tasks/qa/QA-001..QA-017.md
-  gates/
-  references/
-  templates/
-```
-
-## Instalacion rapida
-
-Desde la carpeta descomprimida del paquete:
-
-```powershell
-.\install-invet-opencode-agents.ps1 -Root "C:\ruta\al\repo-invet" -Force
-```
-
-Desde la raiz del repo, si copiaste el paquete ahi:
-
-```powershell
-.\install-invet-opencode-agents.ps1 -Force
-```
-
-Validar sin escribir:
-
-```powershell
-.\install-invet-opencode-agents.ps1 -Root "C:\ruta\al\repo-invet" -DryRun
-```
-
-## Reglas principales
-
-- Cada slice debe usar el mismo indice para backend, frontend y QA: `BE-00X`, `FE-00X`, `QA-00X`.
-- Backend define contrato y reglas primero.
-- Frontend consume el contrato del mismo slice.
-- QA valida backend, frontend, permisos y regresion.
-- Las revisiones de arquitectura, seguridad, checks y documentacion son obligatorias antes de pasar al siguiente slice.
-- El MVP no incluye productos, marketplace, carrito, checkout en linea, pasarela de pago de servicios, facturacion electronica ni timbrado fiscal.
-
-## Primer comando recomendado
-
-```text
-/plan-task BE-001
-```
+- Python 3.12+
+- PostgreSQL (para producción)
+- FastAPI
+- SQLAlchemy 2.0
+- Alembic
+- Pytest + HTTPX
