@@ -1,6 +1,7 @@
 """
 Interfaz de repositorio para Veterinarios
 """
+
 from typing import List, Optional
 
 from app.domain.entities.veterinarian import (

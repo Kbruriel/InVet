@@ -1,4 +1,5 @@
 ﻿"""Implementación del repositorio de usuarios internos."""
+
 from typing import List, Optional
 
 from sqlalchemy.orm import Session

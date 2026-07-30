@@ -1,4 +1,5 @@
 ﻿"""Tests para verificar la configuración básica de la aplicación."""
+
 from fastapi.testclient import TestClient
 
 from app.api.main import app
@@ -26,3 +27,10 @@ def test_database_config():
     assert settings.POSTGRES_SERVER == "localhost"
     assert settings.POSTGRES_USER == "postgres"
     assert settings.POSTGRES_DB == "invet"
+
+
+def test_qa_env_file_is_supported():
+    env_files = settings.model_config.get("env_file")
+
+    assert env_files is not None
+    assert ".env.qa" in env_files

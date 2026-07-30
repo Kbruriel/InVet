@@ -1,6 +1,7 @@
 """
 Pruebas de integracion para la funcionalidad de citas.
 """
+
 from datetime import datetime, timedelta
 
 import pytest

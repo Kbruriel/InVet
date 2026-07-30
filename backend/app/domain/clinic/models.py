@@ -2,6 +2,7 @@
 Domain models for clinics.
 This module defines the core entities and value objects for clinic management.
 """
+
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Optional

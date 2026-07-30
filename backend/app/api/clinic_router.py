@@ -1,8 +1,10 @@
 """Routers for public profile and clinic administration endpoints."""
+
 from typing import Any, Dict, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, Response, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from jose import JWTError
 
 from app.api.dependencies import (
     get_branch_admin_use_case,
@@ -31,6 +33,8 @@ from app.application.use_cases.clinic_use_case import (
     GetBranchProfileUseCase,
     GetBranchProfileWithPermissionUseCase,
 )
+from app.core.config import settings
+from app.core.security import verify_token
 
 router = APIRouter(prefix="/clinics", tags=["Clinics"])
 branch_router = APIRouter(prefix="/branches", tags=["Branches"])
@@ -62,14 +66,61 @@ def get_current_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
+    token = credentials.credentials
+    payload = _decode_bearer_payload(token)
+    user_id = payload.get("sub")
+    if user_id is not None:
+        try:
+            return {"id": int(user_id)}
+        except (TypeError, ValueError) as exc:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Not authenticated",
+                headers={"WWW-Authenticate": "Bearer"},
+            ) from exc
+
     try:
-        return {"id": int(credentials.credentials)}
+        return {"id": int(token)}
     except ValueError as exc:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Not authenticated",
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
+
+
+def _decode_bearer_payload(token: str) -> dict[str, Any]:
+    try:
+        payload = verify_token(token)
+    except HTTPException:
+        return _decode_legacy_jwt(token)
+
+    if payload.get("sub") is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return payload
+
+
+def _decode_legacy_jwt(token: str) -> dict[str, Any]:
+    try:
+        from jose import jwt
+
+        payload = jwt.decode(
+            token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]
+        )
+    except JWTError:
+        return {}
+
+    if payload.get("sub") is None:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Not authenticated",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return payload
 
 
 @router.get("", response_model=PaginatedClinicsResponse)

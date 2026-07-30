@@ -14,7 +14,7 @@ Implementa tareas frontend pendientes del plan, respeta contratos API y sistema 
 
 ## invet-qa-validator
 
-Valida calidad funcional usando objetivos y criterios de aceptacion del plan, crea o ajusta pruebas cuando hace falta, ejecuta pruebas disponibles, documenta evidencia y marca tareas QA verificadas.
+Valida calidad funcional usando objetivos y criterios de aceptacion del plan, auto-recupera infraestructura QA local cuando es posible, crea o ajusta pruebas cuando hace falta, valida evidencia del runner, aplica regresion por impacto, documenta trazabilidad y marca tareas QA solo cuando existe evidencia PASS.
 
 ## invet-slice-reviewer
 

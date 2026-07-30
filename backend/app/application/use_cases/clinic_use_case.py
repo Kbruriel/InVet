@@ -1,4 +1,5 @@
 """Use cases for clinics, branches, and branch hours."""
+
 from typing import Dict, List, Optional
 
 from app.domain.entities.clinic import Branch, Clinic, Schedule

@@ -1,6 +1,7 @@
 """
 Entidad Usuario Interno
 """
+
 from datetime import datetime
 from typing import Optional
 

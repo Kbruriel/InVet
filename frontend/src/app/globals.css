@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+:root {
+  --brand-teal: #006065;
+  --brand-mint: #bcedda;
+  --surface-base: #fff8f0;
+  --surface-soft: #faf3e8;
+  --surface-muted: #f4ede2;
+  --ink-strong: #12343b;
+  --ink-soft: #4b6470;
+  --ring-soft: rgba(0, 96, 101, 0.25);
+}
+
+@theme inline {
+  --color-brand-teal: var(--brand-teal);
+  --color-brand-mint: var(--brand-mint);
+  --color-surface-base: var(--surface-base);
+  --color-surface-soft: var(--surface-soft);
+  --color-surface-muted: var(--surface-muted);
+  --color-ink-strong: var(--ink-strong);
+  --color-ink-soft: var(--ink-soft);
+  --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top right, rgba(188, 237, 218, 0.72), transparent 28%),
+    linear-gradient(180deg, #fffdf8 0%, var(--surface-base) 48%, #f8f1e4 100%);
+  color: var(--ink-strong);
+  font-family: var(--font-sans);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+:focus-visible {
+  outline: 3px solid var(--ring-soft);
+  outline-offset: 3px;
+}

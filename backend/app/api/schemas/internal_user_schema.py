@@ -1,6 +1,7 @@
 """
 Esquemas Pydantic para usuarios internos
 """
+
 from datetime import datetime
 from typing import Optional
 

@@ -28,7 +28,9 @@ The standard lifecycle for a slice is:
 /implement-frontend-task FE-00X
 /qa-task QA-00X
 /review-slice BE-00X
+/review-slice FE-00X
 /implement-findings BE-00X
+/implement-findings FE-00X
 /clean-architecture-review
 /security-review
 /run-checks
@@ -169,14 +171,15 @@ Important supporting files:
 - Marks completed QA validation tasks as `- [x]` only after evidence exists.
 - Writes `docs/opencode/qa/QA-00X-findings.md` when environment or execution issues block QA.
 
-`/review-slice BE-00X`
+`/review-slice BE-00X` o `/review-slice FE-00X`
 - Agent: `invet-slice-reviewer`
 - Reviews the plan and implementation of the slice.
 - Creates a Markdown findings report if corrections are required.
 
-`/implement-findings BE-00X`
+`/implement-findings BE-00X` o `/implement-findings FE-00X`
 - Agent: `invet-findings-implementer`
-- Fixes the findings raised by the slice review.
+- Fixes the findings raised by the slice review for the same vertical slice.
+- If invoked with `FE-00X`, it derives the matching `BE-00X` and keeps the same slice index.
 - Creates a Markdown corrections report and checklist.
 
 `/clean-architecture-review`

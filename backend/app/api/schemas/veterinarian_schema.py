@@ -1,6 +1,7 @@
 """
 Esquemas Pydantic para veterinarios
 """
+
 from datetime import datetime
 from typing import Optional
 

@@ -1,4 +1,5 @@
 """Casos de uso para propietarios."""
+
 from typing import List, Optional
 
 from app.domain.repositories.owner_repository import OwnerRepository

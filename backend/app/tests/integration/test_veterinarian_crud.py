@@ -1,6 +1,7 @@
 """
 Test de CRUD para veterinarios
 """
+
 from sqlalchemy.orm import Session
 
 from app.domain.entities.veterinarian import VeterinarianCreate, VeterinarianUpdate

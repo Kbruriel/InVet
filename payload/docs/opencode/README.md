@@ -22,12 +22,21 @@ Si aparece `Skill "invet-backend-implementer" not found`, revisa `12_troubleshoo
 /implement-frontend-task FE-00X
 /qa-task QA-00X
 /review-slice BE-00X
+/review-slice FE-00X
 /implement-findings BE-00X
+/implement-findings FE-00X
 /clean-architecture-review
 /security-review
 /run-checks
 /update-docs
 ```
+
+Notas:
+- `/plan-task` solo acepta `BE-00X` y nunca implementa codigo.
+- Para implementar frontend usa `/implement-frontend-task FE-00X`.
+- Para ejecutar QA usa `/qa-task QA-00X`.
+- Para revisar un slice puedes usar `/review-slice BE-00X` o `/review-slice FE-00X`.
+- Para cerrar hallazgos puedes usar `/implement-findings BE-00X` o `/implement-findings FE-00X`.
 
 ## Indice
 

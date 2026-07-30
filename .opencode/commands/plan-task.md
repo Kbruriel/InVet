@@ -7,7 +7,10 @@ Planifica el slice indicado por `$ARGUMENTS`.
 
 Instrucciones:
 0. Ejecuta de forma autonoma. Pregunta al usuario solo si falta informacion bloqueante, hay contradicciones criticas entre matriz/tareas/plan o se requiere decidir alcance.
-1. Normaliza el argumento a formato `BE-00X`.
+1. Acepta exclusivamente argumentos `BE-00X`.
+   - Si recibe `FE-00X`, no normalices ni implementes codigo: explica que `/plan-task` solo genera o actualiza el plan del slice vertical, no debe remapear silenciosamente a backend y redirige a `/implement-frontend-task FE-00X`.
+   - Si recibe `QA-00X`, no normalices ni implementes codigo: explica que `/plan-task` no ejecuta QA, no debe remapear silenciosamente a backend y redirige a `/qa-task QA-00X`.
+   - Solo si el argumento ya viene como `BE-00X`, continua con la planificacion.
 2. Identifica el frontend y QA equivalentes: `FE-00X` y `QA-00X`.
 3. Lee:
    - `docs/opencode/02_be_fe_qa_task_matrix.md`
@@ -33,6 +36,7 @@ Instrucciones:
    - `Paralelismo[P]: Si/No`
 7. Cada tarea debe tener un unico objetivo y criterios de aceptacion verificables.
 8. No implementes codigo fuente en este comando.
+   - `/plan-task` nunca implementa backend, frontend ni QA; solo crea o corrige `docs/opencode/plans/BE-00X-plan.md`.
 9. Si falta informacion critica, existen contradicciones entre matriz/tareas o no se pueden derivar criterios de aceptacion medibles:
    - Deten la planificacion solo cuando el gap sea bloqueante.
    - Haz preguntas concretas al usuario antes de guardar el plan final.

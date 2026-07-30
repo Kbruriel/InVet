@@ -1,4 +1,5 @@
 """Casos de uso para mascotas."""
+
 from typing import List, Optional
 
 from app.domain.repositories.pet_repository import PetRepository

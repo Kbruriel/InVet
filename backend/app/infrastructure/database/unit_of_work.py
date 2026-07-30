@@ -1,4 +1,5 @@
 """Manejo de Unit of Work para transacciones."""
+
 from typing import Generator
 
 from sqlalchemy.orm import Session

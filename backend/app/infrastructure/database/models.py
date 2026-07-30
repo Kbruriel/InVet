@@ -1,6 +1,7 @@
 """
 Modelos ORM de SQLAlchemy para la base de datos
 """
+
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text
 from sqlalchemy.sql import func
 

@@ -1,4 +1,5 @@
 """SQLAlchemy models for branch-related clinic data."""
+
 from datetime import datetime
 
 from sqlalchemy import (

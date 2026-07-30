@@ -1,4 +1,5 @@
 """Repository interfaces for clinics, branches, services, schedules, and ratings."""
+
 from abc import ABC, abstractmethod
 from typing import List, Optional
 

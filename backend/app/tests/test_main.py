@@ -1,4 +1,5 @@
 ﻿"""Tests iniciales para verificar el arranque básico de la aplicación."""
+
 from fastapi.testclient import TestClient
 
 from app.api.main import app

@@ -1,4 +1,5 @@
 """Manejo de sesiones de base de datos."""
+
 from __future__ import annotations
 
 import os
@@ -16,6 +17,7 @@ Base = declarative_base()
 
 def _build_engine(database_url: str):
     if database_url.startswith("sqlite"):
+        _reset_ephemeral_sqlite(database_url)
         return create_engine(
             database_url,
             connect_args={"check_same_thread": False},
@@ -39,6 +41,22 @@ def _initialize_sqlite_schema(engine) -> None:
     Base.metadata.create_all(bind=engine)
 
 
+def _reset_ephemeral_sqlite(database_url: str) -> None:
+    prefix = "sqlite:///"
+    if not database_url.startswith(prefix):
+        return
+
+    db_path = Path(database_url.removeprefix(prefix))
+    if not db_path.is_absolute():
+        db_path = Path.cwd() / db_path
+
+    if db_path.name != "qa-test.db":
+        return
+
+    if db_path.exists():
+        db_path.unlink()
+
+
 def _build_sqlite_fallback_engine():
     db_path = Path(tempfile.gettempdir()) / f"invet_test_{os.getpid()}.db"
     if db_path.exists():
@@ -56,6 +74,8 @@ def _build_sqlite_fallback_engine():
 def _create_engine():
     try:
         engine = _build_engine(settings.DATABASE_URL)
+        if settings.DATABASE_URL.startswith("sqlite"):
+            _initialize_sqlite_schema(engine)
         with engine.connect():
             pass
         return engine

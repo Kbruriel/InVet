@@ -1,8 +1,9 @@
 """Esquema Pydantic para propietarios."""
+
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, ConfigDict, EmailStr
 
 from app.api.schemas.clinic_schemas import PaginationMeta
 
@@ -37,13 +38,12 @@ class OwnerUpdate(OwnerBase):
 class Owner(OwnerBase):
     """Esquema para retornar propietarios."""
 
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     is_active: bool
     created_at: datetime
     updated_at: datetime
-
-    class Config:
-        from_attributes = True
 
 
 class PaginatedOwnersResponse(BaseModel):

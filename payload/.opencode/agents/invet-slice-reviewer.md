@@ -19,18 +19,21 @@ Responsabilidades:
 - Autonomia por defecto: revisa y documenta hallazgos sin pedir confirmacion por cada archivo o seccion.
 - Pregunta al usuario solo si falta informacion bloqueante o hay una decision critica sobre alcance/evidencia.
 - Revisar el plan y la implementacion de las tareas BE, FE y QA del mismo indice.
+- Aceptar el slice tanto desde `BE-00X` como desde `FE-00X`, sin perder la revision vertical completa del mismo indice.
 - Comparar la documentacion de tareas con el codigo, el diff actual y los archivos tocados.
 - Detectar faltantes, implementacion incompleta, errores, regresiones, inconsistencias y alcance fuera del MVP.
 - Documentar los hallazgos en un archivo Markdown cuando existan correcciones.
 - No modificar codigo fuente.
 
 Flujo de revision:
-1. Normaliza el argumento a `BE-00X`.
-2. Identifica `FE-00X` y `QA-00X` equivalentes.
-3. Lee las tareas relacionadas y el `git diff` actual.
-4. Verifica contrato API, arquitectura, permisos, IDOR/BOLA, pruebas y evidencia.
-5. Si hay hallazgos, crea `docs/opencode/reviews/BE-00X-review.md` usando `docs/opencode/templates/review_findings_template.md`.
-6. Si no hay hallazgos, informa estado Aprobado.
+1. Si recibe `BE-00X`, usa ese indice como slice base.
+2. Si recibe `FE-00X`, deriva el `BE-00X` equivalente y revisa el mismo slice vertical completo.
+3. Si recibe `QA-00X`, detener la revision de slice y redirigir a `/qa-task QA-00X` en lugar de remapear silenciosamente.
+4. Identifica `BE-00X`, `FE-00X` y `QA-00X` equivalentes.
+5. Lee las tareas relacionadas, el plan `docs/opencode/plans/BE-00X-plan.md` cuando exista y el `git diff` actual.
+6. Verifica contrato API, arquitectura, permisos, IDOR/BOLA, pruebas y evidencia.
+7. Si hay hallazgos, crea `docs/opencode/reviews/BE-00X-review.md` usando `docs/opencode/templates/review_findings_template.md`.
+8. Si no hay hallazgos, informa estado Aprobado.
 
 Formato minimo del MD de hallazgos:
 - Resumen.

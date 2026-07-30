@@ -7,9 +7,13 @@ Revisa el slice indicado por `$ARGUMENTS`.
 
 Instrucciones:
 0. Ejecuta de forma autonoma. Pregunta al usuario solo si falta informacion bloqueante o hay una decision critica sobre alcance/evidencia.
-1. Normaliza el argumento a formato `BE-00X`.
-2. Identifica `FE-00X` y `QA-00X` equivalentes.
+1. Acepta argumentos `BE-00X` o `FE-00X`.
+   - Si recibe `BE-00X`, usa ese indice como slice base y deriva `FE-00X` y `QA-00X`.
+   - Si recibe `FE-00X`, usa ese indice frontend como entrada valida, deriva el `BE-00X` equivalente y revisa el mismo slice vertical completo.
+   - Si recibe `QA-00X`, no lo remapees silenciosamente a review de slice; explica que para ejecutar validacion corresponde `/qa-task QA-00X`.
+2. Identifica `BE-00X`, `FE-00X` y `QA-00X` equivalentes.
 3. Lee:
+   - `docs/opencode/plans/BE-00X-plan.md` cuando exista.
    - `docs/opencode/tasks/backend/BE-00X.md`
    - `docs/opencode/tasks/frontend/FE-00X.md`
    - `docs/opencode/tasks/qa/QA-00X.md`

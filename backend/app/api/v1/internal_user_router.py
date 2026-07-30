@@ -1,4 +1,5 @@
 """Router para usuarios internos."""
+
 from typing import List
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status

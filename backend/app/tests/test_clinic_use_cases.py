@@ -1,4 +1,5 @@
 """Pruebas unitarias para casos de uso de clínicas."""
+
 from unittest.mock import AsyncMock
 
 import pytest

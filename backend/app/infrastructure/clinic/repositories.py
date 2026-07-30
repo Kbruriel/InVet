@@ -2,6 +2,7 @@
 Repository implementation for clinic entities.
 This module contains the data access layer for clinic operations.
 """
+
 from typing import List, Optional
 
 from sqlalchemy.orm import Session

@@ -2,6 +2,7 @@
 Database models for clinic entities.
 This module defines SQLAlchemy models for clinic data.
 """
+
 from sqlalchemy import Column, DateTime, Integer, String, Text
 from sqlalchemy.sql import func
 

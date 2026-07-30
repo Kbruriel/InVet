@@ -1,9 +1,12 @@
 """
 Schemas Pydantic para las citas.
 """
+
 from datetime import datetime
 from typing import Optional
-from pydantic import BaseModel
+
+from pydantic import BaseModel, ConfigDict
+
 
 # Schemas de entrada (request)
 class AppointmentCreateRequest(BaseModel):
@@ -14,9 +17,11 @@ class AppointmentCreateRequest(BaseModel):
     appointment_slot_id: int
     scheduled_date: datetime
 
+
 class AppointmentUpdateRequest(BaseModel):
     status: Optional[str] = None
     veterinarian_id: Optional[int] = None
+
 
 class AppointmentSlotCreateRequest(BaseModel):
     clinic_id: int
@@ -25,8 +30,11 @@ class AppointmentSlotCreateRequest(BaseModel):
     end_time: datetime
     is_available: bool = True
 
+
 # Schemas de salida (response)
 class AppointmentResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     owner_id: int
     veterinarian_id: Optional[int] = None
@@ -38,7 +46,10 @@ class AppointmentResponse(BaseModel):
     updated_at: datetime
     scheduled_date: datetime
 
+
 class AppointmentSlotResponse(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     clinic_id: int
     branch_id: int
@@ -47,6 +58,7 @@ class AppointmentSlotResponse(BaseModel):
     is_available: bool = True
     created_at: datetime
     updated_at: datetime
+
 
 # Schema de respuesta para listados
 class AppointmentListResponse(BaseModel):

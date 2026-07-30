@@ -44,10 +44,12 @@ Objetivo:
 - Corregir archivos solo si el usuario pidio explicitamente solucionar/corregir/fix errors.
 
 Checks backend:
-- Desde `backend/`: `python -m pytest app/tests -q`.
+- Desde `backend/`: `python -W ignore::PendingDeprecationWarning -m pytest app/tests -q`.
 - Desde `backend/`: `python -m ruff check .`.
 - Desde `backend/`: `python -m black --check .`.
 - Desde `backend/`: `python -m mypy app` si existe configuracion de mypy.
+- Antes de ejecutar, confirmar que el interprete seleccionado puede importar `pytest`, `ruff`, `black` y `mypy`.
+- Si faltan dependencias, reportar el bloqueo con la causa exacta y la instruccion de instalacion usando `backend/requirements.txt`.
 
 Referencias para ejecutar pruebas backend:
 - Windows PowerShell desde la raiz del repo: `cd backend` y luego `python -m pytest app/tests -q`.

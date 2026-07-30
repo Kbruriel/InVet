@@ -1,4 +1,5 @@
 ﻿"""Conexión a la base de datos PostgreSQL con SQLAlchemy 2.0."""
+
 from typing import Generator
 
 from sqlalchemy.orm import Session

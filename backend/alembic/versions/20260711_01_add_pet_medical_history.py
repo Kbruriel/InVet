@@ -1,8 +1,8 @@
 """Add has_medical_history to pets."""
 
-from alembic import op
 import sqlalchemy as sa
 
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "20260711_01"
@@ -14,7 +14,12 @@ depends_on = None
 def upgrade() -> None:
     op.add_column(
         "pets",
-        sa.Column("has_medical_history", sa.Boolean(), nullable=False, server_default=sa.false()),
+        sa.Column(
+            "has_medical_history",
+            sa.Boolean(),
+            nullable=False,
+            server_default=sa.false(),
+        ),
     )
 
 

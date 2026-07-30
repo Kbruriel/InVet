@@ -28,7 +28,9 @@ The standard lifecycle for a slice is:
 /implement-frontend-task FE-00X
 /qa-task QA-00X
 /review-slice BE-00X
+/review-slice FE-00X
 /implement-findings BE-00X
+/implement-findings FE-00X
 /clean-architecture-review
 /security-review
 /run-checks
@@ -123,15 +125,17 @@ Important supporting files:
 `invet-findings-implementer`
 - Mode: `all`
 - Objective: implement review findings, close corrections, and document the result.
-- Expected artifact: `docs/opencode/reviews/BE-00X-corrections.md` based on `docs/opencode/templates/corrections_checklist_template.md`.
+- Expected artifacts: `docs/opencode/reviews/BE-00X-corrections.md` based on `docs/opencode/templates/corrections_checklist_template.md`, plus any slice review files that feed the corrections flow.
 
 `invet-clean-architecture-reviewer`
 - Mode: `subagent`
 - Objective: verify backend layering and frontend modular separation without modifying code.
+- Expected artifact: `docs/opencode/reviews/BE-00X-clean-architecture-review.md` based on `docs/opencode/templates/review_findings_template.md`.
 
 `invet-security-reviewer`
 - Mode: `subagent`
 - Objective: verify OWASP concerns, permissions, IDOR/BOLA, token handling, logging, and data exposure without modifying code.
+- Expected artifact: `docs/opencode/reviews/BE-00X-security-review.md` based on `docs/opencode/templates/review_findings_template.md`.
 
 ### Operational support
 
@@ -169,23 +173,26 @@ Important supporting files:
 - Marks completed QA validation tasks as `- [x]` only after evidence exists.
 - Writes `docs/opencode/qa/QA-00X-findings.md` when environment or execution issues block QA.
 
-`/review-slice BE-00X`
+`/review-slice BE-00X` o `/review-slice FE-00X`
 - Agent: `invet-slice-reviewer`
 - Reviews the plan and implementation of the slice.
 - Creates a Markdown findings report if corrections are required.
 
-`/implement-findings BE-00X`
+`/implement-findings BE-00X` o `/implement-findings FE-00X`
 - Agent: `invet-findings-implementer`
-- Fixes the findings raised by the slice review.
+- Fixes the findings raised by the slice review for the same vertical slice.
+- If invoked with `FE-00X`, it derives the matching `BE-00X` and keeps the same slice index.
 - Creates a Markdown corrections report and checklist.
 
 `/clean-architecture-review`
 - Agent: `invet-clean-architecture-reviewer`
 - Global architecture gate.
+- Creates `docs/opencode/reviews/BE-00X-clean-architecture-review.md` when findings exist.
 
 `/security-review`
 - Agent: `invet-security-reviewer`
 - Global security gate.
+- Creates `docs/opencode/reviews/BE-00X-security-review.md` when findings exist.
 
 `/run-checks`
 - Agent: `invet-check-runner`
@@ -259,6 +266,8 @@ Expected artifact locations:
 ```text
 docs/opencode/plans/BE-00X-plan.md
 docs/opencode/reviews/BE-00X-review.md
+docs/opencode/reviews/BE-00X-clean-architecture-review.md
+docs/opencode/reviews/BE-00X-security-review.md
 docs/opencode/reviews/BE-00X-corrections.md
 ```
 

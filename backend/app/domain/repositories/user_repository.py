@@ -1,4 +1,5 @@
 """Interfaz del repositorio de usuarios."""
+
 from abc import ABC, abstractmethod
 from typing import List, Optional
 

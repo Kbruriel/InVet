@@ -1,6 +1,7 @@
 """
 Test de CRUD para usuarios internos
 """
+
 from sqlalchemy.orm import Session
 
 from app.domain.entities.internal_user import InternalUserCreate, InternalUserUpdate

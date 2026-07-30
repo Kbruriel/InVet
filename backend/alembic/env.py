@@ -1,4 +1,5 @@
 ﻿"""Alembic environment configuration."""
+
 # Añadir el directorio app al path de Python para poder importar modelos
 import sys
 from logging.config import fileConfig

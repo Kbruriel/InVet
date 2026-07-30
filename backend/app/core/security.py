@@ -1,4 +1,5 @@
 ﻿"""Funciones de seguridad y manejo de tokens."""
+
 from datetime import datetime, timedelta
 from typing import Optional
 

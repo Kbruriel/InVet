@@ -1,6 +1,7 @@
 """
 Casos de uso para la gestion de citas.
 """
+
 from typing import List, Optional
 
 from app.domain.entities.appointment import (
@@ -118,7 +119,9 @@ class RescheduleAppointmentUseCase:
             raise ValueError("No se pudo reservar la nueva franja horaria")
 
         try:
-            updated_appointment = self.appointment_repo.reschedule(appointment_id, new_slot_id)
+            updated_appointment = self.appointment_repo.reschedule(
+                appointment_id, new_slot_id
+            )
             if not updated_appointment:
                 self.slot_repo.mark_available(new_slot_id)
                 return None
@@ -183,7 +186,9 @@ class GetAvailableSlotsUseCase:
         self.slot_repo = slot_repo
 
     def execute(self, clinic_id: int, branch_id: int) -> List[AppointmentSlot]:
-        return self.slot_repo.find_available_slots_by_clinic_branch(clinic_id, branch_id)
+        return self.slot_repo.find_available_slots_by_clinic_branch(
+            clinic_id, branch_id
+        )
 
 
 class GetUserAppointmentsUseCase:

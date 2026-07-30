@@ -1,6 +1,7 @@
 """
 Test de endpoints API para veterinarios
 """
+
 import pytest
 from httpx import AsyncClient
 

@@ -1,4 +1,5 @@
 """Interface de repositorio para propietarios."""
+
 from abc import ABC, abstractmethod
 from typing import List, Optional
 

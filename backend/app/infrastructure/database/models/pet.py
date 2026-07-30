@@ -1,4 +1,5 @@
 """Modelo de mascota."""
+
 from datetime import datetime
 
 from sqlalchemy import (

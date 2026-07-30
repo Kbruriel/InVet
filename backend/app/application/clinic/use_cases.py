@@ -2,6 +2,7 @@
 Use cases for clinic management.
 This module contains the business logic for clinic operations.
 """
+
 from typing import List, Optional
 
 from app.domain.clinic.models import Clinic

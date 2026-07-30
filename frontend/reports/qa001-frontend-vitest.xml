@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="3" failures="0" errors="0" time="0.2827123">
+    <testsuite name="src/features/public-landing/components/public-search-bar.test.tsx" timestamp="2026-07-28T01:40:40.632Z" hostname="DESKTOP-4GVL3K4" tests="3" failures="0" errors="0" skipped="0" time="0.2827123">
+        <testcase classname="src/features/public-landing/components/public-search-bar.test.tsx" name="buildClinicSearchHref &gt; normalizes the clinic search route" time="0.0021164">
+        </testcase>
+        <testcase classname="src/features/public-landing/components/public-search-bar.test.tsx" name="PublicSearchBar &gt; shows a validation error when the query is empty" time="0.2563766">
+        </testcase>
+        <testcase classname="src/features/public-landing/components/public-search-bar.test.tsx" name="PublicSearchBar &gt; calls the search callback when a valid query is submitted" time="0.0228391">
+        </testcase>
+    </testsuite>
+</testsuites>

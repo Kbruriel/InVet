@@ -6,21 +6,24 @@ agent: invet-check-runner
 Ejecuta los checks tecnicos disponibles del repositorio y reporta pass/fail/skipped.
 
 Estrategia:
-0. Ejecuta de forma autonoma los checks configurados. Pregunta al usuario solo si falta informacion bloqueante, se requiere Docker/servicios externos o una decision critica.
-1. Detectar estructura del repo y herramientas configuradas antes de ejecutar.
-2. Backend:
+0. Antes de correr nada, verifica que el interprete Python seleccionado tenga instaladas las dependencias de backend declaradas en `backend/requirements.txt`.
+   - Si faltan `pytest`, `ruff`, `black` o `mypy`, reporta el bloqueo con la causa exacta y la instruccion de instalacion.
+   - Prioriza un entorno local ya preparado, como `backend/.venv` o `.venv`, si existe.
+1. Ejecuta de forma autonoma los checks configurados. Pregunta al usuario solo si falta informacion bloqueante, se requiere Docker/servicios externos o una decision critica.
+2. Detectar estructura del repo y herramientas configuradas antes de ejecutar.
+3. Backend:
    - Entrar a `backend/` si existe.
-   - Ejecutar `python -m pytest app/tests -q`.
+   - Ejecutar `python -W ignore::PendingDeprecationWarning -m pytest app/tests -q`.
    - Ejecutar `python -m ruff check .`.
    - Ejecutar `python -m black --check .`.
    - Ejecutar `python -m mypy app` si `mypy.ini` o configuracion equivalente existe.
-3. Frontend:
+4. Frontend:
    - Ejecutar checks solo si existe `frontend/package.json`.
    - Usar el gestor detectado por lockfile: pnpm, npm o yarn.
    - Ejecutar lint, typecheck, test y build solo si el script existe.
-4. DevOps:
+5. DevOps:
    - Docker Compose es opcional y solo se ejecuta con entorno/configuracion disponible y permiso explicito.
-5. Reportar comandos ejecutados, resultado, skips justificados y warnings relevantes.
+6. Reportar comandos ejecutados, resultado, skips justificados y warnings relevantes.
 
 Modo correccion:
 - Por defecto, `/run-checks` solo reporta resultados.

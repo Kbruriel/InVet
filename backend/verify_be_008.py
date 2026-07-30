@@ -12,7 +12,7 @@ print("- Validación de estados: PENDING, CONFIRMED, CANCELLED, NO_SHOW, COMPLET
 
 print("\n2. CASOS DE USO:")
 print("- CreateAppointmentUseCase")
-print("- ConfirmAppointmentUseCase") 
+print("- ConfirmAppointmentUseCase")
 print("- CancelAppointmentUseCase")
 print("- RescheduleAppointmentUseCase")
 print("- MarkNoShowUseCase")

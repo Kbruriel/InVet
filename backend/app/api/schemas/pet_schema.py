@@ -1,8 +1,9 @@
 """Esquema Pydantic para mascotas."""
+
 from datetime import datetime
 from typing import Optional
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict
 
 from app.api.schemas.clinic_schemas import PaginationMeta
 
@@ -33,16 +34,15 @@ class PetUpdate(PetBase):
     pass
 
 
-class Pet(PetBase):
+class Pet(BaseModel):
     """Esquema para retornar mascotas."""
+
+    model_config = ConfigDict(from_attributes=True)
 
     id: int
     is_active: bool
     created_at: datetime
     updated_at: datetime
-
-    class Config:
-        from_attributes = True
 
 
 class PaginatedPetsResponse(BaseModel):

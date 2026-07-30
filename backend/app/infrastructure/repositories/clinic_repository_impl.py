@@ -1,4 +1,5 @@
 """SQLAlchemy repositories for clinics, branches, services, schedules, and ratings."""
+
 from typing import List, Optional
 
 from sqlalchemy import and_, or_

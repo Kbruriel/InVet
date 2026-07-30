@@ -23,6 +23,12 @@ Get-ChildItem "C:\ruta\al\repo-invet\docs\opencode"
 
 ## 4. Ejecutar el primer slice
 
+Antes de lanzar `/run-checks`, confirma que el entorno de Python del backend tenga instaladas las dependencias de `backend/requirements.txt`.
+Si no estan presentes `pytest`, `ruff`, `black` o `mypy`, instala primero el backend en ese entorno y vuelve a ejecutar los checks.
+Para preparar el entorno QA automaticamente, ejecuta `python backend/scripts/prepare_qa_env.py --install-deps` desde la raiz del repo.
+Ese bootstrap crea `backend/.env.qa` con `sqlite:///./qa-test.db`, valida una base utilizable y deja listas las variables locales para pruebas.
+Si prefieres correrlos fuera de OpenCode, usa `.\run-checks.ps1` o `.\run-checks.cmd` desde la raiz del repo.
+
 ```text
 /plan-task BE-001
 /implement-backend-task BE-001

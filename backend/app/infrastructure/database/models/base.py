@@ -1,4 +1,5 @@
 """Modelo base para las entidades de la base de datos."""
+
 from typing import Any
 
 from sqlalchemy.ext.hybrid import hybrid_property

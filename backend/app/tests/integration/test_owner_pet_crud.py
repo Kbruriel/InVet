@@ -1,11 +1,11 @@
 """Pruebas de integracion para propietarios y mascotas."""
+
 from datetime import datetime
 
 import pytest
 from fastapi.testclient import TestClient
 
 from app.api.main import app
-from app.infrastructure.database.models.owner import Owner as OwnerDB
 from app.infrastructure.database.models.user import User as UserDB
 from app.infrastructure.database.session import get_db
 from app.infrastructure.models.clinic_models import ClinicDB

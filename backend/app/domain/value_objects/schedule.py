@@ -1,6 +1,7 @@
 """
 Value Objects para horarios
 """
+
 from datetime import time
 from typing import List
 

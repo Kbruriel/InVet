@@ -1,4 +1,5 @@
 """Pruebas para los endpoints de clínicas y sucursales."""
+
 import pytest
 from httpx import ASGITransport, AsyncClient
 
@@ -10,6 +11,7 @@ from app.api.dependencies import (
     get_clinic_admin_use_case,
 )
 from app.api.main import app
+from app.core.security import create_access_token
 from app.domain.entities.clinic import Branch, Rating, Schedule, Service
 
 
@@ -259,21 +261,21 @@ class FakeBranchHoursAdminUseCase:
 
 @pytest.fixture(autouse=True)
 def override_branch_use_cases():
-    app.dependency_overrides[
-        get_branch_profile_use_case
-    ] = lambda: FakePublicBranchProfileUseCase()
-    app.dependency_overrides[
-        get_branch_profile_with_permission_use_case
-    ] = lambda: FakeProtectedBranchProfileUseCase()
-    app.dependency_overrides[
-        get_clinic_admin_use_case
-    ] = lambda: FakeClinicAdminUseCase()
-    app.dependency_overrides[
-        get_branch_admin_use_case
-    ] = lambda: FakeBranchAdminUseCase()
-    app.dependency_overrides[
-        get_branch_hours_admin_use_case
-    ] = lambda: FakeBranchHoursAdminUseCase()
+    app.dependency_overrides[get_branch_profile_use_case] = (
+        lambda: FakePublicBranchProfileUseCase()
+    )
+    app.dependency_overrides[get_branch_profile_with_permission_use_case] = (
+        lambda: FakeProtectedBranchProfileUseCase()
+    )
+    app.dependency_overrides[get_clinic_admin_use_case] = (
+        lambda: FakeClinicAdminUseCase()
+    )
+    app.dependency_overrides[get_branch_admin_use_case] = (
+        lambda: FakeBranchAdminUseCase()
+    )
+    app.dependency_overrides[get_branch_hours_admin_use_case] = (
+        lambda: FakeBranchHoursAdminUseCase()
+    )
     yield
     app.dependency_overrides.pop(get_branch_profile_use_case, None)
     app.dependency_overrides.pop(get_branch_profile_with_permission_use_case, None)
@@ -333,6 +335,22 @@ async def test_list_clinics_returns_paginated_payload():
     payload = response.json()
     assert payload["items"][0]["name"] == "Clinica Central"
     assert payload["pagination"] == {"skip": 0, "limit": 10, "total": 1}
+
+
+@pytest.mark.asyncio
+async def test_list_clinics_accepts_jwt_bearer_token():
+    """Clinic administration list should also accept JWT bearer tokens."""
+    token = create_access_token({"sub": "1"})
+    transport = ASGITransport(app=app)
+    async with AsyncClient(transport=transport, base_url="http://test") as ac:
+        response = await ac.get(
+            "/api/v1/clinics",
+            headers={"Authorization": f"Bearer {token}"},
+            params={"skip": 0, "limit": 10},
+        )
+
+    assert response.status_code == 200
+    assert response.json()["pagination"] == {"skip": 0, "limit": 10, "total": 1}
 
 
 @pytest.mark.asyncio

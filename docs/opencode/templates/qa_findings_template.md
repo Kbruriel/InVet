@@ -1,28 +1,45 @@
 # Hallazgos de QA para slice QA-XXX
 
-## Resumen
+## Finding
 
-## Entorno y ejecución
+- Identificador:
+- Severidad: `blocker|critical|major|minor`
+- Criterio afectado:
+- Componente:
+- Ambiente:
+- Estado:
+
+## Contexto
+
+- Precondiciones:
+- Alcance del slice:
+- Archivos afectados:
+
+## Ejecucion
 
 - Comando o comandos ejecutados:
-- Resultado obtenido:
+- Codigo(s) de salida:
 - Resultado esperado:
-
-## Bloqueos
-
-### Configuracion del entorno
-
-### Ejecucion de pruebas
-
-### Dependencias faltantes
-
-## Impacto
+- Resultado observado:
+- Evidencia:
 
 ## Pasos para reproducir
 
-## Archivos afectados
+1. Paso 1
+2. Paso 2
+3. Paso 3
 
-## Recomendacion para `/implement-findings`
+## Impacto
+
+- Riesgo funcional:
+- Riesgo de seguridad o datos:
+- Riesgo de regresion:
+
+## Correccion sugerida
+
+- Prueba de regresion propuesta:
+- Recomendacion:
+- Bloqueos externos:
 
 ## Decision
 

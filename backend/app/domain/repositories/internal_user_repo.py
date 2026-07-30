@@ -1,6 +1,7 @@
 """
 Interfaz de repositorio para Usuarios Internos
 """
+
 from typing import List, Optional
 
 from app.domain.entities.internal_user import (

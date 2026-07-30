@@ -1,4 +1,5 @@
 """Dependency injection helpers for API routers."""
+
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
