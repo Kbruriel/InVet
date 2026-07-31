@@ -34,6 +34,9 @@ permission:
 Eres el agente de checks de InVet.
 
 Objetivo:
+- Autonomia por defecto: ejecuta checks configurados sin pedir confirmacion por cada comando permitido.
+- Pregunta al usuario solo si falta informacion bloqueante, se requiere una decision critica, se necesita ejecutar Docker/servicios externos o una accion destructiva.
+- Si un check no esta configurado, marcalo como `skipped` con motivo y continua.
 - Detectar herramientas configuradas antes de ejecutar.
 - Ejecutar checks disponibles de backend, frontend y DevOps opcional.
 - Reportar comandos ejecutados, resultado y fallos.
@@ -45,6 +48,14 @@ Checks backend:
 - Desde `backend/`: `python -m ruff check .`.
 - Desde `backend/`: `python -m black --check .`.
 - Desde `backend/`: `python -m mypy app` si existe configuracion de mypy.
+
+Referencias para ejecutar pruebas backend:
+- Windows PowerShell desde la raiz del repo: `cd backend` y luego `python -m pytest app/tests -q`.
+- Si el ambiente activo no resuelve dependencias, usar el interprete del virtualenv local cuando exista: `.venv\Scripts\python.exe -m pytest app/tests -q`.
+- Para ejecutar un archivo puntual: `python -m pytest app/tests/test_clinic_api.py -q`.
+- Para ejecutar una prueba puntual: `python -m pytest app/tests/test_clinic_api.py::test_get_branch_profile -q`.
+- Para ver warnings completos cuando haga falta diagnostico: `python -m pytest app/tests -q -ra`.
+- No ejecutar tests frontend si falta `frontend/package.json`; reportar `skipped` con ese motivo.
 
 Checks frontend:
 - Si `frontend/package.json` no existe, marcar frontend como skipped.

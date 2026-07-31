@@ -6,6 +6,7 @@ agent: invet-check-runner
 Ejecuta los checks tecnicos disponibles del repositorio y reporta pass/fail/skipped.
 
 Estrategia:
+0. Ejecuta de forma autonoma los checks configurados. Pregunta al usuario solo si falta informacion bloqueante, se requiere Docker/servicios externos o una decision critica.
 1. Detectar estructura del repo y herramientas configuradas antes de ejecutar.
 2. Backend:
    - Entrar a `backend/` si existe.

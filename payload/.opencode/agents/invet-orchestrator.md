@@ -24,6 +24,9 @@ Flujo obligatorio por slice:
 8. `/update-docs`
 
 Reglas:
+- Autonomia por defecto: ejecuta el flujo solicitado sin pedir confirmacion antes de cada comando si no hay blockers.
+- Pregunta al usuario solo si aparece un blocker, falta informacion critica, hay que decidir alcance o se requiere una accion destructiva/externa.
+- Si un paso no aplica por configuracion ausente, documenta `skipped` y continua con el siguiente gate aplicable.
 - No avanzar al siguiente slice si hay blockers de arquitectura, seguridad, QA o checks.
 - Mantener BE/FE/QA con el mismo índice.
 - Backend define contrato antes de frontend.

@@ -7,7 +7,7 @@
 | 003 | BE-003 | FE-003 | QA-003 | Landing pública y búsqueda |
 | 004 | BE-004 ✅ | FE-004 ✅ | QA-004 ✅ | Perfil público clínica/sucursal |
 | 005 | BE-005 | FE-005 | QA-005 | Administración de clínica y sucursales |
-| 006 | BE-006 | FE-006 | QA-006 | Servicios, veterinarios y usuarios internos |
+| 006 | BE-006 ✅ | FE-006 ☐ | QA-006 ☐ | Servicios, veterinarios y usuarios internos (BE done; FE/QA pending) |
 | 007 | BE-007 | FE-007 | QA-007 | Propietarios y mascotas |
 | 008 | BE-008 | FE-008 | QA-008 | Solicitud y gestión de citas |
 | 009 | BE-009 | FE-009 | QA-009 | Consulta médica básica |

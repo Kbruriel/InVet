@@ -13,7 +13,7 @@ class Veterinarian(Base):
     __tablename__ = "veterinarians"
 
     id = Column(Integer, primary_key=True, index=True)
-    clinic_id = Column(Integer, ForeignKey("clinics.id"), nullable=False)
+    branch_id = Column(Integer, ForeignKey("branches.id"), nullable=False)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
     email = Column(String, unique=True, nullable=False)
@@ -24,13 +24,13 @@ class Veterinarian(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
-    # Relación con clínica
-    clinic = relationship("Clinic", back_populates="veterinarians")
+    # Relación con sucursal
+    branch = relationship("Branch", back_populates="veterinarians")
 
 
-# Relación inversa en la tabla de clínica
-from app.infrastructure.database.models.clinic import Clinic
+# Relación inversa en la tabla de sucursal
+from app.infrastructure.database.models.branch import Branch
 
-Clinic.veterinarians = relationship(
-    "Veterinarian", order_by=Veterinarian.id, back_populates="clinic"
+Branch.veterinarians = relationship(
+    "Veterinarian", order_by=Veterinarian.id, back_populates="branch"
 )

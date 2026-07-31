@@ -6,6 +6,7 @@ agent: invet-backend-implementer
 Implementa la tarea backend indicada por `$ARGUMENTS`.
 
 Instrucciones:
+0. Ejecuta de forma autonoma. Pregunta al usuario solo si falta informacion bloqueante, hay una decision critica de alcance/seguridad o se requiere una accion destructiva/migracion irreversible.
 1. Normaliza el argumento a `BE-00X`.
 2. Identifica el plan generado por `/plan-task`: `docs/opencode/plans/BE-00X-plan.md`.
 3. Lee:

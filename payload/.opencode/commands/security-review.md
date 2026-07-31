@@ -6,6 +6,7 @@ agent: invet-security-reviewer
 Ejecuta revisión de seguridad sobre los cambios actuales.
 
 Instrucciones:
+0. Ejecuta de forma autonoma. Pregunta al usuario solo si falta informacion bloqueante, se requiere auditoria externa o hay una decision critica de riesgo/alcance.
 1. Revisa autenticación/autorización en endpoints privados.
 2. Valida controles por rol, permiso y contexto.
 3. Prueba o razona escenarios IDOR/BOLA.

@@ -6,6 +6,7 @@ agent: invet-frontend-implementer
 Implementa la tarea frontend indicada por `$ARGUMENTS`.
 
 Instrucciones:
+0. Ejecuta de forma autonoma. Pregunta al usuario solo si falta informacion bloqueante, hay una decision critica de alcance/UX o se requiere una accion destructiva.
 1. Normaliza el argumento a `FE-00X` e identifica el backend equivalente `BE-00X`.
 2. Identifica el plan generado por `/plan-task`: `docs/opencode/plans/BE-00X-plan.md`.
 3. Lee:
