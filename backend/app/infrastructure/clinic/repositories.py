@@ -3,6 +3,7 @@ Repository implementation for clinic entities.
 This module contains the data access layer for clinic operations.
 """
 from typing import List, Optional
+
 from sqlalchemy.orm import Session
 
 from app.domain.clinic.models import Clinic
@@ -18,7 +19,7 @@ class ClinicRepository:
     def __init__(self, db: Session):
         """
         Initialize the ClinicRepository with a database session.
-        
+
         Args:
             db: SQLAlchemy database session
         """
@@ -27,10 +28,10 @@ class ClinicRepository:
     def create(self, clinic_data: dict) -> Clinic:
         """
         Create a new clinic in the database.
-        
+
         Args:
             clinic_data: Dictionary containing clinic information
-            
+
         Returns:
             Created Clinic object
         """
@@ -39,17 +40,17 @@ class ClinicRepository:
         self.db.add(db_clinic)
         self.db.commit()
         self.db.refresh(db_clinic)
-        
+
         # Return domain model
         return self._db_to_domain(db_clinic)
 
     def get_by_id(self, clinic_id: int) -> Optional[Clinic]:
         """
         Retrieve a clinic by its ID from the database.
-        
+
         Args:
             clinic_id: The ID of the clinic to retrieve
-            
+
         Returns:
             Clinic object if found, None otherwise
         """
@@ -59,7 +60,7 @@ class ClinicRepository:
     def get_all(self) -> List[Clinic]:
         """
         Retrieve all clinics from the database.
-        
+
         Returns:
             List of Clinic objects
         """
@@ -69,11 +70,11 @@ class ClinicRepository:
     def update(self, clinic_id: int, clinic_data: dict) -> Optional[Clinic]:
         """
         Update an existing clinic in the database.
-        
+
         Args:
             clinic_id: The ID of the clinic to update
             clinic_data: Dictionary containing updated clinic information
-            
+
         Returns:
             Updated Clinic object if found, None otherwise
         """
@@ -84,19 +85,19 @@ class ClinicRepository:
         # Update fields
         for key, value in clinic_data.items():
             setattr(db_clinic, key, value)
-        
+
         self.db.commit()
         self.db.refresh(db_clinic)
-        
+
         return self._db_to_domain(db_clinic)
 
     def delete(self, clinic_id: int) -> bool:
         """
         Delete a clinic from the database.
-        
+
         Args:
             clinic_id: The ID of the clinic to delete
-            
+
         Returns:
             True if deletion was successful, False otherwise
         """
@@ -111,10 +112,10 @@ class ClinicRepository:
     def _db_to_domain(self, db_clinic: ClinicDB) -> Clinic:
         """
         Convert a database model to a domain model.
-        
+
         Args:
             db_clinic: Database clinic model instance
-            
+
         Returns:
             Domain clinic model instance
         """
@@ -129,6 +130,5 @@ class ClinicRepository:
             phone=db_clinic.phone,
             email=db_clinic.email,
             created_at=db_clinic.created_at,
-            updated_at=db_clinic.updated_at
+            updated_at=db_clinic.updated_at,
         )
-

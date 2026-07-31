@@ -1,15 +1,17 @@
 """Modelo de veterinario."""
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey
+
+from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
+
 from app.infrastructure.database.models.base import Base
 
 
 class Veterinarian(Base):
     """Modelo de veterinario para la base de datos."""
-    
+
     __tablename__ = "veterinarians"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     clinic_id = Column(Integer, ForeignKey("clinics.id"), nullable=False)
     first_name = Column(String, nullable=False)
@@ -21,7 +23,7 @@ class Veterinarian(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
-    
+
     # Relación con clínica
     clinic = relationship("Clinic", back_populates="veterinarians")
 
@@ -29,4 +31,6 @@ class Veterinarian(Base):
 # Relación inversa en la tabla de clínica
 from app.infrastructure.database.models.clinic import Clinic
 
-Clinic.veterinarians = relationship("Veterinarian", order_by=Veterinarian.id, back_populates="clinic")
+Clinic.veterinarians = relationship(
+    "Veterinarian", order_by=Veterinarian.id, back_populates="clinic"
+)

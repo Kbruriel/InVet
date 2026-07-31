@@ -13,6 +13,7 @@ class Clinic:
     Domain model for a clinic entity.
     This represents the core business entity for clinic information.
     """
+
     id: Optional[int] = None
     name: str = ""
     address: str = ""
@@ -33,4 +34,3 @@ class Clinic:
             self.created_at = datetime.utcnow()
         if self.updated_at is None:
             self.updated_at = datetime.utcnow()
-

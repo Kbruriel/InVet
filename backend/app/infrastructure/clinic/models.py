@@ -2,7 +2,7 @@
 Database models for clinic entities.
 This module defines SQLAlchemy models for clinic data.
 """
-from sqlalchemy import Column, Integer, String, DateTime, Text
+from sqlalchemy import Column, DateTime, Integer, String, Text
 from sqlalchemy.sql import func
 
 from app.core.database import Base
@@ -13,6 +13,7 @@ class Clinic(Base):
     SQLAlchemy model for clinic entity.
     This represents the database table structure for clinics.
     """
+
     __tablename__ = "clinics"
 
     id = Column(Integer, primary_key=True, index=True)
