@@ -28,11 +28,13 @@ usa el comando slash:
 .opencode/agents/*.md
 .opencode/commands/*.md
 docs/opencode/**/*.md
+backend/scripts/validate_slice_plan.py
 ```
 
 ## Comandos instalados
 
 ```text
+/execute-slice
 /plan-task
 /implement-backend-task
 /implement-frontend-task

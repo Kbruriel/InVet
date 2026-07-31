@@ -2,38 +2,44 @@
 
 ## Secuencia obligatoria
 
+La forma recomendada es:
+
+```text
+/execute-slice BE-001
+```
+
+La secuencia manual equivalente es:
+
 ```text
 /plan-task BE-001
 /implement-backend-task BE-001
 /implement-frontend-task FE-001
 /qa-task QA-001
 /review-slice BE-001
-/review-slice FE-001
+/clean-architecture-review BE-001
+/security-review BE-001
 /implement-findings BE-001
-/implement-findings FE-001
-/clean-architecture-review
-/security-review
-/run-checks
-/update-docs
+/qa-task QA-001
+/run-checks BE-001
+/update-docs BE-001
 ```
 
 ## Reglas
 
-1. `plan-task` siempre recibe un ID backend `BE-00X`.
-   Si el usuario envia `FE-00X` o `QA-00X`, el flujo correcto es redirigirlo a `/implement-frontend-task FE-00X` o `/qa-task QA-00X`; `plan-task` no debe remapear silenciosamente el argumento.
-2. `plan-task` genera `docs/opencode/plans/BE-00X-plan.md` con checklist numerado, objetivos, criterios de aceptacion y `Paralelismo[P]`.
+1. `plan-task` acepta `BE-00X`, `FE-00X` o `QA-00X`, informa la normalizacion y conserva el mismo indice vertical.
+2. `plan-task` genera un unico `docs/opencode/plans/BE-00X-plan.md` schema v2 con contrato frontend y tareas atomicas.
    Nunca implementa codigo de backend ni frontend.
-3. `implement-backend-task` implementa solo tareas backend pendientes del plan y marca `- [x]` cuando los criterios quedaron verificados.
-4. `implement-frontend-task` recibe el ID frontend equivalente `FE-00X`, implementa solo tareas frontend pendientes del plan y marca `- [x]` cuando los criterios quedaron verificados.
+3. Cada comando mutable ejecuta `backend/scripts/validate_slice_plan.py` antes de editar.
+4. Backend y frontend implementan sus pruebas unitarias y registran evidencia por tarea.
 5. `qa-task` recibe el ID QA equivalente `QA-00X`, valida usando objetivos y criterios del plan, y marca tareas QA o de validacion completadas.
-6. `qa-task` documenta evidencia y, si no puede ejecutar pruebas por ambiente/configuracion, genera `docs/opencode/qa/QA-00X-findings.md`.
-7. `review-slice` acepta `BE-00X` o `FE-00X`, revisa el plan y la implementacion del mismo slice vertical y deja `docs/opencode/reviews/BE-00X-review.md` si hay hallazgos.
-8. `clean-architecture-review` deja `docs/opencode/reviews/BE-00X-clean-architecture-review.md` si hay hallazgos.
-9. `security-review` deja `docs/opencode/reviews/BE-00X-security-review.md` si hay hallazgos.
+6. `qa-task` documenta evidencia, rechaza gaps unitarios y no repara pruebas unitarias de producto.
+7. `review-slice` acepta `BE-00X` o `FE-00X` y siempre deja `docs/opencode/reviews/BE-00X-review.md` con decision.
+8. `clean-architecture-review BE-00X` siempre deja `docs/opencode/reviews/BE-00X-clean-architecture-review.md`.
+9. `security-review BE-00X` siempre deja `docs/opencode/reviews/BE-00X-security-review.md`.
 10. `implement-findings` acepta `BE-00X` o `FE-00X`, toma el reporte de hallazgos, el archivo de bloqueo de QA o los archivos de review del slice y cierra correcciones sobre el mismo slice vertical.
-11. Las revisiones globales se ejecutan despues de QA.
-12. `run-checks` debe ejecutarse antes de `update-docs`.
-13. `update-docs` cierra el slice.
+11. `/implement-findings` deja findings QA en `READY_FOR_REVALIDATION`; QA es el unico que puede declarar `RESOLVED`.
+12. Las revisiones reciben un ID explicito y siempre escriben decision `APPROVED|REJECTED`.
+13. `run-checks BE-00X` deja evidencia Markdown antes de `update-docs BE-00X`.
 
 ## Ejemplo: busqueda publica
 
@@ -43,13 +49,12 @@
 /implement-frontend-task FE-003
 /qa-task QA-003
 /review-slice BE-003
-/review-slice FE-003
 /implement-findings BE-003
-/implement-findings FE-003
-/clean-architecture-review
-/security-review
-/run-checks
-/update-docs
+/qa-task QA-003
+/clean-architecture-review BE-003
+/security-review BE-003
+/run-checks BE-003
+/update-docs BE-003
 ```
 
 ## Resultado esperado por slice

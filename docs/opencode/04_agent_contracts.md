@@ -1,61 +1,63 @@
 # 04 - Agent Contracts
 
-## Agent Responsibilities
+## Contrato comun
 
-| Agent | Responsibilities |
-|-------|------------------|
-| `invet-backend-implementer` | Implements pending backend tasks from `docs/opencode/plans/BE-00X-plan.md`, verifies acceptance criteria, and marks completed tasks. |
-| `invet-frontend-implementer` | Implements pending frontend tasks from `docs/opencode/plans/BE-00X-plan.md`, verifies acceptance criteria, and marks completed tasks. |
-| `invet-qa-validator` | Validates slices using plan objectives and acceptance criteria, auto-recovers local QA infrastructure when possible, creates or adjusts tests, validates runner evidence, applies impact-based regression, records traceability, and marks QA validation tasks only when PASS evidence exists. |
-| `invet-clean-architecture-reviewer` | Reviews Clean Architecture compliance in backend and frontend modularization without modifying code and writes `docs/opencode/reviews/BE-00X-clean-architecture-review.md` when findings exist. |
-| `invet-security-reviewer` | Reviews OWASP security, IDOR/BOLA, tokens, permissions, logs, data exposure and writes `docs/opencode/reviews/BE-00X-security-review.md` when findings exist. |
-| `invet-docs-updater` | Updates InVet documentation after each slice with changelogs, task status, contracts, variables, migrations and tests. |
-| `invet-findings-implementer` | Implements findings from slice reviews, architecture/security gates and QA findings, then documents checklist and corrections in Markdown. |
-| `invet-product-planner` | Writes `docs/opencode/plans/BE-00X-plan.md` with numbered tasks, objectives, measurable acceptance criteria, and `Paralelismo[P]`. |
+- `BE-00X`, `FE-00X` y `QA-00X` representan un unico slice vertical.
+- El plan canonico es `docs/opencode/plans/BE-00X-plan.md`.
+- Los agentes intercambian estado mediante Markdown versionado, no memoria implicita.
+- Cada comando mutable ejecuta `backend/scripts/validate_slice_plan.py`.
+- Las tareas mecanicas de ejecucion pueden delegarse a `invet-command-executor` para conservar el razonamiento en el agente de dominio.
+- Una tarea completada requiere criterios verificados y `Evidencia` reproducible.
+- Un gate fallido detiene el flujo; no se convierte en `skipped`.
 
-## Slice Status Tracking
+## Responsabilidades
 
-### BE-004: Public clinic/branch profile
-- [x] Backend task implemented
-- [x] Frontend task implemented
-- [x] QA task performed
-- [x] Review completed
-- [x] Findings implemented
-- [x] Clean architecture review passed
-- [x] Security review passed
-- [x] Checks executed
+| Agente | Responsabilidad | Gate o salida |
+| --- | --- | --- |
+| `invet-orchestrator` | Ejecuta el slice completo y evita saltar etapas | Bloquea ante plan invalido, QA no aprobado, findings abiertos, reviews o checks rechazados |
+| `invet-product-planner` | Acepta IDs BE/FE/QA y crea el plan vertical schema v2 | `BE-00X-plan.md` validado |
+| `invet-backend-implementer` | Implementa tareas `Capa: backend` y sus pruebas unitarias | Criterios, validacion y evidencia por tarea |
+| `invet-frontend-implementer` | Implementa el contrato frontend y sus pruebas unitarias/de componente | Criterios, validacion y evidencia por tarea |
+| `invet-qa-validator` | Valida aceptacion, integracion, contrato, seguridad y regresion | `QA-00X-results.md` y decision `APPROVED|REJECTED|BLOCKED` |
+| `invet-slice-reviewer` | Revisa el slice vertical completo | `BE-00X-review.md` con decision |
+| `invet-clean-architecture-reviewer` | Revisa capas backend y modularidad frontend | `BE-00X-clean-architecture-review.md` con decision |
+| `invet-security-reviewer` | Revisa autenticacion, autorizacion, IDOR/BOLA y datos | `BE-00X-security-review.md` con decision |
+| `invet-findings-implementer` | Corrige findings y pruebas unitarias faltantes en la capa responsable | Correcciones y estado `READY_FOR_REVALIDATION` |
+| `invet-command-executor` | Ejecuta comandos, tests, lint, lectura de logs y reintentos mecanicos con Qwen3 Coder 30B | Salida cruda y evidencia reproducible |
+| `invet-command-executor-fallback` | Respaldo mecanico con GPT OSS 20B para comandos y verificaciones que requieran mas profundidad | Salida cruda y evidencia reproducible |
+| `invet-check-runner` | Ejecuta tests, lint, format, types y build | `BE-00X-checks.md` con decision |
+| `invet-docs-updater` | Documenta el cierre despues de aprobar gates | Changelog, contratos y estado final |
 
-## Updated Slice Status Matrix
+## Ownership de pruebas
 
-| Slice | Backend | Frontend | QA | Resultado |
-|---|---|---|---|---|
-| 001 | BE-001 | FE-001 | QA-001 | Base tecnica y design system |
-| 002 | BE-002 | FE-002 | QA-002 | Autenticacion y sesion |
-| 003 | BE-003 | FE-003 | QA-003 | Landing publica y busqueda |
-| 004 | BE-004 | FE-004 | QA-004 | Perfil publico clinica/sucursal |
-| 005 | BE-005 | FE-005 | QA-005 | Administracion de clinica y sucursales |
-| 006 | BE-006 | FE-006 | QA-006 | Servicios, veterinarios y usuarios internos |
-| 007 | BE-007 | FE-007 | QA-007 | Propietarios y mascotas |
-| 008 | BE-008 | FE-008 | QA-008 | Solicitud y gestion de citas |
-| 009 | BE-009 | FE-009 | QA-009 | Consulta medica basica |
-| 010 | BE-010 | FE-010 | QA-010 | Recetas, tratamientos y recordatorios |
-| 011 | BE-011 | FE-011 | QA-011 | Registro operativo de pagos de servicios |
-| 012 | BE-012 | FE-012 | QA-012 | Calificaciones y comentarios |
-| 013 | BE-013 | FE-013 | QA-013 | Notificaciones internas y correo |
-| 014 | BE-014 | FE-014 | QA-014 | Soporte basico |
-| 015 | BE-015 | FE-015 | QA-015 | Reportes operativos basicos |
-| 016 | BE-016 | FE-016 | QA-016 | Administracion inicial del sistema |
-| 017 | BE-017 | FE-017 | QA-017 | Hardening E2E MVP |
+| Tipo | Responsable |
+| --- | --- |
+| Unitarias backend | `invet-backend-implementer` |
+| Unitarias/componentes frontend | `invet-frontend-implementer` |
+| Unitarias faltantes reportadas | Agente de capa o `invet-findings-implementer` |
+| Aceptacion, integracion, contrato, seguridad y regresion | `invet-qa-validator` |
+| Certificacion final | `invet-qa-validator` |
 
-## Security and Risk Notes
+QA no repara y certifica el mismo gap unitario. Debe emitir `REJECTED`, dejar un finding y revalidar despues de la correccion.
 
-### Critical Security Issues Identified (BE-004)
-Security findings should now be captured in the dedicated review file for the slice and resolved through `/implement-findings`.
+## Lifecycle de findings QA
 
-## Document Structure Updated
-All documentation reflects current implementation with:
-- Clean Architecture compliance
-- Updated endpoints and contracts
-- Security considerations in place
-- QA evidence preserved
-- Findings corrections documented
+```text
+OPEN
+  -> IN_PROGRESS
+  -> READY_FOR_REVALIDATION
+  -> RESOLVED
+```
+
+- `/implement-findings` puede llegar hasta `READY_FOR_REVALIDATION`.
+- Solo `/qa-task` puede declarar `RESOLVED`.
+- `ACCEPTED_RISK` requiere una decision explicita y evidencia.
+- `OPEN`, `IN_PROGRESS` y `READY_FOR_REVALIDATION` bloquean el siguiente slice.
+
+## Fuente de verdad y distribucion
+
+- `.opencode`, `docs/opencode` y `backend/scripts` son los archivos operativos del repositorio.
+- `payload` es el espejo distribuible usado por `install-invet-opencode-agents.ps1`.
+- Las pruebas contractuales deben impedir divergencias en agentes, comandos, templates y validadores.
+- `invet-command-executor` es el ejecutor primario; `invet-command-executor-fallback` es el respaldo con `gpt-oss:20b`.
+- El respaldo se reserva para checks y logs, reintentos de comandos fallidos y correcciones mecanicas cuando el primario se quede corto.

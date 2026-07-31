@@ -17,6 +17,7 @@ from app.qa.validation import (
     SuiteExecution,
     TraceabilityStatus,
     analyze_changed_files,
+    analyze_unit_test_coverage,
     can_mark_qa_task_completed,
     classify_slice_decision,
 )
@@ -115,6 +116,22 @@ def test_high_severity_defects_prevent_approval(severity: DefectSeverity) -> Non
 
     assert summary.decision is FinalDecision.REJECTED
     assert any("F-001" in reason for reason in summary.reasons)
+
+
+def test_missing_unit_tests_prevent_approval() -> None:
+    coverage_report = analyze_unit_test_coverage(
+        ["backend/app/core/security.py"],
+        ["backend/app/tests/test_auth.py"],
+    )
+
+    summary = classify_slice_decision(
+        criteria=[make_passing_criterion()],
+        suite_executions=[make_passing_suite()],
+        unit_test_gaps=coverage_report.missing_gaps,
+    )
+
+    assert summary.decision is FinalDecision.REJECTED
+    assert any("Missing required unit tests" in reason for reason in summary.reasons)
 
 
 def test_zero_tests_discovered_blocks_the_decision() -> None:
@@ -301,3 +318,56 @@ def test_impact_analysis_requires_full_regression_for_shared_backend_files() -> 
     assert analysis.requires_full_regression
     assert "backend" in analysis.affected_areas
     assert "security" in analysis.affected_areas
+
+
+def test_unit_test_coverage_detects_missing_backend_tests() -> None:
+    report = analyze_unit_test_coverage(
+        ["backend/app/core/security.py"],
+        ["backend/app/tests/test_auth.py"],
+    )
+
+    assert report.required_source_files == ("backend/app/core/security.py",)
+    assert len(report.missing_gaps) == 1
+    assert report.missing_gaps[0].expected_test_files == (
+        "test_security.py",
+        "security_test.py",
+    )
+
+
+def test_unit_test_coverage_detects_missing_frontend_tests() -> None:
+    report = analyze_unit_test_coverage(
+        ["frontend/src/features/auth/login-form.tsx"],
+        ["frontend/src/features/auth/login-button.test.tsx"],
+    )
+
+    assert report.required_source_files == (
+        "frontend/src/features/auth/login-form.tsx",
+    )
+    assert len(report.missing_gaps) == 1
+    assert report.missing_gaps[0].expected_test_files == (
+        "login-form.test.ts",
+        "login-form.test.tsx",
+        "login-form.spec.ts",
+        "login-form.spec.tsx",
+    )
+
+
+def test_unit_test_coverage_accepts_matching_test_files_and_ignores_tests() -> None:
+    report = analyze_unit_test_coverage(
+        [
+            "backend/app/core/security.py",
+            "backend/app/tests/test_security.py",
+            "frontend/src/features/public-landing/components/public-search-bar.tsx",
+            "frontend/src/features/public-landing/components/public-search-bar.test.tsx",
+        ],
+        [
+            "backend/app/tests/test_security.py",
+            "frontend/src/features/public-landing/components/public-search-bar.test.tsx",
+        ],
+    )
+
+    assert report.is_satisfied
+    assert report.required_source_files == (
+        "backend/app/core/security.py",
+        "frontend/src/features/public-landing/components/public-search-bar.tsx",
+    )

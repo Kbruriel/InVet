@@ -1,117 +1,74 @@
 # 05 - Done Gates by Command
 
-## Command Execution Requirements
+Este archivo define requisitos, no el estado de un slice. Los checks permanecen sin marcar para evitar confundir el contrato con evidencia real.
 
-### `/plan-task BE-00X`
-- [x] Slice requirements understood
-- [x] Task breakdown completed
-- [x] Scope defined properly
-- [x] Technical feasibility validated
-- [x] Plan saved in `docs/opencode/plans/BE-00X-plan.md`
-- [x] Numbered checklist includes objective, measurable acceptance criteria, and `Paralelismo[P]`
+## `/plan-task BE-00X|FE-00X|QA-00X`
 
-### `/implement-backend-task BE-00X`
-- [x] Backend code implemented following Clean Architecture
-- [x] All requirements from task definition satisfied
-- [x] Backend tasks from `docs/opencode/plans/BE-00X-plan.md` implemented
-- [x] Completed backend tasks marked as `- [x]` only after acceptance criteria were verified
-- [x] Unit tests written for all components
-- [x] Code reviewed and linted
-- [x] Security considerations applied
+- [ ] El ID fue normalizado explicitamente al mismo slice.
+- [ ] El plan usa `schema_version: 2`.
+- [ ] Existe contrato frontend completo.
+- [ ] Hay tareas BE, FE y QA con IDs, capa, dependencias y entregables.
+- [ ] Cada tarea tiene criterios, validacion, evidencia y paralelismo.
+- [ ] Las tareas completadas contienen evidencia reproducible.
+- [ ] `validate_slice_plan.py --stage plan` termina en `PASS`.
 
-### `/implement-frontend-task FE-00X`
-- [x] Frontend code implemented
-- [x] Frontend tasks from `docs/opencode/plans/BE-00X-plan.md` implemented
-- [x] Completed frontend tasks marked as `- [x]` only after acceptance criteria were verified
-- [x] Component structure follows design guidelines
-- [x] API communication working properly
-- [x] Tests covering functionality
-- [x] Responsive and accessible UI
+## `/implement-backend-task BE-00X`
 
-### `/qa-task QA-00X`
-- [x] QA tests executed for all endpoints
-- [x] QA cases derived from plan objectives and acceptance criteria
-- [x] Results documented with traceability to plan tasks
-- [x] Completed QA tasks marked as `- [x]` only after validation evidence exists
-- [x] Positive and negative cases validated
-- [x] Regression testing completed
-- [x] Permission validation checked
-- [x] Security considerations verified
-- [x] Evidence of testing provided in `docs/opencode/qa/QA-00X-results.md`
+- [ ] El preflight backend pasa.
+- [ ] Solo se implementan tareas `Capa: backend`.
+- [ ] Las dependencias estan completas y evidenciadas.
+- [ ] Los archivos productivos modificados tienen pruebas unitarias.
+- [ ] La validacion de cada tarea pasa.
+- [ ] El plan contiene evidencia actualizada.
 
-### `/review-slice BE-00X|FE-00X`
-- [x] Review of implementation against requirements
-- [x] Architecture compliance validated
-- [x] Security issues identified and documented
-- [x] Quality standards reviewed
-- [x] Findings captured in `docs/opencode/reviews/BE-00X-review.md`
+## `/implement-frontend-task FE-00X`
 
-### `/implement-findings BE-00X`
-- [x] All findings from review implemented
-- [x] Corrections documented in `docs/opencode/reviews/BE-00X-corrections.md`
-- [x] Changes made to source code or documentation only
-- [x] No new functionality added outside of scope
-- [x] Validation performed on implemented fixes
+- [ ] El preflight frontend pasa.
+- [ ] El contrato frontend define rutas, flujos, API, formularios, arquitectura, accesibilidad y pruebas.
+- [ ] Solo se implementan tareas `Capa: frontend`.
+- [ ] Los archivos productivos modificados tienen pruebas unitarias/de componente.
+- [ ] Lint, typecheck, test y build aplicables pasan.
+- [ ] El plan contiene evidencia actualizada.
 
-### `/clean-architecture-review`
-- [x] Backend layers properly separated (API, Application, Domain, Infrastructure)
-- [x] No business logic in routers
-- [x] Domain entities remain independent from infrastructure concerns
-- [x] Interfaces properly defined as ports/abstractions
-- [x] Dependencies injected through proper patterns
-- [x] Findings captured in `docs/opencode/reviews/BE-00X-clean-architecture-review.md` when applicable
-- [x] Corrections can be consumed by `/implement-findings`
+## `/qa-task QA-00X`
 
-### `/security-review`
-- [x] Authentication, authorization and IDOR/BOLA controls evaluated
-- [x] Tokens, logs and public exposure reviewed
-- [x] Findings captured in `docs/opencode/reviews/BE-00X-security-review.md` when applicable
-- [x] Corrections can be consumed by `/implement-findings`
+- [ ] El plan schema v2 es valido.
+- [ ] Cada criterio tiene trazabilidad y estado.
+- [ ] Los reportes pertenecen a la corrida actual.
+- [ ] Los gaps unitarios producen `REJECTED` y findings `OPEN`.
+- [ ] QA no repara pruebas unitarias de producto.
+- [ ] La regresion relevante pasa.
+- [ ] La decision es `APPROVED`, `REJECTED` o `BLOCKED`.
+- [ ] Solo QA cambia findings a `RESOLVED`.
 
-### `/run-checks`
-- [x] Code quality checks passed
-- [x] Linting and formatting validated
-- [x] Type checking passed
-- [x] Tests execute successfully
+## Reviews
 
-### `/update-docs`
-- [x] All documentation updated with current status
-- [x] Endpoints, components, variables properly documented
-- [x] Decision logs updated
-- [x] Risk matrix updated with current status
-- [x] Changelogs and task status reflected
+- [ ] `/review-slice BE-00X` escribe `BE-00X-review.md`.
+- [ ] `/clean-architecture-review BE-00X` escribe su reporte.
+- [ ] `/security-review BE-00X` escribe su reporte.
+- [ ] Cada reporte contiene `Decision: APPROVED|REJECTED`.
+- [ ] Los reviews no infieren IDs ambiguos ni modifican producto.
 
-## Current Status - BE-004
+## `/implement-findings BE-00X|FE-00X`
 
-### Historical Example
-This section is kept as an example of how the gate contract is documented for a slice.
-Current security or architecture findings should be recorded in the dedicated review files:
-- `docs/opencode/reviews/BE-004-review.md`
-- `docs/opencode/reviews/BE-004-clean-architecture-review.md`
-- `docs/opencode/reviews/BE-004-security-review.md`
+- [ ] Corrige solo hallazgos del slice.
+- [ ] Agrega pruebas unitarias faltantes en la capa responsable.
+- [ ] Reejecuta validaciones relevantes.
+- [ ] Documenta correcciones.
+- [ ] Cambia findings QA a `READY_FOR_REVALIDATION`, no `RESOLVED`.
+- [ ] Deriva el cierre a `/qa-task QA-00X`.
 
-### Completed Gate Requirements:
-- All previous gates have been completed for BE-004
-- Clean Architecture implemented properly
-- QA validation complete
-- Findings addressed
-- Tests passing
+## `/run-checks BE-00X`
 
-## Implementation Notes:
+- [ ] QA y reviews estan aprobados.
+- [ ] Tests, lint, formato, tipos y build aplicables pasan.
+- [ ] Cada skip es realmente no aplicable.
+- [ ] Existe `docs/opencode/checks/BE-00X-checks.md`.
+- [ ] El reporte contiene `Decision: APPROVED`.
 
-### Backend Changes (BE-004):
-- **Endpoints**:
-  - `GET /api/v1/clinics/branches/{branch_id}` - Public profile without auth
-  - `GET /api/v1/clinics/{clinic_id}/{branch_id}` - Protected profile with auth
+## `/update-docs BE-00X`
 
-- **Architectural improvements**:
-  - Implemented dependency injection in `app/api/dependencies.py`
-  - Routers free of business logic
-  - Separation of concerns maintained
-
-- **Entities**:
-  - `Branch`, `Service`, `Schedule`, `Rating` models using Pydantic v2
-  - Entities properly separated from ORM concerns
-
-### Security Considerations:
-While Clean Architecture and functionality are solid, security findings should now be captured in the dedicated review file for the slice and resolved through `/implement-findings`.
+- [ ] Plan, QA, reviews y checks estan aprobados.
+- [ ] Contratos, riesgos, decisiones y changelog estan actualizados.
+- [ ] No quedan findings abiertos.
+- [ ] El estado final contiene enlaces a evidencia.

@@ -7,6 +7,7 @@ permission:
     "*": ask
     "git status*": allow
     "git diff*": allow
+    "python backend/scripts/validate_slice_plan.py*": allow
     "rg*": allow
     "find*": allow
   webfetch: deny
@@ -30,10 +31,11 @@ Flujo de revision:
 2. Si recibe `FE-00X`, deriva el `BE-00X` equivalente y revisa el mismo slice vertical completo.
 3. Si recibe `QA-00X`, detener la revision de slice y redirigir a `/qa-task QA-00X` en lugar de remapear silenciosamente.
 4. Identifica `BE-00X`, `FE-00X` y `QA-00X` equivalentes.
-5. Lee las tareas relacionadas, el plan `docs/opencode/plans/BE-00X-plan.md` cuando exista y el `git diff` actual.
-6. Verifica contrato API, arquitectura, permisos, IDOR/BOLA, pruebas y evidencia.
-7. Si hay hallazgos, crea `docs/opencode/reviews/BE-00X-review.md` usando `docs/opencode/templates/review_findings_template.md`.
-8. Si no hay hallazgos, informa estado Aprobado.
+5. Ejecuta `python backend/scripts/validate_slice_plan.py BE-00X --stage review`; no revises un slice sin QA aprobado.
+6. Lee las tareas, el plan y el `git diff` actual.
+7. Verifica contrato API, arquitectura, permisos, IDOR/BOLA, pruebas y evidencia.
+8. Crea siempre `docs/opencode/reviews/BE-00X-review.md` con decision `APPROVED` o `REJECTED`.
+9. Si hay hallazgos, usa `docs/opencode/templates/review_findings_template.md`.
 
 Formato minimo del MD de hallazgos:
 - Resumen.

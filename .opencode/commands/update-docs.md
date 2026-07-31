@@ -1,15 +1,17 @@
 ---
-description: Actualiza documentación Markdown posterior al slice.
+description: Actualiza documentacion Markdown despues de cerrar los gates del slice.
 agent: invet-docs-updater
 ---
 
-Actualiza documentación del proyecto después del slice actual.
+Actualiza la documentacion del slice indicado por `$ARGUMENTS`.
 
 Instrucciones:
-0. Ejecuta de forma autonoma. Pregunta al usuario solo si falta informacion bloqueante o hay una decision critica sobre estado/alcance.
-1. Revisa cambios implementados y resultados QA/checks.
-2. Actualiza `docs/opencode` según aplique.
-3. Documenta endpoints, componentes, decisiones, riesgos y pendientes.
-4. Mantén alcance MVP separado de Stage 1, Stage 2 y fuera de alcance.
-5. No modifiques código fuente.
-6. Resume archivos Markdown actualizados.
+1. Requiere `BE-00X`, `FE-00X` o `QA-00X` y normaliza el mismo indice vertical.
+2. Ejecuta `python backend/scripts/validate_slice_plan.py BE-00X --stage docs`.
+3. Si el preflight falla, no documentes el slice como cerrado.
+4. Revisa implementacion, QA, reviews y checks.
+5. Actualiza `docs/opencode` segun aplique.
+6. Documenta endpoints, componentes, decisiones, riesgos y pendientes.
+7. Manten separados MVP, Stage 1, Stage 2 y fuera de alcance.
+8. No modifiques codigo fuente.
+9. Resume los Markdown actualizados.

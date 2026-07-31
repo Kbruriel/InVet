@@ -53,6 +53,8 @@ def test_qa_agent_frontmatter_allows_known_safe_validation_commands() -> None:
         "python -m pytest*",
         "coverage*",
         "python -m coverage*",
+        "git ls-files*",
+        "rg*",
         "python -m pip install*",
         "pip install*",
         "git status*",
@@ -87,6 +89,11 @@ def test_qa_agent_body_includes_required_states_and_gates() -> None:
         "NOT_APPLICABLE",
         "frontend/package.json",
         "run-checks",
+        "sin pruebas unitarias explicitas",
+        "git ls-files",
+        "no reparar el gap dentro de QA",
+        "READY_FOR_REVALIDATION",
+        "Solo QA",
     ]
 
     for phrase in required_phrases:
@@ -103,6 +110,10 @@ def test_qa_command_invalidates_stale_frontend_not_applicable_results() -> None:
         "frontend/package.json",
         "run-checks",
         "evidencia stale",
+        "sin prueba unitaria",
+        "QA-00X-findings.md",
+        "QA no implementa esa prueba",
+        "solo una nueva corrida QA puede marcarlo `RESOLVED`",
     ]
 
     for phrase in required_phrases:
@@ -116,15 +127,19 @@ def test_qa_findings_template_has_required_fields() -> None:
 
     required_fields = [
         "Identificador",
+        "Tipo de hallazgo",
         "Severidad",
         "Criterio afectado",
         "Componente",
         "Ambiente",
         "Precondiciones",
+        "Gate afectado",
+        "Archivos sin pruebas unitarias",
         "Pasos para reproducir",
         "Resultado esperado",
         "Resultado observado",
         "Prueba de regresion propuesta",
+        "Accion requerida antes de continuar",
         "Estado",
     ]
 
@@ -146,8 +161,10 @@ def test_qa_results_template_has_required_sections() -> None:
         "Comandos ejecutados",
         "Codigos de salida",
         "Cobertura",
+        "Gate de pruebas unitarias",
         "Comparacion contra baseline",
         "Decision final",
+        "continuar con nuevas tareas",
     ]
 
     lower_template = template.lower()

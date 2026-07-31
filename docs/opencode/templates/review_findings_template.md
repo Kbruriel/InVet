@@ -2,6 +2,11 @@
 
 ## Resumen
 
+- Slice:
+- Tipo de review:
+- Estado: `OPEN|RESOLVED`
+- Decision: `APPROVED|REJECTED`
+
 ## Alcance revisado
 
 - Backend:
@@ -33,5 +38,5 @@
 
 ## Decision final
 
-- [ ] Aprobado
-- [ ] Rechazado
+- Decision: `APPROVED|REJECTED`
+- Evidencia:

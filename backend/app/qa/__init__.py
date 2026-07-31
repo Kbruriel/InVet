@@ -13,7 +13,10 @@ from .validation import (
     SuiteExecution,
     TestLevel,
     TraceabilityStatus,
+    UnitTestCoverageGap,
+    UnitTestCoverageReport,
     analyze_changed_files,
+    analyze_unit_test_coverage,
     can_mark_qa_task_completed,
     classify_slice_decision,
 )
@@ -31,7 +34,10 @@ __all__ = [
     "SuiteExecution",
     "TestLevel",
     "TraceabilityStatus",
+    "UnitTestCoverageGap",
+    "UnitTestCoverageReport",
     "analyze_changed_files",
+    "analyze_unit_test_coverage",
     "can_mark_qa_task_completed",
     "classify_slice_decision",
 ]

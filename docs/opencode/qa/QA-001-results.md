@@ -2,111 +2,115 @@
 
 ## Metadata
 
-- commit: `a5f3c37a35a5ae936649b6fdd815e8748db6e766`
-- branch: `BE-009`
-- timestamp: `2026-07-28`
+- commit: `e520374255d2d054ae3d99612031cbf45ab150b3`
+- branch: `FE-002`
+- timestamp: `2026-07-30 12:43:20 -06:00`
 - ambiente: `Windows + PowerShell + backend/frontend local`
-- versiones relevantes: `FastAPI`, `pytest`, `ruff`, `black`, `mypy`, `Next.js 16.2.9`, `TypeScript`, `Vitest`
+- versiones relevantes: `pytest`, `ruff`, `black`, `mypy`, `Next.js 16.2.9`, `TypeScript`, `Vitest`
 
 ## Alcance
 
 - alcance:
   - Smoke del backend (`/`, `/health`, `/api/v1/`)
-  - Configuracion base (`settings`)
-  - Helpers de seguridad (`hash`, `JWT`, validacion de token)
-  - Requerimiento de autenticacion en endpoints protegidos
+  - Configuracion base y utilidades de seguridad del slice `001`
+  - Requerimiento de autenticacion minima en endpoints protegidos
   - Smoke del frontend (`lint`, `typecheck`, `test`, `build`)
-  - Verificacion de rutas publicas, cliente API base y estados UX iniciales de `FE-001`
+  - Gate de pruebas unitarias explicitas para los archivos frontend del slice `FE-001`
 - fuera de alcance:
-  - Login/registro persistente y sesion completa, correspondientes al slice `002`
-  - Casos de negocio de busqueda real o disponibilidad en tiempo real, todavia fuera del alcance de `FE-001`
+  - Login/registro persistente y sesiones completas del slice `002`
+  - Casos de negocio posteriores a la base tecnica del slice `001`
 
 ## Matriz de trazabilidad
 
 | criterio | riesgo | caso de prueba | nivel | suite o archivo | comando | resultado | evidencia | estado |
 |---|---|---|---|---|---|---|---|---|
-| Smoke backend y healthcheck | Medio | Validar `/`, `/health` y `/api/v1/` | integration | `backend/app/tests/test_main.py`, `backend/app/tests/test_setup.py` | `python -m pytest app/tests -q --junitxml reports/qa001-backend-pytest.xml` | 110 pruebas backend OK | `backend/reports/qa001-backend-pytest.xml` con `collected=110`, `passed=110` | PASS |
-| Configuracion tecnica base | Medio | Validar `PROJECT_NAME`, `API_V1_STR`, defaults y arranque | unit | `backend/app/tests/test_main.py`, `backend/app/tests/test_setup.py` | `python -m pytest app/tests -q --junitxml reports/qa001-backend-pytest.xml` | configuraciones minimas verificadas | JUnit backend vigente y `.\run-checks.ps1` en PASS | PASS |
-| Tokens JWT | Alto | Generar y validar token con `sub` | unit | `backend/app/tests/test_security.py` | `python -m pytest app/tests -q --junitxml reports/qa001-backend-pytest.xml` | helpers y rutas protegidas cubiertos | backend pytest, `ruff`, `black` y `mypy` OK | PASS |
-| Rechazo de token invalido | Alto | Enviar token malformado | security | `backend/app/tests/test_security.py` | `python -m pytest app/tests -q --junitxml reports/qa001-backend-pytest.xml` | 401 esperado | suite backend vigente sin errores ni skips | PASS |
-| Auth requerida en endpoints protegidos | Alto | Solicitud sin credenciales y con JWT valido | integration | `backend/app/tests/test_clinic_api.py` | `python -m pytest app/tests -q --junitxml reports/qa001-backend-pytest.xml` | 401 sin auth y flujo valido con credenciales | backend pytest PASS en corrida actual | PASS |
-| Workspace frontend ejecutable | Alto | Verificar `package.json`, scripts y compilacion | frontend | `frontend/package.json`, `frontend/src/**` | `.\run-checks.ps1` | lint, typecheck, test y build frontend OK | `run-checks` valido `frontend lint`, `frontend typecheck`, `frontend test` y `frontend build` | PASS |
-| Estados UI y responsive base | Medio | Validar buscador publico, rutas reales y estados iniciales | frontend | `frontend/src/features/public-landing/components/public-search-bar.test.tsx` | `npx vitest run --reporter=default --reporter=junit --outputFile=reports/qa001-frontend-vitest.xml` | 3 pruebas frontend OK | `frontend/reports/qa001-frontend-vitest.xml` con `collected=3`, `passed=3` | PASS |
+| Smoke backend y healthcheck | Medio | Validar `/`, `/health` y `/api/v1/` | integration | `backend/app/tests/test_main.py`, `backend/app/tests/test_setup.py` | `python -m pytest app/tests -q --junitxml reports/qa001-backend-pytest-20260730-fixed.xml` | 120 pruebas backend OK, sin fallos | `backend/reports/qa001-backend-pytest-20260730-fixed.xml` | PASS |
+| Configuracion tecnica base | Medio | Validar defaults y soporte de `.env.qa` | unit | `backend/app/tests/test_setup.py` | `python -m pytest app/tests -q --junitxml reports/qa001-backend-pytest-20260730-fixed.xml` | Configuracion minima verificada | `backend/reports/qa001-backend-pytest-20260730-fixed.xml` | PASS |
+| Tokens JWT y autenticacion minima | Alto | Hash, JWT valido, token invalido y endpoint protegido | security | `backend/app/tests/test_security.py`, `backend/app/tests/test_clinic_api.py` | `python -m pytest app/tests -q --junitxml reports/qa001-backend-pytest-20260730-fixed.xml` | Helpers y auth minima OK | `backend/reports/qa001-backend-pytest-20260730-fixed.xml` | PASS |
+| Workspace frontend ejecutable | Alto | Ejecutar lint, typecheck, test y build | frontend | `frontend/package.json`, `frontend/src/**` | `.\run-checks.ps1` | Frontend smoke completo en PASS | corrida actual de `run-checks` del jueves 30 de julio de 2026 | PASS |
+| Interaccion base del buscador publico | Medio | Validar submit, error vacio y normalizacion de ruta | frontend | `frontend/src/features/public-landing/components/public-search-bar.test.tsx` | `npx vitest run --reporter=default --reporter=junit --outputFile=reports/qa001-frontend-vitest-20260730-fixed.xml` | 24 archivos, 35 pruebas frontend OK | `frontend/reports/qa001-frontend-vitest-20260730-fixed.xml` | PASS |
+| Gate de pruebas unitarias FE-001 | Alto | Auditar archivos fuente frontend contra pruebas unitarias explicitas | unit | `frontend/src/**`, `frontend/reports/qa001-frontend-unit-gaps-20260730-fixed.json` | `python` inline usando `backend/app/qa/validation.py` | 28 archivos requeridos, 0 gaps detectados | `frontend/reports/qa001-frontend-unit-gaps-20260730-fixed.json` | PASS |
 
 ## Criterios y estados
 
 - `PASS`:
   - Backend arranca y responde en rutas base.
   - La configuracion minima del slice puede ejecutarse sin infraestructura externa.
-  - Los helpers JWT y de hashing tienen pruebas unitarias explicitas.
-  - Los endpoints protegidos rechazan acceso sin autenticacion y aceptan JWT valido.
-  - `FE-001` ya no es `NOT_APPLICABLE`: existe app frontend ejecutable, rutas publicas reales, cliente API base y checks frontend en PASS.
+  - Los helpers JWT y el rechazo de autenticacion faltante o invalida tienen evidencia automatizada vigente.
+  - `run-checks` valida backend y frontend en la misma corrida actual.
+  - El frontend de `FE-001` ahora cuenta con pruebas unitarias explicitas para layout, paginas, cliente API, configuracion, shell, shared UI y componentes publicos base.
 - `FAIL`: ninguno.
 - `BLOCKED`: ninguno.
-- `NOT_APPLICABLE`: ninguno en la corrida actual.
+- `NOT_APPLICABLE`: ninguno.
 
 ## Comandos ejecutados
 
 ```text
-python -m pytest app/tests -q --junitxml reports/qa001-backend-pytest.xml
-npx vitest run --reporter=default --reporter=junit --outputFile=reports/qa001-frontend-vitest.xml
+python -m pytest app/tests -q --junitxml reports/qa001-backend-pytest-20260730-fixed.xml
+npx vitest run --reporter=default --reporter=junit --outputFile=reports/qa001-frontend-vitest-20260730-fixed.xml
+python inline usando backend/app/qa/validation.py para auditar gaps unitarios frontend
 .\run-checks.ps1
-python -m pytest app/tests/test_qa_agent_contracts.py app/tests/test_qa_validation.py -q
 ```
 
 ## Codigos de salida
 
-- suite: `run-checks`
-  - codigo: `0`
-  - reporte: `backend pytest`, `backend ruff`, `backend black`, `backend mypy`, `frontend lint`, `frontend typecheck`, `frontend test` y `frontend build` en PASS
 - suite: `backend pytest JUnit`
   - codigo: `0`
-  - reporte: `110 passed, 1 warning in 8.18s`
-- suite: `frontend vitest`
+  - reporte: `120 passed, 1 warning in 8.24s`
+- suite: `frontend vitest JUnit`
   - codigo: `0`
-  - reporte: `1 passed file`, `3 passed tests`, `0 failed`, `0 errors`
-- suite: `qa agent contracts`
+  - reporte: `24 passed files`, `35 passed tests`, `0 failed`, `0 errors`
+- suite: `frontend unit gap audit`
   - codigo: `0`
-  - reporte: `25 passed`
+  - reporte: `28 required source files`, `0 missing gaps`
+- suite: `run-checks`
+  - codigo: `0`
+  - reporte: backend `pytest`, `ruff`, `black`, `mypy`; frontend `lint`, `typecheck`, `test`, `build` en PASS
 
 ## Resumen por nivel de prueba
 
-- unit: hashing, JWT, configuracion
-- integration: smoke del backend y endpoints protegidos
+- unit: configuracion backend, helpers JWT, cliente API, config y shared UI frontend
+- integration: smoke del backend y rutas protegidas
 - contract: raiz versionada `/api/v1/`
 - end-to-end: no aplica en este slice base
 - regression: `.\run-checks.ps1` completo
-- security: token invalido, autenticacion requerida, JWT aceptado
-- frontend: lint, typecheck, vitest y build del frontend
+- security: token invalido, autenticacion requerida y JWT valido
+- frontend: render/smoke de layout, paginas, componentes publicos y utilidades
 - models-and-data: no requerido para el slice base
 
 ## Cobertura
 
 - cobertura global: no existe threshold configurado en el repo
-- cobertura de archivos modificados: verificada por `.\run-checks.ps1`, Vitest y pruebas de contratos QA
+- cobertura de archivos modificados: verificada con evidencia automatizada actual en backend y frontend
 - thresholds existentes: ninguno definido para coverage
-- disminuciones detectadas: ninguna observada
+- disminuciones detectadas: ninguna observada en la corrida actual
+
+## Gate de pruebas unitarias
+
+- archivos backend sin pruebas unitarias: no se detecto un gap material para los criterios auditados de `BE-001`
+- archivos frontend sin pruebas unitarias: ninguno
+- hallazgo documentado en: `docs/opencode/qa/QA-001-findings.md`
+- accion requerida antes de continuar: ninguna para el slice `001`
 
 ## Comparacion contra baseline
 
 - baseline usada: `docs/opencode/qa/QA-001-results.md` historico del mismo slice
-- fallos preexistentes: la corrida anterior marcaba frontend como `NOT_APPLICABLE`
+- fallos preexistentes: la corrida intermedia del jueves 30 de julio de 2026 habia rechazado `FE-001` por gaps de pruebas unitarias explicitas
 - regresiones nuevas: ninguna
 - fallos de ambiente: ninguno bloqueante
-- flakiness: no observada en esta corrida
+- flakiness: no observada en la corrida actual
 
 ## Pruebas omitidas y bloqueos
 
 - omitidas:
-  - Flujos funcionales completos de autenticacion de `FE-002` en adelante
+  - E2E completos de autenticacion, fuera de alcance del slice `001`
 - bloqueos: ninguno
 - riesgos residuales:
-  - La autenticacion completa con login/registro persiste fuera del alcance de `QA-001` y corresponde al slice `QA-002`
-  - El frontend actual valida base tecnica y shell publica, no comportamiento de negocio avanzado
+  - La autenticacion completa con login/registro sigue correspondiendo al slice `QA-002`
 
 ## Defects
 
-- identificador: ninguno
+- identificador: ninguno activo
 - severidad: N/A
 - criterio afectado: N/A
 - evidencia: N/A
@@ -114,4 +118,5 @@ python -m pytest app/tests/test_qa_agent_contracts.py app/tests/test_qa_validati
 ## Decision final
 
 - decision: `APPROVED`
-- justificacion: La corrida actual invalida la conclusion historica que trataba `FE-001` como no aplicable. El workspace ya contiene frontend ejecutable, `.\run-checks.ps1` valida backend y frontend en la misma ejecucion y todos los criterios aplicables del slice quedan en `PASS`.
+- justificacion: La corrida actual del jueves 30 de julio de 2026 confirma backend, frontend y gate de pruebas unitarias en PASS. El hallazgo `QA-001-F01` quedo corregido con pruebas unitarias explicitas para los modulos frontend del slice `FE-001`, sin gaps residuales en la auditoria estructural.
+- continuar con nuevas tareas: `SI`

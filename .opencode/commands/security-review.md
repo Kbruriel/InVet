@@ -1,20 +1,15 @@
 ---
-description: Revisa seguridad OWASP y documenta hallazgos que puedan consumirse con /implement-findings.
+description: Revisa seguridad de un slice identificado y escribe evidencia.
 agent: invet-security-reviewer
 ---
 
-Revisa los cambios actuales con foco en seguridad.
+Revisa la seguridad del slice indicado por `$ARGUMENTS`.
 
 Instrucciones:
-0. Ejecuta de forma autonoma. Pregunta al usuario solo si falta informacion bloqueante, se requiere auditoria externa o hay una decision critica de riesgo/alcance.
-1. Identifica el BE-00X afectado a partir del contexto, los archivos modificados o la rama actual.
-2. Revisa `git diff` y archivos modificados.
-3. Valida autenticacion y autorizacion en endpoints privados.
-4. Valida controles por rol, permiso y contexto.
-5. Prueba o razona escenarios IDOR/BOLA.
-6. Valida aislamiento por clinica, sucursal, empresa y propietario.
-7. Valida manejo de tokens, cookies y logs.
-8. Verifica que endpoints publicos no expongan datos internos.
-9. Si existen correcciones, crea `docs/opencode/reviews/BE-00X-security-review.md` con base en `docs/opencode/templates/review_findings_template.md`.
-10. Si no hay hallazgos, reporta estado Aprobado.
-11. No implementes codigo en este comando.
+1. Acepta `BE-00X` o `FE-00X`; si falta el ID, pregunta antes de continuar.
+2. Normaliza al mismo indice vertical y ejecuta `python backend/scripts/validate_slice_plan.py BE-00X --stage review`.
+3. Revisa plan, diff y archivos del slice.
+4. Valida autenticacion, autorizacion, IDOR/BOLA, aislamiento, tokens, logs y exposicion.
+5. Crea siempre `docs/opencode/reviews/BE-00X-security-review.md`.
+6. Emite `APPROVED` o `REJECTED` con evidencia.
+7. No modifiques codigo fuente.

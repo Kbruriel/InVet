@@ -35,10 +35,28 @@ def test_implement_frontend_task_bootstraps_fe001_workspace() -> None:
         encoding="utf-8"
     )
 
-    assert "aun no existe `frontend/package.json`" in command
+    assert "Si falta `frontend/package.json`" in command
     assert "scripts `lint`, `typecheck`, `test`, `build`" in command
     assert "docs/opencode/references/frontend_visual_alignment.md" in agent
     assert "DESIGN.md" not in agent
+
+
+def test_frontend_command_requires_valid_plan_and_unit_tests() -> None:
+    command = (REPO_ROOT / ".opencode/commands/implement-frontend-task.md").read_text(
+        encoding="utf-8"
+    )
+
+    required_phrases = [
+        "validate_slice_plan.py FE-00X --stage frontend",
+        "Contrato de implementacion frontend",
+        "Capa: frontend",
+        "Depende de",
+        "pruebas unitarias o de componente",
+        "Evidencia: pending",
+    ]
+
+    for phrase in required_phrases:
+        assert phrase in command
 
 
 def test_fe001_and_plan_require_executable_frontend() -> None:

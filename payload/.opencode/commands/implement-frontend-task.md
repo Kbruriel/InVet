@@ -6,21 +6,30 @@ agent: invet-frontend-implementer
 Implementa la tarea frontend indicada por `$ARGUMENTS`.
 
 Instrucciones:
-0. Ejecuta de forma autonoma. Pregunta al usuario solo si falta informacion bloqueante, hay una decision critica de alcance/UX o se requiere una accion destructiva.
-1. Normaliza el argumento a `FE-00X` e identifica el backend equivalente `BE-00X`.
-2. Identifica el plan generado por `/plan-task`: `docs/opencode/plans/BE-00X-plan.md`.
-3. Lee:
+0. Ejecuta de forma autonoma. Pregunta solo si falta informacion bloqueante, hay una decision critica de alcance/UX o se requiere una accion destructiva.
+1. Valida el argumento `FE-00X` e identifica `BE-00X` y `QA-00X` del mismo indice.
+2. Identifica el plan canonico `docs/opencode/plans/BE-00X-plan.md`.
+3. Ejecuta `python backend/scripts/validate_slice_plan.py FE-00X --stage frontend` antes de editar codigo.
+   - Si falla, deten la implementacion y reporta cada gap.
+   - Si el plan es legacy o incompleto, indica `/plan-task FE-00X`.
+4. Lee:
    - `docs/opencode/plans/BE-00X-plan.md`
    - `docs/opencode/tasks/frontend/FE-00X.md`
    - `docs/opencode/tasks/backend/BE-00X.md`
-4. Selecciona solo tareas pendientes `- [ ]` del plan que correspondan a frontend, UI, rutas, componentes, cliente API, validacion cliente, estados UX o pruebas frontend.
-5. Respeta `Paralelismo[P]`: si una tarea marca `No`, verifica que sus dependencias previas esten completas antes de implementarla.
-6. Implementa cada tarea usando su `Objetivo` y `Criterios de aceptacion` como contrato de alcance.
-7. Usa Next.js, TypeScript, React y Tailwind local.
-8. Aplica tokens y lineamientos de `docs/opencode/references/frontend_visual_alignment.md`.
-9. Implementa estados loading/error/empty/success cuando apliquen.
-10. Centraliza consumo API en `src/shared/api`.
-11. No agregues checkout, productos, marketplace, inventario ni facturacion.
-12. Marca como completadas en `docs/opencode/plans/BE-00X-plan.md` solo las tareas frontend cuyos criterios de aceptacion quedaron verificados, cambiando `- [ ]` por `- [x]`.
-13. Si una tarea no se puede completar, dejala como `- [ ]` y documenta el bloqueo debajo de la tarea o en el resumen final.
-14. Resume tareas completadas, rutas, componentes, contratos y pruebas ejecutadas.
+5. Verifica que `Contrato de implementacion frontend` defina rutas, flujos, API, formularios, componentes, accesibilidad y pruebas.
+6. Si falta `frontend/package.json` y el slice requiere base tecnica, crea un workspace ejecutable antes de implementar UI.
+   - Para `FE-001`, deja Next.js, TypeScript, Tailwind local, scripts `lint`, `typecheck`, `test`, `build`, estructura `src/` y pruebas verificables.
+7. Selecciona solo tareas pendientes con `Capa: frontend`.
+8. Verifica los IDs de `Depende de`; cada dependencia debe estar `- [x]` y tener evidencia.
+   - Si el backend aun no existe, solo continua cuando el plan documente un mock aprobado como entregable.
+9. Implementa usando `Objetivo`, `Entregables` y `Criterios de aceptacion` como contrato.
+10. Usa Next.js, TypeScript, React y Tailwind local.
+11. Aplica `docs/opencode/references/frontend_visual_alignment.md`.
+12. Implementa estados loading, submitting, error, empty y success, responsive y accesibilidad segun el contrato.
+13. Centraliza el consumo API en `src/shared/api`.
+14. Agrega pruebas unitarias o de componente para todo archivo productivo nuevo o modificado y pruebas de integracion cuando el flujo lo requiera.
+15. No delegues a QA las pruebas unitarias frontend.
+16. No agregues checkout, productos, marketplace, inventario ni facturacion.
+17. Marca `- [x]` solo tras ejecutar `Validacion`; reemplaza `Evidencia: pending` con archivos, comandos y resultado.
+18. Si una tarea no se completa, conserva `- [ ]`, `Evidencia: pending` y documenta el bloqueo.
+19. Resume tareas completadas, rutas, componentes, contratos y pruebas ejecutadas.

@@ -275,12 +275,36 @@ class ImpactAnalysis:
     requires_full_regression: bool
 
 
+@dataclass(frozen=True)
+class UnitTestCoverageGap:
+    source_file: str
+    layer: str
+    expected_test_files: tuple[str, ...]
+    reason: str = "Missing explicit unit tests for the changed source file."
+
+    def __post_init__(self) -> None:
+        object.__setattr__(self, "source_file", _normalize_path(self.source_file))
+        object.__setattr__(self, "expected_test_files", tuple(self.expected_test_files))
+
+
+@dataclass(frozen=True)
+class UnitTestCoverageReport:
+    required_source_files: tuple[str, ...]
+    discovered_test_files: tuple[str, ...]
+    missing_gaps: tuple[UnitTestCoverageGap, ...]
+
+    @property
+    def is_satisfied(self) -> bool:
+        return not self.missing_gaps
+
+
 def classify_slice_decision(
     *,
     criteria: Sequence[AcceptanceCriterionResult],
     suite_executions: Sequence[SuiteExecution],
     defects: Sequence[Defect] = (),
     regressions: Sequence[RegressionFinding] = (),
+    unit_test_gaps: Sequence[UnitTestCoverageGap] = (),
     secret_exposure: bool = False,
     pii_exposure: bool = False,
     required_suite_names: Sequence[str] = (),
@@ -291,6 +315,7 @@ def classify_slice_decision(
         suite_executions=suite_executions,
         defects=defects,
         regressions=regressions,
+        unit_test_gaps=unit_test_gaps,
         secret_exposure=secret_exposure,
         pii_exposure=pii_exposure,
         required_suite_names=required_suite_names,
@@ -361,6 +386,38 @@ def analyze_changed_files(changed_files: Iterable[str]) -> ImpactAnalysis:
     )
 
 
+def analyze_unit_test_coverage(
+    changed_files: Iterable[str],
+    discovered_test_files: Iterable[str],
+) -> UnitTestCoverageReport:
+    normalized_changed = tuple(_normalize_path(path) for path in changed_files)
+    normalized_tests = tuple(_normalize_path(path) for path in discovered_test_files)
+    required_source_files: list[str] = []
+    missing_gaps: list[UnitTestCoverageGap] = []
+
+    for source_file in normalized_changed:
+        if not _requires_unit_test_gate(source_file):
+            continue
+
+        required_source_files.append(source_file)
+        if _has_matching_unit_test(source_file, normalized_tests):
+            continue
+
+        missing_gaps.append(
+            UnitTestCoverageGap(
+                source_file=source_file,
+                layer=_layer_for_source_file(source_file),
+                expected_test_files=_expected_unit_test_files(source_file),
+            )
+        )
+
+    return UnitTestCoverageReport(
+        required_source_files=tuple(required_source_files),
+        discovered_test_files=normalized_tests,
+        missing_gaps=tuple(missing_gaps),
+    )
+
+
 def _is_shared_surface(path_parts: tuple[str, ...]) -> bool:
     shared_prefixes = {
         ("backend", "app", "core"),
@@ -383,6 +440,7 @@ def _collect_decision_reasons(
     suite_executions: Sequence[SuiteExecution],
     defects: Sequence[Defect],
     regressions: Sequence[RegressionFinding],
+    unit_test_gaps: Sequence[UnitTestCoverageGap],
     secret_exposure: bool,
     pii_exposure: bool,
     required_suite_names: Sequence[str],
@@ -403,6 +461,7 @@ def _collect_decision_reasons(
     blocked_reasons.extend(_criterion_blocks(applicable_criteria))
     rejected_reasons.extend(_blocking_defects(defects))
     rejected_reasons.extend(_regression_rejections(regressions))
+    rejected_reasons.extend(_unit_test_gap_rejections(unit_test_gaps))
     blocked_reasons.extend(_regression_blocks(regressions))
     blocked_reasons.extend(
         _missing_required_suites(
@@ -464,6 +523,17 @@ def _regression_blocks(regressions: Sequence[RegressionFinding]) -> list[str]:
     ]
 
 
+def _unit_test_gap_rejections(
+    unit_test_gaps: Sequence[UnitTestCoverageGap],
+) -> list[str]:
+    return [
+        "Missing required unit tests for "
+        f"{gap.source_file} ({gap.layer}); expected one of: "
+        + ", ".join(gap.expected_test_files)
+        for gap in unit_test_gaps
+    ]
+
+
 def _missing_required_suites(
     *,
     suite_executions: Sequence[SuiteExecution],
@@ -504,6 +574,64 @@ def _suite_specific_blocks(suite: SuiteExecution) -> list[str]:
     if not suite.critical or suite.skipped == 0:
         return []
     return [f"Suite {suite.suite_name} skipped critical tests ({suite.skipped})."]
+
+
+def _requires_unit_test_gate(path: str) -> bool:
+    normalized = _normalize_path(path)
+    suffix = PurePosixPath(normalized).suffix.lower()
+
+    if normalized.startswith("backend/app/"):
+        return (
+            suffix == ".py"
+            and "/tests/" not in normalized
+            and not normalized.endswith("__init__.py")
+        )
+
+    if normalized.startswith("frontend/src/"):
+        return (
+            suffix in {".ts", ".tsx"}
+            and not normalized.endswith(".d.ts")
+            and not _is_frontend_test_file(normalized)
+        )
+
+    return False
+
+
+def _layer_for_source_file(path: str) -> str:
+    normalized = _normalize_path(path)
+    if normalized.startswith("backend/"):
+        return "backend"
+    if normalized.startswith("frontend/"):
+        return "frontend"
+    return "unknown"
+
+
+def _expected_unit_test_files(path: str) -> tuple[str, ...]:
+    normalized = _normalize_path(path)
+    stem = PurePosixPath(normalized).stem
+    if normalized.startswith("backend/"):
+        return (f"test_{stem}.py", f"{stem}_test.py")
+    return (
+        f"{stem}.test.ts",
+        f"{stem}.test.tsx",
+        f"{stem}.spec.ts",
+        f"{stem}.spec.tsx",
+    )
+
+
+def _has_matching_unit_test(source_file: str, test_files: Sequence[str]) -> bool:
+    expected_names = {name.lower() for name in _expected_unit_test_files(source_file)}
+    for test_file in test_files:
+        test_name = PurePosixPath(test_file).name.lower()
+        if test_name in expected_names:
+            return True
+    return False
+
+
+def _is_frontend_test_file(path: str) -> bool:
+    normalized = _normalize_path(path).lower()
+    test_suffixes = (".test.ts", ".test.tsx", ".spec.ts", ".spec.tsx")
+    return normalized.endswith(test_suffixes)
 
 
 def _apply_primary_impact(

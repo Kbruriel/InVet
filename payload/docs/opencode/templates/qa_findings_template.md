@@ -3,17 +3,21 @@
 ## Finding
 
 - Identificador:
+- Tipo de hallazgo:
 - Severidad: `blocker|critical|major|minor`
 - Criterio afectado:
 - Componente:
 - Ambiente:
-- Estado:
+- Estado: `OPEN|IN_PROGRESS|READY_FOR_REVALIDATION|RESOLVED|ACCEPTED_RISK`
+- Gate afectado:
+- Propietario de cierre: `QA`
 
 ## Contexto
 
 - Precondiciones:
 - Alcance del slice:
 - Archivos afectados:
+- Archivos sin pruebas unitarias:
 
 ## Ejecucion
 
@@ -40,8 +44,11 @@
 - Prueba de regresion propuesta:
 - Recomendacion:
 - Bloqueos externos:
+- Accion requerida antes de continuar:
 
 ## Decision
 
 - [ ] Se puede resolver con `/implement-findings`.
 - [ ] Requiere intervencion adicional externa.
+- [ ] Correccion lista para revalidar (`READY_FOR_REVALIDATION`).
+- [ ] QA revalido y cerro el finding (`RESOLVED`).

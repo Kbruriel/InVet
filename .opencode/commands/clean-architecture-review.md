@@ -1,19 +1,15 @@
 ---
-description: Revisa Clean Architecture y documenta hallazgos que puedan consumirse con /implement-findings.
+description: Revisa Clean Architecture de un slice identificado y escribe evidencia.
 agent: invet-clean-architecture-reviewer
 ---
 
-Revisa los cambios actuales con foco en Clean Architecture.
+Revisa la arquitectura del slice indicado por `$ARGUMENTS`.
 
 Instrucciones:
-0. Ejecuta de forma autonoma. Pregunta al usuario solo si falta informacion bloqueante o hay una decision critica de alcance arquitectonico.
-1. Identifica el BE-00X afectado a partir del contexto, los archivos modificados o la rama actual.
-2. Revisa `git diff` y archivos modificados.
-3. Valida backend por capas: API, application, domain, infrastructure, core y tests.
-4. Valida que los routers no tengan logica de negocio.
-5. Valida que dominio no dependa de FastAPI, SQLAlchemy ni proveedores.
-6. Valida que ORM no se exponga.
-7. Valida frontend por rutas, features, shared UI y cliente API centralizado.
-8. Si existen correcciones, crea `docs/opencode/reviews/BE-00X-clean-architecture-review.md` con base en `docs/opencode/templates/review_findings_template.md`.
-9. Si no hay hallazgos, reporta estado Aprobado.
-10. No implementes codigo en este comando.
+1. Acepta `BE-00X` o `FE-00X`; si falta el ID, pregunta antes de continuar.
+2. Normaliza al mismo indice vertical y ejecuta `python backend/scripts/validate_slice_plan.py BE-00X --stage review`.
+3. Revisa plan, diff y archivos del slice.
+4. Valida capas backend y modularidad frontend.
+5. Crea siempre `docs/opencode/reviews/BE-00X-clean-architecture-review.md`.
+6. Emite `APPROVED` o `REJECTED` con evidencia.
+7. No modifiques codigo fuente.

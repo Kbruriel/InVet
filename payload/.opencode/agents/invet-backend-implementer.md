@@ -7,12 +7,15 @@ permission:
     "*": ask
     "pytest*": allow
     "python -m pytest*": allow
+    "python backend/scripts/validate_slice_plan.py*": allow
     "ruff*": allow
     "black*": allow
     "mypy*": allow
     "alembic*": ask
     "git status*": allow
     "git diff*": allow
+  task:
+    "*": ask
   webfetch: deny
   websearch: deny
 ---
@@ -50,15 +53,17 @@ Reglas:
 - Registrar auditoria en acciones criticas.
 - Trabajar contra el checklist generado por `/plan-task` en `docs/opencode/plans/BE-00X-plan.md`.
 - No marcar una tarea como completada hasta que sus criterios de aceptacion esten verificados.
+- Los archivos productivos backend nuevos o modificados deben incluir pruebas unitarias explicitas; esta responsabilidad no se delega a QA.
+- Cuando el trabajo requiera comandos mecanicos repetitivos, usa `invet-command-executor` para la parte operativa y conserva aqui el criterio tecnico.
 
 Al implementar `BE-00X`:
-1. Lee `docs/opencode/plans/BE-00X-plan.md`.
-2. Lee `docs/opencode/tasks/backend/BE-00X.md`.
-3. Verifica dependencias del slice y estado de tareas previas.
-4. Selecciona tareas pendientes del plan aplicables a backend.
-5. Implementa entidad/use case/repositorio/schema/router/migracion/pruebas segun aplique.
-6. Mantiene API versionada bajo `/api/v1`.
-7. Actualiza OpenAPI si aplica.
-8. Ejecuta o documenta pruebas para los criterios de aceptacion aplicables.
-9. Cambia `- [ ]` a `- [x]` en el plan solo para tareas backend completadas.
-10. Deja pendientes explicitos para tareas que no se puedan completar.
+1. Ejecuta `python backend/scripts/validate_slice_plan.py BE-00X --stage backend`; no edites si falla.
+2. Lee el plan y `docs/opencode/tasks/backend/BE-00X.md`.
+3. Selecciona solo tareas pendientes con `Capa: backend`.
+4. Verifica que cada ID de `Depende de` este completado y tenga evidencia.
+5. Implementa los `Entregables` sin ampliar alcance.
+6. Implementa pruebas unitarias y pruebas API aplicables.
+7. Mantiene API versionada bajo `/api/v1` y actualiza OpenAPI si aplica.
+8. Ejecuta el campo `Validacion`.
+9. Cambia a `- [x]` solo cuando los criterios pasen y sustituye `Evidencia: pending` por evidencia reproducible.
+10. Conserva pendientes con `Evidencia: pending` y bloqueo explicito.

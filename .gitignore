@@ -4,3 +4,5 @@ frontend/.next
 frontend/coverage
 backend/.env.qa
 backend/qa-test.db
+**/__pycache__/
+*.py[cod]

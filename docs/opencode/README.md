@@ -16,23 +16,32 @@ Si aparece `Skill "invet-backend-implementer" not found`, revisa `12_troubleshoo
 
 ## Flujo obligatorio por slice
 
+Flujo recomendado:
+
+```text
+/execute-slice BE-00X
+```
+
+Flujo manual equivalente:
+
 ```text
 /plan-task BE-00X
 /implement-backend-task BE-00X
 /implement-frontend-task FE-00X
 /qa-task QA-00X
 /review-slice BE-00X
-/review-slice FE-00X
-/implement-findings BE-00X
-/implement-findings FE-00X
-/clean-architecture-review
-/security-review
-/run-checks
-/update-docs
+/clean-architecture-review BE-00X
+/security-review BE-00X
+/implement-findings BE-00X  # solo si hay hallazgos
+/qa-task QA-00X             # repetir despues de correcciones
+/run-checks BE-00X
+/update-docs BE-00X
 ```
 
 Notas:
-- `/plan-task` solo acepta `BE-00X` y nunca implementa codigo.
+- `/plan-task` acepta `BE-00X`, `FE-00X` o `QA-00X`, normaliza el mismo indice y nunca implementa codigo.
+- Todos los IDs producen un unico plan canonico `docs/opencode/plans/BE-00X-plan.md`.
+- Los planes schema v2 se validan con `backend/scripts/validate_slice_plan.py`.
 - Para implementar frontend usa `/implement-frontend-task FE-00X`.
 - Para ejecutar QA usa `/qa-task QA-00X`.
 - Para revisar un slice puedes usar `/review-slice BE-00X` o `/review-slice FE-00X`.
@@ -55,6 +64,7 @@ Los archivos de hallazgos esperados son:
 - `11_chatgpt_project_context.md`: contexto consolidado para usar el proyecto en ChatGPT.
 - `12_troubleshooting_skills_vs_agents.md`: solucion al error de confundir skills Codex con agentes OpenCode.
 - `templates`: plantillas Markdown para resultados, hallazgos y correcciones.
+- `templates/slice_plan_template.md`: contrato obligatorio de planes schema v2.
 - `tasks/backend`: tareas backend.
 - `tasks/frontend`: tareas frontend.
 - `tasks/qa`: tareas QA.

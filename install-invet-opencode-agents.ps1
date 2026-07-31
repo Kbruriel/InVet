@@ -59,6 +59,12 @@ $items = @(
   @{ Source = 'payload/docs/opencode';      Target = 'docs/opencode';      Label = 'Documentación y tareas Markdown' }
 )
 
+$items += @{
+  Source = 'payload/backend/scripts'
+  Target = 'backend/scripts'
+  Label = 'Validadores de gates'
+}
+
 $copied = 0
 $skipped = 0
 $backedUp = 0
@@ -110,7 +116,7 @@ foreach ($item in $items) {
 
 if (-not $DryRun) {
   Write-Ok "Instalación completada. Archivos copiados: $copied. Omitidos: $skipped. Respaldados: $backedUp."
-  Write-Info "Comandos disponibles esperados: /plan-task, /implement-backend-task, /implement-frontend-task, /qa-task, /review-slice, /implement-findings, /clean-architecture-review, /security-review, /run-checks, /update-docs"
+  Write-Info "Comandos disponibles esperados: /execute-slice, /plan-task, /implement-backend-task, /implement-frontend-task, /qa-task, /review-slice, /implement-findings, /clean-architecture-review, /security-review, /run-checks, /update-docs"
   Write-Info "Nota: invet-backend-implementer es un agente OpenCode, no una skill Codex. Usa /implement-backend-task BE-00X."
   Write-Info "Siguiente ejecución sugerida: /plan-task BE-001"
   if ($Force -and (-not $NoBackup) -and $backedUp -gt 0) {

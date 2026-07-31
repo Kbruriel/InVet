@@ -40,14 +40,14 @@ Skill invet-backend-implementer
 
 | Objetivo | Uso correcto | Agente usado internamente |
 |---|---|---|
-| Planificar slice | `/plan-task BE-00X` | `invet-product-planner` |
+| Planificar slice | `/plan-task BE-00X|FE-00X|QA-00X` | `invet-product-planner` |
 | Implementar backend | `/implement-backend-task BE-00X` | `invet-backend-implementer` |
 | Implementar frontend | `/implement-frontend-task FE-00X` | `invet-frontend-implementer` |
 | Ejecutar QA | `/qa-task QA-00X` | `invet-qa-validator` |
 | Revisar slice | `/review-slice BE-00X` o `/review-slice FE-00X` | `invet-slice-reviewer` |
 | Implementar hallazgos | `/implement-findings BE-00X` o `/implement-findings FE-00X` | `invet-findings-implementer` |
 
-`/plan-task` no implementa codigo y no debe usarse con `FE-00X` para intentar disparar frontend.
+`/plan-task FE-00X` planifica el mismo slice vertical y no implementa frontend. Para implementar usa `/implement-frontend-task FE-00X`.
 
 ## Verificacion
 

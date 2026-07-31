@@ -1,16 +1,15 @@
 ---
-description: Revisa cumplimiento de Clean Architecture backend y modularidad frontend.
+description: Revisa Clean Architecture de un slice identificado y escribe evidencia.
 agent: invet-clean-architecture-reviewer
 ---
 
-Ejecuta revisión de arquitectura limpia sobre los cambios actuales.
+Revisa la arquitectura del slice indicado por `$ARGUMENTS`.
 
 Instrucciones:
-0. Ejecuta de forma autonoma. Pregunta al usuario solo si falta informacion bloqueante o hay una decision critica de alcance arquitectonico.
-1. Revisa `git diff` y archivos modificados.
-2. Valida backend por capas: API, application, domain, infrastructure, core, tests.
-3. Valida que los routers no tengan lógica de negocio.
-4. Valida que dominio no dependa de FastAPI/SQLAlchemy/proveedores.
-5. Valida que ORM no se exponga.
-6. Valida frontend por rutas, features, shared UI y cliente API centralizado.
-7. Entrega Aprobado/Rechazado con hallazgos por severidad.
+1. Acepta `BE-00X` o `FE-00X`; si falta el ID, pregunta antes de continuar.
+2. Normaliza al mismo indice vertical y ejecuta `python backend/scripts/validate_slice_plan.py BE-00X --stage review`.
+3. Revisa plan, diff y archivos del slice.
+4. Valida capas backend y modularidad frontend.
+5. Crea siempre `docs/opencode/reviews/BE-00X-clean-architecture-review.md`.
+6. Emite `APPROVED` o `REJECTED` con evidencia.
+7. No modifiques codigo fuente.

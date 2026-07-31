@@ -9,23 +9,27 @@ Instrucciones:
 0. Ejecuta de forma autonoma. Pregunta al usuario solo si falta informacion bloqueante, hay una decision critica de alcance/seguridad o se requiere una accion destructiva/migracion irreversible.
 1. Normaliza el argumento a `BE-00X`.
 2. Identifica el plan generado por `/plan-task`: `docs/opencode/plans/BE-00X-plan.md`.
-3. Lee:
+3. Ejecuta `python backend/scripts/validate_slice_plan.py BE-00X --stage backend` antes de editar codigo.
+   - Si falla, deten la implementacion y reporta cada gap.
+   - Si el plan es legacy o incompleto, indica `/plan-task BE-00X`.
+4. Lee:
    - `docs/opencode/plans/BE-00X-plan.md`
    - `docs/opencode/tasks/backend/BE-00X.md`
    - `docs/opencode/02_be_fe_qa_task_matrix.md`
-4. Selecciona solo tareas pendientes `- [ ]` del plan que correspondan a backend, API, dominio, persistencia, migraciones, seguridad backend o pruebas backend.
-5. Respeta `Paralelismo[P]`: si una tarea marca `No`, verifica que sus dependencias previas esten completas antes de implementarla.
-6. Implementa cada tarea usando su `Objetivo` y `Criterios de aceptacion` como contrato de alcance.
-7. Manten Clean Architecture:
+5. Selecciona solo tareas pendientes con `Capa: backend`.
+6. Verifica los IDs de `Depende de`; cada dependencia debe estar `- [x]` y tener evidencia.
+7. Implementa usando `Objetivo`, `Entregables` y `Criterios de aceptacion` como contrato.
+8. Manten Clean Architecture:
    - router/adapters en `app/api`.
    - use cases en `app/application`.
    - entidades/reglas/ports en `app/domain`.
    - ORM/repositorios/proveedores en `app/infrastructure`.
    - config/security/errors en `app/core`.
-8. Agrega o actualiza migraciones Alembic si aplica.
-9. Agrega pruebas Pytest/HTTPX que validen los criterios de aceptacion aplicables.
-10. No expongas modelos ORM.
-11. Valida permisos y pertenencia de tenant/propietario/clinica/sucursal.
-12. Marca como completadas en `docs/opencode/plans/BE-00X-plan.md` solo las tareas backend cuyos criterios de aceptacion quedaron verificados, cambiando `- [ ]` por `- [x]`.
-13. Si una tarea no se puede completar, dejala como `- [ ]` y documenta el bloqueo debajo de la tarea o en el resumen final.
-14. Resume tareas completadas, archivos modificados, endpoints y pruebas ejecutadas.
+9. Agrega o actualiza migraciones Alembic si aplica.
+10. Agrega pruebas unitarias Pytest para todo archivo productivo nuevo o modificado y pruebas HTTPX cuando el criterio sea de API.
+11. No delegues a QA las pruebas unitarias backend.
+12. No expongas modelos ORM.
+13. Valida permisos y pertenencia de tenant/propietario/clinica/sucursal.
+14. Marca `- [x]` solo tras ejecutar `Validacion`; reemplaza `Evidencia: pending` con archivos, comandos y resultado.
+15. Si una tarea no se completa, conserva `- [ ]`, `Evidencia: pending` y documenta el bloqueo.
+16. Resume tareas completadas, archivos modificados, endpoints y pruebas ejecutadas.

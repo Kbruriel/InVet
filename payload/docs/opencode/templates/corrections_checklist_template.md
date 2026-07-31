@@ -24,4 +24,5 @@
 ## Cierre
 
 - [ ] Todas las correcciones del hallazgo quedaron aplicadas.
-- [ ] El slice puede revalidarse o avanzar.
+- [ ] Findings QA cambiados a `READY_FOR_REVALIDATION`.
+- [ ] El slice puede revalidarse; solo QA puede declarar `RESOLVED`.

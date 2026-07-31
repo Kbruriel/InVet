@@ -59,6 +59,13 @@ python -m mypy app
 - thresholds existentes:
 - disminuciones detectadas:
 
+## Gate de pruebas unitarias
+
+- archivos backend sin pruebas unitarias:
+- archivos frontend sin pruebas unitarias:
+- hallazgo documentado en:
+- accion requerida antes de continuar:
+
 ## Comparacion contra baseline
 
 - baseline usada:
@@ -84,3 +91,4 @@ python -m mypy app
 
 - decision: `APPROVED|REJECTED|BLOCKED`
 - justificacion:
+- continuar con nuevas tareas: `SI|NO`

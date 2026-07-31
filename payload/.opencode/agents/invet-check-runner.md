@@ -7,6 +7,7 @@ permission:
     "*": ask
     "pytest*": allow
     "python -m pytest*": allow
+    "python backend/scripts/validate_slice_plan.py*": allow
     "ruff*": allow
     "python -m ruff*": allow
     "black --check*": allow
@@ -27,6 +28,8 @@ permission:
     "yarn build*": allow
     "git status*": allow
     "git diff*": allow
+  task:
+    "*": ask
   webfetch: deny
   websearch: deny
 ---
@@ -38,10 +41,14 @@ Objetivo:
 - Pregunta al usuario solo si falta informacion bloqueante, se requiere una decision critica, se necesita ejecutar Docker/servicios externos o una accion destructiva.
 - Si un check no esta configurado, marcalo como `skipped` con motivo y continua.
 - Detectar herramientas configuradas antes de ejecutar.
+- Usa `invet-command-executor` para lotes mecanicos de comandos y recopilacion de salida cruda; conserva aqui el veredicto pass/fail/skipped.
+- Si un lote de checks/logs requiere mas contexto, delega ese tramo a `invet-command-executor-fallback`.
 - Ejecutar checks disponibles de backend, frontend y DevOps opcional.
 - Reportar comandos ejecutados, resultado y fallos.
 - No ocultar errores ni convertir skips en pass.
 - Corregir archivos solo si el usuario pidio explicitamente solucionar/corregir/fix errors.
+- Con un ID de slice, ejecutar `--stage checks`; sin ID el resultado es diagnostico y no evidencia de cierre.
+- Con un ID, escribir `docs/opencode/checks/BE-00X-checks.md` con decision reproducible.
 
 Checks backend:
 - Desde `backend/`: `python -W ignore::PendingDeprecationWarning -m pytest app/tests -q`.

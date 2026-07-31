@@ -23,27 +23,35 @@ Work is organized through OpenCode agents and slash commands.
 The standard lifecycle for a slice is:
 
 ```text
-/plan-task BE-00X
+/execute-slice BE-00X
+```
+
+Manual flow:
+
+```text
+/plan-task BE-00X|FE-00X|QA-00X
 /implement-backend-task BE-00X
 /implement-frontend-task FE-00X
 /qa-task QA-00X
 /review-slice BE-00X
-/review-slice FE-00X
 /implement-findings BE-00X
-/implement-findings FE-00X
-/clean-architecture-review
-/security-review
-/run-checks
-/update-docs
+/qa-task QA-00X
+/clean-architecture-review BE-00X
+/security-review BE-00X
+/run-checks BE-00X
+/update-docs BE-00X
 ```
 
 General rules:
-- Always start from a backend slice ID `BE-00X`.
+- Planning accepts BE, FE, or QA IDs and normalizes the same slice index.
 - Keep backend, frontend, and QA aligned by index.
 - Backend defines contracts first.
 - Frontend consumes the contract of the same slice.
 - QA validates the full slice.
 - Reviews, checks, and documentation must be closed before advancing.
+- Use `invet-command-executor` for mechanical command batches, test runs, log collection, and repeat verifications.
+- Use `invet-command-executor-fallback` with `gpt-oss:20b` when the primary executor is unavailable or a heavier reasoning pass is worth the cost.
+- Reserve the fallback for checks and logs, failed-command retries, and mechanical fixes that need more context than the primary executor can comfortably carry.
 
 Skill usage rule:
 - The available Codex skill is `customize-opencode`.
@@ -92,8 +100,8 @@ Important supporting files:
 
 `invet-product-planner`
 - Mode: `subagent`
-- Objective: translate a `BE-00X` task into an actionable MVP slice plan in `docs/opencode/plans/BE-00X-plan.md`.
-- Output: objective, MVP scope, out-of-scope, entities, business rules, endpoints, frontend components, QA cases, risks, Definition of Done, and numbered checklist with measurable acceptance criteria and `Paralelismo[P]`.
+- Objective: translate a BE, FE, or QA ID into one schema v2 vertical plan in `docs/opencode/plans/BE-00X-plan.md`.
+- Output: backend contract, detailed frontend contract, QA scope, dependencies, deliverables, validation, evidence, and measurable tasks.
 
 ### Implementation
 
@@ -113,7 +121,7 @@ Important supporting files:
 
 `invet-qa-validator`
 - Mode: `all`
-- Objective: validate the slice using plan objectives and acceptance criteria, create or adjust tests when needed, execute available tests, validate happy path, negative path, permissions, IDOR/BOLA, regression, and evidence.
+- Objective: validate acceptance, integration, contract, security and regression; reject missing product unit tests without repairing them.
 - Expected artifact: QA evidence in Markdown with traceability to plan tasks, completed QA validation tasks marked in the plan, and a findings file when execution or configuration blocks occur.
 
 `invet-slice-reviewer`
@@ -126,6 +134,16 @@ Important supporting files:
 - Mode: `all`
 - Objective: implement review findings, close corrections, and document the result.
 - Expected artifacts: `docs/opencode/reviews/BE-00X-corrections.md` based on `docs/opencode/templates/corrections_checklist_template.md`, plus any slice review files that feed the corrections flow.
+
+`invet-command-executor`
+- Mode: `all`
+- Objective: run command-heavy work, tests, lint, diffs, log collection, and repeat checks with the local Qwen3 Coder 30B model.
+- Expected artifact: exact command output and any safe mechanical fix requested by the parent agent.
+
+`invet-command-executor-fallback`
+- Mode: `all`
+- Objective: serve as the higher-capacity mechanical fallback when the primary executor is unavailable or a deeper pass is needed.
+- Expected artifact: exact command output and any safe mechanical fix requested by the parent agent.
 
 `invet-clean-architecture-reviewer`
 - Mode: `subagent`
@@ -149,10 +167,10 @@ Important supporting files:
 
 ## Command structure
 
-`/plan-task BE-00X`
+`/plan-task BE-00X|FE-00X|QA-00X`
 - Agent: `invet-product-planner`
 - Produces `docs/opencode/plans/BE-00X-plan.md`.
-- The plan includes numbered checklist tasks with objective, acceptance criteria, and `Paralelismo[P]`.
+- The plan uses schema v2 and includes layer, dependencies, deliverables, validation and evidence per task.
 - No source code changes.
 
 `/implement-backend-task BE-00X`
@@ -169,7 +187,8 @@ Important supporting files:
 - Agent: `invet-qa-validator`
 - Validates backend, frontend, and integration for the slice.
 - Uses plan objectives and acceptance criteria to derive QA cases.
-- Creates or adjusts tests when needed and executes available tests.
+- Creates or adjusts QA-level tests and executes available tests.
+- Rejects missing backend/frontend unit tests and delegates their fix.
 - Marks completed QA validation tasks as `- [x]` only after evidence exists.
 - Writes `docs/opencode/qa/QA-00X-findings.md` when environment or execution issues block QA.
 
@@ -224,7 +243,7 @@ After planning:
 - Out-of-scope is explicit.
 - Backend and frontend contracts are defined.
 - QA scope is identified.
-- `docs/opencode/plans/BE-00X-plan.md` exists with numbered checklist tasks, measurable acceptance criteria, and `Paralelismo[P]`.
+- `docs/opencode/plans/BE-00X-plan.md` passes `validate_slice_plan.py --stage plan`.
 
 After backend:
 - API stays under `/api/v1`.

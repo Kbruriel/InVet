@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<testsuites name="vitest tests" tests="35" failures="0" errors="0" time="3.3876203">
+    <testsuite name="src/app/layout.test.tsx" timestamp="2026-07-30T18:43:28.076Z" hostname="DESKTOP-4GVL3K4" tests="1" failures="0" errors="0" skipped="0" time="0.0104575">
+        <testcase classname="src/app/layout.test.tsx" name="RootLayout &gt; exposes the base metadata and root html shell" time="0.0092045">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/app/page.test.tsx" timestamp="2026-07-30T18:43:28.077Z" hostname="DESKTOP-4GVL3K4" tests="6" failures="0" errors="0" skipped="0" time="0.0725182">
+        <testcase classname="src/app/page.test.tsx" name="FE-001 pages &gt; renders the home page shell" time="0.0313538">
+        </testcase>
+        <testcase classname="src/app/page.test.tsx" name="FE-001 pages &gt; renders the clinics explorer with filtered results" time="0.0083941">
+        </testcase>
+        <testcase classname="src/app/page.test.tsx" name="FE-001 pages &gt; renders the empty state when no clinics match the filters" time="0.0045663">
+        </testcase>
+        <testcase classname="src/app/page.test.tsx" name="FE-001 pages &gt; renders the sign-in placeholder route" time="0.0046919">
+        </testcase>
+        <testcase classname="src/app/page.test.tsx" name="FE-001 pages &gt; renders the clinic registration placeholder route" time="0.0050978">
+        </testcase>
+        <testcase classname="src/app/page.test.tsx" name="FE-001 pages &gt; renders the registration placeholder route" time="0.0169772">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/entities/clinic/model.test.ts" timestamp="2026-07-30T18:43:28.080Z" hostname="DESKTOP-4GVL3K4" tests="1" failures="0" errors="0" skipped="0" time="0.0036941">
+        <testcase classname="src/entities/clinic/model.test.ts" name="ClinicCardModel &gt; describes the FE-001 clinic card contract" time="0.0022888">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/shared/api/http-client.test.ts" timestamp="2026-07-30T18:43:28.080Z" hostname="DESKTOP-4GVL3K4" tests="2" failures="0" errors="0" skipped="0" time="0.0135373">
+        <testcase classname="src/shared/api/http-client.test.ts" name="http-client &gt; calls the API root with a normalized absolute URL" time="0.0102133">
+        </testcase>
+        <testcase classname="src/shared/api/http-client.test.ts" name="http-client &gt; raises ApiError with backend detail when the request fails" time="0.0019204">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/shared/config/env.test.ts" timestamp="2026-07-30T18:43:28.081Z" hostname="DESKTOP-4GVL3K4" tests="2" failures="0" errors="0" skipped="0" time="0.0067561">
+        <testcase classname="src/shared/config/env.test.ts" name="env &gt; uses the default API base URL when no environment variable exists" time="0.0035161">
+        </testcase>
+        <testcase classname="src/shared/config/env.test.ts" name="env &gt; trims trailing slashes from the configured API base URL" time="0.0018053">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/shared/config/routes.test.ts" timestamp="2026-07-30T18:43:28.082Z" hostname="DESKTOP-4GVL3K4" tests="1" failures="0" errors="0" skipped="0" time="0.002632">
+        <testcase classname="src/shared/config/routes.test.ts" name="routes &gt; exposes the public FE-001 routes without placeholders" time="0.0015389">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/shared/ui/button.test.tsx" timestamp="2026-07-30T18:43:28.082Z" hostname="DESKTOP-4GVL3K4" tests="2" failures="0" errors="0" skipped="0" time="0.22456">
+        <testcase classname="src/shared/ui/button.test.tsx" name="buttonClassName &gt; returns styles for variant and size" time="0.0016063">
+        </testcase>
+        <testcase classname="src/shared/ui/button.test.tsx" name="Button &gt; renders a button with a safe default type" time="0.2213358">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/shared/ui/card.test.tsx" timestamp="2026-07-30T18:43:28.083Z" hostname="DESKTOP-4GVL3K4" tests="1" failures="0" errors="0" skipped="0" time="0.0312232">
+        <testcase classname="src/shared/ui/card.test.tsx" name="Card &gt; renders children and merges custom classes" time="0.030003">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/shared/ui/cn.test.ts" timestamp="2026-07-30T18:43:28.084Z" hostname="DESKTOP-4GVL3K4" tests="1" failures="0" errors="0" skipped="0" time="0.0018149">
+        <testcase classname="src/shared/ui/cn.test.ts" name="cn &gt; joins only truthy values" time="0.0009422">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/shared/ui/section-heading.test.tsx" timestamp="2026-07-30T18:43:28.084Z" hostname="DESKTOP-4GVL3K4" tests="1" failures="0" errors="0" skipped="0" time="0.3097699">
+        <testcase classname="src/shared/ui/section-heading.test.tsx" name="SectionHeading &gt; renders eyebrow, title and description" time="0.3082237">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/shared/ui/state-panel.test.tsx" timestamp="2026-07-30T18:43:28.085Z" hostname="DESKTOP-4GVL3K4" tests="1" failures="0" errors="0" skipped="0" time="0.0363554">
+        <testcase classname="src/shared/ui/state-panel.test.tsx" name="StatePanel &gt; renders the selected tone and content" time="0.0351707">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/shared/layout/public-shell.test.tsx" timestamp="2026-07-30T18:43:28.086Z" hostname="DESKTOP-4GVL3K4" tests="1" failures="0" errors="0" skipped="0" time="0.0337385">
+        <testcase classname="src/shared/layout/public-shell.test.tsx" name="PublicShell &gt; renders the shared header, content and footer" time="0.0325324">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/features/public-landing/index.test.ts" timestamp="2026-07-30T18:43:28.086Z" hostname="DESKTOP-4GVL3K4" tests="1" failures="0" errors="0" skipped="0" time="0.0027859">
+        <testcase classname="src/features/public-landing/index.test.ts" name="public-landing index &gt; re-exports the FE-001 public sections" time="0.001596">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/features/public-landing/components/api-status-card.test.tsx" timestamp="2026-07-30T18:43:28.087Z" hostname="DESKTOP-4GVL3K4" tests="2" failures="0" errors="0" skipped="0" time="0.0743961">
+        <testcase classname="src/features/public-landing/components/api-status-card.test.tsx" name="ApiStatusCard &gt; renders the API success state" time="0.0528613">
+        </testcase>
+        <testcase classname="src/features/public-landing/components/api-status-card.test.tsx" name="ApiStatusCard &gt; renders the API error state when the request fails" time="0.0201885">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/features/public-landing/components/category-chips.test.tsx" timestamp="2026-07-30T18:43:28.088Z" hostname="DESKTOP-4GVL3K4" tests="1" failures="0" errors="0" skipped="0" time="0.3869927">
+        <testcase classname="src/features/public-landing/components/category-chips.test.tsx" name="CategoryChips &gt; renders the public search categories with real routes" time="0.3854922">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/features/public-landing/components/clinic-card.test.tsx" timestamp="2026-07-30T18:43:28.088Z" hostname="DESKTOP-4GVL3K4" tests="1" failures="0" errors="0" skipped="0" time="0.0388975">
+        <testcase classname="src/features/public-landing/components/clinic-card.test.tsx" name="ClinicCard &gt; renders the clinic summary and services" time="0.0375338">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/features/public-landing/components/hero-bento-visual.test.tsx" timestamp="2026-07-30T18:43:28.089Z" hostname="DESKTOP-4GVL3K4" tests="1" failures="0" errors="0" skipped="0" time="0.0378327">
+        <testcase classname="src/features/public-landing/components/hero-bento-visual.test.tsx" name="HeroBentoVisual &gt; renders the FE-001 highlights and embeds API status" time="0.0364262">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/features/public-landing/components/hero-section.test.tsx" timestamp="2026-07-30T18:43:28.090Z" hostname="DESKTOP-4GVL3K4" tests="1" failures="0" errors="0" skipped="0" time="0.4205063">
+        <testcase classname="src/features/public-landing/components/hero-section.test.tsx" name="HeroSection &gt; renders the landing headline and primary CTAs" time="0.4189885">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/features/public-landing/components/how-it-works-section.test.tsx" timestamp="2026-07-30T18:43:28.090Z" hostname="DESKTOP-4GVL3K4" tests="1" failures="0" errors="0" skipped="0" time="0.0407826">
+        <testcase classname="src/features/public-landing/components/how-it-works-section.test.tsx" name="HowItWorksSection &gt; renders the three onboarding steps of FE-001" time="0.0395704">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/features/public-landing/components/professional-cta-section.test.tsx" timestamp="2026-07-30T18:43:28.091Z" hostname="DESKTOP-4GVL3K4" tests="1" failures="0" errors="0" skipped="0" time="0.3146571">
+        <testcase classname="src/features/public-landing/components/professional-cta-section.test.tsx" name="ProfessionalCtaSection &gt; links to clinic registration with the shared CTA" time="0.3132872">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/features/public-landing/components/public-footer.test.tsx" timestamp="2026-07-30T18:43:28.091Z" hostname="DESKTOP-4GVL3K4" tests="1" failures="0" errors="0" skipped="0" time="0.3568534">
+        <testcase classname="src/features/public-landing/components/public-footer.test.tsx" name="PublicFooter &gt; renders the footer links for the FE-001 shell" time="0.3552215">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/features/public-landing/components/public-header.test.tsx" timestamp="2026-07-30T18:43:28.092Z" hostname="DESKTOP-4GVL3K4" tests="1" failures="0" errors="0" skipped="0" time="0.4465606">
+        <testcase classname="src/features/public-landing/components/public-header.test.tsx" name="PublicHeader &gt; renders the brand and public navigation links" time="0.4449557">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/features/public-landing/components/public-search-bar.test.tsx" timestamp="2026-07-30T18:43:28.092Z" hostname="DESKTOP-4GVL3K4" tests="3" failures="0" errors="0" skipped="0" time="0.5163083">
+        <testcase classname="src/features/public-landing/components/public-search-bar.test.tsx" name="buildClinicSearchHref &gt; normalizes the clinic search route" time="0.002264">
+        </testcase>
+        <testcase classname="src/features/public-landing/components/public-search-bar.test.tsx" name="PublicSearchBar &gt; shows a validation error when the query is empty" time="0.475052">
+        </testcase>
+        <testcase classname="src/features/public-landing/components/public-search-bar.test.tsx" name="PublicSearchBar &gt; calls the search callback when a valid query is submitted" time="0.0375681">
+        </testcase>
+    </testsuite>
+    <testsuite name="src/features/public-landing/data/mock-clinics.test.ts" timestamp="2026-07-30T18:43:28.093Z" hostname="DESKTOP-4GVL3K4" tests="1" failures="0" errors="0" skipped="0" time="0.00399">
+        <testcase classname="src/features/public-landing/data/mock-clinics.test.ts" name="mockClinics &gt; provides seeded clinics for the FE-001 explorer" time="0.0027494">
+        </testcase>
+    </testsuite>
+</testsuites>

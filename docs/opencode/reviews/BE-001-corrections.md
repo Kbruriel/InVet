@@ -2,7 +2,12 @@
 
 ## Resumen de correcciones
 
-Se alineo la documentacion fuente del slice `001` con el estado real ya aprobado en el plan y en `QA-001-results`. El ajuste cierra el drift entre tareas fuente, evidencia QA y checklist del slice.
+Se cerraron dos grupos de hallazgos sobre el slice `001`:
+
+1. La alineacion documental entre tareas fuente, plan y evidencia QA.
+2. El gap de pruebas unitarias explicitas en `FE-001` detectado por `QA-001`.
+
+Con esto, el slice vuelve a quedar consistente y verificable en backend, frontend y QA.
 
 ## Hallazgos cerrados
 
@@ -10,6 +15,8 @@ Se alineo la documentacion fuente del slice `001` con el estado real ya aprobado
 - [x] Se actualizo `docs/opencode/tasks/qa/QA-001.md` para reflejar QA completado y documentado.
 - [x] Se sincronizaron los equivalentes en `payload/`.
 - [x] Se actualizo el contrato de `/implement-findings` para aceptar `FE-00X` y trabajar el mismo slice vertical.
+- [x] Se agregaron pruebas unitarias explicitas para los modulos frontend base de `FE-001`.
+- [x] Se regenero la evidencia QA de `QA-001` con el gate de pruebas unitarias en `PASS`.
 
 ## Archivos modificados
 
@@ -31,6 +38,31 @@ Se alineo la documentacion fuente del slice `001` con el estado real ya aprobado
 - `payload/docs/opencode/11_chatgpt_project_context.md`
 - `docs/opencode/12_troubleshooting_skills_vs_agents.md`
 - `payload/docs/opencode/12_troubleshooting_skills_vs_agents.md`
+- `frontend/src/app/layout.test.tsx`
+- `frontend/src/app/page.test.tsx`
+- `frontend/src/entities/clinic/model.test.ts`
+- `frontend/src/features/public-landing/index.test.ts`
+- `frontend/src/features/public-landing/components/api-status-card.test.tsx`
+- `frontend/src/features/public-landing/components/category-chips.test.tsx`
+- `frontend/src/features/public-landing/components/clinic-card.test.tsx`
+- `frontend/src/features/public-landing/components/hero-bento-visual.test.tsx`
+- `frontend/src/features/public-landing/components/hero-section.test.tsx`
+- `frontend/src/features/public-landing/components/how-it-works-section.test.tsx`
+- `frontend/src/features/public-landing/components/professional-cta-section.test.tsx`
+- `frontend/src/features/public-landing/components/public-footer.test.tsx`
+- `frontend/src/features/public-landing/components/public-header.test.tsx`
+- `frontend/src/features/public-landing/data/mock-clinics.test.ts`
+- `frontend/src/shared/api/http-client.test.ts`
+- `frontend/src/shared/config/env.test.ts`
+- `frontend/src/shared/config/routes.test.ts`
+- `frontend/src/shared/layout/public-shell.test.tsx`
+- `frontend/src/shared/ui/button.test.tsx`
+- `frontend/src/shared/ui/card.test.tsx`
+- `frontend/src/shared/ui/cn.test.ts`
+- `frontend/src/shared/ui/section-heading.test.tsx`
+- `frontend/src/shared/ui/state-panel.test.tsx`
+- `docs/opencode/qa/QA-001-results.md`
+- `docs/opencode/qa/QA-001-findings.md`
 
 ## Validaciones ejecutadas
 
@@ -39,14 +71,24 @@ Se alineo la documentacion fuente del slice `001` con el estado real ya aprobado
 - [x] QA
 - [x] Checks
 
+Detalles:
+- `python -m pytest app/tests -q --junitxml reports/qa001-backend-pytest-20260730-fixed.xml`
+- `npx vitest run --reporter=default --reporter=junit --outputFile=reports/qa001-frontend-vitest-20260730-fixed.xml`
+- `python` inline usando `backend/app/qa/validation.py` para verificar `0` gaps de pruebas unitarias frontend
+- `npm run lint`
+- `npm run typecheck`
+- `.\run-checks.ps1`
+
 ## Documentacion actualizada
 
-- Estado del slice `001` consistente entre tareas fuente, plan, resultados QA y correcciones.
-- Uso operativo de `/implement-findings FE-00X` documentado junto a la variante `BE-00X`.
+- Estado del slice `001` consistente entre tareas fuente, findings QA, resultados QA y correcciones.
+- `QA-001` vuelve a quedar en `APPROVED`.
+- El hallazgo `QA-001-F01` queda documentado como resuelto.
 
 ## Pendientes o riesgos residuales
 
-- Ninguno para el hallazgo corregido.
+- Ninguno material para el slice `001`.
+- Los siguientes slices deben conservar el mismo gate de pruebas unitarias explicitas para evitar regresiones de cobertura.
 
 ## Cierre
 

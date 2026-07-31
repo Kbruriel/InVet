@@ -1,70 +1,74 @@
-# 05 - Gates de cierre por comando
+# 05 - Done Gates by Command
 
-## Gate despues de `/plan-task`
+Este archivo define requisitos, no el estado de un slice. Los checks permanecen sin marcar para evitar confundir el contrato con evidencia real.
 
-- Slice definido.
-- Scope MVP claro.
-- Fuera de alcance explicito.
-- Contratos backend/frontend definidos.
-- QA planificado.
-- Plan guardado en `docs/opencode/plans/BE-00X-plan.md`.
-- Checklist numerado con objetivo, criterios de aceptacion medibles y `Paralelismo[P]`.
+## `/plan-task BE-00X|FE-00X|QA-00X`
 
-## Gate despues de `/implement-backend-task`
+- [ ] El ID fue normalizado explicitamente al mismo slice.
+- [ ] El plan usa `schema_version: 2`.
+- [ ] Existe contrato frontend completo.
+- [ ] Hay tareas BE, FE y QA con IDs, capa, dependencias y entregables.
+- [ ] Cada tarea tiene criterios, validacion, evidencia y paralelismo.
+- [ ] Las tareas completadas contienen evidencia reproducible.
+- [ ] `validate_slice_plan.py --stage plan` termina en `PASS`.
 
-- Tareas backend pendientes del plan implementadas.
-- Tareas backend completadas marcadas como `- [x]` solo despues de verificar criterios.
-- API bajo `/api/v1`.
-- Casos de uso fuera del router.
-- Dominio sin dependencia de frameworks.
-- Repositorios desacoplados.
-- Migraciones si aplican.
-- Pruebas backend.
+## `/implement-backend-task BE-00X`
 
-## Gate despues de `/implement-frontend-task`
+- [ ] El preflight backend pasa.
+- [ ] Solo se implementan tareas `Capa: backend`.
+- [ ] Las dependencias estan completas y evidenciadas.
+- [ ] Los archivos productivos modificados tienen pruebas unitarias.
+- [ ] La validacion de cada tarea pasa.
+- [ ] El plan contiene evidencia actualizada.
 
-- Tareas frontend pendientes del plan implementadas.
-- Tareas frontend completadas marcadas como `- [x]` solo despues de verificar criterios.
-- Rutas y componentes implementados.
-- Tailwind local.
-- Tokens InVet aplicados.
-- Estados loading/error/empty/success.
-- Consumo API centralizado.
-- Rutas privadas protegidas si aplica.
+## `/implement-frontend-task FE-00X`
 
-## Gate despues de `/qa-task`
+- [ ] El preflight frontend pasa.
+- [ ] El contrato frontend define rutas, flujos, API, formularios, arquitectura, accesibilidad y pruebas.
+- [ ] Solo se implementan tareas `Capa: frontend`.
+- [ ] Los archivos productivos modificados tienen pruebas unitarias/de componente.
+- [ ] Lint, typecheck, test y build aplicables pasan.
+- [ ] El plan contiene evidencia actualizada.
 
-- Casos QA derivados de objetivos y criterios de aceptacion del plan.
-- Resultados documentados con trazabilidad por tarea del plan.
-- Tareas QA completadas marcadas como `- [x]` solo despues de evidencia de validacion.
-- Happy path validado.
-- Negative path validado.
-- Permisos e IDOR/BOLA validados.
-- Regresion cubierta.
-- Evidencia registrada.
-- Pruebas creadas o ajustadas cuando eran necesarias.
-- Bloqueos de ejecucion/configuracion documentados en Markdown si existieron.
+## `/qa-task QA-00X`
 
-## Gate arquitectura
+- [ ] El plan schema v2 es valido.
+- [ ] Cada criterio tiene trazabilidad y estado.
+- [ ] Los reportes pertenecen a la corrida actual.
+- [ ] Los gaps unitarios producen `REJECTED` y findings `OPEN`.
+- [ ] QA no repara pruebas unitarias de producto.
+- [ ] La regresion relevante pasa.
+- [ ] La decision es `APPROVED`, `REJECTED` o `BLOCKED`.
+- [ ] Solo QA cambia findings a `RESOLVED`.
 
-- Sin logica de negocio en routers.
-- Sin ORM expuesto.
-- Dominio limpio.
-- Frontend modular.
+## Reviews
 
-## Gate seguridad
+- [ ] `/review-slice BE-00X` escribe `BE-00X-review.md`.
+- [ ] `/clean-architecture-review BE-00X` escribe su reporte.
+- [ ] `/security-review BE-00X` escribe su reporte.
+- [ ] Cada reporte contiene `Decision: APPROVED|REJECTED`.
+- [ ] Los reviews no infieren IDs ambiguos ni modifican producto.
 
-- Auth y permisos correctos.
-- Aislamiento tenant/owner/branch.
-- Logs sin sensibles.
-- Paginacion/rate limit donde aplica.
+## `/implement-findings BE-00X|FE-00X`
 
-## Gate checks
+- [ ] Corrige solo hallazgos del slice.
+- [ ] Agrega pruebas unitarias faltantes en la capa responsable.
+- [ ] Reejecuta validaciones relevantes.
+- [ ] Documenta correcciones.
+- [ ] Cambia findings QA a `READY_FOR_REVALIDATION`, no `RESOLVED`.
+- [ ] Deriva el cierre a `/qa-task QA-00X`.
 
-- Backend y frontend compilan o fallos documentados.
-- Tests/lint/typecheck/build ejecutados segun disponibilidad.
+## `/run-checks BE-00X`
 
-## Gate docs
+- [ ] QA y reviews estan aprobados.
+- [ ] Tests, lint, formato, tipos y build aplicables pasan.
+- [ ] Cada skip es realmente no aplicable.
+- [ ] Existe `docs/opencode/checks/BE-00X-checks.md`.
+- [ ] El reporte contiene `Decision: APPROVED`.
 
-- Estado del slice actualizado.
-- Decisiones y riesgos documentados.
+## `/update-docs BE-00X`
+
+- [ ] Plan, QA, reviews y checks estan aprobados.
+- [ ] Contratos, riesgos, decisiones y changelog estan actualizados.
+- [ ] No quedan findings abiertos.
+- [ ] El estado final contiene enlaces a evidencia.

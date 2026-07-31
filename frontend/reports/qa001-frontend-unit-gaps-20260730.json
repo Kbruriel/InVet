@@ -1,0 +1,334 @@
+{
+  "required_source_files": [
+    "frontend/src/app/layout.tsx",
+    "frontend/src/app/page.tsx",
+    "frontend/src/app/clinicas/page.tsx",
+    "frontend/src/app/iniciar-sesion/page.tsx",
+    "frontend/src/app/registrar-clinica/page.tsx",
+    "frontend/src/app/registrarse/page.tsx",
+    "frontend/src/entities/clinic/model.ts",
+    "frontend/src/features/public-landing/index.ts",
+    "frontend/src/features/public-landing/components/api-status-card.tsx",
+    "frontend/src/features/public-landing/components/category-chips.tsx",
+    "frontend/src/features/public-landing/components/clinic-card.tsx",
+    "frontend/src/features/public-landing/components/hero-bento-visual.tsx",
+    "frontend/src/features/public-landing/components/hero-section.tsx",
+    "frontend/src/features/public-landing/components/how-it-works-section.tsx",
+    "frontend/src/features/public-landing/components/professional-cta-section.tsx",
+    "frontend/src/features/public-landing/components/public-footer.tsx",
+    "frontend/src/features/public-landing/components/public-header.tsx",
+    "frontend/src/features/public-landing/components/public-search-bar.tsx",
+    "frontend/src/features/public-landing/data/mock-clinics.ts",
+    "frontend/src/shared/api/http-client.ts",
+    "frontend/src/shared/config/env.ts",
+    "frontend/src/shared/config/routes.ts",
+    "frontend/src/shared/layout/public-shell.tsx",
+    "frontend/src/shared/ui/button.tsx",
+    "frontend/src/shared/ui/card.tsx",
+    "frontend/src/shared/ui/cn.ts",
+    "frontend/src/shared/ui/section-heading.tsx",
+    "frontend/src/shared/ui/state-panel.tsx"
+  ],
+  "discovered_test_files": [
+    "frontend/src/features/public-landing/components/public-search-bar.test.tsx"
+  ],
+  "missing_gaps": [
+    {
+      "source_file": "frontend/src/app/layout.tsx",
+      "layer": "frontend",
+      "expected_test_files": [
+        "layout.test.ts",
+        "layout.test.tsx",
+        "layout.spec.ts",
+        "layout.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    },
+    {
+      "source_file": "frontend/src/app/page.tsx",
+      "layer": "frontend",
+      "expected_test_files": [
+        "page.test.ts",
+        "page.test.tsx",
+        "page.spec.ts",
+        "page.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    },
+    {
+      "source_file": "frontend/src/app/clinicas/page.tsx",
+      "layer": "frontend",
+      "expected_test_files": [
+        "page.test.ts",
+        "page.test.tsx",
+        "page.spec.ts",
+        "page.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    },
+    {
+      "source_file": "frontend/src/app/iniciar-sesion/page.tsx",
+      "layer": "frontend",
+      "expected_test_files": [
+        "page.test.ts",
+        "page.test.tsx",
+        "page.spec.ts",
+        "page.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    },
+    {
+      "source_file": "frontend/src/app/registrar-clinica/page.tsx",
+      "layer": "frontend",
+      "expected_test_files": [
+        "page.test.ts",
+        "page.test.tsx",
+        "page.spec.ts",
+        "page.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    },
+    {
+      "source_file": "frontend/src/app/registrarse/page.tsx",
+      "layer": "frontend",
+      "expected_test_files": [
+        "page.test.ts",
+        "page.test.tsx",
+        "page.spec.ts",
+        "page.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    },
+    {
+      "source_file": "frontend/src/entities/clinic/model.ts",
+      "layer": "frontend",
+      "expected_test_files": [
+        "model.test.ts",
+        "model.test.tsx",
+        "model.spec.ts",
+        "model.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    },
+    {
+      "source_file": "frontend/src/features/public-landing/index.ts",
+      "layer": "frontend",
+      "expected_test_files": [
+        "index.test.ts",
+        "index.test.tsx",
+        "index.spec.ts",
+        "index.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    },
+    {
+      "source_file": "frontend/src/features/public-landing/components/api-status-card.tsx",
+      "layer": "frontend",
+      "expected_test_files": [
+        "api-status-card.test.ts",
+        "api-status-card.test.tsx",
+        "api-status-card.spec.ts",
+        "api-status-card.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    },
+    {
+      "source_file": "frontend/src/features/public-landing/components/category-chips.tsx",
+      "layer": "frontend",
+      "expected_test_files": [
+        "category-chips.test.ts",
+        "category-chips.test.tsx",
+        "category-chips.spec.ts",
+        "category-chips.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    },
+    {
+      "source_file": "frontend/src/features/public-landing/components/clinic-card.tsx",
+      "layer": "frontend",
+      "expected_test_files": [
+        "clinic-card.test.ts",
+        "clinic-card.test.tsx",
+        "clinic-card.spec.ts",
+        "clinic-card.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    },
+    {
+      "source_file": "frontend/src/features/public-landing/components/hero-bento-visual.tsx",
+      "layer": "frontend",
+      "expected_test_files": [
+        "hero-bento-visual.test.ts",
+        "hero-bento-visual.test.tsx",
+        "hero-bento-visual.spec.ts",
+        "hero-bento-visual.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    },
+    {
+      "source_file": "frontend/src/features/public-landing/components/hero-section.tsx",
+      "layer": "frontend",
+      "expected_test_files": [
+        "hero-section.test.ts",
+        "hero-section.test.tsx",
+        "hero-section.spec.ts",
+        "hero-section.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    },
+    {
+      "source_file": "frontend/src/features/public-landing/components/how-it-works-section.tsx",
+      "layer": "frontend",
+      "expected_test_files": [
+        "how-it-works-section.test.ts",
+        "how-it-works-section.test.tsx",
+        "how-it-works-section.spec.ts",
+        "how-it-works-section.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    },
+    {
+      "source_file": "frontend/src/features/public-landing/components/professional-cta-section.tsx",
+      "layer": "frontend",
+      "expected_test_files": [
+        "professional-cta-section.test.ts",
+        "professional-cta-section.test.tsx",
+        "professional-cta-section.spec.ts",
+        "professional-cta-section.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    },
+    {
+      "source_file": "frontend/src/features/public-landing/components/public-footer.tsx",
+      "layer": "frontend",
+      "expected_test_files": [
+        "public-footer.test.ts",
+        "public-footer.test.tsx",
+        "public-footer.spec.ts",
+        "public-footer.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    },
+    {
+      "source_file": "frontend/src/features/public-landing/components/public-header.tsx",
+      "layer": "frontend",
+      "expected_test_files": [
+        "public-header.test.ts",
+        "public-header.test.tsx",
+        "public-header.spec.ts",
+        "public-header.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    },
+    {
+      "source_file": "frontend/src/features/public-landing/data/mock-clinics.ts",
+      "layer": "frontend",
+      "expected_test_files": [
+        "mock-clinics.test.ts",
+        "mock-clinics.test.tsx",
+        "mock-clinics.spec.ts",
+        "mock-clinics.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    },
+    {
+      "source_file": "frontend/src/shared/api/http-client.ts",
+      "layer": "frontend",
+      "expected_test_files": [
+        "http-client.test.ts",
+        "http-client.test.tsx",
+        "http-client.spec.ts",
+        "http-client.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    },
+    {
+      "source_file": "frontend/src/shared/config/env.ts",
+      "layer": "frontend",
+      "expected_test_files": [
+        "env.test.ts",
+        "env.test.tsx",
+        "env.spec.ts",
+        "env.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    },
+    {
+      "source_file": "frontend/src/shared/config/routes.ts",
+      "layer": "frontend",
+      "expected_test_files": [
+        "routes.test.ts",
+        "routes.test.tsx",
+        "routes.spec.ts",
+        "routes.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    },
+    {
+      "source_file": "frontend/src/shared/layout/public-shell.tsx",
+      "layer": "frontend",
+      "expected_test_files": [
+        "public-shell.test.ts",
+        "public-shell.test.tsx",
+        "public-shell.spec.ts",
+        "public-shell.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    },
+    {
+      "source_file": "frontend/src/shared/ui/button.tsx",
+      "layer": "frontend",
+      "expected_test_files": [
+        "button.test.ts",
+        "button.test.tsx",
+        "button.spec.ts",
+        "button.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    },
+    {
+      "source_file": "frontend/src/shared/ui/card.tsx",
+      "layer": "frontend",
+      "expected_test_files": [
+        "card.test.ts",
+        "card.test.tsx",
+        "card.spec.ts",
+        "card.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    },
+    {
+      "source_file": "frontend/src/shared/ui/cn.ts",
+      "layer": "frontend",
+      "expected_test_files": [
+        "cn.test.ts",
+        "cn.test.tsx",
+        "cn.spec.ts",
+        "cn.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    },
+    {
+      "source_file": "frontend/src/shared/ui/section-heading.tsx",
+      "layer": "frontend",
+      "expected_test_files": [
+        "section-heading.test.ts",
+        "section-heading.test.tsx",
+        "section-heading.spec.ts",
+        "section-heading.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    },
+    {
+      "source_file": "frontend/src/shared/ui/state-panel.tsx",
+      "layer": "frontend",
+      "expected_test_files": [
+        "state-panel.test.ts",
+        "state-panel.test.tsx",
+        "state-panel.spec.ts",
+        "state-panel.spec.tsx"
+      ],
+      "reason": "Missing explicit unit tests for the changed source file."
+    }
+  ]
+}
