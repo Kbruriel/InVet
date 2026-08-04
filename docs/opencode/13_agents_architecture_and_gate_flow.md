@@ -23,6 +23,42 @@ Las fuentes normativas complementarias son:
 
 En caso de discrepancia, prevalecen el validador determinista y el contrato del comando que se esta ejecutando.
 
+## Inventario recuperado
+
+La restauracion esperada del sistema agentico incluye 14 agentes activos en `.opencode/agents`:
+
+- `invet-orchestrator.md`
+- `invet-product-planner.md`
+- `invet-backend-implementer.md`
+- `invet-frontend-implementer.md`
+- `invet-qa-validator.md`
+- `invet-slice-reviewer.md`
+- `invet-clean-architecture-reviewer.md`
+- `invet-security-reviewer.md`
+- `invet-findings-implementer.md`
+- `invet-check-runner.md`
+- `invet-docs-updater.md`
+- `invet-final-reviewer.md`
+- `invet-command-executor.md`
+- `invet-command-executor-fallback.md`
+
+Tambien incluye 12 comandos slash en `.opencode/commands`:
+
+- `/execute-slice`
+- `/plan-task`
+- `/implement-backend-task`
+- `/implement-frontend-task`
+- `/qa-task`
+- `/review-slice`
+- `/clean-architecture-review`
+- `/security-review`
+- `/implement-findings`
+- `/run-checks`
+- `/update-docs`
+- `/final-gate`
+
+Los agentes `invet-command-executor` e `invet-command-executor-fallback` no representan gates por si mismos. Son agentes de soporte para ejecutar comandos mecanicos, pruebas, lint, lectura de logs y reintentos reproducibles cuando un agente principal necesita evidencia cruda.
+
 ## Principios del sistema
 
 1. Un slice funcional se identifica por un indice compartido: `BE-00X`, `FE-00X` y `QA-00X` pertenecen al mismo slice `00X`.
@@ -175,7 +211,7 @@ Los prefijos mostrados en este orden son convencionales. El validador normaliza 
 | Agente | Comando principal | Responsabilidad | Puede modificar codigo | Evidencia o gate |
 |---|---|---|---|---|
 | InVet Orchestrator | `/execute-slice` | Normalizar el ID, coordinar agentes y detenerse ante gates fallidos | Solo por delegacion | Flujo completo del slice |
-| Planner | `/plan-task` | Crear el plan canonico schema v2 con tareas BE, FE y QA trazables | No | `BE-00X-plan.md` valido |
+| Product Planner | `/plan-task` | Crear el plan canonico schema v2 con tareas BE, FE y QA trazables | No | `BE-00X-plan.md` valido |
 | Backend Implementer | `/implement-backend-task` | Implementar backend y sus pruebas unitarias | Si, backend y pruebas relacionadas | Tareas BE y validaciones satisfechas |
 | Frontend Implementer | `/implement-frontend-task` | Implementar UI, integracion y pruebas unitarias de frontend | Si, frontend y pruebas relacionadas | Tareas FE y validaciones satisfechas |
 | QA Engineer | `/qa-task` | Ejecutar QA, ampliar pruebas de nivel QA y emitir decision | Solo pruebas y soporte QA, no producto | `QA-00X-results.md` con `APPROVED`, `REJECTED` o `BLOCKED`, y findings |
@@ -185,6 +221,9 @@ Los prefijos mostrados en este orden son convencionales. El validador normaliza 
 | Findings Implementer | `/implement-findings` | Corregir hallazgos en codigo y pruebas del propietario correcto | Si | Correcciones en `READY_FOR_REVALIDATION` |
 | Check Runner | `/run-checks` | Ejecutar la suite integral y registrar resultados reproducibles | No deberia corregir producto | `BE-00X-checks.md` con decision |
 | Documentation Agent | `/update-docs` | Consolidar documentacion y cierre despues de todos los gates | Solo documentacion | Documentacion final actualizada |
+| Final Reviewer | `/final-gate` | Emitir una segunda opinion de release despues de QA, reviews, checks y docs | No, excepto su reporte Markdown | `BE-00X-final-review.md` con decision |
+| Command Executor | Delegado por agentes principales | Ejecutar comandos mecanicos, pruebas, lint, inspeccion de diff y lectura de logs | Solo cambios mecanicos dentro del alcance delegado | Comandos ejecutados, salida sintetizada y bloqueos |
+| Command Executor Fallback | Delegado por agentes principales | Respaldar al ejecutor primario cuando se requiere mas contexto o robustez | Solo cambios mecanicos dentro del alcance delegado | Evidencia mecanica alternativa o reintentos |
 
 ## Contrato del plan schema v2
 

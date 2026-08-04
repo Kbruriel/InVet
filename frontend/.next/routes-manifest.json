@@ -18,23 +18,29 @@
   "onMatchHeaders": [],
   "rewrites": {
     "beforeFiles": [],
-    "afterFiles": [
-      {
-        "source": "/api/:path*",
-        "destination": "http://localhost:8000/api/:path*",
-        "regex": "^/api(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))?(?:/)?$"
-      }
-    ],
+    "afterFiles": [],
     "fallback": []
   },
-  "dynamicRoutes": [],
-  "staticRoutes": [
+  "dynamicRoutes": [
     {
-      "page": "/",
-      "regex": "^/(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/(?:/)?$"
+      "page": "/clinics/[clinicId]/branches/[branchId]",
+      "regex": "^/clinics/([^/]+?)/branches/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPclinicId": "nxtPclinicId",
+        "nxtPbranchId": "nxtPbranchId"
+      },
+      "namedRegex": "^/clinics/(?<nxtPclinicId>[^/]+?)/branches/(?<nxtPbranchId>[^/]+?)(?:/)?$"
     },
+    {
+      "page": "/clinics/[id]",
+      "regex": "^/clinics/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPid": "nxtPid"
+      },
+      "namedRegex": "^/clinics/(?<nxtPid>[^/]+?)(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
     {
       "page": "/_global-error",
       "regex": "^/_global\\-error(?:/)?$",
@@ -46,42 +52,6 @@
       "regex": "^/_not\\-found(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/_not\\-found(?:/)?$"
-    },
-    {
-      "page": "/auth/login",
-      "regex": "^/auth/login(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/auth/login(?:/)?$"
-    },
-    {
-      "page": "/auth/register",
-      "regex": "^/auth/register(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/auth/register(?:/)?$"
-    },
-    {
-      "page": "/clinicas",
-      "regex": "^/clinicas(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/clinicas(?:/)?$"
-    },
-    {
-      "page": "/iniciar-sesion",
-      "regex": "^/iniciar\\-sesion(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/iniciar\\-sesion(?:/)?$"
-    },
-    {
-      "page": "/registrar-clinica",
-      "regex": "^/registrar\\-clinica(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/registrar\\-clinica(?:/)?$"
-    },
-    {
-      "page": "/registrarse",
-      "regex": "^/registrarse(?:/)?$",
-      "routeKeys": {},
-      "namedRegex": "^/registrarse(?:/)?$"
     }
   ],
   "dataRoutes": [],

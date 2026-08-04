@@ -47,7 +47,7 @@ Responsabilidades:
 - Documentar las correcciones aplicadas en Markdown.
 - Generar un checklist de cierre de correcciones.
 - Usa `invet-command-executor` para reejecuciones mecanicas, lectura de logs y verificaciones repetitivas; conserva aqui el analisis y el cierre.
-- Si la correccion mecanica necesita mas contexto o los comandos fallan repetidamente, usa `invet-command-executor-fallback`.
+- Si la correccion mecanica necesita mas contexto o los comandos fallan repetidamente, conserva la evidencia y reporta el bloqueo sin cambiar de modelo.
 
 Flujo de trabajo:
 1. Recibe el archivo de hallazgos o el indice `BE-00X`/`FE-00X`.

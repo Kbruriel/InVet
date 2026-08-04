@@ -1,31 +1,6 @@
 {
-  "app": {
-    "[project]/src/app/_not-found/page": [
-      "static/media/fba5a26ea33df6a3-s.p.18rizl4rsrl42.woff2"
-    ],
-    "[project]/src/app/auth/login/page": [
-      "static/media/fba5a26ea33df6a3-s.p.18rizl4rsrl42.woff2"
-    ],
-    "[project]/src/app/auth/register/page": [
-      "static/media/fba5a26ea33df6a3-s.p.18rizl4rsrl42.woff2"
-    ],
-    "[project]/src/app/clinicas/page": [
-      "static/media/fba5a26ea33df6a3-s.p.18rizl4rsrl42.woff2"
-    ],
-    "[project]/src/app/iniciar-sesion/page": [
-      "static/media/fba5a26ea33df6a3-s.p.18rizl4rsrl42.woff2"
-    ],
-    "[project]/src/app/page": [
-      "static/media/fba5a26ea33df6a3-s.p.18rizl4rsrl42.woff2"
-    ],
-    "[project]/src/app/registrar-clinica/page": [
-      "static/media/fba5a26ea33df6a3-s.p.18rizl4rsrl42.woff2"
-    ],
-    "[project]/src/app/registrarse/page": [
-      "static/media/fba5a26ea33df6a3-s.p.18rizl4rsrl42.woff2"
-    ]
-  },
-  "appUsingSizeAdjust": true,
+  "app": {},
+  "appUsingSizeAdjust": false,
   "pages": {},
   "pagesUsingSizeAdjust": false
 }

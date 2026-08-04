@@ -43,7 +43,7 @@ Objetivo:
 - Si un check no esta configurado, marcalo como `skipped` con motivo y continua.
 - Detectar herramientas configuradas antes de ejecutar.
 - Usa `invet-command-executor` para lotes mecanicos de comandos y recopilacion de salida cruda; conserva aqui el veredicto pass/fail/skipped.
-- Si un lote de checks/logs requiere mas contexto, delega ese tramo a `invet-command-executor-fallback`.
+- Si un lote de checks/logs requiere mas contexto, conserva la evidencia y reporta el bloqueo sin cambiar de modelo.
 - Ejecutar checks disponibles de backend, frontend y DevOps opcional.
 - Reportar comandos ejecutados, resultado y fallos.
 - No ocultar errores ni convertir skips en pass.

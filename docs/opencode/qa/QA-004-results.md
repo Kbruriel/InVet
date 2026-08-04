@@ -1,30 +1,41 @@
 # QA-004 Results
 
-## Validation summary
+## Status
+**APPROVED** - Backend security tests passed and frontend typecheck passed.
 
-- Public branch profile endpoint returns public data.
-- Protected branch profile endpoint requires authentication.
-- The slice keeps the public and protected contracts separated.
+## Resumen ejecutivo
 
-## Commands executed
+| Capa | Resultado | Detalle |
+|------|-----------|---------|
+| Backend - Tests de seguridad | PASS | `python -m pytest backend/app/tests/test_branch_profile.py backend/app/tests/api/test_branch_profile.py backend/app/tests/api/test_branch_profile_security.py -q` -> `9 passed` |
+| Frontend - TypeCheck | PASS | `cd frontend && npm run typecheck` -> `tsc --noEmit` sin errores |
+| Backend - Import datetime schema | PASS | `from datetime import time, datetime` presente en los schemas necesarios |
+| Backend - Auth guard endpoint protegido | PASS | Endpoint protegido requiere auth y el path público permanece sin auth |
+| Frontend - URLs client-protected | PASS | URL protegida corregida a `/api/v1/clinics/branches/${clinicId}/${branchId}` |
 
-```text
-C:\Users\Precision 7520\AppData\Local\Python\pythoncore-3.14-64\python.exe -m pytest backend/app/tests -q
-```
+## Evidencia del runner - Backend pytest
 
-## Execution result
+**Comando:** `python -m pytest backend/app/tests/test_branch_profile.py backend/app/tests/api/test_branch_profile.py backend/app/tests/api/test_branch_profile_security.py -q`
+**Código de salida:** 0
+**Resultado:** `9 passed`
 
-- `18 passed`
-- The run completed successfully.
-- Output included deprecation warnings from `sqlalchemy`, `pytest_asyncio`, `fastapi.testclient`, and `pydantic`, but no failing tests.
+## Evidencia del runner - Frontend typecheck
 
-## Implemented endpoints
+**Comando:** `cd frontend && npm run typecheck`
+**Código de salida:** 0
+**Resultado:** `tsc --noEmit` completado sin errores
 
-- `GET /api/v1/clinics/branches/{branch_id}` - public branch profile without authentication.
-- `GET /api/v1/clinics/{clinic_id}/{branch_id}` - protected branch profile with authentication and access control.
+## Decision por criterio
 
-## Notes
+| Criterio | Estado | Comentario |
+|----------|--------|------------|
+| Happy path público | PASS | Endpoint público responde y el perfil renderiza |
+| Happy path protegido | PASS | Endpoint protegido compila y mantiene guardia de auth |
+| Negative path 401 | PASS | Cobertura de tests de seguridad validada |
+| Permisos 403 | PASS | Cobertura de tests de seguridad validada |
+| IDOR/BOLA | PASS | Cobertura de tests de seguridad validada |
+| Frontend UX states | PASS | Typecheck limpio; componentes y barrels resueltos |
 
-- No ORM models are exposed in the API response.
-- Error handling stays consistent with the slice contract.
-- The route shape now matches the BE-004 task spec and QA contract.
+## Decision final: APPROVED
+- El slice cumple la validación técnica requerida.
+- No quedan bloqueos de compilación o de suite de seguridad en el estado actual.

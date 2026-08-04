@@ -1,0 +1,80 @@
+"""Routers para perfiles de clínica/sucursal."""
+from fastapi import APIRouter, Depends, HTTPException, status
+from sqlalchemy.orm import Session
+from app.api.v1.schemas.branch_public import BranchPublicProfile
+from app.api.v1.schemas.branch_protected import BranchProtectedProfile
+from app.application.use_cases.branch_profile import (
+    GetBranchPublicProfileUseCase,
+    GetBranchProtectedProfileUseCase
+)
+from app.core.security import get_current_access_user
+from app.infrastructure.database.session import get_db
+from app.infrastructure.database.repositories.branch_repository import (
+    BranchRepositoryImpl,
+    ServiceRepositoryImpl,
+    BranchScheduleRepositoryImpl,
+    RatingSummaryRepositoryImpl,
+    AvailabilitySummaryRepositoryImpl
+)
+
+router = APIRouter(prefix="/clinics", tags=["branches"])
+
+
+def get_branch_use_case(db: Session = Depends(get_db)):
+    """Inyección de dependencias para el caso de uso del perfil público."""
+    branch_repo = BranchRepositoryImpl(db)
+    service_repo = ServiceRepositoryImpl(db)
+    schedule_repo = BranchScheduleRepositoryImpl(db)
+    rating_repo = RatingSummaryRepositoryImpl(db)
+    availability_repo = AvailabilitySummaryRepositoryImpl(db)
+
+    return GetBranchPublicProfileUseCase(
+        branch_repo, service_repo, schedule_repo, rating_repo, availability_repo
+    )
+
+
+def get_branch_protected_use_case(db: Session = Depends(get_db)):
+    """Inyección de dependencias para el caso de uso del perfil protegido."""
+    branch_repo = BranchRepositoryImpl(db)
+    service_repo = ServiceRepositoryImpl(db)
+    schedule_repo = BranchScheduleRepositoryImpl(db)
+    rating_repo = RatingSummaryRepositoryImpl(db)
+    availability_repo = AvailabilitySummaryRepositoryImpl(db)
+
+    return GetBranchProtectedProfileUseCase(
+        branch_repo, service_repo, schedule_repo, rating_repo, availability_repo
+    )
+
+
+@router.get("/branches/{branch_id}", response_model=BranchPublicProfile)
+async def get_branch_public_profile(
+    branch_id: int,
+    use_case: GetBranchPublicProfileUseCase = Depends(get_branch_use_case)
+):
+    """Obtener perfil público de una sucursal (sin autenticación)."""
+    branch = await use_case.execute(branch_id)
+    if not branch:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Sucursal no encontrada")
+
+    return branch
+
+
+@router.get("/branches/{clinic_id}/{branch_id}", response_model=BranchProtectedProfile)
+async def get_branch_protected_profile(
+    clinic_id: int,
+    branch_id: int,
+    use_case: GetBranchProtectedProfileUseCase = Depends(get_branch_protected_use_case),
+    current_user: dict = Depends(get_current_access_user),
+):
+    """Obtener perfil protegido de una sucursal (requiere autenticación y acceso).
+
+    Ruta completa: GET /api/v1/clinics/branches/{clinic_id}/{branch_id}
+    """
+    branch = await use_case.execute(branch_id, clinic_id, current_user)
+    if not branch:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No tienes permiso para acceder a esta sucursal."
+        )
+
+    return branch

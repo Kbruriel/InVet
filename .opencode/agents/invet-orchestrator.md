@@ -33,7 +33,7 @@ Reglas:
 - Autonomia por defecto: ejecuta el flujo solicitado sin pedir confirmacion antes de cada comando si no hay blockers.
 - Pregunta al usuario solo si aparece un blocker, falta informacion critica, hay que decidir alcance o se requiere una accion destructiva/externa.
 - Delega la ejecucion mecanica de comandos, tests, lint, diffs y lectura de logs al agente `invet-command-executor` cuando ayude a reducir friccion.
-- Cuando el trabajo sea de checks y logs, reintentos de comandos fallidos o correcciones mecanicas que excedan al primer ejecutor, usa `invet-command-executor-fallback`.
+- Si los reintentos mecanicos no alcanzan, conserva la evidencia y devuelve el bloqueo al agente responsable.
 - Un gate solo puede ser `skipped` cuando no aplica al slice y existe justificacion verificable; dependencia ausente, entorno roto o comando fallido no cuentan como `skipped`.
 - No avanzar al siguiente slice si hay blockers de arquitectura, seguridad, QA o checks.
 - Ejecutar `backend/scripts/validate_slice_plan.py` antes de cada etapa.

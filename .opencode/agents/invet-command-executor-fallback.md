@@ -1,7 +1,6 @@
 ---
-description: Respaldo de ejecucion mecanica con GPT OSS 20B local.
+description: Respaldo de ejecucion mecanica con el modelo seleccionado por el usuario.
 mode: all
-model: ollama/gpt-oss:20b
 permission:
   edit: ask
   bash:
@@ -42,7 +41,7 @@ Responsabilidades:
 - Repetir comandos cuando haga falta para obtener evidencia reproducible.
 - No tomar decisiones de alcance, arquitectura o seguridad: esa parte corresponde al agente llamante.
 - Si detectas un bloqueo o hallazgo, devolver salida concreta, comando exacto y causa observada.
-- Usar GPT OSS 20B como respaldo de mayor capacidad para lotes mecanicos que necesiten mas contexto o robustez.
+- Usar el modelo seleccionado por el usuario; este agente no fija un modelo por defecto.
 
 Flujo:
 1. Recibe una instruccion mecanica concreta.

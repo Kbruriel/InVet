@@ -1,7 +1,0 @@
-1:"$Sreact.fragment"
-2:I[19065,["/_next/static/chunks/05-c3ty_6dwfk.js","/_next/static/chunks/14mrh2-p_w84d.js","/_next/static/chunks/2bf-ydktgsqax.js"],"default"]
-3:I[22016,["/_next/static/chunks/05-c3ty_6dwfk.js","/_next/static/chunks/14mrh2-p_w84d.js","/_next/static/chunks/2bf-ydktgsqax.js"],""]
-4:I[97367,["/_next/static/chunks/05-c3ty_6dwfk.js","/_next/static/chunks/14mrh2-p_w84d.js"],"OutletBoundary"]
-5:"$Sreact.suspense"
-0:{"rsc":["$","$1","c",{"children":[["$","div",null,{"className":"min-h-screen bg-[#fff8f0] flex items-center justify-center p-4","children":["$","div",null,{"className":"w-full max-w-md","children":["$","div",null,{"className":"bg-white rounded-2xl shadow-lg p-8","children":[["$","div",null,{"className":"text-center mb-8","children":[["$","h1",null,{"className":"text-2xl font-bold text-[#006065] mb-2","children":"Crear cuenta"}],["$","p",null,{"className":"text-gray-600","children":"Regístrate en InVet"}]]}],["$","$L2",null,{}],["$","div",null,{"className":"mt-6 text-center","children":["$","p",null,{"className":"text-gray-600 text-sm","children":["¿Ya tienes cuenta?"," ",["$","$L3",null,{"href":"/auth/login","className":"text-[#006065] font-medium hover:underline","children":"Inicia sesión aquí"}]]}]}]]}]}]}],[["$","script","script-0",{"src":"/_next/static/chunks/2bf-ydktgsqax.js","async":true}]],["$","$L4",null,{"children":["$","$5",null,{"name":"Next.MetadataOutlet","children":"$@6"}]}]]}],"isPartial":false,"staleTime":300,"varyParams":null,"buildId":"vK8wxPyj2btPNkh7ME8WH"}
-6:null

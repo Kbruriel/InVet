@@ -23,8 +23,8 @@
 | `invet-clean-architecture-reviewer` | Revisa capas backend y modularidad frontend | `BE-00X-clean-architecture-review.md` con decision |
 | `invet-security-reviewer` | Revisa autenticacion, autorizacion, IDOR/BOLA y datos | `BE-00X-security-review.md` con decision |
 | `invet-findings-implementer` | Corrige findings y pruebas unitarias faltantes en la capa responsable | Correcciones y estado `READY_FOR_REVALIDATION` |
-| `invet-command-executor` | Ejecuta comandos, tests, lint, lectura de logs y reintentos mecanicos con Qwen3 Coder 30B | Salida cruda y evidencia reproducible |
-| `invet-command-executor-fallback` | Respaldo mecanico con GPT OSS 20B para comandos y verificaciones que requieran mas profundidad | Salida cruda y evidencia reproducible |
+| `invet-command-executor` | Ejecuta comandos, tests, lint, lectura de logs y reintentos mecanicos con el modelo seleccionado por el usuario | Salida cruda y evidencia reproducible |
+| `invet-command-executor-fallback` | Respaldo mecanico para comandos y verificaciones que requieran reintentos | Salida cruda y evidencia reproducible |
 | `invet-final-reviewer` | Gate final de release con revision de alta capacidad | `BE-00X-final-review.md` con decision |
 | `invet-check-runner` | Ejecuta tests, lint, format, types y build; valida si hay cambios pendientes antes del cierre Docker | `BE-00X-checks.md` con decision |
 | `invet-docs-updater` | Documenta el cierre despues de aprobar gates | Changelog, contratos y estado final |
@@ -64,6 +64,6 @@ OPEN
 - `.opencode`, `docs/opencode` y `backend/scripts` son los archivos operativos del repositorio.
 - `payload` es el espejo distribuible usado por `install-invet-opencode-agents.ps1`.
 - Las pruebas contractuales deben impedir divergencias en agentes, comandos, templates y validadores.
-- `invet-command-executor` es el ejecutor primario; `invet-command-executor-fallback` es el respaldo con `gpt-oss:20b`.
-- El respaldo se reserva para checks y logs, reintentos de comandos fallidos y correcciones mecanicas cuando el primario se quede corto.
+- `invet-command-executor` es el ejecutor primario y hereda el modelo seleccionado por el usuario.
+- `invet-command-executor-fallback` se mantiene como respaldo operativo, pero no fija un modelo por defecto.
 - `invet-final-reviewer` es el gate final de release y se usa despues de QA, reviews, checks y docs cuando se desea una segunda opinion de alta capacidad.

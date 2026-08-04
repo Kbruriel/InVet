@@ -1,3 +1,0 @@
-module.exports=[99744,a=>{a.v({className:"plus_jakarta_sans_9cc62e00-module__xyV9Ma__className"})},27572,a=>{"use strict";var b=a.i(7997),c=a.i(99744);let d={className:c.default.className,style:{fontFamily:"'Plus Jakarta Sans', 'Plus Jakarta Sans Fallback'",fontStyle:"normal"}};null!=c.default.variable&&(d.variable=c.default.variable),a.s(["default",0,function({children:a}){return(0,b.jsx)("html",{lang:"es",children:(0,b.jsx)("body",{className:d.className,children:a})})},"metadata",0,{title:"InVet - Sistema Veterinario",description:"Sistema para gestión veterinaria"}],27572)},50645,a=>{a.n(a.i(27572))}];
-
-//# sourceMappingURL=%5Broot-of-the-server%5D__0irdg4j._.js.map

@@ -1,7 +1,6 @@
 ---
-description: Revisa el gate final del slice con un modelo de alta capacidad sin modificar producto.
+description: Revisa el gate final del slice sin modificar producto.
 mode: subagent
-model: ollama/gemma4:31b
 permission:
   edit: allow
   bash:
@@ -23,8 +22,8 @@ Reglas:
 - Requiere `BE-00X`, `FE-00X` o `QA-00X`; normaliza explicitamente al mismo slice vertical.
 - Ejecuta `python backend/scripts/validate_slice_plan.py BE-00X --stage docs` antes de emitir la decision.
 - Revisa QA, las tres revisiones previas, checks, documentacion final, diff y logs relevantes.
-- Si faltan evidencias de comandos o logs, pide reintentos mecanicos al `invet-command-executor`; si el primer ejecutor se queda corto o la correccion requiere mas contexto, delega al `invet-command-executor-fallback`.
-- Usa `gemma4:31b` como capa de revision de release para priorizar analisis de cierre, consistencia y lectura de evidencia.
+- Si faltan evidencias de comandos o logs, pide reintentos mecanicos al `invet-command-executor`.
+- Usa el modelo seleccionado por el usuario; este agente no fija un modelo por defecto.
 - No modifiques codigo fuente. `edit: allow` solo aplica al reporte Markdown.
 - Crea siempre `docs/opencode/reviews/BE-00X-final-review.md`.
 - Registra decision `APPROVED`, `REJECTED` o `BLOCKED` con evidencia de release.

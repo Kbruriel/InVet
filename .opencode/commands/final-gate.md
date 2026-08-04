@@ -17,7 +17,7 @@ Instrucciones:
    - `docs/opencode/checks/BE-00X-checks.md`
    - `docs/opencode` actualizado para el slice
    - `git diff` y logs relevantes
-3. Si faltan comandos, logs o evidencias mecanicas, delega reintentos a `invet-command-executor`; si el primer ejecutor no alcanza o la correccion exige mas contexto, usa `invet-command-executor-fallback`.
+3. Si faltan comandos, logs o evidencias mecanicas, delega reintentos a `invet-command-executor`.
 4. Crea siempre `docs/opencode/reviews/BE-00X-final-review.md` usando `docs/opencode/templates/review_findings_template.md` como base.
 5. Usa `APPROVED` solo si QA, las tres revisiones, checks y docs estan cerrados y no hay findings abiertos.
 6. Usa `REJECTED` o `BLOCKED` si hay gaps, inconsistencias o verificaciones imposibles.

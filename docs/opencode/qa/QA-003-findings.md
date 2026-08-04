@@ -3,6 +3,7 @@
 ## Estado General
 
 - **Slice afectado**: BE-003 / FE-003 / QA-003
+- Estado: RESOLVED
 - **Estado actual**: APPROVED  
 - **Fecha de ejecución**: 3 de agosto de 2026
 - **Validador**: QA Agent

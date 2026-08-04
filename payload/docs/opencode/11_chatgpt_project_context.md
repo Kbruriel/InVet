@@ -52,8 +52,8 @@ General rules:
 - All operational agents can use `docker compose` when the slice requires PostgreSQL or container runtime validation. Use `db` + `backend` for data-backed tests and `frontend` for UI/runtime validation when applicable.
 - Reviews, checks, and documentation must be closed before advancing.
 - Use `invet-command-executor` for mechanical command batches, test runs, log collection, and repeat verifications.
-- Use `invet-command-executor-fallback` with `gpt-oss:20b` when the primary executor is unavailable or a heavier reasoning pass is worth the cost.
-- Reserve the fallback for checks and logs, failed-command retries, and mechanical fixes that need more context than the primary executor can comfortably carry.
+- `invet-command-executor` and its fallback inherit the model selected by the user; no executor pins a default model.
+- Reserve the fallback for checks and logs, failed-command retries, and mechanical fixes that need an isolated retry path.
 - Use `invet-final-reviewer` for the final release gate after QA, reviews, checks, and docs when a higher-capacity second opinion is needed.
 
 Skill usage rule:
@@ -140,12 +140,12 @@ Important supporting files:
 
 `invet-command-executor`
 - Mode: `all`
-- Objective: run command-heavy work, tests, lint, diffs, log collection, and repeat checks with the local Qwen3 Coder 30B model.
+- Objective: run command-heavy work, tests, lint, diffs, log collection, and repeat checks with the model selected by the user.
 - Expected artifact: exact command output and any safe mechanical fix requested by the parent agent.
 
 `invet-command-executor-fallback`
 - Mode: `all`
-- Objective: serve as the higher-capacity mechanical fallback when the primary executor is unavailable or a deeper pass is needed.
+- Objective: serve as a mechanical fallback when the primary executor is unavailable or an isolated retry path is needed.
 - Expected artifact: exact command output and any safe mechanical fix requested by the parent agent.
 
 `invet-clean-architecture-reviewer`

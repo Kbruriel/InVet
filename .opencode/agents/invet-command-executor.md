@@ -1,7 +1,6 @@
 ---
-description: Ejecuta comandos mecanicos, pruebas y lecturas de logs con Qwen3 Coder 30B local.
+description: Ejecuta comandos mecanicos, pruebas y lecturas de logs con el modelo seleccionado por el usuario.
 mode: all
-model: ollama/qwen3-coder:30b
 permission:
   edit: ask
   bash:
@@ -42,8 +41,8 @@ Responsabilidades:
 - Repetir comandos cuando haga falta para obtener evidencia reproducible.
 - No tomar decisiones de alcance, arquitectura o seguridad: esa parte corresponde al agente llamante.
 - Si detectas un bloqueo o hallazgo, devolver salida concreta, comando exacto y causa observada.
-- Usar el modelo local Qwen3 Coder 30B para maximizar fiabilidad de ejecucion y uso de herramientas.
-- Si el primario no esta disponible o la tarea pide mas profundidad, deriva al agente `invet-command-executor-fallback`.
+- Usar el modelo seleccionado por el usuario; este agente no fija un modelo por defecto.
+- Si la tarea pide mas profundidad, devolver el bloqueo o la necesidad de reintento al agente padre.
 
 Flujo:
 1. Recibe una instruccion mecanica concreta.

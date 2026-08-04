@@ -1,4 +1,4 @@
-"""
-Paquete para las pruebas de la aplicación.
-Este archivo convierte el directorio app/tests en un paquete Python.
-"""
+"""Test package bootstrap."""
+import os
+
+os.environ.setdefault("INVET_ALLOW_SQLITE_FALLBACK", "1")
