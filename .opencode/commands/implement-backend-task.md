@@ -19,6 +19,9 @@ Instrucciones:
 5. Selecciona solo tareas pendientes con `Capa: backend`.
 6. Verifica los IDs de `Depende de`; cada dependencia debe estar `- [x]` y tener evidencia.
 7. Implementa usando `Objetivo`, `Entregables` y `Criterios de aceptacion` como contrato.
+   - Usa tambien `Tipo`, `Historia o criterio`, `Contexto necesario`, `Contratos usados` y `Resultado esperado`.
+   - Si `Responsabilidad unica` no es `Si`, detente y pide regenerar el plan con `/plan-task BE-00X`.
+   - Si una tarea mezcla contrato, persistencia, API, seguridad, pruebas, Docker o documentacion, no la implementes como bloque compuesto; pide dividirla.
 8. Manten Clean Architecture:
    - router/adapters en `app/api`.
    - use cases en `app/application`.
@@ -34,6 +37,7 @@ Instrucciones:
 15. Marca `- [x]` solo tras ejecutar `Validacion`; reemplaza `Evidencia: pending` con archivos, comandos y resultado.
 16. Si una tarea no se completa, conserva `- [ ]`, `Evidencia: pending` y documenta el bloqueo.
 17. Resume tareas completadas, archivos modificados, endpoints y pruebas ejecutadas.
+18. Escribe comentarios, evidencias y outcomes en UTF-8. Corrige mojibake como `Ã`, `Â` o `â` antes de cerrar.
 
 Hook de cierre:
 - Si Docker Compose esta disponible y el usuario no pidió omitirlo, ejecutar `docker compose up -d --build --force-recreate db backend frontend`.

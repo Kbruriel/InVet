@@ -31,6 +31,8 @@ docs/opencode/**/*.md
 backend/scripts/validate_slice_plan.py
 ```
 
+El paquete instala el contrato de planes schema v3, incluyendo `docs/opencode/references/spec_kit_reference_improvements.md`, politica UTF-8 y validacion de tareas con responsabilidad unica.
+
 ## Comandos instalados
 
 ```text

@@ -28,7 +28,7 @@ La secuencia manual equivalente es:
 ## Reglas
 
 1. `plan-task` acepta `BE-00X`, `FE-00X` o `QA-00X`, informa la normalizacion y conserva el mismo indice vertical.
-2. `plan-task` genera un unico `docs/opencode/plans/BE-00X-plan.md` schema v2 con contrato frontend y tareas atomicas.
+2. `plan-task` genera un unico `docs/opencode/plans/BE-00X-plan.md` schema v3 con contrato frontend, trazabilidad, Docker, UTF-8 y tareas atomicas.
    Nunca implementa codigo de backend ni frontend.
 3. Cada comando mutable ejecuta `backend/scripts/validate_slice_plan.py` antes de editar.
 4. Backend y frontend implementan sus pruebas unitarias y registran evidencia por tarea.

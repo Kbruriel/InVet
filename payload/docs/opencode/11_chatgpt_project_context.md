@@ -103,8 +103,8 @@ Important supporting files:
 
 `invet-product-planner`
 - Mode: `subagent`
-- Objective: translate a BE, FE, or QA ID into one schema v2 vertical plan in `docs/opencode/plans/BE-00X-plan.md`.
-- Output: backend contract, detailed frontend contract, QA scope, dependencies, deliverables, validation, evidence, and measurable tasks.
+- Objective: translate a BE, FE, or QA ID into one schema v3 vertical plan in `docs/opencode/plans/BE-00X-plan.md`.
+- Output: backend contract, detailed frontend contract, QA scope, traceability, Docker/test contract, report/finding plan, UTF-8 policy, dependencies, deliverables, validation, evidence, and measurable tasks.
 
 ### Implementation
 
@@ -178,7 +178,7 @@ Important supporting files:
 `/plan-task BE-00X|FE-00X|QA-00X`
 - Agent: `invet-product-planner`
 - Produces `docs/opencode/plans/BE-00X-plan.md`.
-- The plan uses schema v2 and includes layer, dependencies, deliverables, validation and evidence per task.
+- The plan uses schema v3 and includes layer, type, criterion, single responsibility, context, contracts, dependencies, deliverables, validation, expected outcome and evidence per task.
 - No source code changes.
 
 `/implement-backend-task BE-00X`

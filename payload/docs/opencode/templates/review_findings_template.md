@@ -1,3 +1,8 @@
+---
+encoding: UTF-8
+artifact: review_findings
+---
+
 # Hallazgos de revisión de slice BE-XXX
 
 ## Resumen
@@ -40,3 +45,8 @@
 
 - Decision: `APPROVED|REJECTED`
 - Evidencia:
+
+## Política UTF-8
+
+- El reporte conserva acentos, eñes y signos de apertura.
+- No debe quedar mojibake como `Ã`, `Â` o `â`.

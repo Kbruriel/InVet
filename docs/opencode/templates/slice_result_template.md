@@ -1,3 +1,8 @@
+---
+encoding: UTF-8
+artifact: slice_result
+---
+
 # Resultado de slice XX
 
 ## Comandos ejecutados
@@ -50,3 +55,8 @@ O flujo manual:
 - Checks: `APPROVED|REJECTED`
 - [ ] Puede avanzar al siguiente slice.
 - [ ] No puede avanzar por blockers.
+
+## Política UTF-8
+
+- Redacciones, comentarios y outcomes conservan UTF-8.
+- No debe quedar mojibake como `Ã`, `Â` o `â`.

@@ -23,6 +23,9 @@ Instrucciones:
 8. Verifica los IDs de `Depende de`; cada dependencia debe estar `- [x]` y tener evidencia.
    - Si el backend aun no existe, solo continua cuando el plan documente un mock aprobado como entregable.
 9. Implementa usando `Objetivo`, `Entregables` y `Criterios de aceptacion` como contrato.
+   - Usa tambien `Tipo`, `Historia o criterio`, `Contexto necesario`, `Contratos usados` y `Resultado esperado`.
+   - Si `Responsabilidad unica` no es `Si`, detente y pide regenerar el plan con `/plan-task FE-00X`.
+   - Si una tarea mezcla cliente API, ruta, componente, estado UX, pruebas, Docker o documentacion, no la implementes como bloque compuesto; pide dividirla.
 10. Usa Next.js, TypeScript, React y Tailwind local.
 11. Aplica `docs/opencode/references/frontend_visual_alignment.md`.
 12. Implementa estados loading, submitting, error, empty y success, responsive y accesibilidad segun el contrato.
@@ -33,6 +36,7 @@ Instrucciones:
 17. Marca `- [x]` solo tras ejecutar `Validacion`; reemplaza `Evidencia: pending` con archivos, comandos y resultado.
 18. Si una tarea no se completa, conserva `- [ ]`, `Evidencia: pending` y documenta el bloqueo.
 19. Resume tareas completadas, rutas, componentes, contratos y pruebas ejecutadas.
+20. Escribe comentarios, evidencias y outcomes en UTF-8. Corrige mojibake como `Ã`, `Â` o `â` antes de cerrar.
 
 Hook de cierre:
 - Si Docker Compose esta disponible y el usuario no pidió omitirlo, ejecutar `docker compose up -d --build --force-recreate db backend frontend`.

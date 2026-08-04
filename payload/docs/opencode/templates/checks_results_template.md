@@ -1,3 +1,8 @@
+---
+encoding: UTF-8
+artifact: checks_results
+---
+
 # Checks tecnicos para slice BE-XXX
 
 ## Resumen
@@ -30,3 +35,8 @@ Cada `SKIPPED` debe indicar por que el check no aplica. Un entorno roto no es un
 
 - Decision: `APPROVED|REJECTED`
 - Evidencia:
+
+## Politica UTF-8
+
+- Resultados y outcomes conservan UTF-8.
+- No debe quedar mojibake como `Ã`, `Â` o `â`.

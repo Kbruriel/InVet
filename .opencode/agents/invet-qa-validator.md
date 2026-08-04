@@ -55,6 +55,8 @@ Estados por criterio:
 - `FAIL` requiere contradiccion observable entre criterio e implementacion.
 - `BLOCKED` requiere limitacion concreta de entorno, datos, dependencias o configuracion.
 - `NOT_APPLICABLE` requiere justificacion explicita.
+- La matriz debe incorporar `Historia o criterio`, `Responsabilidad unica`, `Contexto necesario`, `Contratos usados` y `Resultado esperado` desde cada tarea.
+- Una tarea compuesta o sin responsabilidad unica es un gap de plan; QA debe emitir `BLOCKED` por contrato, no reinterpretarla.
 
 Gate de decision:
 - `APPROVED` solo cuando todos los criterios aplicables estan en `PASS`, las pruebas nuevas pasan, la regresion relevante pasa, los reportes pertenecen a la ejecucion actual, no hay defects `blocker` o `critical`, no hay exposicion de secretos/PII, no existen pruebas criticas omitidas y no quedan archivos BE/FE modificados sin pruebas unitarias explicitas.
@@ -69,6 +71,7 @@ Matriz de trazabilidad:
 Validaciones obligatorias:
 - Validar backend, frontend e integracion del slice `QA-00X`.
 - Usar `docs/opencode/plans/BE-00X-plan.md` como fuente de tareas, objetivos y criterios de aceptacion.
+- Usar `Fuentes y artefactos de contexto`, `Matriz de trazabilidad`, `Contrato de ejecucion Docker y pruebas` y `Plan de reportes y findings` para evitar validar con contexto incompleto.
 - Cubrir happy path, negative path, permisos, IDOR/BOLA, estados HTTP, responsive, loading/error/empty/success, seguridad, modelos, persistencia y regresion del flujo principal cuando aplique.
 - Ejecutar primero pruebas focalizadas y luego la regresion relacionada en funcion del impacto detectado con `git diff`.
 - Detectar archivos productivos backend/frontend nuevos o modificados que carezcan de pruebas unitarias explicitas; ese gap se considera incumplimiento material del gate.
@@ -78,6 +81,7 @@ Validaciones obligatorias:
 - Si falta configuracion local, el agente debe preferir `.env.qa` con `DATABASE_URL=postgresql+psycopg://postgres:postgres@localhost:5432/invet` y `SECRET_KEY` temporal de QA antes de reportar bloqueo.
 - Si la base de datos externa no esta disponible, el agente debe revisar primero `backend/app/tests/conftest.py` y `backend/app/infrastructure/database/session.py` para correr las pruebas dentro de los contenedores de backend contra PostgreSQL.
 - Si el preflight del plan falla, el agente debe tratar cualquier `QA-00X-results.md` previo como stale, crear o actualizar `QA-00X-findings.md` con la evidencia del fallo y redirigir la correccion al plan canonico del slice.
+- Todos los resultados, findings y outcomes se escriben en UTF-8. Si detectas mojibake nuevo como `Ã`, `Â` o `â`, rechaza esa evidencia hasta corregirla.
 
 Contexto Docker para ejecucion de pruebas:
 - La raiz del repo contiene `docker-compose.yml` con servicios `db`, `backend` y `frontend`.

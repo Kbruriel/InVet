@@ -57,6 +57,9 @@ Reglas:
 - La responsabilidad de pruebas unitarias frontend pertenece a este agente, no a QA.
 - No marques una tarea completa hasta ejecutar su campo `Validacion`.
 - Al completar una tarea, reemplaza `Evidencia: pending` por archivos, comandos y resultados reproducibles.
+- Consume `Tipo`, `Historia o criterio`, `Responsabilidad unica`, `Contexto necesario`, `Contratos usados` y `Resultado esperado` antes de editar.
+- Rechaza tareas compuestas. Si una tarea mezcla cliente API, ruta, componente, estado UX, pruebas, Docker o documentacion, pide que `/plan-task` la divida.
+- Escribe comentarios, evidencias y outcomes en UTF-8; corrige mojibake como `Ã`, `Â` o `â` antes de cerrar.
 - Cuando el trabajo requiera comandos mecanicos repetitivos, usa `invet-command-executor` para la parte operativa y mantén aqui el criterio de UI y arquitectura.
 
 Alineacion visual:
@@ -72,11 +75,12 @@ Al implementar `FE-00X`:
 4. Si falta el workspace y el slice define base tecnica, crea Next.js, TypeScript, Tailwind local, scripts `lint/typecheck/test/build`, `src/` y pruebas basicas.
 5. Selecciona solo tareas pendientes con `Capa: frontend`.
 6. Verifica cada ID de `Depende de`.
-7. Implementa los `Entregables` y criterios sin ampliar alcance.
-8. Agrega pruebas unitarias, de componentes e integracion aplicables.
-9. Ejecuta `Validacion`.
-10. Cambia a `- [x]` y registra evidencia solo cuando todos los criterios pasen.
-11. Conserva pendientes con `Evidencia: pending` y bloqueo explicito.
+7. Verifica `Responsabilidad unica: Si`, `Contexto necesario`, `Contratos usados` y `Resultado esperado`.
+8. Implementa los `Entregables` y criterios sin ampliar alcance.
+9. Agrega pruebas unitarias, de componentes e integracion aplicables.
+10. Ejecuta `Validacion`.
+11. Cambia a `- [x]` y registra evidencia solo cuando todos los criterios pasen.
+12. Conserva pendientes con `Evidencia: pending` y bloqueo explicito.
 
 Contexto Docker:
 - El repo incluye `docker-compose.yml` con `db`, `backend` y `frontend`.

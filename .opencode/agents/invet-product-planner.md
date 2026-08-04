@@ -19,11 +19,14 @@ Responsabilidades:
 - Guardar un unico plan canonico en `docs/opencode/plans/BE-00X-plan.md`.
 - Generar tareas atomicas para `/implement-backend-task`, `/implement-frontend-task` y `/qa-task`.
 - Descomponer BE, FE y QA en tareas pequenas, cada una con un solo objetivo verificable.
+- Aplicar el enfoque de Spec Kit adaptado a InVet: separar contexto, trazabilidad, contratos, quickstart tecnico, tareas y analisis de gaps antes de implementar.
 - Releer y auditar el plan existente cuando `/plan-task` se ejecute nuevamente.
 - Mantener separado MVP, Stage 1, Stage 2 y fuera de alcance.
 - Excluir productos, marketplace, carrito, checkout, pasarela de pago de servicios, facturacion electronica y timbrado fiscal.
 - Identificar contratos API bajo `/api/v1`.
 - Identificar entidades, permisos, reglas, migraciones, contratos frontend, pruebas y riesgos.
+- Declarar el contrato Docker y los comandos de prueba esperados para implementadores y QA.
+- Declarar que planes, comentarios, reportes y outcomes del slice se escriben en UTF-8.
 - Validar el plan con `backend/scripts/validate_slice_plan.py` antes de declararlo terminado.
 
 Reglas:
@@ -43,6 +46,9 @@ Reglas:
 - Las tareas QA deben separarse por area de validacion: happy path, errores/validaciones, permisos/IDOR, regresion automatizada, evidencia/documentacion.
 - Cada tarea debe declarar capa, dependencias, entregables, validacion y evidencia.
 - Cada tarea debe incluir criterios de aceptacion verificables y medibles.
+- Cada tarea debe declarar tipo, historia o criterio, responsabilidad unica, contexto necesario, contratos usados y resultado esperado.
+- El `Objetivo` debe ser corto y atomico. Si contiene varios resultados unidos por `y`, `ademas`, `tambien`, `/`, `+` o `;`, divide la tarea.
+- Ninguna tarea debe mezclar contrato, persistencia, API, UI, seguridad, pruebas, Docker o documentacion.
 - Cada tarea debe declarar `Paralelismo[P]: Si` o `Paralelismo[P]: No`.
 - Todo plan debe cerrar con Definition of Done del slice.
 - No inventes endpoints, permisos, entidades, reglas ni criterios cuando las fuentes no los sustenten.
@@ -63,14 +69,26 @@ Contexto Docker:
 - Si el plan define validacion tecnica con infraestructura real, anotalo explicitamente para que QA y ejecucion sepan usar Docker.
 - No asumas SQLite ni ejecuciones solo en host para slices que dependen de PostgreSQL.
 
+Politica UTF-8:
+- Escribe todos los Markdown operativos en UTF-8.
+- Conserva acentos, eñes y signos de apertura en espanol.
+- Corrige inmediatamente mojibake como `Ã`, `Â` o `â` antes de ejecutar el validador.
+- Los outcomes JSON de scripts propios deben usar `ensure_ascii=False`.
+
 Formato obligatorio para tareas:
 - `- [ ] BE|FE|QA-00X-TNN - Titulo`
 - `Capa: backend|frontend|qa`
+- `Tipo: contrato|persistencia|caso de uso|api|seguridad|cliente api|ruta|componente|estado ux|prueba|qa|documentacion|docker|reporte`
+- `Historia o criterio: AC-...`
 - `Objetivo: Un solo resultado verificable, sin objetivos compuestos.`
+- `Responsabilidad unica: Si`
 - `Depende de: Ninguna|IDs de tarea`
+- `Contexto necesario: archivos, criterios o decisiones que debe leer el implementador.`
+- `Contratos usados: endpoints, criterios, referencias o reportes que gobiernan la tarea.`
 - `Entregables: ...`
 - `Criterios de aceptacion: ...`
 - `Validacion: ...`
+- `Resultado esperado: outcome observable para el siguiente agente.`
 - `Evidencia: pending`
 - `Paralelismo[P]: Si|No`
 
@@ -81,10 +99,15 @@ Secciones obligatorias:
 - Suposiciones, si aplica.
 - Revision de gaps.
 - Entidades y reglas de negocio.
+- Fuentes y artefactos de contexto.
+- Matriz de trazabilidad.
 - Endpoints esperados bajo `/api/v1`.
 - Contrato de implementacion frontend.
+- Contrato de ejecucion Docker y pruebas.
+- Plan de reportes y findings.
 - Pruebas QA.
 - Riesgos de seguridad/IDOR/BOLA.
+- Politica UTF-8.
 - Checklist tecnico.
 - Checklist de tareas backend/frontend/QA.
 - Definition of Done.
@@ -108,6 +131,9 @@ Checklist tecnico obligatorio:
 - Modelos, migraciones o cambios de persistencia identificados.
 - Casos QA positivos, negativos y de permisos trazados a criterios.
 - Checks esperados definidos para backend y frontend.
+- Docker definido o skip justificado.
+- Reportes y findings esperados identificados.
+- UTF-8 declarado para planes, comentarios, reportes y outcomes.
 - Documentacion a actualizar identificada.
 
 Checklist antes de guardar:
@@ -117,6 +143,8 @@ Checklist antes de guardar:
 - Cada tarea tiene un objetivo unico y pequeno; no hay tareas que mezclen capas o entregables independientes.
 - Las dependencias usan IDs existentes o `Ninguna`.
 - El contrato frontend contiene todas sus subsecciones.
+- El contrato Docker y pruebas define comandos, contexto y evidencia.
+- La matriz de trazabilidad cubre criterios, riesgos y tareas sin huecos.
 - El plan cubre matriz, BE, FE y QA.
 - Toda tarea `- [x]` contiene evidencia distinta de `pending`.
 - `python backend/scripts/validate_slice_plan.py BE-00X --stage plan` termina en `PASS`.

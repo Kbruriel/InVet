@@ -1,3 +1,8 @@
+---
+encoding: UTF-8
+artifact: qa_results
+---
+
 # QA-00X Results
 
 ## Metadata
@@ -18,6 +23,8 @@
 | criterio | riesgo | caso de prueba | nivel | suite o archivo | comando | resultado | evidencia | estado |
 |---|---|---|---|---|---|---|---|---|
 | AC-001 | riesgo principal | caso principal | integration | backend/app/tests/... | python -m pytest ... | pass | ruta o reporte | PASS |
+
+La matriz debe incorporar `Historia o criterio`, `Contexto necesario`, `Contratos usados` y `Resultado esperado` cuando provengan del plan schema v3.
 
 ## Criterios y estados
 
@@ -92,3 +99,8 @@ python -m mypy app
 - decision: `APPROVED|REJECTED|BLOCKED`
 - justificacion:
 - continuar con nuevas tareas: `SI|NO`
+
+## Política UTF-8
+
+- Resultados, hallazgos y outcomes conservan UTF-8.
+- No debe quedar mojibake como `Ã`, `Â` o `â`.

@@ -41,7 +41,9 @@ Flujo manual equivalente:
 Notas:
 - `/plan-task` acepta `BE-00X`, `FE-00X` o `QA-00X`, normaliza el mismo indice y nunca implementa codigo.
 - Todos los IDs producen un unico plan canonico `docs/opencode/plans/BE-00X-plan.md`.
-- Los planes schema v2 se validan con `backend/scripts/validate_slice_plan.py`.
+- Los planes nuevos usan schema v3 y se validan con `backend/scripts/validate_slice_plan.py`.
+- Los planes schema v2 son legacy: deben regenerarse con `/plan-task` antes de implementarse.
+- Los artefactos operativos se escriben en UTF-8.
 - Para implementar frontend usa `/implement-frontend-task FE-00X`.
 - Para ejecutar QA usa `/qa-task QA-00X`.
 - Para revisar un slice puedes usar `/review-slice BE-00X` o `/review-slice FE-00X`.
@@ -64,7 +66,8 @@ Los archivos de hallazgos esperados son:
 - `11_chatgpt_project_context.md`: contexto consolidado para usar el proyecto en ChatGPT.
 - `12_troubleshooting_skills_vs_agents.md`: solucion al error de confundir skills Codex con agentes OpenCode.
 - `templates`: plantillas Markdown para resultados, hallazgos y correcciones.
-- `templates/slice_plan_template.md`: contrato obligatorio de planes schema v2.
+- `templates/slice_plan_template.md`: contrato obligatorio de planes schema v3.
+- `references/spec_kit_reference_improvements.md`: adaptacion de aprendizajes de `github/spec-kit` al flujo agentico InVet.
 - `tasks/backend`: tareas backend.
 - `tasks/frontend`: tareas frontend.
 - `tasks/qa`: tareas QA.

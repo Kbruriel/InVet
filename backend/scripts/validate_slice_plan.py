@@ -9,21 +9,32 @@ import sys
 from dataclasses import dataclass
 from pathlib import Path
 
+EXPECTED_SCHEMA_VERSION = "3"
 SLICE_ID_RE = re.compile(r"^(BE|FE|QA)-(?P<index>\d{3})$", re.IGNORECASE)
 TASK_RE = re.compile(
     r"^- \[(?P<done>[ xX])\] " r"(?P<id>(?:BE|FE|QA)-\d{3}-T\d{2})\s+-\s+\S.*$"
 )
 FIELD_RE = re.compile(r"^\s{2,}(?P<name>[^:]+):\s*(?P<value>.*)$")
+MOJIBAKE_RE = re.compile(r"(?:Ã.|Â.|â..)")
+COMPOSITE_OBJECTIVE_RE = re.compile(
+    r"\b(?:y|ademas|además|tambien|también|junto con|incluyendo)\b|[;/+]",
+    re.IGNORECASE,
+)
 
 REQUIRED_SECTIONS = (
     "objetivo del slice",
     "alcance mvp",
     "fuera de alcance",
     "entidades y reglas de negocio",
+    "fuentes y artefactos de contexto",
+    "matriz de trazabilidad",
     "endpoints esperados",
     "contrato de implementacion frontend",
+    "contrato de ejecucion docker y pruebas",
+    "plan de reportes y findings",
     "pruebas qa",
     "riesgos de seguridad/idor/bola",
+    "politica utf-8",
     "checklist tecnico",
     "checklist de tareas",
     "definition of done",
@@ -41,11 +52,17 @@ REQUIRED_FRONTEND_SECTIONS = (
 
 REQUIRED_TASK_FIELDS = (
     "capa",
+    "tipo",
+    "historia o criterio",
     "objetivo",
+    "responsabilidad unica",
     "depende de",
+    "contexto necesario",
+    "contratos usados",
     "entregables",
     "criterios de aceptacion",
     "validacion",
+    "resultado esperado",
     "evidencia",
     "paralelismo[p]",
 )
@@ -177,8 +194,10 @@ def _validate_plan_metadata(
     frontmatter = _parse_frontmatter(text)
     headings = _extract_headings(text)
 
-    if frontmatter.get("schema_version") != "2":
-        errors.append("El frontmatter debe declarar schema_version: 2.")
+    if frontmatter.get("schema_version") != EXPECTED_SCHEMA_VERSION:
+        errors.append(
+            f"El frontmatter debe declarar schema_version: {EXPECTED_SCHEMA_VERSION}."
+        )
     if frontmatter.get("slice") != expected.index:
         errors.append(f'El frontmatter debe declarar slice: "{expected.index}".')
     if frontmatter.get("canonical_plan", "").upper() != expected.backend:
@@ -193,6 +212,11 @@ def _validate_plan_metadata(
     for section in REQUIRED_FRONTEND_SECTIONS:
         if section not in headings:
             errors.append(f"Falta la subseccion frontend: {section}.")
+
+    if MOJIBAKE_RE.search(text):
+        errors.append(
+            "El plan contiene mojibake probable. Guarda y redacta el artefacto en UTF-8."
+        )
 
     return errors
 
@@ -225,6 +249,50 @@ def _validate_dependencies(task: PlanTask, task_ids: set[str]) -> list[str]:
             errors.append(
                 f"Linea {task.line_number}: dependencia inexistente {dependency}."
             )
+    return errors
+
+
+def _validate_task_atomic_contract(task: PlanTask) -> list[str]:
+    errors: list[str] = []
+    single_responsibility = _normalize_label(
+        task.fields.get("responsabilidad unica", "")
+    )
+    if single_responsibility not in {"si", "sí"}:
+        errors.append(f"Linea {task.line_number}: Responsabilidad unica debe ser Si.")
+
+    task_type = _normalize_label(task.fields.get("tipo", ""))
+    allowed_types = {
+        "contrato",
+        "persistencia",
+        "caso de uso",
+        "api",
+        "seguridad",
+        "cliente api",
+        "ruta",
+        "componente",
+        "estado ux",
+        "prueba",
+        "qa",
+        "documentacion",
+        "docker",
+        "reporte",
+    }
+    if task_type and task_type not in allowed_types:
+        errors.append(
+            f"Linea {task.line_number}: Tipo debe ser uno de "
+            f"{', '.join(sorted(allowed_types))}."
+        )
+
+    objective = task.fields.get("objetivo", "")
+    if len(objective.split()) > 24:
+        errors.append(
+            f"Linea {task.line_number}: Objetivo debe ser pequeno "
+            "(24 palabras maximo)."
+        )
+    if COMPOSITE_OBJECTIVE_RE.search(_normalize_label(objective)):
+        errors.append(
+            f"Linea {task.line_number}: Objetivo parece compuesto; divide la tarea."
+        )
     return errors
 
 
@@ -263,6 +331,8 @@ def _validate_task(
     parallelism = _normalize_label(task.fields.get("paralelismo[p]", ""))
     if parallelism not in {"si", "no"}:
         errors.append(f"Linea {task.line_number}: Paralelismo[P] debe ser Si o No.")
+
+    errors.extend(_validate_task_atomic_contract(task))
 
     evidence = _normalize_label(task.fields.get("evidencia", ""))
     if task.done and evidence in {"", "pending", "pendiente", "ninguna", "n/a"}:
@@ -509,6 +579,11 @@ def validate_stage(repo_root: Path, slice_ids: SliceIds, stage: str) -> list[str
 
 
 def main() -> int:
+    if hasattr(sys.stdout, "reconfigure"):
+        sys.stdout.reconfigure(encoding="utf-8")
+    if hasattr(sys.stderr, "reconfigure"):
+        sys.stderr.reconfigure(encoding="utf-8")
+
     parser = argparse.ArgumentParser(
         description="Valida el plan y los gates de un slice InVet."
     )
@@ -553,7 +628,7 @@ def main() -> int:
     }
 
     if args.as_json:
-        print(json.dumps(result, ensure_ascii=True, indent=2))
+        print(json.dumps(result, ensure_ascii=False, indent=2))
     else:
         print(
             f"[{result['status']}] {slice_ids.backend}/{slice_ids.frontend}/"

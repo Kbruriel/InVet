@@ -1,3 +1,8 @@
+---
+encoding: UTF-8
+artifact: qa_findings
+---
+
 # Hallazgos de QA para slice QA-XXX
 
 ## Finding
@@ -52,3 +57,8 @@
 - [ ] Requiere intervencion adicional externa.
 - [ ] Correccion lista para revalidar (`READY_FOR_REVALIDATION`).
 - [ ] QA revalido y cerro el finding (`RESOLVED`).
+
+## Política UTF-8
+
+- El finding conserva acentos, eñes y signos de apertura.
+- No debe quedar mojibake como `Ã`, `Â` o `â`.

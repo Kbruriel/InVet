@@ -19,6 +19,7 @@ Instrucciones:
    - `docs/opencode/tasks/backend/BE-00X.md`
    - `docs/opencode/tasks/frontend/FE-00X.md`
    - `docs/opencode/tasks/qa/QA-00X.md`
+   - `docs/opencode/references/spec_kit_reference_improvements.md`
    - `docs/opencode/templates/slice_plan_template.md`
    - `docs/opencode/plans/BE-00X-plan.md` si ya existe.
 5. Produce un plan de ejecucion vertical con:
@@ -26,10 +27,15 @@ Instrucciones:
    - Alcance MVP.
    - Fuera de alcance.
    - Entidades y reglas de negocio.
+   - Fuentes y artefactos de contexto.
+   - Matriz de trazabilidad criterio -> tarea -> validacion.
    - Endpoints esperados.
    - Contrato de implementacion frontend detallado.
+   - Contrato de ejecucion Docker y pruebas.
+   - Plan de reportes y findings.
    - Pruebas QA.
    - Riesgos de seguridad/IDOR/BOLA.
+   - Politica UTF-8.
    - Definition of Done.
 6. El contrato frontend debe definir obligatoriamente:
    - Rutas y acceso publico/privado.
@@ -42,14 +48,23 @@ Instrucciones:
 7. Genera tareas atomicas para backend, frontend y QA con el formato exacto de la plantilla:
    - `- [ ] BE|FE|QA-00X-TNN - Titulo`
    - `Capa: backend|frontend|qa`
+   - `Tipo: contrato|persistencia|caso de uso|api|seguridad|cliente api|ruta|componente|estado ux|prueba|qa|documentacion|docker|reporte`
+   - `Historia o criterio: AC-...`
    - `Objetivo: ...`
+   - `Responsabilidad unica: Si`
    - `Depende de: Ninguna|IDs de tarea`
+   - `Contexto necesario: ...`
+   - `Contratos usados: ...`
    - `Entregables: ...`
    - `Criterios de aceptacion: ...`
    - `Validacion: ...`
+   - `Resultado esperado: ...`
    - `Evidencia: pending`
    - `Paralelismo[P]: Si|No`
-8. Cada tarea debe tener un unico objetivo, dependencias explicitas, entregables concretos y criterios verificables.
+8. Cada tarea debe tener un unico objetivo, dependencias explicitas, entregables concretos, contexto minimo, contratos usados, resultado esperado y criterios verificables.
+   - Si una tarea contiene objetivos unidos por `y`, `ademas`, `tambien`, `/`, `+` o `;`, dividela.
+   - Si una tarea toca mas de una capa o tipo de trabajo, dividela.
+   - Si una tarea necesita varios entregables independientes para ser verificable, dividela.
 9. No implementes codigo fuente en este comando.
    - `/plan-task` nunca implementa backend, frontend ni QA; solo crea o corrige `docs/opencode/plans/BE-00X-plan.md`.
 10. Si falta informacion critica, existen contradicciones entre matriz/tareas o no se pueden derivar criterios de aceptacion medibles:
@@ -65,6 +80,9 @@ Instrucciones:
    - Si una tarea completada carece de evidencia, regresala a `- [ ]`, usa `Evidencia: pending` y registra el motivo en `Revision de gaps`.
    - No dupliques tareas existentes; actualizalas o agrega solo las tareas faltantes.
    - Documenta cambios en una seccion `Revision de gaps`.
-12. Agrega un `Checklist tecnico` obligatorio con validaciones de rutas, contratos API, permisos, migraciones/modelos, estados de error, pruebas, run-checks y documentacion.
+12. Agrega un `Checklist tecnico` obligatorio con validaciones de rutas, contratos API, permisos, migraciones/modelos, estados de error, pruebas, Docker, run-checks, reportes/findings, UTF-8 y documentacion.
 13. Al terminar, ejecuta `python backend/scripts/validate_slice_plan.py BE-00X --stage plan`.
    - No declares la planificacion terminada mientras el validador reporte errores.
+14. Escribe y conserva el plan en UTF-8.
+   - Los textos en espanol deben conservar acentos y eñes.
+   - Si aparece mojibake como `Ã`, `Â` o `â` en artefactos nuevos, corrige antes de validar.

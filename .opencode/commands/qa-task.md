@@ -28,6 +28,11 @@ Instrucciones:
     - trata el contenedor de `frontend` como runtime por defecto: no asumas que sirve para pruebas sin un flujo de testing explicito.
     - usa los contenedores de backend cuando la suite requiera PostgreSQL en Docker.
 5. Usa los `Objetivo` y `Criterios de aceptacion` de cada tarea del plan para derivar una matriz de trazabilidad por criterio:
+   - historia o criterio
+   - responsabilidad unica
+   - contexto necesario
+   - contratos usados
+   - resultado esperado
    - criterio
    - riesgo
    - caso de prueba
@@ -56,6 +61,7 @@ Instrucciones:
 16. Documenta trazabilidad, reportes, defects, gate unitario y decision final.
 17. Crea `docs/opencode/qa/QA-00X-findings.md` con estado `OPEN`; `/implement-findings` lo mueve a `READY_FOR_REVALIDATION` y solo una nueva corrida QA puede marcarlo `RESOLVED`.
 18. No declares el slice listo mientras QA no sea `APPROVED` o existan findings no resueltos.
+19. Escribe resultados, findings y outcomes en UTF-8. Rechaza evidencia nueva con mojibake como `Ã`, `Â` o `â`.
 
 Hook de cierre:
 - Si QA termina en `APPROVED`, Docker Compose esta disponible y el usuario no pidió omitirlo, primero validar si existen cambios pendientes que afecten `backend`, `frontend`, `docker-compose.yml`, `Dockerfile*`, `backend/requirements.txt`, `backend/pyproject.toml`, `frontend/package.json` o lockfiles.

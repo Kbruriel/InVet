@@ -6,16 +6,20 @@
 - El plan canonico es `docs/opencode/plans/BE-00X-plan.md`.
 - Los agentes intercambian estado mediante Markdown versionado, no memoria implicita.
 - Cada comando mutable ejecuta `backend/scripts/validate_slice_plan.py`.
+- Los planes nuevos usan `schema_version: 3` y declaran `encoding: UTF-8`.
+- Todas las redacciones, comentarios, evidencias y outcomes operativos se escriben en UTF-8.
 - Las tareas mecanicas de ejecucion pueden delegarse a `invet-command-executor` para conservar el razonamiento en el agente de dominio.
 - Una tarea completada requiere criterios verificados y `Evidencia` reproducible.
 - Un gate fallido detiene el flujo; no se convierte en `skipped`.
+- Cada tarea debe tener responsabilidad unica, tipo declarado, contexto necesario, contratos usados y resultado esperado.
+- Los agentes de implementacion deben rechazar tareas compuestas en lugar de reinterpretarlas.
 
 ## Responsabilidades
 
 | Agente | Responsabilidad | Gate o salida |
 | --- | --- | --- |
 | `invet-orchestrator` | Ejecuta el slice completo y evita saltar etapas | Bloquea ante plan invalido, QA no aprobado, findings abiertos, reviews o checks rechazados |
-| `invet-product-planner` | Acepta IDs BE/FE/QA y crea el plan vertical schema v2 | `BE-00X-plan.md` validado |
+| `invet-product-planner` | Acepta IDs BE/FE/QA y crea el plan vertical schema v3 | `BE-00X-plan.md` validado |
 | `invet-backend-implementer` | Implementa tareas `Capa: backend` y sus pruebas unitarias | Criterios, validacion y evidencia por tarea |
 | `invet-frontend-implementer` | Implementa el contrato frontend y sus pruebas unitarias/de componente | Criterios, validacion y evidencia por tarea |
 | `invet-qa-validator` | Valida aceptacion, integracion, contrato, seguridad y regresion | `QA-00X-results.md` y decision `APPROVED|REJECTED|BLOCKED` |
@@ -44,6 +48,34 @@ QA no repara y certifica el mismo gap unitario. Debe emitir `REJECTED`, dejar un
 Todos los agentes operativos pueden usar `docker compose` cuando el slice requiera PostgreSQL, backend runtime o frontend runtime en contenedor. La referencia normal es `db` + `backend` para pruebas con persistencia y `frontend` para validacion de UI cuando aplique.
 
 Cuando la validacion requiera PostgreSQL u otro servicio del compose del repo, `invet-qa-validator` ejecuta la suite dentro del contenedor de backend y usa `docker compose` como contexto de prueba. Antes de reiniciar contenedores al cierre, valida si existen cambios pendientes que realmente ameriten rebuild/restart; si no los hay, registra el skip y no fuerza Docker. El contenedor de `frontend` se considera runtime por defecto y no debe asumirse apto para tests salvo que el flujo lo prepare de forma explicita.
+
+## Contrato de tarea schema v3
+
+Cada tarea del plan debe incluir:
+
+- `Capa`
+- `Tipo`
+- `Historia o criterio`
+- `Objetivo`
+- `Responsabilidad unica`
+- `Depende de`
+- `Contexto necesario`
+- `Contratos usados`
+- `Entregables`
+- `Criterios de aceptacion`
+- `Validacion`
+- `Resultado esperado`
+- `Evidencia`
+- `Paralelismo[P]`
+
+`Responsabilidad unica` debe ser `Si`. El objetivo debe ser pequeno y no compuesto. Si un agente detecta que una tarea mezcla contrato, persistencia, API, UI, seguridad, pruebas, Docker o documentacion, debe devolverla al planner para division antes de implementar.
+
+## Politica UTF-8
+
+- Markdown operativo, comentarios de codigo escritos por agentes, reportes, findings y outcomes deben conservar UTF-8.
+- Los scripts Python del pipeline deben usar `encoding="utf-8"` para leer/escribir texto.
+- JSON generado por herramientas propias debe usar `ensure_ascii=False`.
+- Texto nuevo con mojibake probable (`Ã`, `Â`, `â`) invalida el artefacto hasta corregirse.
 
 ## Lifecycle de findings QA
 

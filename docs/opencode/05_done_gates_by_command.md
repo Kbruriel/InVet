@@ -5,11 +5,16 @@ Este archivo define requisitos, no el estado de un slice. Los checks permanecen 
 ## `/plan-task BE-00X|FE-00X|QA-00X`
 
 - [ ] El ID fue normalizado explicitamente al mismo slice.
-- [ ] El plan usa `schema_version: 2`.
+- [ ] El plan usa `schema_version: 3` y declara `encoding: UTF-8`.
 - [ ] Existe contrato frontend completo.
-- [ ] Hay tareas BE, FE y QA con IDs, capa, dependencias y entregables.
-- [ ] Cada tarea tiene criterios, validacion, evidencia y paralelismo.
+- [ ] Existe matriz de trazabilidad criterio -> tarea -> validacion.
+- [ ] Existe contrato de ejecucion Docker y pruebas.
+- [ ] Existe plan de reportes y findings.
+- [ ] Hay tareas BE, FE y QA con IDs, capa, tipo, dependencias, contexto, contratos usados y entregables.
+- [ ] Cada tarea tiene responsabilidad unica, criterios, validacion, resultado esperado, evidencia y paralelismo.
+- [ ] No hay tareas compuestas que mezclen contrato, persistencia, API, UI, seguridad, pruebas, Docker o documentacion.
 - [ ] Las tareas completadas contienen evidencia reproducible.
+- [ ] El plan no contiene mojibake y conserva UTF-8.
 - [ ] `validate_slice_plan.py --stage plan` termina en `PASS`.
 
 ## `/implement-backend-task BE-00X`
@@ -17,6 +22,8 @@ Este archivo define requisitos, no el estado de un slice. Los checks permanecen 
 - [ ] El preflight backend pasa.
 - [ ] Solo se implementan tareas `Capa: backend`.
 - [ ] Las dependencias estan completas y evidenciadas.
+- [ ] Cada tarea implementada declara `Responsabilidad unica: Si`.
+- [ ] Se usaron `Contexto necesario`, `Contratos usados` y `Resultado esperado`.
 - [ ] Los archivos productivos modificados tienen pruebas unitarias.
 - [ ] La validacion de cada tarea pasa.
 - [ ] El plan contiene evidencia actualizada.
@@ -27,6 +34,8 @@ Este archivo define requisitos, no el estado de un slice. Los checks permanecen 
 - [ ] El preflight frontend pasa.
 - [ ] El contrato frontend define rutas, flujos, API, formularios, arquitectura, accesibilidad y pruebas.
 - [ ] Solo se implementan tareas `Capa: frontend`.
+- [ ] Cada tarea implementada declara `Responsabilidad unica: Si`.
+- [ ] Se usaron `Contexto necesario`, `Contratos usados` y `Resultado esperado`.
 - [ ] Los archivos productivos modificados tienen pruebas unitarias/de componente.
 - [ ] Lint, typecheck, test y build aplicables pasan.
 - [ ] El plan contiene evidencia actualizada.
@@ -34,14 +43,16 @@ Este archivo define requisitos, no el estado de un slice. Los checks permanecen 
 
 ## `/qa-task QA-00X`
 
-- [ ] El plan schema v2 es valido.
+- [ ] El plan schema v3 es valido.
 - [ ] Cada criterio tiene trazabilidad y estado.
+- [ ] La matriz QA incorpora historia o criterio, contexto necesario, contratos usados y resultado esperado.
 - [ ] Los reportes pertenecen a la corrida actual.
 - [ ] Los gaps unitarios producen `REJECTED` y findings `OPEN`.
 - [ ] QA no repara pruebas unitarias de producto.
 - [ ] La regresion relevante pasa.
 - [ ] La decision es `APPROVED`, `REJECTED` o `BLOCKED`.
 - [ ] Solo QA cambia findings a `RESOLVED`.
+- [ ] Los resultados y findings estan escritos en UTF-8.
 - [ ] Antes del cierre se valido si habia cambios pendientes que justificaran actualizar contenedores.
 - [ ] El hook de Docker Compose de cierre se ejecuto cuando QA quedo `APPROVED`.
 

@@ -5,7 +5,7 @@
 | Campo | Valor |
 |---|---|
 | Estado | Vigente |
-| Contrato de plan | Schema v2 |
+| Contrato de plan | Schema v3 |
 | Entrada orquestada | `/execute-slice BE-00X`, `/execute-slice FE-00X` o `/execute-slice QA-00X` |
 | Motor de gates | `backend/scripts/validate_slice_plan.py` |
 | Plan canonico | `docs/opencode/plans/BE-00X-plan.md` |
@@ -20,6 +20,8 @@ Las fuentes normativas complementarias son:
 - `backend/scripts/validate_slice_plan.py`
 - `docs/opencode/04_agent_contracts.md`
 - `docs/opencode/05_done_gates_by_command.md`
+- `docs/opencode/templates/slice_plan_template.md`
+- `docs/opencode/references/spec_kit_reference_improvements.md`
 
 En caso de discrepancia, prevalecen el validador determinista y el contrato del comando que se esta ejecutando.
 
@@ -69,6 +71,24 @@ Los agentes `invet-command-executor` e `invet-command-executor-fallback` no repr
 6. La existencia de un archivo no equivale a aprobacion. Las decisiones y estados declarados dentro de los artefactos son obligatorios.
 7. QA valida y bloquea, pero no corrige codigo de producto ni implementa las pruebas unitarias que corresponden a BE o FE.
 8. Un slice solo se considera cerrado cuando QA, las tres revisiones y los checks estan aprobados, y la documentacion final fue actualizada.
+9. Los planes nuevos usan schema v3 y deben declarar contexto, trazabilidad, contrato Docker/pruebas, plan de reportes/findings y politica UTF-8.
+10. Las tareas deben ser pequenas, de una sola capa, de un solo tipo y con `Responsabilidad unica: Si`.
+11. Los implementadores no reinterpretan tareas compuestas; las devuelven al planner para division.
+12. Todos los planes, reportes, comentarios, evidencias y outcomes operativos deben conservar UTF-8.
+
+## Cambios schema v3 implementados
+
+La arquitectura agentica adopta aprendizajes de `github/spec-kit` sin copiar su estructura completa. InVet conserva su plan canonico por slice, pero agrega controles equivalentes a especificacion, plan, tareas, analisis e implementacion:
+
+| Area | Cambio implementado | Efecto operativo |
+|---|---|---|
+| Contexto | `Fuentes y artefactos de contexto` | Los agentes saben que documentos leer antes de decidir o editar |
+| Trazabilidad | `Matriz de trazabilidad` | Cada criterio, riesgo o contrato se conecta con tarea, validacion y evidencia |
+| Granularidad | Nuevos campos de tarea schema v3 | El planner genera tareas pequenas y los implementadores rechazan tareas compuestas |
+| Docker y pruebas | `Contrato de ejecucion Docker y pruebas` | QA e implementacion distinguen host local, PostgreSQL en contenedor y runtime completo |
+| Reportes | `Plan de reportes y findings` | Cada agente sabe que artefacto produce y quien lo consume |
+| UTF-8 | `encoding: UTF-8` y politica UTF-8 | Se evitan redacciones, comentarios y outcomes con encoding roto |
+| Validador | `validate_slice_plan.py` exige schema v3 | Los gaps se detectan antes de iniciar implementacion |
 
 ## Entradas operativas
 
@@ -135,6 +155,7 @@ C4Container
     System_Boundary(repoBoundary, "Repositorio") {
         Container(product, "Codigo y pruebas", "Python y frontend", "Implementacion de producto y suites automatizadas")
         Container(artifacts, "Artefactos de coordinacion", "Markdown", "Planes, QA, findings, reviews, checks y cierre")
+        Container(references, "Referencias operativas", "Markdown", "Spec Kit adaptado, arquitectura, seguridad, visual, checks y alcance")
         Container(payload, "Payload distribuible", "Plantillas y scripts", "Replica instalable de agentes, comandos y contratos")
     }
 
@@ -146,6 +167,7 @@ C4Container
     Rel(agents, validator, "Valida prerequisitos")
     Rel(agents, product, "Lee o modifica segun responsabilidad")
     Rel(agents, artifacts, "Produce y consume evidencia")
+    Rel(agents, references, "Consulta reglas y patrones")
     Rel(validator, artifacts, "Comprueba schema, estados y decisiones")
     Rel(payload, commands, "Distribuye contratos")
     Rel(payload, agents, "Distribuye agentes")
@@ -159,8 +181,9 @@ flowchart TD
     A["Entrada BE, FE o QA-00X"] --> B["Normalizar al slice 00X"]
     B --> C{"Gate del slice anterior aprobado"}
     C -- "No" --> X["BLOCKED: completar QA del slice anterior"]
-    C -- "Si" --> D["Planificar con schema v2"]
-    D --> E{"Plan valido"}
+    C -- "Si" --> D["Planificar con schema v3"]
+    D --> D2["Analizar gaps, trazabilidad y granularidad"]
+    D2 --> E{"Plan valido"}
     E -- "No" --> Y["BLOCKED: corregir o regenerar el plan"]
     E -- "Si" --> F["Implementar backend"]
     F --> F2{"Persistencia segura aprobada"}
@@ -191,18 +214,19 @@ flowchart TD
 El orden canonico administrado por el orquestador es:
 
 1. `/plan-task BE|FE|QA-00X`
-2. `/implement-backend-task BE-00X`
-3. Gate de Persistencia segura: `python backend/scripts/validate_slice_plan.py BE-00X --stage secure-persistence`
-4. `/implement-frontend-task FE-00X`
-5. `/qa-task QA-00X`
-6. `/review-slice BE-00X`
-7. `/clean-architecture-review BE-00X`
-8. `/security-review BE-00X`
-9. `/implement-findings BE-00X`, solo cuando existen hallazgos bloqueantes
-10. Repetir QA y las revisiones afectadas despues de corregir
-11. `/run-checks BE-00X`
-12. `/update-docs BE-00X`
-13. `/final-gate BE-00X`, solo si se activa la segunda opinion de release
+2. Analisis de gaps, trazabilidad, granularidad y UTF-8 dentro del plan.
+3. `/implement-backend-task BE-00X`
+4. Gate de Persistencia segura: `python backend/scripts/validate_slice_plan.py BE-00X --stage secure-persistence`
+5. `/implement-frontend-task FE-00X`
+6. `/qa-task QA-00X`
+7. `/review-slice BE-00X`
+8. `/clean-architecture-review BE-00X`
+9. `/security-review BE-00X`
+10. `/implement-findings BE-00X`, solo cuando existen hallazgos bloqueantes
+11. Repetir QA y las revisiones afectadas despues de corregir
+12. `/run-checks BE-00X`
+13. `/update-docs BE-00X`
+14. `/final-gate BE-00X`, solo si se activa la segunda opinion de release
 
 Los prefijos mostrados en este orden son convencionales. El validador normaliza BE, FE y QA al mismo indice de slice.
 
@@ -211,7 +235,7 @@ Los prefijos mostrados en este orden son convencionales. El validador normaliza 
 | Agente | Comando principal | Responsabilidad | Puede modificar codigo | Evidencia o gate |
 |---|---|---|---|---|
 | InVet Orchestrator | `/execute-slice` | Normalizar el ID, coordinar agentes y detenerse ante gates fallidos | Solo por delegacion | Flujo completo del slice |
-| Product Planner | `/plan-task` | Crear el plan canonico schema v2 con tareas BE, FE y QA trazables | No | `BE-00X-plan.md` valido |
+| Product Planner | `/plan-task` | Crear el plan canonico schema v3 con tareas BE, FE y QA trazables | No | `BE-00X-plan.md` valido |
 | Backend Implementer | `/implement-backend-task` | Implementar backend y sus pruebas unitarias | Si, backend y pruebas relacionadas | Tareas BE y validaciones satisfechas |
 | Frontend Implementer | `/implement-frontend-task` | Implementar UI, integracion y pruebas unitarias de frontend | Si, frontend y pruebas relacionadas | Tareas FE y validaciones satisfechas |
 | QA Engineer | `/qa-task` | Ejecutar QA, ampliar pruebas de nivel QA y emitir decision | Solo pruebas y soporte QA, no producto | `QA-00X-results.md` con `APPROVED`, `REJECTED` o `BLOCKED`, y findings |
@@ -225,21 +249,24 @@ Los prefijos mostrados en este orden son convencionales. El validador normaliza 
 | Command Executor | Delegado por agentes principales | Ejecutar comandos mecanicos, pruebas, lint, inspeccion de diff y lectura de logs | Solo cambios mecanicos dentro del alcance delegado | Comandos ejecutados, salida sintetizada y bloqueos |
 | Command Executor Fallback | Delegado por agentes principales | Respaldar al ejecutor primario cuando se requiere mas contexto o robustez | Solo cambios mecanicos dentro del alcance delegado | Evidencia mecanica alternativa o reintentos |
 
-## Contrato del plan schema v2
+## Contrato del plan schema v3
 
 El plan canonico debe incluir este frontmatter:
 
 ```yaml
 ---
-schema_version: 2
+schema_version: 3
 slice: "00X"
 canonical_plan: BE-00X
 status: PLANNED
+encoding: UTF-8
 ---
 ```
 
-Debe cubrir explicitamente la planificacion frontend mediante estas secciones:
+Debe cubrir explicitamente contexto, trazabilidad, frontend, Docker, reportes y UTF-8 mediante estas secciones:
 
+- Fuentes y artefactos de contexto
+- Matriz de trazabilidad
 - Rutas y acceso
 - Flujos y estados UX
 - Contratos API por accion
@@ -247,21 +274,84 @@ Debe cubrir explicitamente la planificacion frontend mediante estas secciones:
 - Arquitectura de componentes
 - Responsive y accesibilidad
 - Estrategia de pruebas frontend
+- Contrato de ejecucion Docker y pruebas
+- Plan de reportes y findings
+- Politica UTF-8
 
 Cada tarea usa el formato `- [ ] BE|FE|QA-00X-TNN - Titulo` e incluye:
 
 | Campo | Proposito |
 |---|---|
 | `Capa` | Identifica backend, frontend o QA |
+| `Tipo` | Clasifica el trabajo: contrato, persistencia, API, UI, prueba, Docker, reporte, etc. |
+| `Historia o criterio` | Vincula la tarea con la matriz de trazabilidad |
 | `Objetivo` | Declara el resultado esperado |
+| `Responsabilidad unica` | Debe ser `Si`; impide tareas compuestas |
 | `Depende de` | Expresa dependencias explicitas |
+| `Contexto necesario` | Lista fuentes que el agente debe leer antes de editar |
+| `Contratos usados` | Vincula endpoints, criterios, referencias o reportes que gobiernan la tarea |
 | `Entregables` | Define archivos o capacidades a producir |
 | `Criterios de aceptacion` | Establece condiciones observables |
 | `Validacion` | Indica como comprobar el resultado |
+| `Resultado esperado` | Define el outcome verificable para el siguiente agente |
 | `Evidencia` | Define la prueba persistente del cumplimiento |
 | `Paralelismo[P]` | Declara si la tarea puede ejecutarse en paralelo |
 
-Un plan legacy o schema v1 es rechazado intencionalmente. Debe regenerarse con `/plan-task BE-00X`, `/plan-task FE-00X` o `/plan-task QA-00X`; los tres comandos apuntan al mismo plan canonico.
+Un plan legacy o schema v1/v2 es rechazado intencionalmente. Debe regenerarse con `/plan-task BE-00X`, `/plan-task FE-00X` o `/plan-task QA-00X`; los tres comandos apuntan al mismo plan canonico.
+
+## Granularidad y responsabilidad unica
+
+El planner debe generar tareas que un agente pueda ejecutar sin contexto conversacional adicional. La tarea ideal modifica una sola capa, tiene un solo tipo de trabajo y deja un resultado observable para el siguiente agente.
+
+Reglas obligatorias:
+
+- `Responsabilidad unica` debe ser `Si`.
+- `Objetivo` debe ser corto y no compuesto.
+- `Tipo` clasifica el trabajo como contrato, persistencia, caso de uso, API, seguridad, cliente API, ruta, componente, estado UX, prueba, QA, documentacion, Docker o reporte.
+- `Contexto necesario` lista archivos, criterios o decisiones que el implementador debe leer antes de editar.
+- `Contratos usados` indica endpoints, criterios, referencias o reportes que gobiernan la tarea.
+- `Resultado esperado` declara el outcome que QA, reviews o el siguiente implementador pueden verificar.
+
+Una tarea debe dividirse si mezcla:
+
+- Persistencia y endpoint.
+- Caso de uso y router.
+- UI y cliente API.
+- Formulario y estados UX complejos.
+- Implementacion y pruebas.
+- Seguridad y funcionalidad general.
+- Docker y pruebas de producto.
+- Documentacion y cambios de codigo.
+
+Los agentes de implementacion deben detenerse si una tarea no cumple este contrato. No deben resolver la ambiguedad implementando un bloque mas grande.
+
+## Contrato Docker y pruebas
+
+Schema v3 hace explicito cuando una validacion debe correr en host local, en contenedor o con el stack completo.
+
+| Necesidad | Contrato operativo |
+|---|---|
+| Persistencia PostgreSQL | Levantar `db` y preferir pruebas dentro del servicio `backend` |
+| Pruebas backend con DB real | Usar `docker compose run --rm backend pytest ...` o `docker compose exec backend ...` si el contenedor ya esta vivo |
+| Runtime completo despues de cambios relevantes | Ejecutar `docker compose up -d --build --force-recreate db backend frontend` |
+| Frontend | Usar scripts locales `lint`, `typecheck`, `test` y `build`; el contenedor `frontend` es runtime salvo que el plan prepare testing ahi |
+| Skip Docker | Solo permitido con causa exacta y verificable |
+
+QA no debe considerar equivalente una corrida local si el plan o el criterio exige PostgreSQL o runtime en contenedor.
+
+## Politica UTF-8
+
+Todos los artefactos operativos nuevos deben conservar UTF-8:
+
+- Planes.
+- Reportes QA.
+- Findings.
+- Reviews.
+- Checks.
+- Correcciones.
+- Comentarios y outcomes escritos por agentes.
+
+El validador rechaza planes con mojibake probable. Los scripts Python propios deben leer y escribir Markdown con `encoding="utf-8"` y emitir JSON con `ensure_ascii=False`.
 
 ## Motor determinista de gates
 
@@ -270,7 +360,7 @@ Un plan legacy o schema v1 es rechazado intencionalmente. Debe regenerarse con `
 | Etapa | Validacion principal |
 |---|---|
 | `previous` | El QA del slice inmediatamente anterior no mantiene un bloqueo activo |
-| `plan` | Existe el plan canonico, usa schema v2 y contiene estructura y tareas validas |
+| `plan` | Existe el plan canonico, usa schema v3 y contiene estructura, trazabilidad, UTF-8 y tareas validas |
 | `backend` | El gate anterior y el plan permiten iniciar implementacion backend |
 | `secure-persistence` | Las tareas backend de ORM, repositorios, migraciones, permisos, ownership, IDOR/BOLA o auditoria estan completadas con evidencia |
 | `frontend` | El plan y prerequisitos permiten iniciar implementacion frontend |
@@ -334,6 +424,9 @@ Reglas del ciclo:
 | Artefacto | Productor | Consumidores | Funcion |
 |---|---|---|---|
 | `docs/opencode/plans/BE-00X-plan.md` | Planner | Todos | Plan canonico y trazabilidad de tareas |
+| `docs/opencode/references/spec_kit_reference_improvements.md` | Equipo tecnico | Planner, implementadores, QA | Referencia de gaps, decisiones y adaptacion de Spec Kit |
+| `docs/opencode/templates/slice_plan_template.md` | Equipo tecnico | Planner, validador, payload | Plantilla schema v3 para planes atomicos |
+| `docs/opencode/templates/*_template.md` | Equipo tecnico | QA, reviews, checks, docs | Plantillas UTF-8 para reportes y outcomes |
 | `docs/opencode/qa/QA-00X-results.md` | QA Engineer | Orchestrator, reviewers, checks | Resultados por criterio y decision QA |
 | `docs/opencode/qa/QA-00X-findings.md` | QA Engineer y reviewers | Findings Implementer, QA | Hallazgos y estados de revalidacion |
 | `docs/opencode/reviews/BE-00X-review.md` | Slice Reviewer | Orchestrator, checks | Decision funcional y de regresion |
@@ -350,11 +443,11 @@ Cada reviewer genera siempre su reporte, incluso cuando no encuentra problemas. 
 
 | Transicion | Requisito de entrada | Resultado que permite avanzar | Resultado bloqueante |
 |---|---|---|---|
-| Inicio -> Plan | Gate del slice anterior valido | Plan schema v2 | Slice anterior bloqueado |
-| Plan -> Backend | Plan valido | Implementacion BE y unit tests | Plan incompleto o legacy |
+| Inicio -> Plan | Gate del slice anterior valido | Plan schema v3 | Slice anterior bloqueado |
+| Plan -> Backend | Plan valido | Implementacion BE y unit tests | Plan incompleto, legacy, sin trazabilidad, con tareas compuestas o con UTF-8 roto |
 | Backend -> Persistencia segura | Backend implementado | Tareas de persistencia/seguridad completadas con evidencia | Repositorios, migraciones, ownership, permisos o IDOR/BOLA pendientes |
-| Plan/Backend -> Frontend | Plan frontend explicito y contratos disponibles | Implementacion FE y unit tests | Gap de UX, API o dependencias |
-| Implementacion -> QA | Entregables y validaciones del plan disponibles | `Decision: APPROVED` | Criterios FAIL, infraestructura no reproducible o unit tests ausentes |
+| Plan/Backend -> Frontend | Plan frontend explicito y contratos disponibles | Implementacion FE y unit tests | Gap de UX, API, dependencias o contrato frontend incompleto |
+| Implementacion -> QA | Entregables y validaciones del plan disponibles | `Decision: APPROVED` | Criterios FAIL, infraestructura no reproducible, unit tests ausentes o reportes stale |
 | QA -> Reviews | QA aprobado | Tres reportes `APPROVED` | Cualquier reporte ausente o `REJECTED` |
 | Findings -> Revalidacion | Correcciones en `READY_FOR_REVALIDATION` | QA y reviews afectados aprobados nuevamente | Findings todavia reproducibles |
 | Reviews -> Checks | QA y tres reviews aprobados | Checks `APPROVED` | Fallos de suite, lint, build o infraestructura |
@@ -416,7 +509,10 @@ El gate final es opcional y se usa cuando hace falta una segunda opinion de alta
 
 Un slice esta cerrado solo si se cumplen todas estas condiciones:
 
-- El plan canonico usa schema v2 y representa tareas BE, FE y QA.
+- El plan canonico usa schema v3, UTF-8 y representa tareas BE, FE y QA.
+- La matriz de trazabilidad cubre criterios, riesgos, contratos, tareas, validacion y evidencia.
+- No quedan tareas compuestas o sin `Responsabilidad unica: Si`.
+- Docker fue actualizado cuando aplicaba, o el skip quedo justificado.
 - Backend y frontend implementaron sus entregables y pruebas unitarias.
 - QA declaro `Decision: APPROVED` con evidencia reproducible.
 - No quedan findings bloqueantes.
@@ -438,8 +534,9 @@ Las pruebas de contrato deben verificar como minimo:
 - Registro y despliegue de `/execute-slice`.
 - Sincronizacion de agentes y comandos.
 - Despliegue de `backend/scripts/validate_slice_plan.py`.
-- Compatibilidad de plantillas con schema v2.
+- Compatibilidad de plantillas con schema v3.
 - Presencia de los campos y decisiones requeridos en artefactos.
 - Rechazo de planes legacy y de gates incompletos.
+- Rechazo de tareas compuestas, objetivos demasiado amplios y evidencia sin UTF-8.
 
 Cuando cambie el flujo, primero deben actualizarse los contratos ejecutables y el validador; despues, este documento y las plantillas asociadas. Asi la documentacion describe comportamiento comprobable y no una intencion futura.
