@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from sqlalchemy import inspect, text
+from sqlalchemy.engine import Connection, Engine
 
 
-def _seed_default_clinic_branch(connection) -> None:
+def _seed_default_clinic_branch(connection: Connection) -> None:
     """Ensure the default clinic/branch pair exists for branch-scoped tests."""
     connection.execute(
         text(
@@ -49,7 +50,7 @@ def _seed_default_clinic_branch(connection) -> None:
     )
 
 
-def ensure_runtime_schema(engine) -> None:
+def ensure_runtime_schema(engine: Engine) -> None:
     """Apply tiny additive schema fixes needed by the current runtime."""
     with engine.begin() as connection:
         inspector = inspect(connection)
@@ -66,7 +67,7 @@ def ensure_runtime_schema(engine) -> None:
             _seed_default_clinic_branch(connection)
 
 
-def ensure_test_branch_seed(engine) -> None:
+def ensure_test_branch_seed(engine: Engine) -> None:
     """Seed branch-dependent tables in isolated test schemas."""
     with engine.begin() as connection:
         inspector = inspect(connection)

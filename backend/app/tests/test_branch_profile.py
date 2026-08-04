@@ -1,5 +1,6 @@
 """Pruebas para los perfiles de clínica/sucursal."""
-from datetime import datetime, time
+
+from datetime import datetime
 from unittest.mock import AsyncMock, Mock
 
 import pytest
@@ -29,67 +30,77 @@ class TestBranchProfileUseCases:
         rating_repo = Mock()
         availability_repo = Mock()
 
-        branch_repo.get_branch_public_profile = AsyncMock(return_value=Branch(
-            id=1,
-            clinic_id=1,
-            name="Clinica Test",
-            description="Descripción de prueba",
-            address="Calle 123",
-            city="Ciudad Test",
-            state="Estado Test",
-            country="País Test",
-            postal_code="12345",
-            phone="123-456-7890",
-            email="test@example.com",
-            is_active=True,
-            created_at=datetime(2023, 1, 1, 0, 0, 0),
-            updated_at=datetime(2023, 1, 1, 0, 0, 0),
-        ))
-
-        service_repo.get_services_by_branch = AsyncMock(return_value=[
-            Service(
+        branch_repo.get_branch_public_profile = AsyncMock(
+            return_value=Branch(
                 id=1,
-                branch_id=1,
-                name="Servicio de prueba",
-                description="Descripción del servicio",
+                clinic_id=1,
+                name="Clinica Test",
+                description="Descripción de prueba",
+                address="Calle 123",
+                city="Ciudad Test",
+                state="Estado Test",
+                country="País Test",
+                postal_code="12345",
+                phone="123-456-7890",
+                email="test@example.com",
                 is_active=True,
                 created_at=datetime(2023, 1, 1, 0, 0, 0),
                 updated_at=datetime(2023, 1, 1, 0, 0, 0),
             )
-        ])
+        )
 
-        schedule_repo.get_schedules_by_branch = AsyncMock(return_value=[
-            BranchSchedule(
+        service_repo.get_services_by_branch = AsyncMock(
+            return_value=[
+                Service(
+                    id=1,
+                    branch_id=1,
+                    name="Servicio de prueba",
+                    description="Descripción del servicio",
+                    is_active=True,
+                    created_at=datetime(2023, 1, 1, 0, 0, 0),
+                    updated_at=datetime(2023, 1, 1, 0, 0, 0),
+                )
+            ]
+        )
+
+        schedule_repo.get_schedules_by_branch = AsyncMock(
+            return_value=[
+                BranchSchedule(
+                    id=1,
+                    branch_id=1,
+                    day_of_week=1,
+                    open_time="09:00",
+                    close_time="18:00",
+                    is_active=True,
+                    created_at=datetime(2023, 1, 1, 0, 0, 0),
+                    updated_at=datetime(2023, 1, 1, 0, 0, 0),
+                )
+            ]
+        )
+
+        rating_repo.get_rating_summary_by_branch = AsyncMock(
+            return_value=RatingSummary(
                 id=1,
                 branch_id=1,
-                day_of_week=1,
-                open_time="09:00",
-                close_time="18:00",
-                is_active=True,
+                average_rating=4.5,
+                total_reviews=100,
+                review_distribution=None,
                 created_at=datetime(2023, 1, 1, 0, 0, 0),
                 updated_at=datetime(2023, 1, 1, 0, 0, 0),
             )
-        ])
+        )
 
-        rating_repo.get_rating_summary_by_branch = AsyncMock(return_value=RatingSummary(
-            id=1,
-            branch_id=1,
-            average_rating=4.5,
-            total_reviews=100,
-            review_distribution=None,
-            created_at=datetime(2023, 1, 1, 0, 0, 0),
-            updated_at=datetime(2023, 1, 1, 0, 0, 0),
-        ))
-
-        availability_repo.get_availability_summary_by_branch = AsyncMock(return_value=AvailabilitySummary(
-            id=1,
-            branch_id=1,
-            is_available=True,
-            next_available_time=None,
-            availability_type="full",
-            created_at=datetime(2023, 1, 1, 0, 0, 0),
-            updated_at=datetime(2023, 1, 1, 0, 0, 0),
-        ))
+        availability_repo.get_availability_summary_by_branch = AsyncMock(
+            return_value=AvailabilitySummary(
+                id=1,
+                branch_id=1,
+                is_available=True,
+                next_available_time=None,
+                availability_type="full",
+                created_at=datetime(2023, 1, 1, 0, 0, 0),
+                updated_at=datetime(2023, 1, 1, 0, 0, 0),
+            )
+        )
 
         use_case = GetBranchPublicProfileUseCase(
             branch_repo, service_repo, schedule_repo, rating_repo, availability_repo
@@ -119,67 +130,77 @@ class TestBranchProfileUseCases:
         }
 
         branch_repo.is_branch_accessible = AsyncMock(return_value=True)
-        branch_repo.get_branch_protected_profile = AsyncMock(return_value=Branch(
-            id=1,
-            clinic_id=1,
-            name="Clinica Test",
-            description="Descripción de prueba",
-            address="Calle 123",
-            city="Ciudad Test",
-            state="Estado Test",
-            country="País Test",
-            postal_code="12345",
-            phone="123-456-7890",
-            email="test@example.com",
-            is_active=True,
-            created_at=datetime(2023, 1, 1, 0, 0, 0),
-            updated_at=datetime(2023, 1, 1, 0, 0, 0),
-        ))
-
-        service_repo.get_services_by_branch = AsyncMock(return_value=[
-            Service(
+        branch_repo.get_branch_protected_profile = AsyncMock(
+            return_value=Branch(
                 id=1,
-                branch_id=1,
-                name="Servicio de prueba",
-                description="Descripción del servicio",
+                clinic_id=1,
+                name="Clinica Test",
+                description="Descripción de prueba",
+                address="Calle 123",
+                city="Ciudad Test",
+                state="Estado Test",
+                country="País Test",
+                postal_code="12345",
+                phone="123-456-7890",
+                email="test@example.com",
                 is_active=True,
                 created_at=datetime(2023, 1, 1, 0, 0, 0),
                 updated_at=datetime(2023, 1, 1, 0, 0, 0),
             )
-        ])
+        )
 
-        schedule_repo.get_schedules_by_branch = AsyncMock(return_value=[
-            BranchSchedule(
+        service_repo.get_services_by_branch = AsyncMock(
+            return_value=[
+                Service(
+                    id=1,
+                    branch_id=1,
+                    name="Servicio de prueba",
+                    description="Descripción del servicio",
+                    is_active=True,
+                    created_at=datetime(2023, 1, 1, 0, 0, 0),
+                    updated_at=datetime(2023, 1, 1, 0, 0, 0),
+                )
+            ]
+        )
+
+        schedule_repo.get_schedules_by_branch = AsyncMock(
+            return_value=[
+                BranchSchedule(
+                    id=1,
+                    branch_id=1,
+                    day_of_week=1,
+                    open_time="09:00",
+                    close_time="18:00",
+                    is_active=True,
+                    created_at=datetime(2023, 1, 1, 0, 0, 0),
+                    updated_at=datetime(2023, 1, 1, 0, 0, 0),
+                )
+            ]
+        )
+
+        rating_repo.get_rating_summary_by_branch = AsyncMock(
+            return_value=RatingSummary(
                 id=1,
                 branch_id=1,
-                day_of_week=1,
-                open_time="09:00",
-                close_time="18:00",
-                is_active=True,
+                average_rating=4.5,
+                total_reviews=100,
+                review_distribution=None,
                 created_at=datetime(2023, 1, 1, 0, 0, 0),
                 updated_at=datetime(2023, 1, 1, 0, 0, 0),
             )
-        ])
+        )
 
-        rating_repo.get_rating_summary_by_branch = AsyncMock(return_value=RatingSummary(
-            id=1,
-            branch_id=1,
-            average_rating=4.5,
-            total_reviews=100,
-            review_distribution=None,
-            created_at=datetime(2023, 1, 1, 0, 0, 0),
-            updated_at=datetime(2023, 1, 1, 0, 0, 0),
-        ))
-
-        availability_repo.get_availability_summary_by_branch = AsyncMock(return_value=AvailabilitySummary(
-            id=1,
-            branch_id=1,
-            is_available=True,
-            next_available_time=None,
-            availability_type="full",
-            created_at=datetime(2023, 1, 1, 0, 0, 0),
-            updated_at=datetime(2023, 1, 1, 0, 0, 0),
-        ))
+        availability_repo.get_availability_summary_by_branch = AsyncMock(
+            return_value=AvailabilitySummary(
+                id=1,
+                branch_id=1,
+                is_available=True,
+                next_available_time=None,
+                availability_type="full",
+                created_at=datetime(2023, 1, 1, 0, 0, 0),
+                updated_at=datetime(2023, 1, 1, 0, 0, 0),
+            )
+        )
 
         use_case = GetBranchProtectedProfileUseCase(
             branch_repo, service_repo, schedule_repo, rating_repo, availability_repo

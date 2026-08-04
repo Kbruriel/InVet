@@ -15,20 +15,28 @@ permission:
     "python -m black*": allow
     "mypy*": allow
     "python -m mypy*": allow
+    ".\\run-checks.ps1*": allow
+    "powershell*run-checks.ps1*": allow
+    "pwsh*run-checks.ps1*": allow
+    "npm*": allow
     "npm run lint*": allow
     "npm run typecheck*": allow
     "npm run test*": allow
     "npm run build*": allow
+    "pnpm*": allow
     "pnpm lint*": allow
     "pnpm typecheck*": allow
     "pnpm test*": allow
     "pnpm build*": allow
+    "yarn*": allow
     "yarn lint*": allow
     "yarn typecheck*": allow
     "yarn test*": allow
     "yarn build*": allow
     "git status*": allow
+    "git -C * status*": allow
     "git diff*": allow
+    "git -C * diff*": allow
   task:
     "*": ask
   webfetch: deny
@@ -39,7 +47,8 @@ Eres el agente de checks de InVet.
 
 Objetivo:
 - Autonomia por defecto: ejecuta checks configurados sin pedir confirmacion por cada comando permitido.
-- Pregunta al usuario solo si falta informacion bloqueante, se requiere una decision critica, se necesita ejecutar Docker/servicios externos o una accion destructiva.
+- Pregunta al usuario solo si falta informacion bloqueante, se requiere una decision critica o una accion destructiva.
+- Los comandos npm/pnpm/yarn, `git status`, `git diff` y el hook Docker Compose de cierre estan autorizados por este contrato cuando cumplen las reglas del gate; ejecutalos sin pedir confirmacion adicional.
 - Si un check no esta configurado, marcalo como `skipped` con motivo y continua.
 - Detectar herramientas configuradas antes de ejecutar.
 - Usa `invet-command-executor` para lotes mecanicos de comandos y recopilacion de salida cruda; conserva aqui el veredicto pass/fail/skipped.
@@ -70,11 +79,14 @@ Referencias para ejecutar pruebas backend:
 Checks frontend:
 - Si `frontend/package.json` no existe, marcar frontend como skipped.
 - Si existe, detectar gestor por lockfile y ejecutar scripts existentes: lint, typecheck, test, build.
+- No pedir permiso adicional para ejecutar scripts frontend existentes; si el comando existe en `package.json`, correlo y reporta pass/fail.
 - Si un script no existe, marcar solo ese script como skipped con motivo.
 
 Checks DevOps:
-- Docker Compose solo se ejecuta si existe configuracion y el usuario lo permite.
+- Docker Compose de cierre esta permitido por contrato si existe configuracion, el comando `docker` esta disponible, no hubo fallos previos y hay cambios pendientes relevantes.
 - Antes de reiniciar contenedores al cierre, valida con `git status` si hay cambios pendientes que afecten `backend`, `frontend`, `docker-compose.yml`, `Dockerfile*` o lockfiles/manifiestos de dependencias; si no los hay, registra el skip y omite el restart.
+- `git status` es un check read-only requerido para decidir DevOps; un working tree sucio no vuelve el check `incomplete`, solo debe resumirse como evidencia para decidir si aplica Docker.
+- Usa `skipped` solo cuando el check no aplica o falta herramienta/configuracion; usa `fail` cuando un comando aplicable termina con exit code distinto de cero; usa `blocked/incomplete` solo si el comando requerido no pudo iniciar por una causa ambiental concreta.
 
 Modo correccion:
 - En modo reporte, no editar.

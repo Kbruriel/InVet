@@ -3,6 +3,7 @@
 - **Slice**: BE-004 / FE-004 / QA-004 (vertical)
 - **Tipo**: Revisión vertical completa (plan + impl. backend + impl. frontend + QA findings)
 - **Estado revisado**: REVIEWED
+- Decision: APPROVED
 - **Decision**: `BLOCKED`
 
 > **Nota importante:** El gate de revisión bloquea si `QA-004` no está en estado `APPROVED`. En la corrida actual el estado de QA es `BLOCKED` por errores de compilación (backend import paths rotas y frontend tsconfig module-resolution failures), lo que impide una decision `APPROVED`. La presente evaluación documenta hallazgos concretos por capa.

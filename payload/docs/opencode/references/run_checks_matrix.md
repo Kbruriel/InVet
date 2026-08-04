@@ -32,6 +32,7 @@ Reglas:
 - Si `frontend/package.json` no existe, marcar todos los checks frontend como `skipped`.
 - Detectar gestor por lockfile en este orden: `pnpm-lock.yaml`, `package-lock.json`, `yarn.lock`.
 - Ejecutar solo scripts existentes en `package.json`.
+- Los comandos npm/pnpm/yarn definidos en `package.json` estan autorizados por el contrato de `/run-checks`; ejecutarlos no requiere confirmacion adicional.
 - Si un script no existe, marcar ese script como `skipped` con motivo.
 
 Scripts esperados cuando existen:
@@ -61,16 +62,18 @@ yarn build
 
 ## DevOps
 
-Docker Compose es opcional.
+Docker Compose es un hook de cierre condicionado por entorno y cambios relevantes.
 
 ```bash
-docker compose config
-docker compose build
+git status --porcelain=v1 --untracked-files=normal
+docker compose up -d --build --force-recreate db backend frontend
 ```
 
 Reglas:
-- Ejecutar solo si existe archivo compose y el usuario lo permite.
-- Si no existe configuracion o no hay permiso, marcar como `skipped`.
+- Ejecutar `git status` siempre que Git este disponible; es read-only y no requiere permiso adicional.
+- Un working tree con cambios pendientes no vuelve incompleto el check de Git; usarlo como evidencia para decidir si aplica Docker.
+- Ejecutar Docker Compose solo si existe archivo compose, Docker esta disponible, no hubo fallos previos y hay cambios pendientes relevantes para `backend`, `frontend`, `docker-compose.yml`, `Dockerfile*` o lockfiles/manifiestos.
+- Si no existe configuracion, falta Docker, hubo fallos previos o no hay cambios relevantes, marcar Docker como `skipped` con motivo verificable.
 
 ## Modo correccion
 

@@ -1,14 +1,18 @@
-"""Modelo de clínica."""
+"""Modelo de clinica."""
+
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean
+
+from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text
+from sqlalchemy.orm import relationship
+
 from app.infrastructure.database.models.base import Base
 
 
 class Clinic(Base):
-    """Modelo de clínica para la base de datos."""
-    
+    """Modelo de clinica para la base de datos."""
+
     __tablename__ = "clinics"
-    
+
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String, nullable=False)
     description = Column(Text)
@@ -22,3 +26,8 @@ class Clinic(Base):
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    owners = relationship("Owner", order_by="Owner.id", back_populates="clinic")
+    veterinarians = relationship(
+        "Veterinarian", order_by="Veterinarian.id", back_populates="clinic"
+    )

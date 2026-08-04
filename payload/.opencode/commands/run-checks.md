@@ -12,7 +12,7 @@ Estrategia:
 1. Antes de correr nada, verifica que el interprete Python seleccionado tenga instaladas las dependencias de backend declaradas en `backend/requirements.txt`.
    - Si faltan `pytest`, `ruff`, `black` o `mypy`, reporta el bloqueo con la causa exacta y la instruccion de instalacion.
    - Prioriza un entorno local ya preparado, como `backend/.venv` o `.venv`, si existe.
-2. Ejecuta de forma autonoma los checks configurados. Pregunta al usuario solo si falta informacion bloqueante, se requiere Docker/servicios externos o una decision critica.
+2. Ejecuta de forma autonoma los checks configurados. Los scripts frontend existentes, `git status`/`git diff` y el hook Docker Compose de cierre estan autorizados por el contrato del agente; pregunta al usuario solo si falta informacion bloqueante, hay una decision critica o se pide una accion destructiva.
 3. Detectar estructura del repo y herramientas configuradas antes de ejecutar.
 4. Backend:
    - Entrar a `backend/` si existe.
@@ -24,12 +24,15 @@ Estrategia:
    - Ejecutar checks solo si existe `frontend/package.json`.
    - Usar el gestor detectado por lockfile: pnpm, npm o yarn.
    - Ejecutar lint, typecheck, test y build solo si el script existe.
+   - Si el script existe, ejecutar y reportar pass/fail; no pedir confirmacion adicional.
 6. DevOps:
-   - Docker Compose es opcional y solo se ejecuta con entorno/configuracion disponible y permiso explicito.
+   - Docker Compose de cierre se ejecuta con entorno/configuracion disponible, sin fallos previos y cambios relevantes; esta autorizado por el contrato del agente.
    - Si todos los checks aplicables pasan, primero validar si `git status` muestra cambios pendientes relevantes para `backend`, `frontend`, `docker-compose.yml`, `Dockerfile*` o lockfiles/manifiestos de dependencias.
    - Si no hay cambios pendientes relevantes, registrar el skip y no reiniciar contenedores.
    - Si hay cambios pendientes relevantes, cerrar con el hook `docker compose up -d --build --force-recreate db backend frontend`.
 7. Reportar comandos ejecutados, resultado, skips justificados y warnings relevantes.
+   - Un working tree con cambios pendientes no vuelve `git status` incompleto; resume los cambios y usa esa evidencia para decidir el hook Docker.
+   - Usa `skipped` solo para checks no aplicables o herramientas/configuracion ausentes, `fail` para comandos aplicables con salida no cero e `incomplete/blocked` solo si un comando requerido no pudo iniciar por causa ambiental concreta.
 8. Cuando recibas un ID de slice, crea `docs/opencode/checks/BE-00X-checks.md` usando `docs/opencode/templates/checks_results_template.md`.
    - Usa `Decision: APPROVED` solo si todos los checks aplicables pasan y cada skip es realmente no aplicable.
    - Usa `Decision: REJECTED` si cualquier check aplicable falla o queda bloqueado.

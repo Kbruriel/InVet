@@ -1,6 +1,1 @@
-{
-  "/_global-error/page": "/_global-error",
-  "/_not-found/page": "/_not-found",
-  "/clinics/[clinicId]/branches/[branchId]/page": "/clinics/[clinicId]/branches/[branchId]",
-  "/clinics/[id]/page": "/clinics/[id]"
-}
+{"/_not-found/page":"/_not-found","/clinics/[clinicId]/branches/[branchId]/page":"/clinics/[clinicId]/branches/[branchId]","/clinics/[clinicId]/page":"/clinics/[clinicId]"}

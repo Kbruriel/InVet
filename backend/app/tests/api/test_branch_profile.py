@@ -1,8 +1,10 @@
 """Pruebas API para perfiles de clínica/sucursal."""
+
 from datetime import datetime
 
 import pytest
 from fastapi.testclient import TestClient
+
 from app.api.main import app
 from app.api.v1.routers.branch_profile import (
     get_branch_protected_use_case,
@@ -14,6 +16,7 @@ from app.domain.entities.branch import Branch
 @pytest.fixture(scope="module")
 def client():
     """Crea un cliente de prueba para la aplicación FastAPI."""
+
     class _FakePublicUseCase:
         async def execute(self, branch_id: int):
             return Branch(
@@ -63,13 +66,13 @@ def client():
 
 class TestBranchProfileAPI:
     """Test para endpoints de perfil de clínica/sucursal."""
-    
+
     def test_get_branch_public_profile_success(self, client):
         """Prueba obtener perfil público exitoso."""
         response = client.get("/api/v1/clinics/branches/1")
         assert response.status_code == 200
         assert response.json()["id"] == 1
-        
+
     def test_get_branch_protected_profile_success(self, client):
         """Prueba obtener perfil protegido exitoso."""
         response = client.get("/api/v1/clinics/branches/1/1")

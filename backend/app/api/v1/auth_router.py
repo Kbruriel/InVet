@@ -24,7 +24,7 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 async def register(
     payload: AuthRegisterRequest,
     use_case: AuthUseCase = Depends(get_auth_use_case),
-):
+) -> AuthTokenResponse:
     """Registra un usuario y devuelve la sesion inicial."""
     return await use_case.register(
         email=payload.email,
@@ -38,7 +38,7 @@ async def register(
 async def login(
     payload: AuthLoginRequest,
     use_case: AuthUseCase = Depends(get_auth_use_case),
-):
+) -> AuthTokenResponse:
     """Autentica por correo y contrasena."""
     return await use_case.login(email=payload.email, password=payload.password)
 
@@ -47,7 +47,7 @@ async def login(
 async def refresh(
     payload: AuthRefreshRequest,
     use_case: AuthUseCase = Depends(get_auth_use_case),
-):
+) -> AuthTokenResponse:
     """Renueva la sesion usando refresh token."""
     return await use_case.refresh(refresh_token=payload.refresh_token)
 
@@ -56,6 +56,6 @@ async def refresh(
 async def get_me(
     current_user: dict = Depends(get_current_access_user),
     use_case: AuthUseCase = Depends(get_auth_use_case),
-):
+) -> AuthProfileResponse:
     """Devuelve el perfil del usuario autenticado."""
     return await use_case.get_profile(user_id=current_user["id"])

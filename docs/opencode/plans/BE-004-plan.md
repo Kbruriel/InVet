@@ -74,7 +74,7 @@ Reglas:
   - Público o protegido según configuración del producto.
   - Sirve como soporte para detalle de clínica si el frontend conserva la ruta actual `src/app/clinics/[id]/page.tsx`.
 
-## Contrato de implementación frontend
+## Contrato de implementacion frontend
 
 ### Rutas y acceso
 
@@ -92,7 +92,7 @@ Reglas:
 - Success: datos públicos de clínica/sucursal, servicios, horarios, rating summary y CTA de cita.
 - Submitting: estado visual para el CTA de solicitud de cita si se conecta a un flujo futuro o formulario simple.
 
-### Contratos API por acción
+### Contratos API por accion
 
 - Listar clínicas:
   - Endpoint: `GET /api/v1/clinics?page={page}&size={size}&search={search}&city={city}`
@@ -118,7 +118,7 @@ Reglas:
   - Errores: `401`, `403`, `404`, `500`.
   - Autenticación: requerida.
 
-### Formularios y validación
+### Formularios y validacion
 
 - Búsqueda por texto: recortar espacios, tolerar búsqueda vacía y no enviar caracteres de control.
 - Filtro por ciudad: aceptar valores conocidos o dejar sin filtro.
@@ -166,7 +166,7 @@ Reglas:
 - Reportar trazas internas en errores HTTP.
 - Marcar QA como aprobado con evidencia histórica que no coincide con el código actual.
 
-## Checklist técnico
+## Checklist tecnico
 
 - [x] Rutas backend bajo `/api/v1` definidas y registradas en el router activo.
 - [x] Schemas request/response documentados y sin exposición ORM.
@@ -188,7 +188,7 @@ Reglas:
   Objetivo: Modelar los datos necesarios para perfil público de sucursal sin exponer información administrativa.
   Depende de: Ninguna
   Entregables: `backend/app/domain/entities`; `backend/app/infrastructure/database/models`; schemas bajo `backend/app/api/v1/schemas`; migraciones o bootstrap si aplican.
-  Criterios de aceptación: Clinic y Branch contienen campos públicos necesarios; servicios, horarios, rating summary y disponibilidad básica tienen representación verificable; no se exponen modelos ORM en respuestas.
+  Criterios de aceptacion: Clinic y Branch contienen campos públicos necesarios; servicios, horarios, rating summary y disponibilidad básica tienen representación verificable; no se exponen modelos ORM en respuestas.
   Validacion: Revisar modelos/schemas y ejecutar pruebas unitarias de serialización y mapeo.
   Evidencia: pending
   Paralelismo[P]: No
@@ -198,7 +198,7 @@ Reglas:
   Objetivo: Exponer `GET /api/v1/clinics/branches/{branch_id}` con datos públicos seguros.
   Depende de: BE-004-T01
   Entregables: Router bajo `backend/app/api/v1`; caso de uso en `backend/app/application`; repositorio en `backend/app/domain/repositories` e implementación en infraestructura.
-  Criterios de aceptación: El endpoint no requiere autenticación; devuelve solo datos públicos; sucursal inexistente devuelve `404`; errores no filtran detalles internos.
+  Criterios de aceptacion: El endpoint no requiere autenticación; devuelve solo datos públicos; sucursal inexistente devuelve `404`; errores no filtran detalles internos.
   Validacion: `python -m pytest backend/app/tests -q` o suite específica del endpoint público.
   Evidencia: pending
   Paralelismo[P]: No
@@ -208,7 +208,7 @@ Reglas:
   Objetivo: Exponer `GET /api/v1/clinics/{clinic_id}/{branch_id}` con autenticación, ownership y permisos.
   Depende de: BE-004-T01, BE-004-T02
   Entregables: Dependencias de autenticación/autorización; caso de uso protegido; pruebas de `401`, `403`, `404` e IDOR/BOLA.
-  Criterios de aceptación: Sin token devuelve `401`; usuario sin acceso devuelve `403`; branch que no pertenece a clinic devuelve `404` o `403` seguro; no se devuelve información protegida en casos no autorizados.
+  Criterios de aceptacion: Sin token devuelve `401`; usuario sin acceso devuelve `403`; branch que no pertenece a clinic devuelve `404` o `403` seguro; no se devuelve información protegida en casos no autorizados.
   Validacion: `python -m pytest backend/app/tests/api -q` con casos de permisos.
   Evidencia: pending (pytest collection FAIL — import path rotas)
   Paralelismo[P]: No
@@ -220,7 +220,7 @@ Reglas:
   Objetivo: Extender el cliente y los tipos frontend para consumir listado, detalle de clínica y perfil público/protegido de sucursal.
   Depende de: BE-004-T02
   Entregables: `frontend/src/shared/api/branch-client.ts`; `frontend/src/shared/api/branch-client-protected.ts`; `frontend/src/shared/api/types.ts`.
-  Criterios de aceptación: El cliente expone métodos para listado, detalle y perfil público/protegido de sucursal; los tipos incluyen servicios, horarios, rating summary y disponibilidad básica; los errores HTTP se propagan de forma controlada con código numérico en `.status`.
+  Criterios de aceptacion: El cliente expone métodos para listado, detalle y perfil público/protegido de sucursal; los tipos incluyen servicios, horarios, rating summary y disponibilidad básica; los errores HTTP se propagan de forma controlada con código numérico en `.status`.
   Validacion: `npm run typecheck` debe pasar sin errores TS antes de marcar como completado — FALLS actual (ERROR module resolution).
   Evidencia: pending (typecheck FAIL: 7 TS2307 errors in module paths)
   Paralelismo[P]: No
@@ -230,7 +230,7 @@ Reglas:
   Objetivo: Renderizar perfil público con datos de clínica/sucursal, servicios, horarios, rating summary, disponibilidad básica y CTA de cita.
   Depende de: FE-004-T01
   Entregables: `frontend/src/app/clinics/[id]/page.tsx`; `frontend/src/app/clinics/[clinicId]/branches/[branchId]/page.tsx`; componentes en `frontend/src/features/public-clinic-profile/BranchProfile.tsx` y `frontend/src/shared/ui/components/Loading,ErrorBanner,EmptyState`.
-  Criterios de aceptación: La UI muestra loading (spinner CSS), error con banner rojo y botón reintento, empty state svg, y success con datos completos; el CTA usa enlace funcional a /booking?branch=... (no #); la vista es responsive (grid sm/md); no muestra acciones privadas a usuarios públicos.
+  Criterios de aceptacion: La UI muestra loading (spinner CSS), error con banner rojo y botón reintento, empty state svg, y success con datos completos; el CTA usa enlace funcional a /booking?branch=... (no #); la vista es responsive (grid sm/md); no muestra acciones privadas a usuarios públicos.
   Validacion: `npm run typecheck` debe pasar sin errores TS — FALLS actual (ERROR compile time errors).
   Evidencia: pending (typecheck FAIL: 7 module resolution errors in tsconfig paths)
   Paralelismo[P]: No
@@ -242,7 +242,7 @@ Reglas:
   Objetivo: Ejecutar validación reproducible de endpoints, permisos, errores e IDOR/BOLA del slice.
   Depende de: BE-004-T02, BE-004-T03
   Entregables: `docs/opencode/qa/QA-004-results.md`; `docs/opencode/qa/QA-004-findings.md` si hay hallazgos.
-  Criterios de aceptación: Happy path público aprobado; endpoint protegido cubre `401`, `403`, `404`; no hay exposición de datos sensibles; evidencia usa comandos actuales.
+  Criterios de aceptacion: Happy path público aprobado; endpoint protegido cubre `401`, `403`, `404`; no hay exposición de datos sensibles; evidencia usa comandos actuales.
   Validacion: `python backend/scripts/validate_slice_plan.py QA-004 --stage qa`; suite backend específica.
   Evidencia: pending (PYTEST COLLECTION FAIL — import path rotas en test file)
   Paralelismo[P]: No
@@ -252,7 +252,7 @@ Reglas:
   Objetivo: Confirmar que el frontend y la documentación del slice reflejan el comportamiento real implementado.
   Depende de: FE-004-T01, FE-004-T02, QA-004-T01
   Entregables: Reporte QA actualizado; evidencias de frontend; lista de gaps o findings.
-  Criterios de aceptación: Listado/detalle muestran estados esperados; no hay enlaces `#`; responsive básico validado; reportes históricos stale quedan corregidos o reemplazados antes de reviews.
+  Criterios de aceptacion: Listado/detalle muestran estados esperados; no hay enlaces `#`; responsive básico validado; reportes históricos stale quedan corregidos o reemplazados antes de reviews.
   Validacion: `run-checks.ps1` cuando QA backend y frontend estén listos.
   Evidencia: pending (typecheck FAIL)
   Paralelismo[P]: No

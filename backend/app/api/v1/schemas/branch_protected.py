@@ -1,33 +1,37 @@
 """Schemas para perfiles protegidos de clínica/sucursal."""
-from typing import Optional, List
-from pydantic import BaseModel
-from datetime import time, datetime
 
+from datetime import datetime, time
+from typing import Optional
+
+from pydantic import BaseModel
 
 # --- Schemas de datos protegidos ---
 
+
 class BranchProtectedProfileBase(BaseModel):
     """Base schema para perfil protegido de sucursal."""
+
     id: int
     clinic_id: int
     name: str
-    description: Optional[str]
+    description: str | None
     address: str
     city: str
     state: str
     country: str
     postal_code: str
-    phone: Optional[str]
-    email: Optional[str]
+    phone: str | None
+    email: str | None
     is_active: bool
 
 
 class BranchProtectedProfile(BranchProtectedProfileBase):
     """Schema para perfil protegido de sucursal."""
-    services: List['ServiceProtected']
-    schedules: List['BranchScheduleProtected']
-    rating_summary: Optional['RatingSummaryProtected']
-    availability_summary: Optional['AvailabilitySummaryProtected']
+
+    services: list["ServiceProtected"]
+    schedules: list["BranchScheduleProtected"]
+    rating_summary: Optional["RatingSummaryProtected"]
+    availability_summary: Optional["AvailabilitySummaryProtected"]
 
     class Config:
         from_attributes = True
@@ -35,9 +39,10 @@ class BranchProtectedProfile(BranchProtectedProfileBase):
 
 class ServiceProtected(BaseModel):
     """Schema para servicio protegido."""
+
     id: int
     name: str
-    description: Optional[str]
+    description: str | None
     is_active: bool
 
     class Config:
@@ -46,6 +51,7 @@ class ServiceProtected(BaseModel):
 
 class BranchScheduleProtected(BaseModel):
     """Schema para horario protegido de sucursal."""
+
     id: int
     day_of_week: int  # 0=domingo, 1=lunes, ..., 6=sábado
     open_time: time
@@ -58,9 +64,10 @@ class BranchScheduleProtected(BaseModel):
 
 class RatingSummaryProtected(BaseModel):
     """Schema para resumen de calificaciones protegido."""
+
     average_rating: float
     total_reviews: int
-    review_distribution: Optional[str]  # JSON string con distribución de calificaciones
+    review_distribution: str | None  # JSON string con distribución de calificaciones
 
     class Config:
         from_attributes = True
@@ -68,9 +75,10 @@ class RatingSummaryProtected(BaseModel):
 
 class AvailabilitySummaryProtected(BaseModel):
     """Schema para resumen de disponibilidad protegido."""
+
     is_available: bool
-    next_available_time: Optional[datetime]
-    availability_type: Optional[str]
+    next_available_time: datetime | None
+    availability_type: str | None
 
     class Config:
         from_attributes = True

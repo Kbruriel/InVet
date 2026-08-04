@@ -1,6 +1,5 @@
 {
-  "/_global-error/page": "app/_global-error/page.js",
   "/_not-found/page": "app/_not-found/page.js",
   "/clinics/[clinicId]/branches/[branchId]/page": "app/clinics/[clinicId]/branches/[branchId]/page.js",
-  "/clinics/[id]/page": "app/clinics/[id]/page.js"
+  "/clinics/[clinicId]/page": "app/clinics/[clinicId]/page.js"
 }

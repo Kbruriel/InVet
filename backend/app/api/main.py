@@ -1,4 +1,5 @@
 ﻿"""Punto de entrada principal de la aplicación FastAPI."""
+
 from fastapi import FastAPI
 
 from app.api.v1.router import router as api_v1_router
@@ -15,11 +16,11 @@ def create_app() -> FastAPI:
     app.include_router(api_v1_router, prefix=settings.API_V1_STR)
 
     @app.get("/")
-    async def root():
+    async def root() -> dict[str, str]:
         return {"message": "InVet Backend API"}
 
     @app.get("/health")
-    async def health_check():
+    async def health_check() -> dict[str, str]:
         return {"status": "healthy"}
 
     return app

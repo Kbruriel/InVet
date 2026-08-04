@@ -6,8 +6,13 @@ permission:
   bash:
     "docker*": allow
     "*": ask
+    ".\\run-checks.ps1*": allow
+    "powershell*run-checks.ps1*": allow
+    "pwsh*run-checks.ps1*": allow
     "git status*": allow
+    "git -C * status*": allow
     "git diff*": allow
+    "git -C * diff*": allow
     "git show*": allow
     "rg*": allow
     "Get-ChildItem*": allow
@@ -21,6 +26,7 @@ permission:
     "python -m black*": allow
     "mypy*": allow
     "python -m mypy*": allow
+    "npm*": allow
     "npm run*": allow
     "pnpm*": allow
     "yarn*": allow

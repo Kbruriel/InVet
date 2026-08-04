@@ -4,9 +4,10 @@ uvicorn[standard]==0.24.0
 sqlalchemy==2.0.23
 pydantic==2.5.0
 pydantic-settings==2.0.3
+email-validator==2.3.0
 
 # Base de datos
-psycopg2-binary==2.9.7
+psycopg2-binary==2.9.9
 alembic==1.13.1
 
 # Para testing
@@ -20,7 +21,7 @@ black==24.3.0
 mypy==1.7.1
 
 # Para seguridad
-python-jose==1.7.0
+python-jose==3.5.0
 passlib==1.7.4
 
 # Para logging y utilidades

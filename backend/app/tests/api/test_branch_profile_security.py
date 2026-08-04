@@ -5,6 +5,7 @@ Esta suite cubre los gaps C2 y B1 que requirieron nuevas pruebas HTTPX:
 - 403 usuario autenticado pero sin acceso a la sucursal.
 - IDOR/BOLA: intento de acceso cruzado a otra clinic no debe devolver datos protegidos.
 """
+
 from datetime import datetime
 
 import pytest
@@ -47,6 +48,7 @@ class TestBranchProfileSecurityAuth:
     def test_protected_endpoint_rejects_no_auth(self):
         """Sin Bearer token el endpoint protegido debe rechazar con 401."""
         from app.api.main import app
+
         client = TestClient(app)
         response = client.get("/api/v1/clinics/branches/1/2")
         assert response.status_code == 401, (
@@ -57,18 +59,20 @@ class TestBranchProfileSecurityAuth:
     def test_protected_endpoint_validates_token_format(self):
         """Con un token inválido el endpoint debe devolver 401."""
         from app.api.main import app
+
         client = TestClient(app)
         response = client.get(
             "/api/v1/clinics/branches/1/2",
-            headers={"Authorization": "Bearer invalid-token-string"}
+            headers={"Authorization": "Bearer invalid-token-string"},
         )
-        assert response.status_code == 401, (
-            f"Se esperaba 401 para token inválido pero se obtuvo {response.status_code}."
-        )
+        assert (
+            response.status_code == 401
+        ), f"Se esperaba 401 para token inválido pero se obtuvo {response.status_code}."
 
     def test_public_endpoint_accepts_any_access(self):
         """El endpoint público funciona sin autenticación."""
         from app.api.main import app
+
         client = TestClient(app)
         response = client.get("/api/v1/clinics/branches/99")
         assert response.status_code not in [401, 403], (

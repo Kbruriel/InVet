@@ -1,12 +1,20 @@
 """Manejo de sesiones de base de datos."""
-import os
-from sqlalchemy.pool import StaticPool
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, Session
-from sqlalchemy.ext.declarative import declarative_base
-from app.core.config import settings
 
-def _create_engine():
+import os
+from collections.abc import Generator
+
+from sqlalchemy import create_engine
+from sqlalchemy.engine import Engine
+from sqlalchemy.orm import Session, sessionmaker
+from sqlalchemy.pool import StaticPool
+
+from app.core.config import settings
+from app.infrastructure.database.models.base import Base
+
+__all__ = ["Base", "SessionLocal", "engine", "get_db"]
+
+
+def _create_engine() -> Engine:
     """Crea el motor principal y cae a SQLite en entornos sin driver PostgreSQL."""
     try:
         return create_engine(
@@ -41,11 +49,8 @@ engine = _create_engine()
 # Crear la clase de sesión local
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
-# Base para modelos ORM
-Base = declarative_base()
 
-
-def get_db() -> Session:
+def get_db() -> Generator[Session, None, None]:
     """Obtiene una sesión de base de datos."""
     db = SessionLocal()
     try:

@@ -1,14 +1,16 @@
 """
 Modelos del dominio - Entidades y value objects
 """
+
 from datetime import datetime
-from typing import Optional
+
 from pydantic import BaseModel, EmailStr
 
 
 # Modelo base para entidades del dominio
 class DomainModel(BaseModel):
     """Base model for domain entities"""
+
     pass
 
 
@@ -18,6 +20,8 @@ class User(DomainModel):
     email: EmailStr
     username: str
     hashed_password: str
+    first_name: str | None = None
+    last_name: str | None = None
     is_active: bool = True
     is_admin: bool = False
     created_at: datetime
@@ -29,14 +33,16 @@ class UserCreate(DomainModel):
     email: EmailStr
     username: str
     password: str
+    first_name: str | None = None
+    last_name: str | None = None
 
 
 # DTO para actualización de usuario
 class UserUpdate(DomainModel):
-    email: Optional[EmailStr] = None
-    username: Optional[str] = None
-    is_active: Optional[bool] = None
-    is_admin: Optional[bool] = None
+    email: EmailStr | None = None
+    username: str | None = None
+    is_active: bool | None = None
+    is_admin: bool | None = None
 
 
 # DTO para respuesta de usuario (sin información sensible)

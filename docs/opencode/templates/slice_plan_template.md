@@ -45,11 +45,13 @@ status: PLANNED
 
 ## Checklist de tareas
 
+Regla de granularidad: cada tarea debe tener un solo objetivo verificable y pequeno. Si un trabajo mezcla contratos, persistencia, API, UI, permisos, pruebas o documentacion, dividelo en tareas consecutivas.
+
 ### Backend
 
 - [ ] BE-XXX-T01 - Titulo corto
   Capa: backend
-  Objetivo: Un unico resultado verificable.
+  Objetivo: Un unico resultado pequeno y verificable.
   Depende de: Ninguna
   Entregables: Rutas concretas de archivos, endpoint o migracion.
   Criterios de aceptacion: Condiciones observables separadas por punto y coma.
@@ -61,7 +63,7 @@ status: PLANNED
 
 - [ ] FE-XXX-T01 - Titulo corto
   Capa: frontend
-  Objetivo: Un unico resultado verificable.
+  Objetivo: Un unico resultado pequeno y verificable.
   Depende de: BE-XXX-T01
   Entregables: Rutas, componentes, formularios o cliente API concretos.
   Criterios de aceptacion: Condiciones observables separadas por punto y coma.
@@ -73,7 +75,7 @@ status: PLANNED
 
 - [ ] QA-XXX-T01 - Titulo corto
   Capa: qa
-  Objetivo: Validar criterios concretos del slice.
+  Objetivo: Validar un area concreta del slice.
   Depende de: BE-XXX-T01, FE-XXX-T01
   Entregables: Suites y reporte QA esperado.
   Criterios de aceptacion: Estados PASS requeridos y evidencia esperada.

@@ -41,5 +41,5 @@ Cerrar el gate `run_checks` antes de avanzar al siguiente slice.
 ## Estrategia actual del repo
 
 - Backend: ejecutar desde `backend/` con `python -m pytest app/tests -q`, `python -m ruff check .`, `python -m black --check .` y `python -m mypy app`.
-- Frontend: skipped cuando `frontend/package.json` no existe.
-- DevOps: skipped si Docker Compose no esta configurado o no hay permiso explicito.
+- Frontend: ejecutar lint, typecheck, test y build cuando `frontend/package.json` exista y el script este definido; skipped solo cuando no existe `frontend/package.json` o falta un script especifico.
+- DevOps: `git status` es read-only y obligatorio para decidir el cierre. Docker Compose esta autorizado por el contrato del agente cuando existe configuracion, Docker esta disponible, no hubo fallos previos y hay cambios relevantes; skipped solo si no aplica por configuracion, herramienta ausente, fallos previos o ausencia de cambios relevantes.

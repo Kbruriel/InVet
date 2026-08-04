@@ -11,6 +11,7 @@ Instrucciones:
    - Si falla, reporta `BLOCKED` y no declares cierre final.
 2. Revisa:
    - `docs/opencode/qa/QA-00X-results.md`
+   - `docs/opencode/qa/QA-00X-findings.md`
    - `docs/opencode/reviews/BE-00X-review.md`
    - `docs/opencode/reviews/BE-00X-clean-architecture-review.md`
    - `docs/opencode/reviews/BE-00X-security-review.md`
@@ -19,6 +20,6 @@ Instrucciones:
    - `git diff` y logs relevantes
 3. Si faltan comandos, logs o evidencias mecanicas, delega reintentos a `invet-command-executor`.
 4. Crea siempre `docs/opencode/reviews/BE-00X-final-review.md` usando `docs/opencode/templates/review_findings_template.md` como base.
-5. Usa `APPROVED` solo si QA, las tres revisiones, checks y docs estan cerrados y no hay findings abiertos.
+5. Usa `APPROVED` solo si `QA-00X-results.md` esta `APPROVED`, `QA-00X-findings.md` no existe o esta en estado resuelto, las tres revisiones, checks y docs estan cerrados y no hay findings abiertos.
 6. Usa `REJECTED` o `BLOCKED` si hay gaps, inconsistencias o verificaciones imposibles.
 7. No modifiques codigo de producto.

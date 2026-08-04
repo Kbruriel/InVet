@@ -1,5 +1,7 @@
 # QA-004 Findings
 
+- Estado: RESOLVED
+
 ## Estado actual
 **RESUELTO - no hay findings abiertos tras la revalidación**
 

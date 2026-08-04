@@ -7,7 +7,7 @@ Cerrar el gate final de release despues de QA, revisiones, checks y documentacio
 ## Entrada
 
 - Cambios actuales del slice.
-- Evidencia de QA, reviews y checks.
+- Evidencia de QA en `docs/opencode/qa/QA-00X-results.md` y `docs/opencode/qa/QA-00X-findings.md`, reviews y checks.
 - Documentacion final del slice.
 - Logs y reintentos mecanicos relevantes.
 
@@ -21,7 +21,8 @@ Cerrar el gate final de release despues de QA, revisiones, checks y documentacio
 
 ## Criterios de aprobacion
 
-- QA, clean architecture, seguridad y review funcional estan aprobados.
+- QA results esta aprobado y QA findings no existe o esta cerrado/resuelto.
+- Clean architecture, seguridad y review funcional estan aprobados.
 - Checks aplicables estan aprobados.
 - La documentacion final fue actualizada.
 - No quedan findings abiertos.
