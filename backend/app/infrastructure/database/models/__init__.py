@@ -8,6 +8,7 @@ from app.infrastructure.database.models.owner import Owner
 from app.infrastructure.database.models.pet import Pet
 from app.infrastructure.database.models.rating_summary import RatingSummary
 from app.infrastructure.database.models.service import Service
+from app.infrastructure.database.models.session import Session
 from app.infrastructure.database.models.user import User
 from app.infrastructure.database.models.veterinarian import Veterinarian
 
@@ -20,6 +21,7 @@ __all__ = [
     "Pet",
     "RatingSummary",
     "Service",
+    "Session",
     "User",
     "Veterinarian",
 ]

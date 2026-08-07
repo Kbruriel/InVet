@@ -1,8 +1,8 @@
 # 02 - Matriz US/BE/FE/QA/UIA/APIA por slice
 
-| Slice | User stories | Backend | Frontend | QA | UI Automation | API Automation | Resultado |
-| --- | --- | --- | --- | --- | --- | --- | --- |
-| 001 | US-001 | BE-001 | FE-001 | QA-001 | UIA-001 | APIA-001 | Base tecnica y design system |
+| Slice | User stories | Backend | Frontend | QA | UI Automation | API Automation | Resultado | Estado |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| 001 | US-001 | BE-001 | FE-001 | QA-001 | UIA-001 | APIA-001 | Base tecnica y design system | CLOSED |
 | 002 | US-002 | BE-002 | FE-002 | QA-002 | UIA-002 | APIA-002 | Autenticacion y sesion |
 | 003 | US-003 | BE-003 | FE-003 | QA-003 | UIA-003 | APIA-003 | Landing publica y busqueda |
 | 004 | US-004 | BE-004 | FE-004 | QA-004 | UIA-004 | APIA-004 | Perfil publico clinica/sucursal |

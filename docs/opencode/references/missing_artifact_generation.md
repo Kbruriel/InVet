@@ -14,6 +14,24 @@ No existe docs/opencode/plans/BE-00X-plan.md. Ejecuta /plan-task BE-00X.
 
 el agente debe generar `docs/opencode/plans/BE-00X-plan.md` en schema v3. Un archivo legacy en `payload/docs/opencode/plans/BE-00X-plan.md` no desbloquea el gate por si mismo: solo sirve como contexto historico.
 
+## Caso secundario: artefactos auxiliares ausentes
+
+Si falta alguno de estos artefactos:
+
+- `docs/opencode/tasks/user-stories/US-00X.md`
+- `docs/opencode/tasks/ui-automation/UIA-00X.md`
+- `docs/opencode/tasks/api-automation/APIA-00X.md`
+
+el comando responsable tambien es `/plan-task BE-00X`. No existen comandos separados para crear solo `US`, `UIA` o `APIA`.
+
+Reglas:
+
+- `US-00X.md` debe derivar historias y criterios `AC-00X-NN` desde matriz, BE, FE, QA y `slice_task_context.md`.
+- `UIA-00X.md` debe planear cobertura de navegador desde FE, QA, criterios `AC-00X-NN`, rutas, formularios, estados UX y responsive.
+- `APIA-00X.md` debe planear cobertura HTTP desde BE, QA, criterios `AC-00X-NN`, endpoints, authn/authz, payloads, errores e IDOR/BOLA.
+- Los artefactos auxiliares nuevos quedan con evidencia pendiente; no deben declarar ejecuciones `PASSED` sin que el gate correspondiente las haya producido.
+- Si existe un artefacto auxiliar en `payload/`, usarlo solo como contexto historico y no copiar aprobaciones sin evidencia vigente.
+
 ## Fuentes obligatorias
 
 Antes de escribir el artefacto faltante, leer:
@@ -24,6 +42,9 @@ Antes de escribir el artefacto faltante, leer:
 - `docs/opencode/tasks/backend/BE-00X.md`
 - `docs/opencode/tasks/frontend/FE-00X.md`
 - `docs/opencode/tasks/qa/QA-00X.md`
+- `docs/opencode/tasks/user-stories/US-00X.md`, si existe
+- `docs/opencode/tasks/ui-automation/UIA-00X.md`, si existe
+- `docs/opencode/tasks/api-automation/APIA-00X.md`, si existe
 - `docs/opencode/references/slice_task_context.md`
 - `docs/opencode/references/spec_kit_reference_improvements.md`
 - `payload/docs/opencode/plans/BE-00X-plan.md`, si existe

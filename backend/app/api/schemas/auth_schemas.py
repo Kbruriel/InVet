@@ -47,3 +47,37 @@ class AuthProfileResponse(BaseModel):
     first_name: str | None = Field(default=None, alias="firstName")
     last_name: str | None = Field(default=None, alias="lastName")
     role: str
+
+
+# --- BE-002: Schemas para logout y password reset ---
+
+
+class AuthLogoutRequest(BaseModel):
+    """Payload para logout (refresh token opcional)."""
+
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+    refresh_token: str | None = Field(default=None, min_length=1)
+
+
+class AuthPasswordResetRequest(BaseModel):
+    """Payload para solicitar recuperacion de password."""
+
+    model_config = ConfigDict(populate_by_name=True, str_strip_whitespace=True)
+
+    email: EmailStr
+
+
+class AuthPasswordResetConfirmRequest(BaseModel):
+    """Payload para confirmar recuperacion de password."""
+
+    model_config = ConfigDict(str_strip_whitespace=True)
+
+    reset_token: str = Field(min_length=1)
+    new_password: str = Field(min_length=6)
+
+
+class AuthGenericMessageResponse(BaseModel):
+    """Respuesta generica para operaciones que no revelan informacion sensible."""
+
+    message: str = "Se ha procesado su solicitud correctamente."

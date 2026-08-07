@@ -24,7 +24,7 @@ Instrucciones:
    - `docs/opencode/tasks/api-automation/APIA-00X.md` si ya existe
    - `docs/opencode/references/slice_task_context.md`
    - `docs/opencode/references/spec_kit_reference_improvements.md`
-   - `docs/opencode/references/missing_artifact_generation.md` si el plan canonico falta o solo existe en `payload/`.
+   - `docs/opencode/references/missing_artifact_generation.md` si el plan canonico o los artefactos auxiliares faltan, o si el plan solo existe en `payload/`.
    - `docs/opencode/templates/slice_plan_template.md`
    - `docs/opencode/templates/missing_artifact_generation_template.md` si el gate fallo por artefacto faltante.
    - `docs/opencode/plans/BE-00X-plan.md` si ya existe.
@@ -51,6 +51,10 @@ Instrucciones:
    - `docs/opencode/tasks/ui-automation/UIA-00X.md`
    - `docs/opencode/tasks/api-automation/APIA-00X.md`
    - una matriz `Historia -> Criterio -> Backend -> Frontend -> QA -> UIA -> APIA`
+   - Estos tres artefactos auxiliares se generan con `/plan-task`; no hay comandos separados para crearlos.
+   - Si cualquiera de los tres falta, crealo en la misma ejecucion antes de validar el plan.
+   - Si existe, auditelo contra la matriz, BE/FE/QA y plan canonico, y actualizalo sin borrar evidencia vigente.
+   - Si un implementador o gate reporta `US-00X`, `UIA-00X` o `APIA-00X` faltante, el comando correcto para regenerarlo es `/plan-task BE-00X`.
 7. El contrato frontend debe definir obligatoriamente:
    - Rutas y acceso publico/privado.
    - Flujos de usuario y estados loading, submitting, error, empty y success.

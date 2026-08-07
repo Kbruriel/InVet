@@ -18,6 +18,7 @@ Responsabilidades:
 - Convertir el indice en un plan vertical que incluya backend, frontend, QA, UI automation y API automation.
 - Guardar un unico plan canonico en `docs/opencode/plans/BE-00X-plan.md`.
 - Generar o actualizar `docs/opencode/tasks/user-stories/US-00X.md`, `docs/opencode/tasks/ui-automation/UIA-00X.md` y `docs/opencode/tasks/api-automation/APIA-00X.md`.
+- Tratar `/plan-task` como el comando canonico para crear o regenerar artefactos auxiliares faltantes; no existen comandos separados para crear `US-00X`, `UIA-00X` o `APIA-00X`.
 - Generar tareas atomicas para `/implement-backend-task`, `/implement-frontend-task`, `/implement-ui-automation-task`, `/implement-api-automation-task` y `/qa-task`.
 - Partir de historias de usuario `US-00X-NN` y criterios `CA-NN`.
 - Descomponer BE, FE y QA en tareas pequenas, cada una con un solo objetivo verificable.
@@ -44,6 +45,11 @@ Reglas:
 - Usa la matriz para correspondencia de IDs, los task files para detalle funcional y el plan existente como baseline auditable.
 - Usa `docs/opencode/references/slice_task_context.md` para enriquecer cada task BE/FE/QA con contexto accionable.
 - Si el brief, la matriz y las tasks BE/FE/QA discrepan, registra la decision en `Revision de gaps` antes de generar tareas.
+- Si falta `US-00X.md`, crealo desde matriz, BE/FE/QA y brief contextual con historias, criterios `AC-00X-NN`, dependencias, fuentes, entregables y Definition of Done.
+- Si falta `UIA-00X.md`, crealo desde FE, QA, criterios `AC-00X-NN` y contrato frontend con cobertura Playwright prevista, estados, rutas, evidencia pendiente y casos no automatizados.
+- Si falta `APIA-00X.md`, crealo desde BE, QA, criterios `AC-00X-NN` y endpoints esperados con cobertura HTTP prevista, authn/authz, errores, riesgos IDOR/BOLA, evidencia pendiente y casos no automatizados.
+- Si un artefacto auxiliar ya existe, auditalo contra el plan y actualizalo sin duplicar casos ni borrar evidencia vigente.
+- Si un implementador devuelve el trabajo porque falta `US-00X`, `UIA-00X` o `APIA-00X`, regenera el artefacto auxiliar con `/plan-task BE-00X` y valida el plan.
 - Genera una matriz de trazabilidad por historia y criterio con columnas `Backend`, `Frontend`, `QA`, `UIA` y `APIA`.
 - No dejes criterios huerfanos: cada `CA-NN` debe tener cobertura BE, FE, QA, UIA, APIA o una justificacion explicita de `No aplica`.
 - `UIA-00X` cubre flujos visibles, navegacion, formularios, estados UX y evidencia de navegador.

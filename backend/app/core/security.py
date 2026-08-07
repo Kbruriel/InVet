@@ -48,6 +48,19 @@ def create_refresh_token(
     )
 
 
+def create_reset_token(
+    data: dict[str, Any], expires_delta: timedelta | None = None
+) -> str:
+    to_encode = data.copy()
+    expire = datetime.utcnow() + (
+        expires_delta if expires_delta else timedelta(hours=1)
+    )
+    to_encode.update({"exp": expire, "type": "reset"})
+    return cast(
+        str, jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+    )
+
+
 def verify_token(token: str) -> dict[str, Any]:
     try:
         return cast(
