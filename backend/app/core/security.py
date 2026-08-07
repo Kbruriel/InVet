@@ -10,7 +10,7 @@ from passlib.context import CryptContext  # type: ignore[import-untyped]
 
 from app.core.config import settings
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 
 
@@ -81,7 +81,7 @@ def get_current_access_user(token: str = Depends(oauth2_scheme)) -> dict[str, An
     if not isinstance(subject, str):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token invÃ¡lido",
+            detail="Token inválido",
             headers={"WWW-Authenticate": "Bearer"},
         )
 

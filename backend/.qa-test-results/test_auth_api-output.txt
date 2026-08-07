@@ -1,0 +1,30 @@
+﻿============================= test session starts =============================
+platform win32 -- Python 3.11.15, pytest-7.4.3, pluggy-1.6.0 -- C:\Users\Precision 7520\AppData\Local\hermes\hermes-agent\venv\Scripts\python.exe
+cachedir: .pytest_cache
+rootdir: C:\InVet\backend
+configfile: pytest.ini
+plugins: anyio-3.7.1, asyncio-0.21.1
+asyncio: mode=Mode.STRICT
+collecting ... collected 8 items
+
+app/tests/api/test_auth_api.py::test_register_auth_user_returns_tokens_and_hashes_password PASSED [ 12%]
+app/tests/api/test_auth_api.py::test_register_rejects_duplicate_email PASSED [ 25%]
+app/tests/api/test_auth_api.py::test_login_returns_tokens_for_valid_credentials PASSED [ 37%]
+app/tests/api/test_auth_api.py::test_login_rejects_invalid_password PASSED [ 50%]
+app/tests/api/test_auth_api.py::test_me_requires_authorization PASSED    [ 62%]
+app/tests/api/test_auth_api.py::test_me_returns_authenticated_profile PASSED [ 75%]
+app/tests/api/test_auth_api.py::test_refresh_returns_new_tokens_for_valid_refresh_token PASSED [ 87%]
+app/tests/api/test_auth_api.py::test_refresh_rejects_access_token PASSED [100%]
+
+============================== warnings summary ===============================
+..\..\Users\Precision 7520\AppData\Local\hermes\hermes-agent\venv\Lib\site-packages\starlette\formparsers.py:10
+  C:\Users\Precision 7520\AppData\Local\hermes\hermes-agent\venv\Lib\site-packages\starlette\formparsers.py:10: PendingDeprecationWarning: Please use `import python_multipart` instead.
+    import multipart
+
+..\..\Users\Precision 7520\AppData\Local\hermes\hermes-agent\venv\Lib\site-packages\pydantic\_internal\_config.py:268: 10 warnings
+  C:\Users\Precision 7520\AppData\Local\hermes\hermes-agent\venv\Lib\site-packages\pydantic\_internal\_config.py:268: PydanticDeprecatedSince20: Support for class-based `config` is deprecated, use ConfigDict instead. Deprecated in Pydantic V2.0 to be removed in V3.0. See Pydantic V2 Migration Guide at https://errors.pydantic.dev/2.5/migration/
+    warnings.warn(DEPRECATION_MESSAGE, DeprecationWarning)
+
+-- Docs: https://docs.pytest.org/en/stable/how-to/capture-warnings.html
+- generated xml file: C:\InVet\backend\.qa-test-results\test_auth_api-junit.xml -
+======================= 8 passed, 11 warnings in 3.65s ========================

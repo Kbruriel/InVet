@@ -16,6 +16,7 @@ Instrucciones:
    - `docs/opencode/plans/BE-00X-plan.md`
    - `docs/opencode/tasks/frontend/FE-00X.md`
    - `docs/opencode/tasks/backend/BE-00X.md`
+   - `docs/opencode/references/slice_task_context.md`
 5. Verifica que `Contrato de implementacion frontend` defina rutas, flujos, API, formularios, componentes, accesibilidad y pruebas.
 6. Si falta `frontend/package.json` y el slice requiere base tecnica, crea un workspace ejecutable antes de implementar UI.
    - Para `FE-001`, deja Next.js, TypeScript, Tailwind local, scripts `lint`, `typecheck`, `test`, `build`, estructura `src/` y pruebas verificables.
@@ -41,3 +42,8 @@ Instrucciones:
 Hook de cierre:
 - Si Docker Compose esta disponible y el usuario no pidió omitirlo, ejecutar `docker compose up -d --build --force-recreate db backend frontend`.
 - Si Docker Compose no esta disponible, registrar el skip con la causa exacta.
+Cierre obligatorio:
+- Al cerrar, reporta siempre Siguiente paso recomendado con el comando exacto segun el estado final del gate.
+- Si hubo findings, agrega Comando recomendado para resolver hallazgos con el comando exacto que sigue en el flujo.
+- Si hubo bloqueo, agrega Comando recomendado para desbloquear el gate con el comando exacto que destraba la ejecucion.
+- Usa la tabla de continuidad definida en docs/opencode/13_agents_architecture_and_gate_flow.md para decidir la recomendacion correcta y explicar el motivo.

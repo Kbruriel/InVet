@@ -1,0 +1,36 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #fff8f0;
+  --foreground: #0a2540;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #faf3e8;
+    --foreground: #0d1b2a;
+  }
+}
+
+html {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  color: var(--foreground);
+  background-color: var(--background);
+  min-height: 100vh;
+}
+
+/* Focus visible for accessibility */
+*:focus-visible {
+  outline: 2px solid #006065;
+  outline-offset: 2px;
+  border-radius: 4px;
+}

@@ -5,6 +5,11 @@ artifact: qa_findings
 
 # Hallazgos de QA para slice QA-XXX
 
+## Estado global del archivo
+
+- Estado global: `OPEN|IN_PROGRESS|READY_FOR_REVALIDATION|RESOLVED|ACCEPTED_RISK`
+- Regla: usar `RESOLVED` o `ACCEPTED_RISK` solo cuando ningun finding individual siga en `OPEN`, `IN_PROGRESS` o `READY_FOR_REVALIDATION`.
+
 ## Finding
 
 - Identificador:

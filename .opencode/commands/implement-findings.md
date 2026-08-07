@@ -17,7 +17,15 @@ Instrucciones:
 8. Si corriges un finding QA, cambia su estado a `READY_FOR_REVALIDATION`, nunca a `RESOLVED`.
 9. Indica `/qa-task QA-00X` como siguiente gate; solo QA puede cerrar el finding.
 10. No amplie el alcance fuera del slice ni inventes funcionalidad nueva.
+Cierre requerido:
+- El reporte final debe incluir `Estado de ejecucion: READY_FOR_REVALIDATION|BLOCKED|COMPLETED` antes de `Siguiente paso recomendado`.
 
 Hook de cierre:
-- Si las correcciones quedaron listas y el usuario no pidió omitirlo, ejecutar `docker compose up -d --build --force-recreate db backend frontend`.
+- Si las correcciones quedaron listas y el usuario no pidiÃ³ omitirlo, ejecutar `docker compose up -d --build --force-recreate db backend frontend`.
 - Si Docker Compose no esta disponible, registrar el skip con la causa exacta.
+Cierre obligatorio:
+- Al cerrar, reporta siempre Siguiente paso recomendado con el comando exacto segun el estado final del gate.
+- Si el cierre deja findings de QA listos para revalidacion, el estado de ejecucion debe reflejar `READY_FOR_REVALIDATION`.
+- Si hubo findings, agrega Comando recomendado para resolver hallazgos con el comando exacto que sigue en el flujo.
+- Si hubo bloqueo, agrega Comando recomendado para desbloquear el gate con el comando exacto que destraba la ejecucion.
+- Usa la tabla de continuidad definida en docs/opencode/13_agents_architecture_and_gate_flow.md para decidir la recomendacion correcta y explicar el motivo.

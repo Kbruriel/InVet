@@ -28,12 +28,15 @@ Flujo manual equivalente:
 /plan-task BE-00X
 /implement-backend-task BE-00X
 /implement-frontend-task FE-00X
+/implement-ui-automation-task FE-00X
+/implement-api-automation-task BE-00X
 /qa-task QA-00X
 /review-slice BE-00X
 /clean-architecture-review BE-00X
 /security-review BE-00X
 /implement-findings BE-00X  # solo si hay hallazgos
 /qa-task QA-00X             # repetir despues de correcciones
+/run-ui-checks FE-00X
 /run-checks BE-00X
 /update-docs BE-00X
 ```
@@ -41,6 +44,7 @@ Flujo manual equivalente:
 Notas:
 - `/plan-task` acepta `BE-00X`, `FE-00X` o `QA-00X`, normaliza el mismo indice y nunca implementa codigo.
 - Todos los IDs producen un unico plan canonico `docs/opencode/plans/BE-00X-plan.md`.
+- El planner tambien debe crear o actualizar `US-00X`, `UIA-00X` y `APIA-00X`.
 - Los planes nuevos usan schema v3 y se validan con `backend/scripts/validate_slice_plan.py`.
 - Los planes schema v2 son legacy: deben regenerarse con `/plan-task` antes de implementarse.
 - Los artefactos operativos se escriben en UTF-8.
@@ -59,16 +63,24 @@ Los archivos de hallazgos esperados son:
 
 - `00_installation_manifest.md`: que instalo el paquete.
 - `01_command_runbook.md`: como ejecutar comandos.
-- `02_be_fe_qa_task_matrix.md`: matriz BE/FE/QA.
+- `02_be_fe_qa_task_matrix.md`: matriz US/BE/FE/QA/UIA/APIA.
 - `03_task_prompt_contracts.md`: contrato de prompts por comando.
 - `04_agent_contracts.md`: responsabilidades de agentes.
 - `05_done_gates_by_command.md`: gates de cierre.
 - `11_chatgpt_project_context.md`: contexto consolidado para usar el proyecto en ChatGPT.
 - `12_troubleshooting_skills_vs_agents.md`: solucion al error de confundir skills Codex con agentes OpenCode.
+- `13_agents_architecture_and_gate_flow.md`: arquitectura agentica y continuidad de gates.
+- `14_github_copilot_agentic_flow.md`: version del flujo compatible con GitHub Copilot.
 - `templates`: plantillas Markdown para resultados, hallazgos y correcciones.
 - `templates/slice_plan_template.md`: contrato obligatorio de planes schema v3.
+- `templates/missing_artifact_generation_template.md`: solicitud reusable para regenerar artefactos canonicos faltantes.
 - `references/spec_kit_reference_improvements.md`: adaptacion de aprendizajes de `github/spec-kit` al flujo agentico InVet.
+- `references/slice_task_context.md`: brief por slice con titulo, descripcion, entregables BE/FE y foco de aceptacion QA.
+- `references/missing_artifact_generation.md`: procedimiento para migrar backups legacy de `payload/` a artefactos canonicos validos.
 - `tasks/backend`: tareas backend.
 - `tasks/frontend`: tareas frontend.
 - `tasks/qa`: tareas QA.
+- `tasks/user-stories`: historias de usuario y criterios `CA-NN`.
+- `tasks/ui-automation`: tareas UI automation.
+- `tasks/api-automation`: tareas API automation.
 - `references`: reglas de alcance, diseno, arquitectura y seguridad.

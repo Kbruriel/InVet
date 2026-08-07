@@ -2,9 +2,11 @@
 
 ## `/plan-task BE-00X|FE-00X|QA-00X`
 
-Debe producir `docs/opencode/plans/BE-00X-plan.md` con:
+Debe producir `docs/opencode/plans/BE-00X-plan.md` y los artefactos `US-00X`, `UIA-00X` y `APIA-00X` con:
 - Frontmatter `schema_version: 3`, indice, plan canonico y `encoding: UTF-8`.
 - Objetivo.
+- Brief operativo del slice con titulo, descripcion, entregables backend, entregables frontend y criterios QA principales.
+- Historias `US-00X-NN` y criterios `CA-NN`.
 - Alcance MVP.
 - Fuera de alcance.
 - Entidades.
@@ -20,6 +22,7 @@ Debe producir `docs/opencode/plans/BE-00X-plan.md` con:
 - Politica UTF-8.
 - Definition of Done.
 - Checklist numerado de tareas para backend, frontend y QA.
+- Matriz `Historia -> Criterio -> Backend -> Frontend -> QA -> UIA -> APIA`.
 
 Cada tarea del checklist debe incluir:
 - `- [ ] BE|FE|QA-00X-TNN - Titulo`
@@ -41,8 +44,24 @@ Cada tarea del checklist debe incluir:
 Cada tarea debe ser pequena, de una sola capa y un solo tipo. Si mezcla contrato, persistencia, API, UI, seguridad, pruebas, Docker o documentacion, debe dividirse antes de implementar.
 
 No debe escribir codigo fuente. Los tres tipos de ID normalizan explicitamente el mismo indice y producen un unico plan canonico.
+Debe usar `docs/opencode/references/slice_task_context.md` para enriquecer titulo, descripcion, entregables y criterios de aceptacion de cada task.
+Si la matriz, las tasks BE/FE/QA y `slice_task_context.md` no coinciden, debe registrar la decision en `Revision de gaps` antes de generar tareas.
+Debe crear o actualizar `docs/opencode/tasks/user-stories/US-00X.md`, `docs/opencode/tasks/ui-automation/UIA-00X.md` y `docs/opencode/tasks/api-automation/APIA-00X.md`.
+Cada `CA-NN` debe tener cobertura UI, API o una justificacion manual explicita.
 Debe terminar con `python backend/scripts/validate_slice_plan.py BE-00X --stage plan` en `PASS`.
 Debe escribir el plan en UTF-8 y corregir mojibake antes de cerrar.
+
+## Estados de cierre compartidos
+
+Todos los prompts y comandos de este documento deben terminar con `Estado de ejecucion` y `Siguiente paso recomendado`.
+
+Estados de ejecucion permitidos por familia:
+
+- QA y reviewers: `APPROVED`, `REJECTED` o `BLOCKED`.
+- Findings implementer: `READY_FOR_REVALIDATION`, `COMPLETED` o `BLOCKED`.
+- Implementadores, planner, check runner, docs updater y final reviewer: `COMPLETED` o `BLOCKED`, salvo que el gate concreto use `APPROVED` o `REJECTED`.
+
+`READY_FOR_REVALIDATION` solo describe findings. No debe usarse como estado de cierre de QA o de un review.
 
 ## `/implement-backend-task BE-00X`
 
@@ -103,9 +122,45 @@ Debe validar backend + frontend + integracion del slice:
 - Rechazar tareas compuestas o sin responsabilidad unica como `BLOCKED` por contrato de plan.
 - Solo si falla la auto-recuperacion o si la suite requiere un servicio externo no mockeable, crear `docs/opencode/qa/QA-00X-findings.md` siguiendo `docs/opencode/templates/qa_findings_template.md` para que luego lo consuma `/implement-findings`.
 - Usar `docs/opencode/templates/qa_results_template.md` para `docs/opencode/qa/QA-00X-results.md`.
+- Cierre requerido: el reporte final debe incluir `Estado de ejecucion: APPROVED|REJECTED|BLOCKED` antes de `Siguiente paso recomendado`.
+- `READY_FOR_REVALIDATION` no es un estado de cierre de QA; ese valor pertenece al lifecycle de findings.
+- Si el findings file sigue `READY_FOR_REVALIDATION`, la salida debe reflejar el bloqueo real y derivar al flujo de correcciones, no pedir un auto-rerun del mismo gate.
 Hook de cierre: si QA termina en `APPROVED` y Docker Compose esta disponible, primero validar si existen cambios pendientes que afecten `backend`, `frontend`, `docker-compose.yml`, `Dockerfile*`, `backend/requirements.txt`, `backend/pyproject.toml`, `frontend/package.json` o lockfiles.
 Si no existen cambios pendientes que requieran actualizar contenedores, registrar el skip con la causa exacta y no ejecutar el restart.
 Si existen cambios pendientes, ejecutar `docker compose up -d --build --force-recreate db backend frontend`.
+
+## `/implement-ui-automation-task FE-00X`
+
+Debe implementar solo tareas de automatizacion UI del slice:
+- Leer `docs/opencode/plans/BE-00X-plan.md`.
+- Leer `docs/opencode/tasks/user-stories/US-00X.md`.
+- Leer `docs/opencode/tasks/ui-automation/UIA-00X.md`.
+- Leer las tasks `BE-00X`, `FE-00X` y `QA-00X` del mismo slice.
+- Implementar specs Playwright en `InVet_UI_Automation/tests/e2e`.
+- Cubrir flujos visibles, navegacion, formularios, redirects y estados UX.
+- Referenciar `US-00X-NN` y `CA-NN`.
+- Ejecutar `npm run test:e2e` y `npm run test:regression`.
+- Documentar evidencia y casos no automatizados.
+
+## `/implement-api-automation-task BE-00X`
+
+Debe implementar solo tareas de automatizacion API del slice:
+- Leer `docs/opencode/plans/BE-00X-plan.md`.
+- Leer `docs/opencode/tasks/user-stories/US-00X.md`.
+- Leer `docs/opencode/tasks/api-automation/APIA-00X.md`.
+- Leer las tasks `BE-00X`, `FE-00X` y `QA-00X` del mismo slice.
+- Implementar specs Playwright en `InVet_UI_Automation/tests/api`.
+- Validar payloads, statuses, authn/authz, IDOR/BOLA, aislamiento tenant y datos sensibles.
+- Referenciar `US-00X-NN` y `CA-NN`.
+- Ejecutar `npm run test:api`.
+- Documentar evidencia y casos no automatizados.
+
+## `/run-ui-checks FE-00X`
+
+Debe ejecutar los checks UI oficiales del proyecto de automatizacion:
+- Correr `npm run test:e2e`.
+- Correr `npm run test:regression`.
+- Reportar evidencia y bloqueos antes de permitir `/run-checks BE-00X`.
 
 ## `/review-slice BE-00X|FE-00X`
 
@@ -117,6 +172,7 @@ Debe revisar el slice vertical completo desde backend o frontend:
 - Leer `docs/opencode/tasks/backend/BE-00X.md`, `docs/opencode/tasks/frontend/FE-00X.md` y `docs/opencode/tasks/qa/QA-00X.md`.
 - Revisar `git diff` y archivos modificados del slice.
 - Documentar hallazgos en `docs/opencode/reviews/BE-00X-review.md` cuando existan.
+- Cierre requerido: el reporte final debe incluir `Estado de ejecucion: APPROVED|REJECTED|BLOCKED` antes de `Siguiente paso recomendado`.
 
 ## `/clean-architecture-review`
 

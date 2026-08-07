@@ -12,6 +12,18 @@ encoding: UTF-8
 
 Un resultado funcional vertical, demostrable y acotado.
 
+## Brief operativo del slice
+
+| Campo | Valor |
+| --- | --- |
+| Titulo |  |
+| Descripcion |  |
+| Entregables backend |  |
+| Entregables frontend |  |
+| Criterios QA principales |  |
+
+Fuente obligatoria: `docs/opencode/references/slice_task_context.md`.
+
 ## Alcance MVP
 
 ## Fuera de alcance
@@ -41,6 +53,7 @@ Registrar solo supuestos no bloqueantes. Si el supuesto cambia contrato publico,
 | Tarea backend | `docs/opencode/tasks/backend/BE-XXX.md` | Reglas, entidades, persistencia y API | REQUIRED |
 | Tarea frontend | `docs/opencode/tasks/frontend/FE-XXX.md` | Rutas, UI, estados y contrato de cliente | REQUIRED |
 | Tarea QA | `docs/opencode/tasks/qa/QA-XXX.md` | Criterios de aceptacion y riesgos | REQUIRED |
+| Brief de contexto | `docs/opencode/references/slice_task_context.md` | Titulo, descripcion, entregables y criterios por slice | REQUIRED |
 | Referencia arquitectura | `docs/opencode/references/backend_clean_architecture.md` | Limites backend | REQUIRED si hay backend |
 | Referencia visual | `docs/opencode/references/frontend_visual_alignment.md` | UI y accesibilidad | REQUIRED si hay frontend |
 | Referencia checks | `docs/opencode/references/run_checks_matrix.md` | Checks esperados | REQUIRED |
@@ -142,6 +155,8 @@ Reglas:
 - `Contexto necesario` debe listar archivos o decisiones que el implementador debe leer.
 - `Contratos usados` debe mapear la tarea con endpoints, criterios, referencias o reportes.
 - `Resultado esperado` debe describir el outcome observable que otro agente puede validar.
+- Titulo, descripcion, entregables y criterios de aceptacion deben alinearse con `Brief operativo del slice`.
+- Si el brief, la matriz y las tasks BE/FE/QA discrepan, registrar la decision en `Revision de gaps`.
 
 ### Backend
 

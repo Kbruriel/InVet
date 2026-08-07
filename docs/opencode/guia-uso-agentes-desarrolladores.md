@@ -1,396 +1,394 @@
-# Guia para desarrolladores: uso de agentes en InVet
+# Guia de uso de agentes para desarrolladores
 
 ## Objetivo
 
-Esta guia explica como pedir y ejecutar una tarea usando los agentes de InVet, desde el plan inicial hasta el final review.
+Esta guia explica como pedir trabajo a los agentes de InVet y como leer su resultado usando el flujo agentico vigente.
 
-El formato base de trabajo es por slice:
+La unidad real de trabajo es el slice vertical. Un mismo indice funcional se representa con estos artefactos:
 
-- `BE-00X`: tarea de backend.
-- `FE-00X`: tarea de frontend.
-- `QA-00X`: tarea de validacion.
+- `US-00X`: historias de usuario y criterios `CA-NN`
+- `BE-00X`: backend
+- `FE-00X`: frontend
+- `QA-00X`: validacion del slice
+- `UIA-00X`: automatizacion UI/E2E
+- `APIA-00X`: automatizacion API
 
-Cada slice debe tener un alcance claro, criterios de aceptacion, comandos de cierre y evidencia.
+El sistema no trata backend, frontend, QA y automatizacion como esfuerzos aislados. Todo pertenece al mismo slice verificable.
 
-## Como pedir una tarea
+## Que pedir
 
-La forma recomendada de pedir trabajo a los agentes es indicar:
+La forma mas estable de pedir trabajo es indicar:
 
-- Codigo del slice.
-- Objetivo.
-- Alcance.
-- Criterios de aceptacion.
-- Restricciones importantes.
-- Resultado esperado.
+- ID del slice
+- objetivo funcional
+- alcance MVP
+- criterios de aceptacion
+- restricciones o riesgos
+- dependencias conocidas
 
-Ejemplo para backend:
+Ejemplo:
 
 ```text
-Implementa BE-004: gestion de clinicas.
+Implementa FE-008 para busqueda publica de clinicas.
 
 Objetivo:
-Crear endpoints para listar clinicas y consultar detalle por ID.
+Permitir buscar clinicas y abrir su perfil publico.
 
 Alcance:
-- GET /api/v1/clinics
-- GET /api/v1/clinics/{id}
-- Soporte de paginacion y filtro por ciudad.
-- Respuestas 404 cuando no exista la clinica.
+- Ruta /search/clinics
+- Listado de resultados
+- Navegacion a /clinics/[clinicId]
+- Estados loading, error, empty y success
 
 Criterios de aceptacion:
-- Tests de API en verde.
-- Contrato compatible con FE-004.
-- Sin exponer datos sensibles.
+- Usa el contrato API del slice
+- UI responsive
+- Sin mocks si el backend del slice ya existe
+- Build y typecheck en verde
+- Automatizacion UI y API alineada al slice
 ```
 
-Ejemplo para frontend:
+## Comando recomendado
+
+Para un flujo completo, la entrada preferida es:
 
 ```text
-Implementa FE-004: buscador publico de clinicas.
-
-Objetivo:
-Crear una pantalla publica para buscar clinicas y abrir detalle.
-
-Alcance:
-- Ruta /search.
-- Ruta /clinics/[id].
-- Estados loading, error y empty.
-- Consumo real de /api/v1/clinics.
-
-Criterios de aceptacion:
-- UI responsive.
-- Cliente API centralizado.
-- No usar mocks si el backend ya existe.
+/execute-slice FE-008
 ```
 
-Ejemplo para QA:
+El orquestador normaliza el indice y ejecuta el flujo completo con gates.
+
+Si quieres operar paso a paso, usa:
 
 ```text
-Ejecuta QA-004 para BE-004 y FE-004.
-
-Objetivo:
-Validar el flujo publico de busqueda de clinicas.
-
-Alcance:
-- Happy path.
-- Negative path.
-- Empty state.
-- Permisos si aplica.
-- Regresion minima.
-
-Entregable:
-Documento de findings con estado APPROVED o BLOCKED.
+/plan-task FE-008
+/implement-backend-task BE-008
+/implement-frontend-task FE-008
+/implement-ui-automation-task FE-008
+/implement-api-automation-task BE-008
+/qa-task QA-008
+/review-slice FE-008
+/clean-architecture-review FE-008
+/security-review FE-008
+/run-ui-checks FE-008
+/run-checks FE-008
+/update-docs FE-008
+/final-gate FE-008
 ```
 
-## Flujo completo de una tarea
+`/final-gate` es opcional. Se usa cuando hace falta una segunda opinion fuerte antes de liberar el slice.
 
-Una tarea completa normalmente pasa por estas etapas:
-
-1. **Plan**
-2. **Implementacion BE**
-3. **Implementacion FE**
-4. **QA**
-5. **Correccion de findings**
-6. **Run checks**
-7. **Final review**
+## Como funciona el flujo
 
 ### 1. Plan
 
-El plan convierte una necesidad de producto en slices concretos.
+`/plan-task` acepta `BE-00X`, `FE-00X` o `QA-00X`, pero siempre genera un unico plan canonico:
 
-Entrada esperada:
+- `docs/opencode/plans/BE-00X-plan.md`
 
-- Descripcion funcional.
-- Prioridad.
-- Dependencias entre BE, FE y QA.
+Ademas debe crear o actualizar estos artefactos companeros:
 
-Salida esperada:
+- `docs/opencode/tasks/user-stories/US-00X.md`
+- `docs/opencode/tasks/ui-automation/UIA-00X.md`
+- `docs/opencode/tasks/api-automation/APIA-00X.md`
 
-- Lista de slices, por ejemplo `BE-004`, `FE-004`, `QA-004`.
-- Contratos esperados.
-- Gates requeridos.
+El plan usa `schema_version: 3` y debe incluir:
 
-Prompt recomendado:
+- contexto
+- matriz de trazabilidad
+- tareas pequenas con `Responsabilidad unica: Si`
+- contrato Docker y pruebas
+- plan de reportes y findings
+- politica UTF-8
+
+El planner no implementa codigo. Si el plan queda incompleto, compuesto o con encoding roto, el flujo debe bloquearse ahi.
+
+### 2. Implementacion backend
+
+Usa `/implement-backend-task BE-00X` cuando el slice toque:
+
+- endpoints
+- dominio
+- casos de uso
+- persistencia
+- permisos
+- seguridad
+- pruebas unitarias backend
+
+El implementador backend debe leer el plan y ejecutar su preflight antes de editar. Si la tarea mezcla varias responsabilidades, debe devolverla al planner para division.
+
+### 3. Implementacion frontend
+
+Usa `/implement-frontend-task FE-00X` cuando el slice toque:
+
+- rutas
+- componentes
+- layouts
+- formularios
+- cliente API
+- estados UX
+- pruebas unitarias o de componente
+
+El implementador frontend consume el mismo plan canonico y debe respetar contratos API, estados UX y granularidad del slice.
+
+### 4. Automatizacion UI
+
+Usa `/implement-ui-automation-task FE-00X` cuando el slice tenga experiencia visible en navegador.
+
+Este agente debe:
+
+- leer `US-00X` y `UIA-00X`
+- cubrir navegacion, formularios, redirects y estados UX con Playwright
+- implementar pruebas en `InVet_UI_Automation/tests/e2e`
+- actualizar `UIA-00X.md` con cobertura, evidencia, bloqueos y casos no automatizados
+
+Si falta `UIA-00X.md`, el trabajo debe volver a `/plan-task`.
+
+### 5. Automatizacion API
+
+Usa `/implement-api-automation-task BE-00X` cuando el slice exponga o consuma contratos HTTP verificables.
+
+Este agente debe:
+
+- leer `US-00X` y `APIA-00X`
+- cubrir contratos HTTP con Playwright `APIRequestContext`
+- implementar pruebas en `InVet_UI_Automation/tests/api`
+- actualizar `APIA-00X.md` con cobertura, evidencia, bloqueos y casos no automatizados
+
+Si falta `APIA-00X.md`, el trabajo debe volver a `/plan-task`.
+
+### 6. QA
+
+Usa `/qa-task QA-00X` cuando backend, frontend y automatizacion ya tienen una version candidata.
+
+QA:
+
+- valida backend, frontend e integracion
+- revisa cobertura funcional y gaps unitarios
+- consume evidencia de `US`, `UIA` y `APIA`
+- puede crear pruebas QA de aceptacion, integracion, contrato, seguridad y regresion
+- no corrige codigo productivo
+
+Resultados esperados:
+
+- `docs/opencode/qa/QA-00X-results.md`
+- `docs/opencode/qa/QA-00X-findings.md` cuando hay hallazgos o bloqueos
+
+Decisiones posibles:
+
+- `APPROVED`
+- `REJECTED`
+- `BLOCKED`
+
+Antes de declarar `BLOCKED`, QA intenta autorecuperacion de entorno:
+
+- preparar dependencias
+- usar `.env.qa`
+- mover la validacion a Docker si el host no representa el entorno real
+
+### 7. Reviews
+
+Despues de QA aprobado, entran las revisiones:
+
+- `/review-slice BE-00X` o `/review-slice FE-00X`
+- `/clean-architecture-review FE-00X`
+- `/security-review FE-00X`
+
+Artefactos esperados:
+
+- `docs/opencode/reviews/BE-00X-review.md`
+- `docs/opencode/reviews/BE-00X-clean-architecture-review.md`
+- `docs/opencode/reviews/BE-00X-security-review.md`
+
+Si alguien intenta usar `QA-00X` en `/review-slice`, el comando debe rechazar esa entrada y redirigir a `/qa-task QA-00X`.
+
+### 8. Correccion de hallazgos
+
+Usa `/implement-findings` cuando QA o una review dejaron hallazgos accionables.
+
+Acepta:
+
+- `BE-00X`
+- `FE-00X`
+- una ruta puntual a un archivo de findings
+
+El agente:
+
+- consolida hallazgos del slice
+- corrige codigo y pruebas de la capa responsable
+- deja evidencia en `docs/opencode/reviews/BE-00X-corrections.md`
+- cambia findings corregidos a `READY_FOR_REVALIDATION`
+
+No puede marcar `RESOLVED`. Solo QA puede cerrar formalmente un finding.
+
+### 9. Checks y documentacion
+
+`/run-ui-checks FE-00X` ejecuta el gate de automatizacion UI del workspace `InVet_UI_Automation`.
+
+`/run-checks FE-00X` ejecuta el gate tecnico integral del slice.
+
+Ambos deben distinguir entre:
+
+- `pass`
+- `fail`
+- `skipped`
+- `blocked`
+
+`skipped` solo es valido cuando algo realmente no aplica. Un entorno roto o un comando fallido no cuentan como `skipped`.
+
+El reporte formal esperado para cierre tecnico es:
+
+- `docs/opencode/checks/BE-00X-checks.md`
+
+Despues, `/update-docs FE-00X` consolida el cierre documental del slice.
+
+### 10. Gate final
+
+`/final-gate FE-00X` revisa:
+
+- resultados QA
+- findings
+- reviews
+- UI checks
+- checks
+- documentacion
+
+El artefacto esperado es:
+
+- `docs/opencode/reviews/BE-00X-final-review.md`
+
+Este gate no reemplaza QA ni checks. Solo valida el cierre global del slice cuando se requiere una segunda opinion fuerte.
+
+## Como pedir bien cada tipo de trabajo
+
+### Pedido para plan
 
 ```text
-Genera el plan para implementar el flujo de busqueda publica de clinicas.
-Divide el trabajo en BE-004, FE-004 y QA-004.
-Incluye alcance, criterios de aceptacion, riesgos y gates de cierre.
+Genera el plan del slice FE-008.
+Usa schema v3.
+Divide el trabajo en tareas pequenas con responsabilidad unica.
+Incluye trazabilidad, contrato frontend, Docker/pruebas, reportes esperados y politica UTF-8.
+Ademas crea o actualiza US-008, UIA-008 y APIA-008.
 ```
 
-### 2. Implementacion BE-00X
-
-Usa el agente BE cuando la tarea modifica API, dominio, persistencia, autenticacion, permisos o reglas de negocio.
-
-Prompt recomendado:
+### Pedido para backend
 
 ```text
-Implementa BE-004 segun el plan.
-Respeta Clean Architecture.
-Actualiza routers, use cases, repositorios y tests necesarios.
-Ejecuta los gates de backend antes de cerrar.
+Implementa BE-008 segun el plan vigente.
+Respeta el contrato API del slice.
+Agrega las pruebas unitarias backend necesarias.
+No cierres tareas compuestas; si el plan esta mal dividido, bloquealo.
 ```
 
-Funcionamiento del agente BE:
-
-- Lee el plan y el contrato.
-- Ubica las capas afectadas.
-- Implementa endpoint, caso de uso y persistencia.
-- Agrega o ajusta tests.
-- Ejecuta validaciones tecnicas.
-
-Comandos que debe ejecutar o dejar listos:
-
-```powershell
-python -m ruff check app
-python -m mypy app
-python -m pytest app/tests -q
-```
-
-Si aplica persistencia segura:
-
-```powershell
-python backend/scripts/validate_slice_plan.py BE-00X --stage secure-persistence
-```
-
-Entregables:
-
-- Codigo backend implementado.
-- Tests backend actualizados.
-- Evidencia de comandos.
-- Notas de riesgos o decisiones.
-
-### 3. Implementacion FE-00X
-
-Usa el agente FE cuando la tarea modifica pantallas, componentes, rutas, estados visuales o consumo de API.
-
-Prompt recomendado:
+### Pedido para frontend
 
 ```text
-Implementa FE-004 segun el contrato de BE-004.
-Crea las rutas, componentes y cliente API necesarios.
-Incluye estados loading, error y empty.
-Valida responsive y ejecuta el gate de frontend.
+Implementa FE-008 segun el plan vigente.
+Conecta el cliente API real del slice.
+Incluye loading, error, empty y success.
+Agrega pruebas de frontend necesarias y valida build/typecheck.
 ```
 
-Funcionamiento del agente FE:
+### Pedido para automatizacion UI
 
-- Lee el contrato backend.
-- Define rutas y componentes.
-- Conecta el cliente API.
-- Maneja estados de UI.
-- Ejecuta build o gate de frontend.
-
-Comandos que debe ejecutar o dejar listos:
-
-```powershell
-npm run gate
-npm run build
+```text
+Implementa UIA-008 para el slice FE-008.
+Cubre happy path, negative path y estados UX visibles.
+Usa Playwright y actualiza UIA-008 con evidencia y gaps.
 ```
 
-Para validar integracion:
+### Pedido para automatizacion API
 
-```powershell
+```text
+Implementa APIA-008 para el slice BE-008.
+Valida contratos HTTP, auth, errores y estados relevantes.
+Usa Playwright APIRequestContext y actualiza APIA-008 con evidencia y gaps.
+```
+
+### Pedido para QA
+
+```text
+Ejecuta QA-008 sobre el slice vertical.
+Valida happy path, negative path, estados UX, permisos si aplica, regresion y gaps unitarios.
+Consume la cobertura de US-008, UIA-008 y APIA-008.
+Documenta results y findings con evidencia reproducible.
+```
+
+### Pedido para findings
+
+```text
+Implementa los findings de FE-008.
+Corrige solo los puntos del slice.
+Deja las correcciones en READY_FOR_REVALIDATION y reejecuta los checks relevantes.
+```
+
+## Artefactos que debes esperar
+
+Por slice, los archivos clave son:
+
+- `docs/opencode/plans/BE-00X-plan.md`
+- `docs/opencode/tasks/user-stories/US-00X.md`
+- `docs/opencode/tasks/ui-automation/UIA-00X.md`
+- `docs/opencode/tasks/api-automation/APIA-00X.md`
+- `docs/opencode/qa/QA-00X-results.md`
+- `docs/opencode/qa/QA-00X-findings.md`
+- `docs/opencode/reviews/BE-00X-review.md`
+- `docs/opencode/reviews/BE-00X-clean-architecture-review.md`
+- `docs/opencode/reviews/BE-00X-security-review.md`
+- `docs/opencode/reviews/BE-00X-corrections.md` si hubo correcciones
+- `docs/opencode/checks/BE-00X-checks.md`
+- `docs/opencode/reviews/BE-00X-final-review.md` si hubo gate final
+
+La existencia del archivo no basta. Debe contener una decision valida y evidencia actual.
+
+## Docker y entorno
+
+Cuando el slice requiere persistencia real o runtime integrado:
+
+- levantar `db` con `docker compose up -d db`
+- correr pruebas backend dentro de `backend`
+- recrear `db backend frontend` solo si hay cambios relevantes
+
+El stack completo:
+
+```text
 docker compose up -d --build --force-recreate db backend frontend
 ```
 
-Entregables:
+No debe ejecutarse por reflejo en cada comando. Primero hay que revisar si hubo cambios relevantes en:
 
-- Pantallas implementadas.
-- Componentes reutilizables.
-- Cliente API actualizado.
-- Evidencia visual o tecnica.
-- Build/gate de frontend en verde.
-
-### 4. QA-00X
-
-Usa el agente QA cuando BE y FE ya tienen una version candidata para validacion.
-
-Prompt recomendado:
-
-```text
-Ejecuta QA-004 sobre BE-004 y FE-004.
-Valida happy path, negative path, permisos si aplica, empty state y regresion minima.
-Documenta findings y emite APPROVED o BLOCKED.
-```
-
-Funcionamiento del agente QA:
-
-- Lee plan, BE y FE implementados.
-- Ejecuta pruebas funcionales.
-- Ejecuta pruebas tecnicas cuando aplique.
-- Documenta evidencia.
-- Decide si el slice pasa o queda bloqueado.
-
-Comandos que puede ejecutar:
-
-```powershell
-python -m pytest app/tests -q
-powershell scripts/compile-gate.ps1
-docker compose up -d --build --force-recreate db backend frontend
-```
-
-Entregables:
-
-- Documento `docs/opencode/qa/QA-00X-findings.md`.
-- Estado `APPROVED` o `BLOCKED`.
-- Lista de evidencia.
-- Riesgos residuales.
-
-### 5. Correccion de findings
-
-Usa el agente de hallazgos cuando QA deja el slice en `BLOCKED` o cuando hay cambios obligatorios despues de review.
-
-Prompt recomendado:
-
-```text
-Implementa los findings de QA-004.
-Corrige solo los puntos bloqueantes.
-Reejecuta los gates que fallaron y actualiza la evidencia.
-```
-
-Funcionamiento:
-
-- Lee findings.
-- Identifica responsable: BE, FE o ambos.
-- Corrige la causa raiz.
-- Repite el gate afectado.
-
-Entregables:
-
-- Fix aplicado.
-- Evidencia nueva.
-- Findings resueltos o reabiertos con causa clara.
-
-### 6. Run checks
-
-Antes de pedir final review, ejecuta el gate general.
-
-Comando recomendado:
-
-```powershell
-powershell scripts/compile-gate.ps1
-```
-
-Este gate ejecuta:
-
-- Gate de frontend.
-- Lint backend.
-- Typecheck backend.
-- Tests backend.
-
-Si el proyecto requiere validar la pila completa:
-
-```powershell
-docker compose up -d --build --force-recreate db backend frontend
-```
-
-### 7. Final review
-
-El final review confirma que el slice esta listo para cerrar.
-
-Prompt recomendado:
-
-```text
-Haz final review de BE-004, FE-004 y QA-004.
-Confirma criterios de aceptacion, gates ejecutados, riesgos residuales y estado final.
-Si todo pasa, marca APPROVED. Si no, deja BLOCKED con findings accionables.
-```
-
-El final review debe revisar:
-
-- Que el alcance planeado fue cubierto.
-- Que los contratos BE/FE coinciden.
-- Que QA documento evidencia.
-- Que los gates pasaron.
-- Que no quedan riesgos bloqueantes.
-
-Entregable:
-
-- Documento en `docs/opencode/reviews/`.
-- Estado final `APPROVED` o `BLOCKED`.
-- Resumen de cambios.
-- Riesgos residuales.
-- Siguiente paso recomendado.
-
-## Formato recomendado para cada slice
-
-Usa este formato para que cualquier desarrollador pueda delegar bien una tarea:
-
-```text
-Codigo:
-BE-00X / FE-00X / QA-00X
-
-Titulo:
-Nombre corto de la tarea.
-
-Objetivo:
-Que debe lograr el slice.
-
-Alcance:
-Que entra en la tarea.
-
-Fuera de alcance:
-Que no debe tocarse.
-
-Criterios de aceptacion:
-Condiciones para aprobar.
-
-Dependencias:
-Slices, endpoints, pantallas o datos requeridos.
-
-Gates:
-Comandos que deben pasar.
-
-Entregables:
-Archivos, tests, findings o review esperados.
-```
-
-## Ejemplo end-to-end
-
-Solicitud inicial:
-
-```text
-Necesitamos busqueda publica de clinicas con detalle.
-Genera plan y ejecuta BE-004, FE-004 y QA-004 hasta final review.
-```
-
-Plan esperado:
-
-- `BE-004`: endpoints de clinicas.
-- `FE-004`: buscador, listado y detalle.
-- `QA-004`: validacion end-to-end.
-
-Ejecucion:
-
-1. Orquestador genera plan.
-2. BE implementa API.
-3. FE consume API y muestra UI.
-4. QA valida funcionalidad.
-5. Hallazgos corrigen bloqueos.
-6. Run checks confirma estabilidad.
-7. Final review emite estado final.
-
-Resultado aprobado:
-
-- `docs/opencode/reviews/BE-004-final-review.md`
-- `docs/opencode/qa/QA-004-findings.md`
-- Gates en verde.
-- Estado `APPROVED`.
-
-Resultado bloqueado:
-
-- Findings accionables.
-- Estado `BLOCKED`.
-- Correccion asignada a BE, FE o ambos.
-- Nueva ronda de QA despues del fix.
+- `backend`
+- `frontend`
+- `docker-compose.yml`
+- `Dockerfile*`
+- lockfiles o manifiestos de dependencias
 
 ## Reglas de oro
 
-- No cierres FE si BE no tiene contrato estable.
-- No cierres QA si falta evidencia.
-- No cierres final review si algun gate fallo.
+- No pidas cerrar un slice sin plan schema v3.
+- No cierres el slice si faltan `US-00X`, `UIA-00X` o `APIA-00X`.
+- No cierres QA si faltan pruebas unitarias explicitas en archivos productivos del slice.
+- No trates un `skipped` como aprobacion silenciosa.
 - No mezcles cambios no relacionados dentro del mismo slice.
-- Usa `BE-00X`, `FE-00X` y `QA-00X` para mantener trazabilidad.
-- Todo `BLOCKED` debe incluir findings accionables.
-- Todo `APPROVED` debe incluir evidencia.
+- No uses `/review-slice QA-00X`; para eso existe `/qa-task QA-00X`.
+- No marques findings QA como `RESOLVED` fuera de QA.
+- No asumas que una corrida local equivale a una corrida en contenedor cuando el criterio exige PostgreSQL o runtime real.
+- Todo artefacto operativo nuevo debe conservar UTF-8.
+
+## Cierre esperado
+
+Un slice esta realmente cerrado cuando:
+
+- el plan esta validado
+- `US-00X`, `UIA-00X` y `APIA-00X` existen y estan actualizados
+- backend y frontend completaron sus entregables
+- la automatizacion UI y API del slice quedo implementada cuando aplica
+- QA quedo `APPROVED`
+- no quedan findings bloqueantes
+- las tres reviews estan `APPROVED`
+- `run-ui-checks` quedo aprobado cuando aplica
+- checks estan `APPROVED`
+- documentacion esta actualizada
+- el gate final, si se uso, tambien quedo `APPROVED`
+
+Si cualquiera de esos puntos falta, el slice sigue abierto aunque el codigo "ya funcione".

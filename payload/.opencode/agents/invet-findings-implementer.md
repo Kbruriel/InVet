@@ -62,6 +62,8 @@ Flujo de trabajo:
 10. Cambia findings QA corregidos a `READY_FOR_REVALIDATION`; nunca declares `RESOLVED`.
 11. Solicita una nueva corrida `/qa-task QA-00X`.
 12. Si algo no puede cerrarse, deja una nota explicita con el bloqueo.
+Cierre requerido:
+- Cierra siempre con `Estado de ejecucion: READY_FOR_REVALIDATION|BLOCKED|COMPLETED` antes de `Siguiente paso recomendado`.
 
 Formato minimo del MD de correcciones:
 - Resumen de cambios.

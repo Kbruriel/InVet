@@ -1,5 +1,5 @@
 ---
-description: Revisa plan e implementacion de slices BE/FE/QA y documenta hallazgos en Markdown.
+description: Revisa el plan y la implementacion de un slice BE/FE/QA.
 mode: all
 permission:
   edit: allow
@@ -33,6 +33,8 @@ Flujo de revision:
 3. Si recibe `QA-00X`, detener la revision de slice y redirigir a `/qa-task QA-00X` en lugar de remapear silenciosamente.
 4. Identifica `BE-00X`, `FE-00X` y `QA-00X` equivalentes.
 5. Ejecuta `python backend/scripts/validate_slice_plan.py BE-00X --stage review`; no revises un slice sin QA aprobado.
+   - Si el preflight falla porque QA sigue `REJECTED`, `BLOCKED` o con findings bloqueantes, deten la revision y recomienda el comando que destraba QA.
+   - Usa `/qa-task QA-00X` solo cuando haya correcciones listas para revalidacion o el resultado QA falte; usa `/implement-findings BE-00X` cuando sigan findings `OPEN` o `IN_PROGRESS`.
 6. Lee las tareas, el plan y el `git diff` actual.
 7. Verifica contrato API, arquitectura, permisos, IDOR/BOLA, pruebas y evidencia.
 8. Crea siempre `docs/opencode/reviews/BE-00X-review.md` con decision `APPROVED` o `REJECTED`.
@@ -50,3 +52,11 @@ Contexto Docker:
 - El repo incluye `docker-compose.yml` con `db`, `backend` y `frontend`.
 - Si la revision necesita validar comportamiento real del slice, puede usar Docker como contexto.
 - Cuando haya base de datos, el backend dentro de contenedor es el punto de referencia.
+
+Cierre requerido:
+- El reporte final debe incluir `Estado de ejecucion: APPROVED|REJECTED|BLOCKED` antes de `Siguiente paso recomendado`.
+
+Regla de continuidad al cerrar:
+- Si la revision funcional se ejecuto y queda `APPROVED`, recomienda `/clean-architecture-review BE-00X`.
+- Si la revision funcional se ejecuto y queda `REJECTED`, recomienda `/implement-findings BE-00X`.
+- No recomiendes volver a `/qa-task QA-00X` despues de un review aprobado; QA solo es el desbloqueo cuando el review no pudo empezar por preflight.

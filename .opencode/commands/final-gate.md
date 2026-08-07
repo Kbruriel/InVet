@@ -23,3 +23,8 @@ Instrucciones:
 5. Usa `APPROVED` solo si `QA-00X-results.md` esta `APPROVED`, `QA-00X-findings.md` no existe o esta en estado resuelto, las tres revisiones, checks y docs estan cerrados y no hay findings abiertos.
 6. Usa `REJECTED` o `BLOCKED` si hay gaps, inconsistencias o verificaciones imposibles.
 7. No modifiques codigo de producto.
+Cierre obligatorio:
+- Al cerrar, reporta siempre Siguiente paso recomendado con el comando exacto segun el estado final del gate.
+- Si hubo findings, agrega Comando recomendado para resolver hallazgos con el comando exacto que sigue en el flujo.
+- Si hubo bloqueo, agrega Comando recomendado para desbloquear el gate con el comando exacto que destraba la ejecucion.
+- Usa la tabla de continuidad definida en docs/opencode/13_agents_architecture_and_gate_flow.md para decidir la recomendacion correcta y explicar el motivo.

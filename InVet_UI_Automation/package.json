@@ -1,0 +1,26 @@
+{
+  "name": "invet-ui-automation",
+  "version": "0.1.0",
+  "private": true,
+  "description": "UI and API automation project for InVet using Playwright",
+  "scripts": {
+    "test:e2e": "playwright test --project=chromium tests/e2e",
+    "test:e2e:all-browsers": "playwright test tests/e2e",
+    "test:smoke": "playwright test tests/e2e --grep @smoke --project=chromium",
+    "test:regression": "playwright test tests/e2e --grep @regression --project=chromium",
+    "test:regression:all-browsers": "playwright test tests/e2e --grep @regression",
+    "test:api": "playwright test --project=api tests/api",
+    "test:api:auth": "playwright test --project=api tests/api/auth",
+    "check:ui": "npm run test:e2e && npm run test:regression",
+    "check:api": "npm run test:api",
+    "check": "npm run typecheck && npm run check:api && npm run check:ui",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.55.0",
+    "@types/node": "^22.10.1",
+    "dotenv": "^16.4.7",
+    "typescript": "^5.6.3"
+  }
+}
+

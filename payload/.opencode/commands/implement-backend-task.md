@@ -16,6 +16,7 @@ Instrucciones:
    - `docs/opencode/plans/BE-00X-plan.md`
    - `docs/opencode/tasks/backend/BE-00X.md`
    - `docs/opencode/02_be_fe_qa_task_matrix.md`
+   - `docs/opencode/references/slice_task_context.md`
 5. Selecciona solo tareas pendientes con `Capa: backend`.
 6. Verifica los IDs de `Depende de`; cada dependencia debe estar `- [x]` y tener evidencia.
 7. Implementa usando `Objetivo`, `Entregables` y `Criterios de aceptacion` como contrato.
@@ -42,3 +43,8 @@ Instrucciones:
 Hook de cierre:
 - Si Docker Compose esta disponible y el usuario no pidió omitirlo, ejecutar `docker compose up -d --build --force-recreate db backend frontend`.
 - Si Docker Compose no esta disponible, registrar el skip con la causa exacta.
+Cierre obligatorio:
+- Al cerrar, reporta siempre Siguiente paso recomendado con el comando exacto segun el estado final del gate.
+- Si hubo findings, agrega Comando recomendado para resolver hallazgos con el comando exacto que sigue en el flujo.
+- Si hubo bloqueo, agrega Comando recomendado para desbloquear el gate con el comando exacto que destraba la ejecucion.
+- Usa la tabla de continuidad definida en docs/opencode/13_agents_architecture_and_gate_flow.md para decidir la recomendacion correcta y explicar el motivo.

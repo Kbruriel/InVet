@@ -70,7 +70,7 @@ Alineacion visual:
 
 Al implementar `FE-00X`:
 1. Ejecuta `python backend/scripts/validate_slice_plan.py FE-00X --stage frontend`; no edites si falla.
-2. Lee el plan canonico y las tareas `FE-00X` y `BE-00X`.
+2. Lee el plan canonico, las tareas `FE-00X` y `BE-00X`, y `docs/opencode/references/slice_task_context.md`.
 3. Verifica el `Contrato de implementacion frontend`: rutas, flujos, API, formularios, arquitectura, accesibilidad y pruebas.
 4. Si falta el workspace y el slice define base tecnica, crea Next.js, TypeScript, Tailwind local, scripts `lint/typecheck/test/build`, `src/` y pruebas basicas.
 5. Selecciona solo tareas pendientes con `Capa: frontend`.

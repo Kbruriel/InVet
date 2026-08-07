@@ -13,3 +13,8 @@ Instrucciones:
 5. Crea siempre `docs/opencode/reviews/BE-00X-security-review.md`.
 6. Emite `APPROVED` o `REJECTED` con evidencia.
 7. No modifiques codigo fuente.
+Cierre obligatorio:
+- Al cerrar, reporta siempre Siguiente paso recomendado con el comando exacto segun el estado final del gate.
+- Si hubo findings, agrega Comando recomendado para resolver hallazgos con el comando exacto que sigue en el flujo.
+- Si hubo bloqueo, agrega Comando recomendado para desbloquear el gate con el comando exacto que destraba la ejecucion.
+- Usa la tabla de continuidad definida en docs/opencode/13_agents_architecture_and_gate_flow.md para decidir la recomendacion correcta y explicar el motivo.

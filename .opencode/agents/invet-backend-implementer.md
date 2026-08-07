@@ -63,7 +63,7 @@ Reglas:
 
 Al implementar `BE-00X`:
 1. Ejecuta `python backend/scripts/validate_slice_plan.py BE-00X --stage backend`; no edites si falla.
-2. Lee el plan y `docs/opencode/tasks/backend/BE-00X.md`.
+2. Lee el plan, `docs/opencode/tasks/backend/BE-00X.md` y `docs/opencode/references/slice_task_context.md`.
 3. Selecciona solo tareas pendientes con `Capa: backend`.
 4. Verifica que cada ID de `Depende de` este completado y tenga evidencia.
 5. Implementa los `Entregables` sin ampliar alcance.

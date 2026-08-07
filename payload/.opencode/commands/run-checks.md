@@ -42,3 +42,8 @@ Modo correccion:
 - Si el usuario pide explicitamente corregir/solucionar/fix errors, se pueden modificar archivos para reparar fallos de configuracion, formato, lint, tipos o tests.
 - Despues de cualquier cambio, rerunear los checks afectados y dejar evidencia del resultado final.
 - Cuando la corrida termine sin fallos, ejecutar el hook de Docker Compose de cierre antes de reportar la decision final.
+Cierre obligatorio:
+- Al cerrar, reporta siempre Siguiente paso recomendado con el comando exacto segun el estado final del gate.
+- Si hubo findings, agrega Comando recomendado para resolver hallazgos con el comando exacto que sigue en el flujo.
+- Si hubo bloqueo, agrega Comando recomendado para desbloquear el gate con el comando exacto que destraba la ejecucion.
+- Usa la tabla de continuidad definida en docs/opencode/13_agents_architecture_and_gate_flow.md para decidir la recomendacion correcta y explicar el motivo.

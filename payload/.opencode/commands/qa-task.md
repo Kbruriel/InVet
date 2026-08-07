@@ -7,6 +7,7 @@ Valida la tarea QA indicada por `$ARGUMENTS`.
 
 Instrucciones:
 0. Ejecuta de forma autonoma. Pregunta al usuario solo si falta informacion bloqueante, hay una decision critica de aceptacion/alcance o se requiere una accion destructiva.
+0.1. Modo compatibilidad: ejecuta los pasos de forma secuencial. No uses llamadas paralelas para leer archivos ni una herramienta llamada `python`; cuando necesites Python, usalo como comando de terminal, por ejemplo `python backend/scripts/validate_slice_plan.py ...`.
 1. Normaliza el argumento a `QA-00X` e identifica `BE-00X` y `FE-00X`.
 2. Ejecuta `python backend/scripts/validate_slice_plan.py QA-00X --stage qa`.
    - Si falla, no intentes validar criterios ambiguos; documenta `BLOCKED` por contrato de plan, marca cualquier `docs/opencode/qa/QA-00X-results.md` previo como baseline stale y crea o actualiza `docs/opencode/qa/QA-00X-findings.md` con evidencia concreta del preflight.
@@ -16,6 +17,7 @@ Instrucciones:
    - `docs/opencode/tasks/qa/QA-00X.md`
    - `docs/opencode/tasks/backend/BE-00X.md`
    - `docs/opencode/tasks/frontend/FE-00X.md`
+   - `docs/opencode/references/slice_task_context.md`
 4. Antes de declarar bloqueo por infraestructura:
    - valida dependencias del backend;
    - ejecuta `python backend/scripts/prepare_qa_env.py --install-deps` desde la raiz o `python scripts/prepare_qa_env.py --install-deps` desde `backend/` si faltan dependencias, `.env.qa` o una base utilizable;
@@ -59,12 +61,25 @@ Instrucciones:
    - `BLOCKED` si el entorno o la evidencia del runner no permiten una decision confiable.
 15. Marca tareas QA `- [x]` solo con estado `PASS` y sustituye `Evidencia: pending`.
 16. Documenta trazabilidad, reportes, defects, gate unitario y decision final.
-17. Crea `docs/opencode/qa/QA-00X-findings.md` con estado `OPEN`; `/implement-findings` lo mueve a `READY_FOR_REVALIDATION` y solo una nueva corrida QA puede marcarlo `RESOLVED`.
+17. Crea `docs/opencode/qa/QA-00X-findings.md` con `- Estado global: OPEN` cuando existan findings; `/implement-findings` lo mueve a `READY_FOR_REVALIDATION` y solo una nueva corrida QA puede marcarlo `RESOLVED`.
+    - Si la revalidacion confirma que todos los findings quedaron corregidos o aceptados formalmente, actualiza el estado global a `RESOLVED` o `ACCEPTED_RISK`.
+    - Si queda cualquier finding `OPEN`, `IN_PROGRESS` o `READY_FOR_REVALIDATION`, el estado global debe seguir bloqueante.
 18. No declares el slice listo mientras QA no sea `APPROVED` o existan findings no resueltos.
-19. Escribe resultados, findings y outcomes en UTF-8. Rechaza evidencia nueva con mojibake como `Ã`, `Â` o `â`.
+19. Escribe resultados, findings y outcomes en UTF-8. Rechaza evidencia nueva con mojibake como `Ãƒ`, `Ã‚` o `Ã¢`.
+20. Cierra siempre con `Estado de ejecucion: APPROVED|REJECTED|BLOCKED` antes de `Siguiente paso recomendado`.
+21. `READY_FOR_REVALIDATION` no es un estado de cierre de QA; pertenece al lifecycle de findings.
+22. Si los findings siguen `READY_FOR_REVALIDATION`, refleja el bloqueo real y deriva al flujo de correcciones; no ordenes un auto-rerun de QA como unico desbloqueo.
 
 Hook de cierre:
-- Si QA termina en `APPROVED`, Docker Compose esta disponible y el usuario no pidió omitirlo, primero validar si existen cambios pendientes que afecten `backend`, `frontend`, `docker-compose.yml`, `Dockerfile*`, `backend/requirements.txt`, `backend/pyproject.toml`, `frontend/package.json` o lockfiles.
+- Si QA termina en `APPROVED`, Docker Compose esta disponible y el usuario no pidiÃ³ omitirlo, primero validar si existen cambios pendientes que afecten `backend`, `frontend`, `docker-compose.yml`, `Dockerfile*`, `backend/requirements.txt`, `backend/pyproject.toml`, `frontend/package.json` o lockfiles.
 - Si no existen cambios pendientes que requieran actualizar contenedores, registrar el skip con la causa exacta y no ejecutar el restart.
 - Si existen cambios pendientes, ejecutar `docker compose up -d --build --force-recreate db backend frontend`.
 - Si Docker Compose no esta disponible o QA no fue aprobado, registrar el skip con la causa exacta.
+Cierre obligatorio:
+- Al cerrar, reporta siempre Siguiente paso recomendado con el comando exacto segun el estado final del gate.
+- Solo recomienda `/review-slice BE-00X` cuando `docs/opencode/qa/QA-00X-results.md` termine con `Decision: APPROVED` y `QA-00X-findings.md` no exista o tenga estado global `RESOLVED`/`ACCEPTED_RISK`.
+- Si QA queda `REJECTED` o hay findings `OPEN`/`IN_PROGRESS`/`READY_FOR_REVALIDATION`, recomienda `/implement-findings BE-00X`; no recomiendes review ni un rerun auto-referencial de QA.
+- Si el bloqueo es de contrato de plan o artefacto faltante, recomienda `/plan-task BE-00X`.
+- Si hubo findings, agrega Comando recomendado para resolver hallazgos con el comando exacto que sigue en el flujo.
+- Si hubo bloqueo, agrega Comando recomendado para desbloquear el gate con el comando exacto que destraba la ejecucion.
+- Usa la tabla de continuidad definida en docs/opencode/13_agents_architecture_and_gate_flow.md para decidir la recomendacion correcta y explicar el motivo.

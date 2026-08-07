@@ -1,6 +1,38 @@
+<#
+.SYNOPSIS
+  Ejecuta checks tecnicos de InVet y resume el resultado en una tabla.
+
+.DESCRIPTION
+  Este script centraliza las rutas habituales para validacion local:
+  - modo completo: backend, frontend y cierre DevOps
+  - modo backend o frontend aislado
+  - modo UI automatizado para FE-00X
+  - validacion opcional de un slice antes de correr checks
+
+.EXAMPLE
+  .\run-checks.ps1
+
+.EXAMPLE
+  .\run-checks.ps1 -SliceId FE-001
+
+.EXAMPLE
+  .\run-checks.ps1 -Mode backend
+
+.EXAMPLE
+  .\run-checks.ps1 -Mode frontend
+
+.EXAMPLE
+  .\run-checks.ps1 -Mode ui
+
+.EXAMPLE
+  .\run-checks.ps1 -Root C:\InVet
+#>
 [CmdletBinding()]
 param(
-  [string]$Root = (Get-Location).Path
+  [string]$Root = (Get-Location).Path,
+  [string]$SliceId,
+  [ValidateSet('all', 'backend', 'frontend', 'ui')]
+  [string]$Mode = 'all'
 )
 
 Set-StrictMode -Version Latest
@@ -61,6 +93,88 @@ function Add-SkippedCheck {
 
   $Results.Add((New-CheckResult -Check $Name -Status 'skipped' -Details $Reason))
   Write-Host "[SKIP] $Name - $Reason"
+}
+
+function Test-FrontendHasEslintConfig {
+  param([string]$FrontendRoot)
+
+  $eslintFiles = @(
+    '.eslintrc',
+    '.eslintrc.js',
+    '.eslintrc.cjs',
+    '.eslintrc.json',
+    '.eslintrc.yml',
+    '.eslintrc.yaml',
+    'eslint.config.js',
+    'eslint.config.mjs',
+    'eslint.config.cjs',
+    'eslint.config.ts'
+  )
+
+  foreach ($file in $eslintFiles) {
+    if (Test-Path -LiteralPath (Join-Path $FrontendRoot $file)) {
+      return $true
+    }
+  }
+
+  return $false
+}
+
+function Test-FrontendHasTests {
+  param([string]$FrontendRoot)
+
+  $ignoredPathPattern = '\\(node_modules|\.next|coverage|dist)\\'
+  $testPatterns = @('*.test.*', '*.spec.*')
+  foreach ($pattern in $testPatterns) {
+    $match = Get-ChildItem -LiteralPath $FrontendRoot -Recurse -File -Filter $pattern -ErrorAction SilentlyContinue |
+      Where-Object { $_.FullName -notmatch $ignoredPathPattern } |
+      Select-Object -First 1
+    if ($null -ne $match) {
+      return $true
+    }
+  }
+
+  $testDirs = @('__tests__')
+  foreach ($dir in $testDirs) {
+    $match = Get-ChildItem -LiteralPath $FrontendRoot -Recurse -Directory -Filter $dir -ErrorAction SilentlyContinue |
+      Where-Object { $_.FullName -notmatch $ignoredPathPattern } |
+      Select-Object -First 1
+    if ($null -ne $match) {
+      return $true
+    }
+  }
+
+  return $false
+}
+
+function Invoke-SliceValidation {
+  param(
+    [string]$RepoRoot,
+    [string]$Id,
+    [System.Collections.Generic.List[object]]$Results
+  )
+
+  if ([string]::IsNullOrWhiteSpace($Id)) {
+    return $true
+  }
+
+  $normalized = $Id.Trim()
+  if ($normalized -notmatch '^(BE|FE|QA)-\d{3}$') {
+    Add-SkippedCheck -Name 'slice validation' -Reason "El slice '$Id' no tiene formato BE-001/FE-001/QA-001" -Results $Results
+    return $false
+  }
+
+  $validator = Join-Path $RepoRoot 'backend\scripts\validate_slice_plan.py'
+  if (-not (Test-Path -LiteralPath $validator)) {
+    Add-SkippedCheck -Name 'slice validation' -Reason 'No existe backend/scripts/validate_slice_plan.py' -Results $Results
+    return $true
+  }
+
+  Invoke-Check -Name "slice validation $normalized" -WorkingDirectory $RepoRoot -Results $Results -Action {
+    & python backend/scripts/validate_slice_plan.py $normalized --stage checks
+  }
+
+  return -not @($Results | Where-Object { $_.Check -eq "slice validation $normalized" -and $_.Status -eq 'fail' }).Count
 }
 
 function Get-ContainerRelevantChanges {
@@ -186,6 +300,124 @@ function Get-PythonCommand {
   throw "No se encontro un interprete Python ejecutable."
 }
 
+function Invoke-BackendChecks {
+  param(
+    [string]$BackendRoot,
+    [string]$PythonCommand,
+    [System.Collections.Generic.List[object]]$Results
+  )
+
+  Invoke-Check -Name 'backend pytest' -WorkingDirectory $BackendRoot -Results $Results -Action {
+    & $PythonCommand -W ignore::PendingDeprecationWarning -m pytest app/tests -q
+  }
+
+  Invoke-Check -Name 'backend ruff' -WorkingDirectory $BackendRoot -Results $Results -Action {
+    & $PythonCommand -m ruff check .
+  }
+
+  Invoke-Check -Name 'backend black' -WorkingDirectory $BackendRoot -Results $Results -Action {
+    & $PythonCommand -m black --check .
+  }
+
+  Invoke-Check -Name 'backend mypy' -WorkingDirectory $BackendRoot -Results $Results -Action {
+    & $PythonCommand -m mypy app
+  }
+}
+
+function Invoke-FrontendChecks {
+  param(
+    [string]$FrontendRoot,
+    [System.Collections.Generic.List[object]]$Results
+  )
+
+  $frontendPackageJson = Join-Path $FrontendRoot 'package.json'
+  if (-not (Test-Path -LiteralPath $frontendPackageJson)) {
+    Add-SkippedCheck -Name 'frontend' -Reason 'frontend/package.json no existe' -Results $Results
+    return
+  }
+
+  $frontendConfig = Get-Content -LiteralPath $frontendPackageJson -Raw | ConvertFrom-Json
+  $scripts = @()
+  if ($frontendConfig.PSObject.Properties.Name -contains 'scripts') {
+    $scripts = @($frontendConfig.scripts.PSObject.Properties.Name)
+  }
+
+  $manager = Get-PackageManager -FrontendRoot $FrontendRoot
+  if (-not (Get-Command $manager -ErrorAction SilentlyContinue)) {
+    Add-SkippedCheck -Name 'frontend package manager' -Reason "No esta instalado '$manager'" -Results $Results
+    return
+  }
+
+  if ($scripts -contains 'lint') {
+    if (Test-FrontendHasEslintConfig -FrontendRoot $FrontendRoot) {
+      Invoke-Check -Name 'frontend lint' -WorkingDirectory $FrontendRoot -Results $Results -Action {
+        switch ($manager) {
+          'pnpm' { & pnpm lint }
+          'npm' { & npm run lint }
+          'yarn' { & yarn lint }
+          default { throw "Gestor de paquetes no soportado: $manager" }
+        }
+      }
+    }
+    else {
+      Add-SkippedCheck -Name 'frontend lint' -Reason 'No hay configuracion ESLint; next lint abriria un prompt interactivo' -Results $Results
+    }
+  }
+  else {
+    Add-SkippedCheck -Name 'frontend lint' -Reason "El script 'lint' no existe en package.json" -Results $Results
+  }
+
+  foreach ($scriptName in @('typecheck', 'test', 'build')) {
+    if ($scripts -notcontains $scriptName) {
+      Add-SkippedCheck -Name "frontend $scriptName" -Reason "El script '$scriptName' no existe en package.json" -Results $Results
+      continue
+    }
+
+    if ($scriptName -eq 'test' -and -not (Test-FrontendHasTests -FrontendRoot $FrontendRoot)) {
+      Add-SkippedCheck -Name 'frontend test' -Reason 'No hay archivos de prueba en frontend' -Results $Results
+      continue
+    }
+
+    Invoke-Check -Name "frontend $scriptName" -WorkingDirectory $FrontendRoot -Results $Results -Action {
+      switch ($manager) {
+        'pnpm' { & pnpm $scriptName }
+        'npm' { & npm run $scriptName }
+        'yarn' { & yarn $scriptName }
+        default { throw "Gestor de paquetes no soportado: $manager" }
+      }
+    }
+  }
+}
+
+function Invoke-UiChecks {
+  param(
+    [string]$AutomationRoot,
+    [System.Collections.Generic.List[object]]$Results
+  )
+
+  if (-not (Test-Path -LiteralPath $AutomationRoot)) {
+    Add-SkippedCheck -Name 'ui automation' -Reason 'No existe InVet_UI_Automation' -Results $Results
+    return
+  }
+
+  $scripts = Get-Content -LiteralPath (Join-Path $AutomationRoot 'package.json') -Raw | ConvertFrom-Json
+  $scriptNames = @()
+  if ($scripts.PSObject.Properties.Name -contains 'scripts') {
+    $scriptNames = @($scripts.scripts.PSObject.Properties.Name)
+  }
+
+  foreach ($scriptName in @('test:e2e', 'test:regression')) {
+    if ($scriptNames -notcontains $scriptName) {
+      Add-SkippedCheck -Name "ui $scriptName" -Reason "El script '$scriptName' no existe en package.json" -Results $Results
+      continue
+    }
+
+    Invoke-Check -Name "ui $scriptName" -WorkingDirectory $AutomationRoot -Results $Results -Action {
+      & npm run $scriptName
+    }
+  }
+}
+
 function Test-PythonUsable {
   param([string]$PythonCommand)
 
@@ -220,6 +452,7 @@ function Get-PackageManager {
 $repoRoot = (Resolve-Path -LiteralPath $Root).Path
 $backendRoot = Join-Path $repoRoot 'backend'
 $frontendRoot = Join-Path $repoRoot 'frontend'
+$automationRoot = Join-Path $repoRoot 'InVet_UI_Automation'
 
 if (-not (Test-Path -LiteralPath $backendRoot)) {
   throw "No se encontro la carpeta backend en: $repoRoot"
@@ -231,64 +464,41 @@ $python = Get-PythonCommand -BackendRoot $backendRoot -RepoRoot $repoRoot
 Write-Host "Repositorio: $repoRoot"
 Write-Host "Python: $python"
 
-Invoke-Check -Name 'backend pytest' -WorkingDirectory $backendRoot -Results $results -Action {
-  & $python -W ignore::PendingDeprecationWarning -m pytest app/tests -q
+$shouldRunBackend = $Mode -in @('all', 'backend')
+$shouldRunFrontend = $Mode -in @('all', 'frontend')
+$shouldRunUi = $Mode -eq 'ui'
+
+$sliceValidated = Invoke-SliceValidation -RepoRoot $repoRoot -Id $SliceId -Results $results
+if ($SliceId -and -not $sliceValidated) {
+  Write-Host ""
+  Write-Host 'Summary'
+  $results | Format-Table -AutoSize
+  exit 1
 }
 
-Invoke-Check -Name 'backend ruff' -WorkingDirectory $backendRoot -Results $results -Action {
-  & $python -m ruff check .
+if ($shouldRunBackend) {
+  Invoke-BackendChecks -BackendRoot $backendRoot -PythonCommand $python -Results $results
 }
 
-Invoke-Check -Name 'backend black' -WorkingDirectory $backendRoot -Results $results -Action {
-  & $python -m black --check .
+if ($shouldRunFrontend) {
+  Invoke-FrontendChecks -FrontendRoot $frontendRoot -Results $results
 }
 
-Invoke-Check -Name 'backend mypy' -WorkingDirectory $backendRoot -Results $results -Action {
-  & $python -m mypy app
-}
-
-$frontendPackageJson = Join-Path $frontendRoot 'package.json'
-if (-not (Test-Path -LiteralPath $frontendPackageJson)) {
-  Add-SkippedCheck -Name 'frontend' -Reason 'frontend/package.json no existe' -Results $results
-}
-else {
-  $frontendConfig = Get-Content -LiteralPath $frontendPackageJson -Raw | ConvertFrom-Json
-  $scripts = @()
-  if ($frontendConfig.PSObject.Properties.Name -contains 'scripts') {
-    $scripts = @($frontendConfig.scripts.PSObject.Properties.Name)
-  }
-
-  $manager = Get-PackageManager -FrontendRoot $frontendRoot
-  $managerCommand = $manager
-  if (-not (Get-Command $managerCommand -ErrorAction SilentlyContinue)) {
-    Add-SkippedCheck -Name 'frontend package manager' -Reason "No esta instalado '$managerCommand'" -Results $results
-  }
-  else {
-    foreach ($scriptName in @('lint', 'typecheck', 'test', 'build')) {
-      if ($scripts -notcontains $scriptName) {
-        Add-SkippedCheck -Name "frontend $scriptName" -Reason "El script '$scriptName' no existe en package.json" -Results $results
-        continue
-      }
-
-      $label = "frontend $scriptName"
-      Invoke-Check -Name $label -WorkingDirectory $frontendRoot -Results $results -Action {
-        switch ($managerCommand) {
-          'pnpm' { & pnpm $scriptName }
-          'npm' { & npm run $scriptName }
-          'yarn' { & yarn $scriptName }
-          default { throw "Gestor de paquetes no soportado: $managerCommand" }
-        }
-      }
-    }
-  }
+if ($shouldRunUi) {
+  Invoke-UiChecks -AutomationRoot $automationRoot -Results $results
 }
 
 $preHookFailures = @($results | Where-Object { $_.Status -eq 'fail' })
-if ($preHookFailures.Count -eq 0) {
+if ($preHookFailures.Count -eq 0 -and $Mode -eq 'all') {
   Invoke-DockerComposeHook -RepoRoot $repoRoot -Results $results
 }
 else {
-  Add-SkippedCheck -Name 'devops docker compose hook' -Reason 'No se ejecuta porque hubo fallos previos en checks' -Results $results
+  if ($Mode -ne 'all') {
+    Add-SkippedCheck -Name 'devops docker compose hook' -Reason "No se ejecuta en modo '$Mode'" -Results $results
+  }
+  elseif ($preHookFailures.Count -gt 0) {
+    Add-SkippedCheck -Name 'devops docker compose hook' -Reason 'No se ejecuta porque hubo fallos previos en checks' -Results $results
+  }
 }
 
 Write-Host ""

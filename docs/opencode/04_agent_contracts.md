@@ -2,7 +2,7 @@
 
 ## Contrato comun
 
-- `BE-00X`, `FE-00X` y `QA-00X` representan un unico slice vertical.
+- `US-00X`, `BE-00X`, `FE-00X`, `QA-00X`, `UIA-00X` y `APIA-00X` representan un unico slice vertical.
 - El plan canonico es `docs/opencode/plans/BE-00X-plan.md`.
 - Los agentes intercambian estado mediante Markdown versionado, no memoria implicita.
 - Cada comando mutable ejecuta `backend/scripts/validate_slice_plan.py`.
@@ -13,15 +13,20 @@
 - Un gate fallido detiene el flujo; no se convierte en `skipped`.
 - Cada tarea debe tener responsabilidad unica, tipo declarado, contexto necesario, contratos usados y resultado esperado.
 - Los agentes de implementacion deben rechazar tareas compuestas en lugar de reinterpretarlas.
+- Cada agente debe cerrar con `Estado de ejecucion`, `Siguiente paso recomendado` y, cuando aplique, `Comando recomendado para resolver hallazgos` o `Comando recomendado para desbloquear el gate`.
+- El `Estado de ejecucion` debe usar el vocabulario permitido por la familia del agente y no mezclarlo con el estado de findings.
+- Los agentes no deben afirmar que un comando es "el unico" que desbloquea el slice; deben declarar el estado actual, el bloqueo real y el siguiente gate verificable.
 
 ## Responsabilidades
 
 | Agente | Responsabilidad | Gate o salida |
 | --- | --- | --- |
 | `invet-orchestrator` | Ejecuta el slice completo y evita saltar etapas | Bloquea ante plan invalido, QA no aprobado, findings abiertos, reviews o checks rechazados |
-| `invet-product-planner` | Acepta IDs BE/FE/QA y crea el plan vertical schema v3 | `BE-00X-plan.md` validado |
+| `invet-product-planner` | Acepta IDs BE/FE/QA, crea el plan vertical schema v3 y actualiza `US/UIA/APIA` | `BE-00X-plan.md` validado y sidecars actualizados |
 | `invet-backend-implementer` | Implementa tareas `Capa: backend` y sus pruebas unitarias | Criterios, validacion y evidencia por tarea |
 | `invet-frontend-implementer` | Implementa el contrato frontend y sus pruebas unitarias/de componente | Criterios, validacion y evidencia por tarea |
+| `invet-ui-automation-implementer` | Implementa E2E, formularios, navegacion, redirects y estados UI con Playwright | `UIA-00X.md` con cobertura y evidencia |
+| `invet-api-automation-implementer` | Implementa validacion HTTP externa con Playwright `APIRequestContext` | `APIA-00X.md` con cobertura y evidencia |
 | `invet-qa-validator` | Valida aceptacion, integracion, contrato, seguridad y regresion | `QA-00X-results.md` y decision `APPROVED|REJECTED|BLOCKED` |
 | `invet-slice-reviewer` | Revisa el slice vertical completo | `BE-00X-review.md` con decision |
 | `invet-clean-architecture-reviewer` | Revisa capas backend y modularidad frontend | `BE-00X-clean-architecture-review.md` con decision |
@@ -30,8 +35,18 @@
 | `invet-command-executor` | Ejecuta comandos, tests, lint, lectura de logs y reintentos mecanicos con el modelo seleccionado por el usuario | Salida cruda y evidencia reproducible |
 | `invet-command-executor-fallback` | Respaldo mecanico para comandos y verificaciones que requieran reintentos | Salida cruda y evidencia reproducible |
 | `invet-final-reviewer` | Gate final de release con revision de alta capacidad | `BE-00X-final-review.md` con decision |
-| `invet-check-runner` | Ejecuta tests, lint, format, types y build; valida si hay cambios pendientes antes del cierre Docker | `BE-00X-checks.md` con decision |
+| `invet-check-runner` | Ejecuta UI checks, tests, lint, format, types y build; valida si hay cambios pendientes antes del cierre Docker | `BE-00X-checks.md` con decision |
 | `invet-docs-updater` | Documenta el cierre despues de aprobar gates | Changelog, contratos y estado final |
+
+## Estados de ejecucion por familia
+
+| Familia | Estado de ejecucion permitido | Cuando usarlo |
+| --- | --- | --- |
+| Implementadores | `COMPLETED` o `BLOCKED` | Trabajo terminado o imposibilidad real de avanzar |
+| Planner | `PLANNED` o `BLOCKED` | Plan generado o bloqueado por contrato/evidencia |
+| QA y reviewers | `APPROVED`, `REJECTED` o `BLOCKED` | Gate aprobado, rechazado o impedido por evidencia/entorno; `READY_FOR_REVALIDATION` no es un estado de gate |
+| Findings implementer | `READY_FOR_REVALIDATION`, `COMPLETED` o `BLOCKED` | Correccion preparada para revalidacion, terminada o bloqueada |
+| Check runner / docs / final reviewer | `APPROVED`, `REJECTED`, `COMPLETED` o `BLOCKED` | Gate aprobado/rechazado o cierre documental completado |
 
 ## Ownership de pruebas
 
@@ -39,11 +54,15 @@
 | --- | --- |
 | Unitarias backend | `invet-backend-implementer` |
 | Unitarias/componentes frontend | `invet-frontend-implementer` |
+| E2E y regresion UI | `invet-ui-automation-implementer` |
+| Contratos HTTP externos | `invet-api-automation-implementer` |
 | Unitarias faltantes reportadas | Agente de capa o `invet-findings-implementer` |
 | Aceptacion, integracion, contrato, seguridad y regresion | `invet-qa-validator` |
 | Certificacion final | `invet-qa-validator` |
 
 QA no repara y certifica el mismo gap unitario. Debe emitir `REJECTED`, dejar un finding y revalidar despues de la correccion.
+
+`READY_FOR_REVALIDATION` pertenece al lifecycle de findings, no al cierre del gate de QA ni de los reviewers. Si un agente de QA o review reporta `Estado de ejecucion`, debe usar solo `APPROVED`, `REJECTED` o `BLOCKED`.
 
 Todos los agentes operativos pueden usar `docker compose` cuando el slice requiera PostgreSQL, backend runtime o frontend runtime en contenedor. La referencia normal es `db` + `backend` para pruebas con persistencia y `frontend` para validacion de UI cuando aplique.
 

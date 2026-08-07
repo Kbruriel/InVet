@@ -1,81 +1,61 @@
-# Hallazgos de QA para slice QA-001
+---
+slice: BE-001/FE-001/QA-001
+reporting_date: 2026-08-06T00:00:00Z
+encoding: UTF-8
+---
 
-## Finding
+# QA-001 Findings - Base tecnica y design system
 
-- Identificador: `QA-001-F01`
-- Tipo de hallazgo: gap de pruebas unitarias
-- Severidad: `major`
-- Criterio afectado: gate de pruebas unitarias explicitas para `FE-001`
-- Componente: frontend base del slice `001`
-- Ambiente: `Windows + PowerShell + frontend local`
-- Estado: `RESOLVED`
-- Gate afectado: `/qa-task QA-001`
+- Estado global: RESOLVED
 
-## Contexto
+## Resumen de la situacion
 
-- Precondiciones:
-  - `frontend/package.json` y scripts del workspace disponibles
-  - Slice `FE-001` implementado y marcado historicamente como completado
-- Alcance del slice:
-  - shell publica
-  - rutas base
-  - componentes compartidos
-  - cliente API y configuracion frontend
-- Archivos afectados:
-  - `frontend/src/app/**`
-  - `frontend/src/features/public-landing/components/**`
-  - `frontend/src/shared/**`
-- Archivos sin pruebas unitarias:
-  - estado original: 27 archivos detectados sin prueba unitaria explicita
-  - estado actual: 0 gaps en `frontend/reports/qa001-frontend-unit-gaps-20260730-fixed.json`
+La revalidacion de QA confirma que los hallazgos QF-005 y QF-006 quedaron corregidos y que QF-007 sigue resuelto. No quedan findings bloqueantes para el slice.
 
-## Ejecucion
+## Findings revalidados
 
-- Comando o comandos ejecutados:
-  - `npx vitest run --reporter=default --reporter=junit --outputFile=reports/qa001-frontend-vitest-20260730-fixed.xml`
-  - `python` inline usando `backend/app/qa/validation.py` para auditar gaps unitarios frontend
-  - `.\run-checks.ps1`
-- Codigo(s) de salida:
-  - vitest: `0`
-  - auditoria de gaps unitarios: `0`
-  - run-checks: `0`
-- Resultado esperado:
-  - Los archivos frontend del slice `FE-001` tienen pruebas unitarias explicitas suficientes para aprobar el gate.
-- Resultado observado:
-  - La implementacion agrego pruebas unitarias explicitas para layout, paginas, cliente API, configuracion, shell, shared UI y componentes publicos base.
-  - La auditoria actual reporta `28 required source files` con `0 missing gaps`.
-- Evidencia:
-  - `frontend/reports/qa001-frontend-vitest-20260730-fixed.xml`
-  - `frontend/reports/qa001-frontend-unit-gaps-20260730-fixed.json`
-  - `docs/opencode/qa/QA-001-results.md`
+### QF-005: security.py sin test unitario directo para funciones token
 
-## Pasos para reproducir
+Estado: RESOLVED
 
-1. Ejecutar `npx vitest run --reporter=default --reporter=junit --outputFile=reports/qa001-frontend-vitest-20260730-fixed.xml` dentro de `frontend/`.
-2. Auditar `frontend/src/**` contra archivos `*.test.ts`, `*.test.tsx`, `*.spec.ts` y `*.spec.tsx` usando `backend/app/qa/validation.py`.
-3. Verificar que el JSON `frontend/reports/qa001-frontend-unit-gaps-20260730-fixed.json` reporta `0` gaps.
+Evidencia:
+- `backend/app/tests/test_security_primitives.py`
+- Cobertura directa de `get_password_hash`, `verify_password`, `create_access_token`, `create_refresh_token`, `verify_token`, `verify_access_token` y `get_current_access_user`
+- Verificacion de que un refresh token no se acepta como access token
 
-## Impacto
+### QF-006: session.py sin validacion PostgreSQL real en pruebas
 
-- Riesgo funcional:
-  - Mitigado en el slice `FE-001` con cobertura unitaria explicita para los modulos base.
-- Riesgo de seguridad o datos:
-  - Mitigado para el cliente API y la configuracion frontend auditados en este slice.
-- Riesgo de regresion:
-  - Reducido con la nueva bateria unitaria del frontend.
+Estado: RESOLVED
 
-## Correccion sugerida
+Evidencia:
+- `backend/app/tests/test_database_postgres.py`
+- Conexion real a PostgreSQL
+- `SELECT version()`
+- Escritura y lectura sobre tabla temporal
 
-- Prueba de regresion propuesta:
-  - Mantener y extender las suites unitarias creadas para `shared/api/http-client.ts`, `shared/config/routes.ts`, `shared/layout/public-shell.tsx`, `shared/ui/*.tsx` y `public-landing`.
-- Recomendacion:
-  - Usar estas suites como baseline para los siguientes slices frontend.
-- Bloqueos externos:
-  - Ninguno.
-- Accion requerida antes de continuar:
-  - Ninguna para `FE-001`; continuar con los siguientes slices manteniendo el mismo gate de QA.
+### QF-007: root() endpoint duplicado potencial via router.py include_router
 
-## Decision
+Estado: RESOLVED
 
-- [x] Se puede resolver con `/implement-findings`.
-- [ ] Requiere intervencion adicional externa.
+Evidencia:
+- `backend/app/api/v1/router.py` montado con prefix `/api/v1`
+- No existe duplicacion real con el root de `main.py`
+
+## Decision final por hallazgos
+
+| Finding | Estado | Bloquea gate? |
+|---|---|---|
+| QF-005 | RESOLVED | No |
+| QF-006 | RESOLVED | No |
+| QF-007 | RESOLVED | No |
+
+**Estado de ejecucion: RESOLVED**
+
+**Siguiente paso recomendado: `/review-slice BE-001`**
+
+## Contexto de estados
+
+- `OPEN` y `IN_PROGRESS` significan trabajo pendiente.
+- `READY_FOR_REVALIDATION` significa correccion aplicada y esperando QA.
+- `RESOLVED` significa que QA revalido y cerro el hallazgo.
+- `ACCEPTED_RISK` requiere justificacion explicita de QA.

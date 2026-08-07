@@ -1,4 +1,6 @@
-﻿"""Alembic environment configuration."""
+"""Alembic environment configuration."""
+
+# ruff: noqa: E402
 
 # Añadir el directorio app al path de Python para poder importar modelos
 import sys

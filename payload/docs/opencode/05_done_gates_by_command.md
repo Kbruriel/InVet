@@ -10,6 +10,8 @@ Este archivo define requisitos, no el estado de un slice. Los checks permanecen 
 - [ ] Existe matriz de trazabilidad criterio -> tarea -> validacion.
 - [ ] Existe contrato de ejecucion Docker y pruebas.
 - [ ] Existe plan de reportes y findings.
+- [ ] Existen `US-00X`, `UIA-00X` y `APIA-00X`.
+- [ ] Cada criterio `CA-NN` tiene cobertura UI, API o justificacion manual.
 - [ ] Hay tareas BE, FE y QA con IDs, capa, tipo, dependencias, contexto, contratos usados y entregables.
 - [ ] Cada tarea tiene responsabilidad unica, criterios, validacion, resultado esperado, evidencia y paralelismo.
 - [ ] No hay tareas compuestas que mezclen contrato, persistencia, API, UI, seguridad, pruebas, Docker o documentacion.
@@ -56,6 +58,32 @@ Este archivo define requisitos, no el estado de un slice. Los checks permanecen 
 - [ ] Antes del cierre se valido si habia cambios pendientes que justificaran actualizar contenedores.
 - [ ] El hook de Docker Compose de cierre se ejecuto cuando QA quedo `APPROVED`.
 
+## `/implement-ui-automation-task FE-00X`
+
+- [ ] Existe `UIA-00X.md`.
+- [ ] Se leyeron `US-00X`, `BE-00X`, `FE-00X`, `QA-00X` y `UIA-00X`.
+- [ ] Los specs se implementaron en `InVet_UI_Automation/tests/e2e`.
+- [ ] Los tests referencian `US-00X-NN` y `CA-NN`.
+- [ ] `npm run test:e2e` pasa o el bloqueo queda documentado.
+- [ ] `npm run test:regression` pasa o el bloqueo queda documentado.
+- [ ] `UIA-00X` contiene evidencia y casos no automatizados.
+
+## `/implement-api-automation-task BE-00X`
+
+- [ ] Existe `APIA-00X.md`.
+- [ ] Se leyeron `US-00X`, `BE-00X`, `FE-00X`, `QA-00X` y `APIA-00X`.
+- [ ] Los specs se implementaron en `InVet_UI_Automation/tests/api`.
+- [ ] Los tests referencian `US-00X-NN` y `CA-NN`.
+- [ ] `npm run test:api` pasa o el bloqueo queda documentado.
+- [ ] `APIA-00X` contiene evidencia y casos no automatizados.
+
+## `/run-ui-checks FE-00X`
+
+- [ ] Existe `UIA-00X.md`.
+- [ ] `npm run test:e2e` pasa.
+- [ ] `npm run test:regression` pasa.
+- [ ] Los fallos o skips tienen evidencia verificable.
+
 ## Reviews
 
 - [ ] `/review-slice BE-00X` escribe `BE-00X-review.md`.
@@ -77,6 +105,8 @@ Este archivo define requisitos, no el estado de un slice. Los checks permanecen 
 ## `/run-checks BE-00X`
 
 - [ ] QA y reviews estan aprobados.
+- [ ] UI automation y API automation estan aprobadas o justificadas.
+- [ ] `run-ui-checks` ya paso para el slice.
 - [ ] Tests, lint, formato, tipos y build aplicables pasan.
 - [ ] Cada skip es realmente no aplicable.
 - [ ] Se valido si habia cambios pendientes que justificaran actualizar contenedores antes del cierre.

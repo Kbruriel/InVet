@@ -20,14 +20,17 @@ Flujo obligatorio por slice:
 2. `/implement-backend-task BE-00X`
 3. Gate de Persistencia segura: `python backend/scripts/validate_slice_plan.py BE-00X --stage secure-persistence`
 4. `/implement-frontend-task FE-00X`
-5. `/qa-task QA-00X`
-6. `/review-slice BE-00X`
-7. `/clean-architecture-review BE-00X`
-8. `/security-review BE-00X`
-9. Si hay hallazgos: `/implement-findings BE-00X`
-10. Si hubo correcciones: repetir `/qa-task QA-00X` y los reviews afectados
-11. `/run-checks BE-00X`
-12. `/update-docs BE-00X`
+5. `/implement-ui-automation-task FE-00X`
+6. `/implement-api-automation-task BE-00X`
+7. `/qa-task QA-00X`
+8. `/review-slice BE-00X`
+9. `/clean-architecture-review BE-00X`
+10. `/security-review BE-00X`
+11. `/run-ui-checks FE-00X`
+12. Si hay hallazgos: `/implement-findings BE-00X`
+13. Si hubo correcciones: repetir `/qa-task QA-00X`, `/run-ui-checks FE-00X` y los reviews afectados
+14. `/run-checks BE-00X`
+15. `/update-docs BE-00X`
 
 Reglas:
 - Autonomia por defecto: ejecuta el flujo solicitado sin pedir confirmacion antes de cada comando si no hay blockers.
@@ -38,6 +41,10 @@ Reglas:
 - No avanzar al siguiente slice si hay blockers de arquitectura, seguridad, QA o checks.
 - Ejecutar `backend/scripts/validate_slice_plan.py` antes de cada etapa.
 - Despues de backend y antes de frontend/QA, ejecutar el stage `secure-persistence`; si falla, devolver el trabajo al backend implementer o findings implementer.
+- Bloquear si falta `docs/opencode/tasks/ui-automation/UIA-00X.md` cuando el slice tenga frontend.
+- Bloquear si falta `docs/opencode/tasks/api-automation/APIA-00X.md` cuando el slice tenga backend o consuma API.
+- Bloquear si existen criterios de aceptacion sin cobertura UI, API o justificacion manual.
+- No avanzar a QA ni a checks si UI automation o API automation fallan.
 - No iniciar un nuevo slice mientras el QA anterior no sea `APPROVED`.
 - Bloquear si un finding esta `OPEN`, `IN_PROGRESS` o `READY_FOR_REVALIDATION`.
 - `RESOLVED` y `ACCEPTED_RISK` no bloquean, pero deben conservar evidencia.

@@ -69,6 +69,7 @@ REQUIRED_TASK_FIELDS = (
 
 FINAL_STAGES = {"review", "checks", "docs"}
 RESOLVED_FINDING_STATES = {"RESOLVED", "ACCEPTED_RISK"}
+BLOCKING_FINDING_STATES = {"OPEN", "IN_PROGRESS", "READY_FOR_REVALIDATION"}
 REVIEW_SUFFIXES = ("review", "clean-architecture-review", "security-review")
 SECURE_PERSISTENCE_KEYWORDS = (
     "alembic",
@@ -466,11 +467,44 @@ def _read_finding_state(findings_path: Path) -> str | None:
     if not findings_path.exists():
         return None
     text = findings_path.read_text(encoding="utf-8")
-    match = re.search(
+    global_match = re.search(
+        r"(?im)^-\s*Estado\s+global:\s*`?([A-Z_]+)`?\s*$",
+        text,
+    )
+    if global_match:
+        return global_match.group(1).upper()
+
+    exact_match = re.search(
         r"(?im)^-\s*Estado:\s*`?([A-Z_]+)`?\s*$",
         text,
     )
-    return match.group(1).upper() if match else "OPEN"
+    if exact_match:
+        return exact_match.group(1).upper()
+
+    states: list[str] = []
+    state_re = re.compile(
+        r"\b(OPEN|IN_PROGRESS|READY_FOR_REVALIDATION|RESOLVED|ACCEPTED_RISK)\b"
+    )
+    for line in text.splitlines():
+        if "OPEN|IN_PROGRESS" in line:
+            continue
+        normalized_line = _normalize_label(line)
+        has_state_context = (
+            "estado" in normalized_line
+            or "qf-" in normalized_line
+            or "->" in line
+            or "\N{RIGHTWARDS ARROW}" in line
+        )
+        if not has_state_context:
+            continue
+        states.extend(match.group(1).upper() for match in state_re.finditer(line))
+
+    for state in BLOCKING_FINDING_STATES:
+        if state in states:
+            return state
+    if any(state in states for state in RESOLVED_FINDING_STATES):
+        return "RESOLVED"
+    return "OPEN"
 
 
 def validate_previous_slice_gate(repo_root: Path, slice_ids: SliceIds) -> list[str]:
