@@ -10,7 +10,7 @@ type UiState = 'loading' | 'success' | 'error';
 
 export default function ClinicDetailPage() {
   const params = useParams();
-  const id = Number(params.id);
+  const clinicId = Number(params.clinicId);
   const [clinic, setClinic] = useState<PublicClinic | null>(null);
   const [state, setState] = useState<UiState>('loading');
   const [error, setError] = useState<string | null>(null);
@@ -22,7 +22,7 @@ export default function ClinicDetailPage() {
       setState('loading');
       setError(null);
       try {
-        const data = await fetchPublicClinicDetail(id);
+        const data = await fetchPublicClinicDetail(clinicId);
         if (!cancelled) {
           setClinic(data);
           setState('success');
@@ -36,9 +36,9 @@ export default function ClinicDetailPage() {
       }
     }
 
-    if (id) load();
+    if (clinicId) load();
     return () => { cancelled = true; };
-  }, [id]);
+  }, [clinicId]);
 
   if (state === 'loading') {
     return (

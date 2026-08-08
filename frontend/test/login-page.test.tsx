@@ -1,5 +1,10 @@
-import { render, screen } from "@testing-library/react";
+// Mock Next.js App Router hooks before any imports
+jest.mock("next/navigation", () => ({
+  useRouter: () => ({ push: jest.fn(), refresh: jest.fn() }),
+}));
 
+import { render, screen } from "@testing-library/react";
+import { describe, it, expect } from "@jest/globals";
 import LoginPage from "@/app/login/page";
 
 describe("login page", () => {

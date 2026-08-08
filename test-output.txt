@@ -1,0 +1,556 @@
+﻿
+> invet-frontend@0.1.0 test
+> jest --verbose
+
+node.exe : PASS src/shared/auth/session.test.ts
+En línea: 1 Carácter: 1
++ & "C:\Program Files\nodejs/node.exe" "C:\Program Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (PASS src/shared/auth/session.test 
+   .ts:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+  session utils
+    getAccessToken
+      ÔêÜ returns null when no token exists (8 ms)
+      ÔêÜ returns the access token when it exists (1 ms)
+    getRefreshToken
+      ÔêÜ returns null when no refresh token exists (1 ms)
+      ÔêÜ returns the refresh token when it exists
+    isAuthenticated
+      ÔêÜ returns false when no access token (1 ms)
+      ÔêÜ returns true when access token exists
+    clearSession
+      ÔêÜ removes both tokens from localStorage (1 ms)
+    requireAuth
+      ÔêÜ throws when no token exists (10 ms)
+      ÔêÜ returns the token when authenticated
+
+PASS src/shared/api/public.test.ts
+  API Public Client
+    fetchPublicClinics
+      ÔêÜ deberia listar clinicas con paginacion (4 ms)
+      ÔêÜ deberia incluir search en los query params
+      ÔêÜ deberia lanzar error en response no ok
+    fetchPublicClinicDetail
+      ÔêÜ deberia obtener detalle de clinica (1 ms)
+      ÔêÜ deberia lanzar 404 cuando no existe
+    fetchPublicBranches
+      ÔêÜ deberia listar sucursales con filtro clinica_id
+    fetchPublicServices
+      ÔêÜ deberia listar servicios con filtro sucursal_id (1 ms)
+
+PASS src/shared/ui/components/Button.test.tsx
+  Button
+    ÔêÜ deberia renderizar texto del boton (69 ms)
+    ÔêÜ deberia aplicar variante primary por defecto (4 ms)
+    ÔêÜ deberia aplicar variante secondary (5 ms)
+    ÔêÜ deberia aplicar variante outline (3 ms)
+    ÔêÜ deberia ser disabled cuando se pasa disabled (3 ms)
+    ÔêÜ deberia aplicar tamano lg (2 ms)
+    ÔêÜ deberia tener focus ring visible (2 ms)
+
+PASS src/shared/ui/components/Input.test.tsx
+  Input
+    ÔêÜ deberia renderizar input con label (38 ms)
+    ÔêÜ deberia mostrar error cuando se pasa (36 ms)
+    ÔêÜ deberia tener clase de error en el input (11 ms)
+    ÔêÜ deberia pasar props al input (6 ms)
+    ÔêÜ deberia tener focus ring (4 ms)
+
+PASS src/shared/ui/components/Card.test.tsx
+  Card
+    ÔêÜ deberia renderizar children (35 ms)
+    ÔêÜ deberia ser un div por defecto (12 ms)
+    ÔêÜ deberia ser un link cuando se pasa href (46 ms)
+    ÔêÜ deberia ser un button cuando se pasa onClick (19 ms)
+
+PASS src/features/public-landing/components/HeroSection.test.tsx
+  HeroSection
+    ÔêÜ deberia renderizar el titulo principal (54 ms)
+    ÔêÜ deberia renderizar el buscador (7 ms)
+    ÔêÜ deberia renderizar los chips de categoria (4 ms)
+    ÔêÜ deberia tener seccion con aria-label de busqueda (5 ms)
+
+FAIL src/features/public-landing/components/HowItWorksSection.test.tsx
+  HowItWorksSection
+    ÔêÜ deberia renderizar el titulo de la seccion (44 ms)
+    ÔêÜ deberia renderizar los tres pasos (26 ms)
+    ÔêÜ deberia tener aria-label de como funciona (7 ms)
+    ├ù deberia mostrar descripcion para cada paso (21 ms)
+
+  ÔùÅ HowItWorksSection ÔÇ║ deberia mostrar descripcion para cada paso
+
+    TestingLibraryElementError: Unable to find an element with the text: 
+/env.*s tu solicitud/i. This could be because the text is broken up by 
+multiple elements. In this case, you can provide a function for your text 
+matcher to make your matcher more flexible.
+
+    Ignored nodes: comments, script, style
+    [36m<body>[39m
+      [36m<div>[39m
+        [36m<section[39m
+          [33maria-label[39m=[32m"Como funciona"[39m
+          [33mclass[39m=[32m"py-16 sm:py-24"[39m
+        [36m>[39m
+          [36m<div[39m
+            [33mclass[39m=[32m"mx-auto max-w-4xl px-4 text-center"[39m
+          [36m>[39m
+            [36m<h2[39m
+              [33mclass[39m=[32m"text-2xl font-extrabold text-slate-900 
+sm:text-3xl"[39m
+            [36m>[39m
+              [0mComo funciona InVet[0m
+            [36m</h2>[39m
+            [36m<p[39m
+              [33mclass[39m=[32m"mt-3 text-base text-slate-600"[39m
+            [36m>[39m
+              [0mUn proceso simple para conectar con la mejor atencion 
+veterinaria.[0m
+            [36m</p>[39m
+            [36m<div[39m
+              [33mclass[39m=[32m"mt-12 grid gap-8 sm:grid-cols-3"[39m
+            [36m>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"rounded-2xl bg-white p-6 shadow-sm 
+border border-sandy-300 text-center"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"mx-auto mb-4 flex h-14 w-14 
+items-center justify-center rounded-full bg-teal text-xl font-bold 
+text-white"[39m
+                [36m>[39m
+                  [0m1[0m
+                [36m</div>[39m
+                [36m<h3[39m
+                  [33mclass[39m=[32m"mb-2 text-lg font-semibold 
+text-slate-900"[39m
+                [36m>[39m
+                  [0mBusca[0m
+                [36m</h3>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-sm text-slate-600"[39m
+                [36m>[39m
+                  [0mIngresa el nombre de la cl├¡nica, ciudad o servicio que 
+necesitas.[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"rounded-2xl bg-white p-6 shadow-sm 
+border border-sandy-300 text-center"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"mx-auto mb-4 flex h-14 w-14 
+items-center justify-center rounded-full bg-teal text-xl font-bold 
+text-white"[39m
+                [36m>[39m
+                  [0m2[0m
+                [36m</div>[39m
+                [36m<h3[39m
+                  [33mclass[39m=[32m"mb-2 text-lg font-semibold 
+text-slate-900"[39m
+                [36m>[39m
+                  [0mCompara[0m
+                [36m</h3>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-sm text-slate-600"[39m
+                [36m>[39m
+                  [0mRevisa perfiles p├║blicos, servicios disponibles y 
+calificaciones.[0m
+                [36m</p>[39m
+              [36m</div>[39m
+              [36m<div[39m
+                [33mclass[39m=[32m"rounded-2xl bg-white p-6 shadow-sm 
+border border-sandy-300 text-center"[39m
+              [36m>[39m
+                [36m<div[39m
+                  [33mclass[39m=[32m"mx-auto mb-4 flex h-14 w-14 
+items-center justify-center rounded-full bg-teal text-xl font-bold 
+text-white"[39m
+                [36m>[39m
+                  [0m3[0m
+                [36m</div>[39m
+                [36m<h3[39m
+                  [33mclass[39m=[32m"mb-2 text-lg font-semibold 
+text-slate-900"[39m
+                [36m>[39m
+                  [0mSolicita[0m
+                [36m</h3>[39m
+                [36m<p[39m
+                  [33mclass[39m=[32m"text-sm text-slate-600"[39m
+                [36m>[39m
+                  [0mEnv├¡a tu solicitud de cita directamente desde el perfil 
+de la cl├¡nica.[0m
+                [36m</p>[39m
+              [36m</div>[39m
+            [36m</div>[39m
+          [36m</div>[39m
+        [36m</section>[39m
+      [36m</div>[39m
+    [36m</body>[39m
+
+    [0m [90m 27 |[39m     expect(screen[33m.[39mgetByText([35m/ingresa 
+el nombre/i[39m))[33m.[39mtoBeInTheDocument()[33m;[39m
+     [90m 28 |[39m     expect(screen[33m.[39mgetByText([35m/revisa 
+perfiles/i[39m))[33m.[39mtoBeInTheDocument()[33m;[39m
+    [31m[1m>[22m[39m[90m 29 |[39m     
+expect(screen[33m.[39mgetByText([35m/env.*s tu 
+solicitud/i[39m))[33m.[39mtoBeInTheDocument()[33m;[39m
+     [90m    |[39m                   [31m[1m^[22m[39m
+     [90m 30 |[39m   })[33m;[39m
+     [90m 31 |[39m })[33m;[39m
+     [90m 32 |[39m[0m
+
+      at Object.getElementError 
+(node_modules/@testing-library/dom/dist/config.js:37:19)
+      at node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+      at node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+      at node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+      at Object.getByText 
+(src/features/public-landing/components/HowItWorksSection.test.tsx:29:19)
+
+  console.error
+    Error: Uncaught [Error: invariant expected app router to be mounted]
+        at reportException (C:\InVet\frontend\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\helpers\runtime-script-errors.js:66:24)
+        at innerInvokeEventListeners (C:\InVet\frontend\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:353:9)
+        at invokeEventListeners (C:\InVet\frontend\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:286:3)
+        at HTMLUnknownElementImpl._dispatch (C:\InVet\frontend\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:233:9)
+        at HTMLUnknownElementImpl.dispatchEvent (C:\InVet\frontend\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:104:17)
+        at HTMLUnknownElement.dispatchEvent (C:\InVet\frontend\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\generated\EventTarget.js:241:34)
+        at Object.invokeGuardedCallbackDev (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:4213:16)
+        at invokeGuardedCallback (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:4277:31)
+        at beginWork$1 (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:27490:7)
+        at performUnitOfWork (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:26599:12)
+        at workLoopSync (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:26505:5)
+        at renderRootSync (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:26473:7)
+        at performConcurrentWorkOnRoot (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:25777:74)
+        at flushActQueue (C:\InVet\frontend\node_modules\react\cjs\react.development.js:2667:24)
+        at act (C:\InVet\frontend\node_modules\react\cjs\react.development.js:2582:11)
+        at C:\InVet\frontend\node_modules\@testing-library\react\dist\act-compat.js:47:25
+        at renderRoot (C:\InVet\frontend\node_modules\@testing-library\react\dist\pure.js:180:26)
+        at render (C:\InVet\frontend\node_modules\@testing-library\react\dist\pure.js:271:10)
+        at Object.<anonymous> (C:\InVet\frontend\test\login-page.test.tsx:7:11)
+        at Promise.then.completed (C:\InVet\frontend\node_modules\jest-circus\build\utils.js:298:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (C:\InVet\frontend\node_modules\jest-circus\build\utils.js:231:10)
+        at _callCircusTest (C:\InVet\frontend\node_modules\jest-circus\build\run.js:316:40)
+        at processTicksAndRejections (node:internal/process/task_queues:104:5)
+        at _runTest (C:\InVet\frontend\node_modules\jest-circus\build\run.js:252:3)
+        at _runTestsForDescribeBlock (C:\InVet\frontend\node_modules\jest-circus\build\run.js:126:9)
+        at _runTestsForDescribeBlock (C:\InVet\frontend\node_modules\jest-circus\build\run.js:121:9)
+        at run (C:\InVet\frontend\node_modules\jest-circus\build\run.js:71:3)
+        at runAndTransformResultsToJestFormat (C:\InVet\frontend\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapterInit.js:122:21)
+        at jestAdapter (C:\InVet\frontend\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapter.js:79:19)
+        at runTestInternal (C:\InVet\frontend\node_modules\jest-runner\build\runTest.js:367:16)
+        at runTest (C:\InVet\frontend\node_modules\jest-runner\build\runTest.js:444:34)
+        at Object.worker (C:\InVet\frontend\node_modules\jest-runner\build\testWorker.js:106:12) {
+      detail: Error: invariant expected app router to be mounted
+          at useRouter (C:\InVet\frontend\node_modules\next\src\client\components\navigation.ts:113:11)
+          at LoginPage (C:\InVet\frontend\src\app\login\page.tsx:8:27)
+          at renderWithHooks (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:15486:18)
+          at mountIndeterminateComponent (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:20103:13)
+          at beginWork (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:21626:16)
+          at HTMLUnknownElement.callCallback (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:4164:14)
+          at HTMLUnknownElement.callTheUserObjectsOperation (C:\InVet\frontend\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\generated\EventListener.js:26:30)
+          at innerInvokeEventListeners (C:\InVet\frontend\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:350:25)
+          at invokeEventListeners (C:\InVet\frontend\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:286:3)
+          at HTMLUnknownElementImpl._dispatch (C:\InVet\frontend\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:233:9)
+          at HTMLUnknownElementImpl.dispatchEvent (C:\InVet\frontend\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:104:17)
+          at HTMLUnknownElement.dispatchEvent (C:\InVet\frontend\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\generated\EventTarget.js:241:34)
+          at Object.invokeGuardedCallbackDev (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:4213:16)
+          at invokeGuardedCallback (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:4277:31)
+          at beginWork$1 (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:27490:7)
+          at performUnitOfWork (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:26599:12)
+          at workLoopSync (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:26505:5)
+          at renderRootSync (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:26473:7)
+          at performConcurrentWorkOnRoot (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:25777:74)
+          at flushActQueue (C:\InVet\frontend\node_modules\react\cjs\react.development.js:2667:24)
+          at act (C:\InVet\frontend\node_modules\react\cjs\react.development.js:2582:11)
+          at C:\InVet\frontend\node_modules\@testing-library\react\dist\act-compat.js:47:25
+          at renderRoot (C:\InVet\frontend\node_modules\@testing-library\react\dist\pure.js:180:26)
+          at render (C:\InVet\frontend\node_modules\@testing-library\react\dist\pure.js:271:10)
+          at Object.<anonymous> (C:\InVet\frontend\test\login-page.test.tsx:7:11)
+          at Promise.then.completed (C:\InVet\frontend\node_modules\jest-circus\build\utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (C:\InVet\frontend\node_modules\jest-circus\build\utils.js:231:10)
+          at _callCircusTest (C:\InVet\frontend\node_modules\jest-circus\build\run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:104:5)
+          at _runTest (C:\InVet\frontend\node_modules\jest-circus\build\run.js:252:3)
+          at _runTestsForDescribeBlock (C:\InVet\frontend\node_modules\jest-circus\build\run.js:126:9)
+          at _runTestsForDescribeBlock (C:\InVet\frontend\node_modules\jest-circus\build\run.js:121:9)
+          at run (C:\InVet\frontend\node_modules\jest-circus\build\run.js:71:3)
+          at runAndTransformResultsToJestFormat (C:\InVet\frontend\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapterInit.js:122:21)
+          at jestAdapter (C:\InVet\frontend\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapter.js:79:19)
+          at runTestInternal (C:\InVet\frontend\node_modules\jest-runner\build\runTest.js:367:16)
+          at runTest (C:\InVet\frontend\node_modules\jest-runner\build\runTest.js:444:34)
+          at Object.worker (C:\InVet\frontend\node_modules\jest-runner\build\testWorker.js:106:12),
+      type: 'unhandled exception'
+    }
+
+    [0m [90m  5 |[39m describe([32m"login page"[39m[33m,[39m () [33m=>[39m {
+     [90m  6 |[39m   it([32m"renders the login form"[39m[33m,[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m  7 |[39m     render([33m<[39m[33mLoginPage[39m [33m/[39m[33m>[39m)[33m;[39m
+     [90m    |[39m           [31m[1m^[22m[39m
+     [90m  8 |[39m
+     [90m  9 |[39m     expect(
+     [90m 10 |[39m       screen[33m.[39mgetByRole([32m"heading"[39m[33m,[39m { name[33m:[39m [35m/Inicia sesion en InVet/i[39m })[33m,[39m[0m
+
+      at VirtualConsole.<anonymous> (node_modules/jest-environment-jsdom/build/index.js:63:23)
+      at Object.invokeGuardedCallbackDev (node_modules/react-dom/cjs/react-dom.development.js:4213:16)
+      at invokeGuardedCallback (node_modules/react-dom/cjs/react-dom.development.js:4277:31)
+      at beginWork$1 (node_modules/react-dom/cjs/react-dom.development.js:27490:7)
+      at performUnitOfWork (node_modules/react-dom/cjs/react-dom.development.js:26599:12)
+      at workLoopSync (node_modules/react-dom/cjs/react-dom.development.js:26505:5)
+      at renderRootSync (node_modules/react-dom/cjs/react-dom.development.js:26473:7)
+      at performConcurrentWorkOnRoot (node_modules/react-dom/cjs/react-dom.development.js:25777:74)
+      at flushActQueue (node_modules/react/cjs/react.development.js:2667:24)
+      at act (node_modules/react/cjs/react.development.js:2582:11)
+      at node_modules/@testing-library/react/dist/act-compat.js:47:25
+      at renderRoot (node_modules/@testing-library/react/dist/pure.js:180:26)
+      at render (node_modules/@testing-library/react/dist/pure.js:271:10)
+      at Object.<anonymous> (test/login-page.test.tsx:7:11)
+
+  console.error
+    Error: Uncaught [Error: invariant expected app router to be mounted]
+        at reportException (C:\InVet\frontend\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\helpers\runtime-script-errors.js:66:24)
+        at innerInvokeEventListeners (C:\InVet\frontend\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:353:9)
+        at invokeEventListeners (C:\InVet\frontend\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:286:3)
+        at HTMLUnknownElementImpl._dispatch (C:\InVet\frontend\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:233:9)
+        at HTMLUnknownElementImpl.dispatchEvent (C:\InVet\frontend\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:104:17)
+        at HTMLUnknownElement.dispatchEvent (C:\InVet\frontend\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\generated\EventTarget.js:241:34)
+        at Object.invokeGuardedCallbackDev (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:4213:16)
+        at invokeGuardedCallback (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:4277:31)
+        at beginWork$1 (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:27490:7)
+        at performUnitOfWork (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:26599:12)
+        at workLoopSync (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:26505:5)
+        at renderRootSync (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:26473:7)
+        at recoverFromConcurrentError (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:25889:20)
+        at performConcurrentWorkOnRoot (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:25789:22)
+        at flushActQueue (C:\InVet\frontend\node_modules\react\cjs\react.development.js:2667:24)
+        at act (C:\InVet\frontend\node_modules\react\cjs\react.development.js:2582:11)
+        at C:\InVet\frontend\node_modules\@testing-library\react\dist\act-compat.js:47:25
+        at renderRoot (C:\InVet\frontend\node_modules\@testing-library\react\dist\pure.js:180:26)
+        at render (C:\InVet\frontend\node_modules\@testing-library\react\dist\pure.js:271:10)
+        at Object.<anonymous> (C:\InVet\frontend\test\login-page.test.tsx:7:11)
+        at Promise.then.completed (C:\InVet\frontend\node_modules\jest-circus\build\utils.js:298:28)
+        at new Promise (<anonymous>)
+        at callAsyncCircusFn (C:\InVet\frontend\node_modules\jest-circus\build\utils.js:231:10)
+        at _callCircusTest (C:\InVet\frontend\node_modules\jest-circus\build\run.js:316:40)
+        at processTicksAndRejections (node:internal/process/task_queues:104:5)
+        at _runTest (C:\InVet\frontend\node_modules\jest-circus\build\run.js:252:3)
+        at _runTestsForDescribeBlock (C:\InVet\frontend\node_modules\jest-circus\build\run.js:126:9)
+        at _runTestsForDescribeBlock (C:\InVet\frontend\node_modules\jest-circus\build\run.js:121:9)
+        at run (C:\InVet\frontend\node_modules\jest-circus\build\run.js:71:3)
+        at runAndTransformResultsToJestFormat (C:\InVet\frontend\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapterInit.js:122:21)
+        at jestAdapter (C:\InVet\frontend\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapter.js:79:19)
+        at runTestInternal (C:\InVet\frontend\node_modules\jest-runner\build\runTest.js:367:16)
+        at runTest (C:\InVet\frontend\node_modules\jest-runner\build\runTest.js:444:34)
+        at Object.worker (C:\InVet\frontend\node_modules\jest-runner\build\testWorker.js:106:12) {
+      detail: Error: invariant expected app router to be mounted
+          at useRouter (C:\InVet\frontend\node_modules\next\src\client\components\navigation.ts:113:11)
+          at LoginPage (C:\InVet\frontend\src\app\login\page.tsx:8:27)
+          at renderWithHooks (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:15486:18)
+          at mountIndeterminateComponent (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:20103:13)
+          at beginWork (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:21626:16)
+          at HTMLUnknownElement.callCallback (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:4164:14)
+          at HTMLUnknownElement.callTheUserObjectsOperation (C:\InVet\frontend\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\generated\EventListener.js:26:30)
+          at innerInvokeEventListeners (C:\InVet\frontend\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:350:25)
+          at invokeEventListeners (C:\InVet\frontend\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:286:3)
+          at HTMLUnknownElementImpl._dispatch (C:\InVet\frontend\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:233:9)
+          at HTMLUnknownElementImpl.dispatchEvent (C:\InVet\frontend\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\events\EventTarget-impl.js:104:17)
+          at HTMLUnknownElement.dispatchEvent (C:\InVet\frontend\node_modules\jest-environment-jsdom\node_modules\jsdom\lib\jsdom\living\generated\EventTarget.js:241:34)
+          at Object.invokeGuardedCallbackDev (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:4213:16)
+          at invokeGuardedCallback (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:4277:31)
+          at beginWork$1 (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:27490:7)
+          at performUnitOfWork (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:26599:12)
+          at workLoopSync (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:26505:5)
+          at renderRootSync (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:26473:7)
+          at recoverFromConcurrentError (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:25889:20)
+          at performConcurrentWorkOnRoot (C:\InVet\frontend\node_modules\react-dom\cjs\react-dom.development.js:25789:22)
+          at flushActQueue (C:\InVet\frontend\node_modules\react\cjs\react.development.js:2667:24)
+          at act (C:\InVet\frontend\node_modules\react\cjs\react.development.js:2582:11)
+          at C:\InVet\frontend\node_modules\@testing-library\react\dist\act-compat.js:47:25
+          at renderRoot (C:\InVet\frontend\node_modules\@testing-library\react\dist\pure.js:180:26)
+          at render (C:\InVet\frontend\node_modules\@testing-library\react\dist\pure.js:271:10)
+          at Object.<anonymous> (C:\InVet\frontend\test\login-page.test.tsx:7:11)
+          at Promise.then.completed (C:\InVet\frontend\node_modules\jest-circus\build\utils.js:298:28)
+          at new Promise (<anonymous>)
+          at callAsyncCircusFn (C:\InVet\frontend\node_modules\jest-circus\build\utils.js:231:10)
+          at _callCircusTest (C:\InVet\frontend\node_modules\jest-circus\build\run.js:316:40)
+          at processTicksAndRejections (node:internal/process/task_queues:104:5)
+          at _runTest (C:\InVet\frontend\node_modules\jest-circus\build\run.js:252:3)
+          at _runTestsForDescribeBlock (C:\InVet\frontend\node_modules\jest-circus\build\run.js:126:9)
+          at _runTestsForDescribeBlock (C:\InVet\frontend\node_modules\jest-circus\build\run.js:121:9)
+          at run (C:\InVet\frontend\node_modules\jest-circus\build\run.js:71:3)
+          at runAndTransformResultsToJestFormat (C:\InVet\frontend\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapterInit.js:122:21)
+          at jestAdapter (C:\InVet\frontend\node_modules\jest-circus\build\legacy-code-todo-rewrite\jestAdapter.js:79:19)
+          at runTestInternal (C:\InVet\frontend\node_modules\jest-runner\build\runTest.js:367:16)
+          at runTest (C:\InVet\frontend\node_modules\jest-runner\build\runTest.js:444:34)
+          at Object.worker (C:\InVet\frontend\node_modules\jest-runner\build\testWorker.js:106:12),
+      type: 'unhandled exception'
+    }
+
+    [0m [90m  5 |[39m describe([32m"login page"[39m[33m,[39m () [33m=>[39m {
+     [90m  6 |[39m   it([32m"renders the login form"[39m[33m,[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m  7 |[39m     render([33m<[39m[33mLoginPage[39m [33m/[39m[33m>[39m)[33m;[39m
+     [90m    |[39m           [31m[1m^[22m[39m
+     [90m  8 |[39m
+     [90m  9 |[39m     expect(
+     [90m 10 |[39m       screen[33m.[39mgetByRole([32m"heading"[39m[33m,[39m { name[33m:[39m [35m/Inicia sesion en InVet/i[39m })[33m,[39m[0m
+
+      at VirtualConsole.<anonymous> (node_modules/jest-environment-jsdom/build/index.js:63:23)
+      at Object.invokeGuardedCallbackDev (node_modules/react-dom/cjs/react-dom.development.js:4213:16)
+      at invokeGuardedCallback (node_modules/react-dom/cjs/react-dom.development.js:4277:31)
+      at beginWork$1 (node_modules/react-dom/cjs/react-dom.development.js:27490:7)
+      at performUnitOfWork (node_modules/react-dom/cjs/react-dom.development.js:26599:12)
+      at workLoopSync (node_modules/react-dom/cjs/react-dom.development.js:26505:5)
+      at renderRootSync (node_modules/react-dom/cjs/react-dom.development.js:26473:7)
+      at recoverFromConcurrentError (node_modules/react-dom/cjs/react-dom.development.js:25889:20)
+      at performConcurrentWorkOnRoot (node_modules/react-dom/cjs/react-dom.development.js:25789:22)
+      at flushActQueue (node_modules/react/cjs/react.development.js:2667:24)
+      at act (node_modules/react/cjs/react.development.js:2582:11)
+      at node_modules/@testing-library/react/dist/act-compat.js:47:25
+      at renderRoot (node_modules/@testing-library/react/dist/pure.js:180:26)
+      at render (node_modules/@testing-library/react/dist/pure.js:271:10)
+      at Object.<anonymous> (test/login-page.test.tsx:7:11)
+
+  console.error
+    The above error occurred in the <LoginPage> component:
+    
+        at LoginPage (C:\InVet\frontend\src\app\login\page.tsx:8:27)
+    
+    Consider adding an error boundary to your tree to customize error handling behavior.
+    Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+
+    [0m [90m  5 |[39m describe([32m"login page"[39m[33m,[39m () [33m=>[39m {
+     [90m  6 |[39m   it([32m"renders the login form"[39m[33m,[39m () [33m=>[39m {
+    [31m[1m>[22m[39m[90m  7 |[39m     render([33m<[39m[33mLoginPage[39m [33m/[39m[33m>[39m)[33m;[39m
+     [90m    |[39m           [31m[1m^[22m[39m
+     [90m  8 |[39m
+     [90m  9 |[39m     expect(
+     [90m 10 |[39m       screen[33m.[39mgetByRole([32m"heading"[39m[33m,[39m { name[33m:[39m [35m/Inicia sesion en InVet/i[39m })[33m,[39m[0m
+
+      at logCapturedError (node_modules/react-dom/cjs/react-dom.development.js:18704:23)
+      at update.callback (node_modules/react-dom/cjs/react-dom.development.js:18737:5)
+      at callCallback (node_modules/react-dom/cjs/react-dom.development.js:15036:12)
+      at commitUpdateQueue (node_modules/react-dom/cjs/react-dom.development.js:15057:9)
+      at commitLayoutEffectOnFiber (node_modules/react-dom/cjs/react-dom.development.js:23430:13)
+      at commitLayoutMountEffects_complete (node_modules/react-dom/cjs/react-dom.development.js:24727:9)
+      at commitLayoutEffects_begin (node_modules/react-dom/cjs/react-dom.development.js:24713:7)
+      at commitLayoutEffects (node_modules/react-dom/cjs/react-dom.development.js:24651:3)
+      at commitRootImpl (node_modules/react-dom/cjs/react-dom.development.js:26862:5)
+      at commitRoot (node_modules/react-dom/cjs/react-dom.development.js:26721:5)
+      at finishConcurrentRender (node_modules/react-dom/cjs/react-dom.development.js:25931:9)
+      at performConcurrentWorkOnRoot (node_modules/react-dom/cjs/react-dom.development.js:25848:7)
+      at flushActQueue (node_modules/react/cjs/react.development.js:2667:24)
+      at act (node_modules/react/cjs/react.development.js:2582:11)
+      at node_modules/@testing-library/react/dist/act-compat.js:47:25
+      at renderRoot (node_modules/@testing-library/react/dist/pure.js:180:26)
+      at render (node_modules/@testing-library/react/dist/pure.js:271:10)
+      at Object.<anonymous> (test/login-page.test.tsx:7:11)
+
+PASS src/features/public-landing/components/PublicSearchBar.test.tsx
+  PublicSearchBar
+    ÔêÜ deberia renderizar input de busqueda con label (64 ms)
+    ÔêÜ deberia renderizar boton buscar (57 ms)
+    ÔêÜ deberia actualizar el valor del input al escribir (24 ms)
+    ÔêÜ deberia llamar onSearch con debounce despues de escribir (7 ms)
+    ÔêÜ deberia prevenir submit del form (6 ms)
+    ÔêÜ deberia tener role search (4 ms)
+
+FAIL src/features/public-landing/components/CategoryChips.test.tsx
+  CategoryChips
+    ÔêÜ deberia renderizar las tres categorias (102 ms)
+    ÔêÜ deberia agregar query param category al hacer click (22 ms)
+    ├ù deberia aplicar estilo activo al chip seleccionado (20 ms)
+
+  ÔùÅ CategoryChips ÔÇ║ deberia aplicar estilo activo al chip seleccionado
+
+    TypeError: Cannot redefine property: useSearchParams
+        at Object.defineProperty (<anonymous>)
+
+    [0m [90m 32 |[39m   it([32m'deberia aplicar estilo activo al chip 
+seleccionado'[39m[33m,[39m () [33m=>[39m {
+     [90m 33 |[39m     [90m// Override the mock to return active 
+category[39m
+    [31m[1m>[22m[39m[90m 34 |[39m     jest[33m.[39mspyOn(jest[33m.[39
+mrequireActual([32m'next/navigation'[39m)[33m,[39m 
+[32m'useSearchParams'[39m)[33m.[39mmockReturnValue(
+     [90m    |[39m          [31m[1m^[22m[39m
+     [90m 35 |[39m       [36mnew[39m 
+[33mURLSearchParams[39m([32m'category=veterinaria'[39m)
+     [90m 36 |[39m     )[33m;[39m
+     [90m 37 |[39m[0m
+
+      at ModuleMocker.spyOn (node_modules/jest-mock/build/index.js:776:16)
+      at Object.spyOn 
+(src/features/public-landing/components/CategoryChips.test.tsx:34:10)
+
+FAIL test/login-page.test.tsx
+  login page
+    ├ù renders the login form (146 ms)
+
+  ÔùÅ login page ÔÇ║ renders the login form
+
+    invariant expected app router to be mounted
+
+    [0m [90m  6 |[39m
+     [90m  7 |[39m [36mexport[39m [36mdefault[39m [36mfunction[39m 
+[33mLoginPage[39m() {
+    [31m[1m>[22m[39m[90m  8 |[39m   [36mconst[39m router [33m=[39m 
+useRouter()[33m;[39m
+     [90m    |[39m                           [31m[1m^[22m[39m
+     [90m  9 |[39m   [36mconst[39m [email[33m,[39m setEmail] [33m=[39m 
+useState([32m''[39m)[33m;[39m
+     [90m 10 |[39m   [36mconst[39m [password[33m,[39m setPassword] 
+[33m=[39m useState([32m''[39m)[33m;[39m
+     [90m 11 |[39m   [36mconst[39m [error[33m,[39m setError] [33m=[39m 
+useState[33m<[39m[33mstring[39m [33m|[39m 
+[36mnull[39m[33m>[39m([36mnull[39m)[33m;[39m[0m
+
+      at useRouter 
+(node_modules/next/src/client/components/navigation.ts:113:11)
+      at LoginPage (src/app/login/page.tsx:8:27)
+      at renderWithHooks 
+(node_modules/react-dom/cjs/react-dom.development.js:15486:18)
+      at mountIndeterminateComponent 
+(node_modules/react-dom/cjs/react-dom.development.js:20103:13)
+      at beginWork 
+(node_modules/react-dom/cjs/react-dom.development.js:21626:16)
+      at beginWork$1 
+(node_modules/react-dom/cjs/react-dom.development.js:27465:14)
+      at performUnitOfWork 
+(node_modules/react-dom/cjs/react-dom.development.js:26599:12)
+      at workLoopSync 
+(node_modules/react-dom/cjs/react-dom.development.js:26505:5)
+      at renderRootSync 
+(node_modules/react-dom/cjs/react-dom.development.js:26473:7)
+      at recoverFromConcurrentError 
+(node_modules/react-dom/cjs/react-dom.development.js:25889:20)
+      at performConcurrentWorkOnRoot 
+(node_modules/react-dom/cjs/react-dom.development.js:25789:22)
+      at flushActQueue (node_modules/react/cjs/react.development.js:2667:24)
+      at act (node_modules/react/cjs/react.development.js:2582:11)
+      at node_modules/@testing-library/react/dist/act-compat.js:47:25
+      at renderRoot (node_modules/@testing-library/react/dist/pure.js:180:26)
+      at render (node_modules/@testing-library/react/dist/pure.js:271:10)
+      at Object.<anonymous> (test/login-page.test.tsx:7:11)
+
+PASS src/features/public-landing/components/ProfessionalCtaSection.test.tsx
+  ProfessionalCtaSection
+    ÔêÜ deberia renderizar el titulo del CTA (71 ms)
+    ÔêÜ deberia tener boton Registrar clinica con link a /register (32 ms)
+    ÔêÜ deberia tener boton Ver cl├¡nicas con link a /clinicas (9 ms)
+    ÔêÜ deberia tener aria-label de registra tu clinica (3 ms)
+
+PASS test/public-shell.test.tsx
+  public shell
+    ÔêÜ renders the home entry page with hero and CTA (103 ms)
+    ÔêÜ renders the public header links (12 ms)
+    ÔêÜ renders the public footer (3 ms)
+
+Test Suites: 3 failed, 9 passed, 12 total
+Tests:       3 failed, 54 passed, 57 total
+Snapshots:   0 total
+Time:        3.671 s
+Ran all test suites.

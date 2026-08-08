@@ -26,6 +26,6 @@ describe('HowItWorksSection', () => {
     render(<HowItWorksSection />);
     expect(screen.getByText(/ingresa el nombre/i)).toBeInTheDocument();
     expect(screen.getByText(/revisa perfiles/i)).toBeInTheDocument();
-    expect(screen.getByText(/env.*s tu solicitud/i)).toBeInTheDocument();
+    expect(screen.getByText(/env.*tu solicitud/i)).toBeInTheDocument();
   });
 });

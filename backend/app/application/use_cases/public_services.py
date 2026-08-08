@@ -1,8 +1,8 @@
-"""Casos de uso para servicios pblicos."""
+"""Casos de uso para servicios públicos."""
 
 from __future__ import annotations
 
-from app.api.v1.schemas.public_service import (
+from app.application.dtos import (
     PublicServiceListDTO,
     PublicServicesPaginatedResponse,
 )

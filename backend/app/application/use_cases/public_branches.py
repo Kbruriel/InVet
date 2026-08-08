@@ -1,8 +1,8 @@
-"""Casos de uso para sucursales pblicas."""
+"""Casos de uso para sucursales públicas."""
 
 from __future__ import annotations
 
-from app.api.v1.schemas.public_branch import (
+from app.application.dtos import (
     PublicBranchesPaginatedResponse,
     PublicBranchListDTO,
 )

@@ -10,13 +10,12 @@ from app.application.use_cases.branch_profile import (
     GetBranchPublicProfileUseCase,
 )
 from app.core.security import get_current_access_user
-from app.domain.entities.branch import Branch
-from app.infrastructure.database.repositories.branch_repository import (
-    AvailabilitySummaryRepositoryImpl,
-    BranchRepositoryImpl,
-    BranchScheduleRepositoryImpl,
-    RatingSummaryRepositoryImpl,
-    ServiceRepositoryImpl,
+from app.domain.repositories.branch_repository import (
+    AvailabilitySummaryRepository,
+    BranchRepository,
+    BranchScheduleRepository,
+    RatingSummaryRepository,
+    ServiceRepository,
 )
 from app.infrastructure.database.session import get_db
 
@@ -27,11 +26,19 @@ def get_branch_use_case(
     db: Session = Depends(get_db),
 ) -> GetBranchPublicProfileUseCase:
     """Inyección de dependencias para el caso de uso del perfil público."""
-    branch_repo = BranchRepositoryImpl(db)
-    service_repo = ServiceRepositoryImpl(db)
-    schedule_repo = BranchScheduleRepositoryImpl(db)
-    rating_repo = RatingSummaryRepositoryImpl(db)
-    availability_repo = AvailabilitySummaryRepositoryImpl(db)
+    from app.infrastructure.database.repositories.branch_repository import (
+        AvailabilitySummaryRepositoryImpl,
+        BranchRepositoryImpl,
+        BranchScheduleRepositoryImpl,
+        RatingSummaryRepositoryImpl,
+        ServiceRepositoryImpl,
+    )
+
+    branch_repo: BranchRepository = BranchRepositoryImpl(db)
+    service_repo: ServiceRepository = ServiceRepositoryImpl(db)
+    schedule_repo: BranchScheduleRepository = BranchScheduleRepositoryImpl(db)
+    rating_repo: RatingSummaryRepository = RatingSummaryRepositoryImpl(db)
+    availability_repo: AvailabilitySummaryRepository = AvailabilitySummaryRepositoryImpl(db)
 
     return GetBranchPublicProfileUseCase(
         branch_repo, service_repo, schedule_repo, rating_repo, availability_repo
@@ -42,11 +49,19 @@ def get_branch_protected_use_case(
     db: Session = Depends(get_db),
 ) -> GetBranchProtectedProfileUseCase:
     """Inyección de dependencias para el caso de uso del perfil protegido."""
-    branch_repo = BranchRepositoryImpl(db)
-    service_repo = ServiceRepositoryImpl(db)
-    schedule_repo = BranchScheduleRepositoryImpl(db)
-    rating_repo = RatingSummaryRepositoryImpl(db)
-    availability_repo = AvailabilitySummaryRepositoryImpl(db)
+    from app.infrastructure.database.repositories.branch_repository import (
+        AvailabilitySummaryRepositoryImpl,
+        BranchRepositoryImpl,
+        BranchScheduleRepositoryImpl,
+        RatingSummaryRepositoryImpl,
+        ServiceRepositoryImpl,
+    )
+
+    branch_repo: BranchRepository = BranchRepositoryImpl(db)
+    service_repo: ServiceRepository = ServiceRepositoryImpl(db)
+    schedule_repo: BranchScheduleRepository = BranchScheduleRepositoryImpl(db)
+    rating_repo: RatingSummaryRepository = RatingSummaryRepositoryImpl(db)
+    availability_repo: AvailabilitySummaryRepository = AvailabilitySummaryRepositoryImpl(db)
 
     return GetBranchProtectedProfileUseCase(
         branch_repo, service_repo, schedule_repo, rating_repo, availability_repo
@@ -57,7 +72,7 @@ def get_branch_protected_use_case(
 async def get_branch_public_profile(
     branch_id: int,
     use_case: GetBranchPublicProfileUseCase = Depends(get_branch_use_case),
-) -> Branch:
+) -> BranchPublicProfile:
     """Obtener perfil público de una sucursal (sin autenticación)."""
     branch = await use_case.execute(branch_id)
     if not branch:
@@ -74,7 +89,7 @@ async def get_branch_protected_profile(
     branch_id: int,
     use_case: GetBranchProtectedProfileUseCase = Depends(get_branch_protected_use_case),
     current_user: dict = Depends(get_current_access_user),
-) -> Branch:
+) -> BranchProtectedProfile:
     """Obtener perfil protegido de una sucursal (requiere autenticación y acceso).
 
     Ruta completa: GET /api/v1/clinics/branches/{clinic_id}/{branch_id}
