@@ -10,7 +10,7 @@ from app.infrastructure.database.repositories.clinic_repository_impl import (
     ClinicRepositoryImpl,
 )
 
-router = APIRouter(prefix="/clinics", tags=["search"])
+router = APIRouter(prefix="/clinicas", tags=["search"])
 
 
 def get_clinic_search_use_case(
@@ -21,8 +21,8 @@ def get_clinic_search_use_case(
     return SearchClinicsUseCase(clinic_repo)
 
 
-@router.get("/search", response_model=ClinicSearchResponse)
-async def search_clinics(
+@router.get("/buscar", response_model=ClinicSearchResponse)
+async def search_clinicas(
     location: str | None = Query(None, description="Ubicación para filtrar clínicas"),
     service_type: str
     | None = Query(None, description="Tipo de servicio para filtrar clínicas"),

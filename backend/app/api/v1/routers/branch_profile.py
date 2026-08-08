@@ -78,12 +78,16 @@ async def get_branch_protected_profile(
     """Obtener perfil protegido de una sucursal (requiere autenticación y acceso).
 
     Ruta completa: GET /api/v1/clinics/branches/{clinic_id}/{branch_id}
+
+    IDOR mitigation: Ambos casos (sucursal inexistente o sin permiso) devuelven 404
+    para prevenir enumeracin de recursos.
     """
     branch = await use_case.execute(branch_id, clinic_id, current_user)
     if not branch:
+        # Devolver 404 en lugar de 403 para prevenir IDOR
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="No tienes permiso para acceder a esta sucursal.",
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Sucursal no encontrada",
         )
 
     return branch

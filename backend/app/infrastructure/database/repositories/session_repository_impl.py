@@ -1,7 +1,7 @@
 """Implementacion del repositorio de sesiones."""
 
 from datetime import datetime
-from typing import Any, cast
+from typing import cast
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session as DBSession

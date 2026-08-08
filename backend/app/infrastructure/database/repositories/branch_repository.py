@@ -97,6 +97,36 @@ class BranchRepositoryImpl(BranchRepository):
             return None
         return Branch.model_validate(db_branch)
 
+    async def list_public_branches(
+        self,
+        clinica_id: int | None = None,
+        search: str | None = None,
+        page: int = 1,
+        size: int = 20,
+    ) -> tuple[list[Branch], int]:
+        """Listar sucursales pblicas segn filtros especificados con paginacin a nivel de base de datos."""
+        query = self.db.query(BranchModel).filter(BranchModel.is_active.is_(True))
+
+        # Filtrar por clnica si se proporciona
+        if clinica_id:
+            query = query.filter(BranchModel.clinic_id == clinica_id)
+
+        # Filtrar por nombre o ciudad si se proporciona
+        if search:
+            search_lower = search.lower()
+            query = query.filter(
+                (BranchModel.name.ilike(f"%{search_lower}%"))
+                | (BranchModel.city.ilike(f"%{search_lower}%"))
+            )
+
+        # Obtener conteo total antes de paginar
+        total = query.count()
+
+        # Aplicar paginacin a nivel de SQL
+        offset = (page - 1) * size
+        db_branches = query.offset(offset).limit(size).all()
+        return [Branch.model_validate(db_branch) for db_branch in db_branches], total
+
 
 class ServiceRepositoryImpl(ServiceRepository):
     """Implementacion del repositorio de servicios."""
@@ -114,6 +144,46 @@ class ServiceRepositoryImpl(ServiceRepository):
             .all()
         )
         return [Service.model_validate(db_service) for db_service in db_services]
+
+    async def list_public_services(
+        self,
+        sucursal_id: int | None = None,
+        clinica_id: int | None = None,
+        search: str | None = None,
+        page: int = 1,
+        size: int = 20,
+    ) -> tuple[list[Service], int]:
+        """Listar servicios pblicos segn filtros especificados con paginacin a nivel de base de datos.
+
+        Si se proporciona clinica_id sin sucursal_id, se filtran servicios de todas las sucursales de esa clnica.
+        """
+        query = self.db.query(ServiceModel).filter(
+            ServiceModel.is_active.is_(True)
+        )
+
+        # Filtrar por sucursal si se proporciona
+        if sucursal_id:
+            query = query.filter(ServiceModel.branch_id == sucursal_id)
+        elif clinica_id:
+            # Filtrar por todas las sucursales de la clnica
+            subquery = self.db.query(BranchModel.id).filter(
+                BranchModel.clinic_id == clinica_id,
+                BranchModel.is_active.is_(True)
+            )
+            query = query.filter(ServiceModel.branch_id.in_(subquery))
+
+        # Filtrar por nombre si se proporciona
+        if search:
+            search_lower = search.lower()
+            query = query.filter(ServiceModel.name.ilike(f"%{search_lower}%"))
+
+        # Obtener conteo total antes de paginar
+        total = query.count()
+
+        # Aplicar paginacin a nivel de SQL
+        offset = (page - 1) * size
+        db_services = query.offset(offset).limit(size).all()
+        return [Service.model_validate(db_service) for db_service in db_services], total
 
 
 class BranchScheduleRepositoryImpl(BranchScheduleRepository):

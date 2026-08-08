@@ -2,13 +2,15 @@
 
 from __future__ import annotations
 
-from datetime import datetime
-
 from pydantic import BaseModel, ConfigDict
 
 
 class ClinicSearchResult(BaseModel):
-    """Resultado individual de búsqueda de clínicas."""
+    """Resultado individual de búsqueda de clínicas (DTO público limpio).
+
+    M-003-02: Se eliminaron campos internos: created_at, updated_at, postal_code, email.
+    Solo se exponen campos necesarios para la interfaz pública.
+    """
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -18,12 +20,8 @@ class ClinicSearchResult(BaseModel):
     city: str
     state: str
     country: str
-    postal_code: str
     phone: str | None
-    email: str | None
     is_active: bool
-    created_at: datetime
-    updated_at: datetime
 
 
 class ClinicSearchResponse(BaseModel):
@@ -37,7 +35,10 @@ class ClinicSearchResponse(BaseModel):
 
 # Schema de respuesta para buscar sucursales (solo para el caso protegido o si queremos extenderlo)
 class ClinicSearchByBranchResponse(BaseModel):
-    """Respuesta de búsqueda con información completa de clínicas y sus sucursales."""
+    """Respuesta de búsqueda con información completa de clínicas y sus sucursales.
+
+    M-003-01: Este schema se usa solo para respuestas protegidas (no públicas).
+    """
 
     model_config = ConfigDict(from_attributes=True)
 

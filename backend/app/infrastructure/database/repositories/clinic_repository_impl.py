@@ -88,3 +88,12 @@ class ClinicRepositoryImpl(ClinicRepository):
 
         # Devolver el conteo
         return query.count()
+
+    async def get_clinic_by_id(self, clinic_id: int) -> Clinic | None:
+        """Obtener una clínica por ID o None si no existe."""
+        clinic_model = (
+            self.db.query(ClinicModel).filter(ClinicModel.id == clinic_id).first()
+        )
+        if clinic_model is None:
+            return None
+        return self._to_domain(clinic_model)

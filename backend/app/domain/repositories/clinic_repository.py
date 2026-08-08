@@ -25,3 +25,8 @@ class ClinicRepository(ABC):
     ) -> int:
         """Obtener el número total de clínicas que coinciden con los criterios."""
         pass
+
+    @abstractmethod
+    async def get_clinic_by_id(self, clinic_id: int) -> Clinic | None:
+        """Obtener una clínica por ID o None si no existe."""
+        pass

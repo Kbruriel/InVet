@@ -38,6 +38,21 @@ class BranchRepository(ABC):
         """Obtener perfil protegido de una sucursal si el usuario tiene acceso."""
         pass
 
+    @abstractmethod
+    async def list_public_branches(
+        self,
+        clinica_id: int | None = None,
+        search: str | None = None,
+        page: int = 1,
+        size: int = 20,
+    ) -> tuple[list[Branch], int]:
+        """Listar sucursales pblicas segn filtros especificados con paginacin a nivel de base de datos.
+
+        Returns:
+            Tuple de (lista de sucursales, total de resultados sin paginar)
+        """
+        pass
+
 
 class ServiceRepository(ABC):
     """Interface para el repositorio de servicios."""
@@ -45,6 +60,22 @@ class ServiceRepository(ABC):
     @abstractmethod
     async def get_services_by_branch(self, branch_id: int) -> list[Service]:
         """Obtener servicios por ID de sucursal."""
+        pass
+
+    @abstractmethod
+    async def list_public_services(
+        self,
+        sucursal_id: int | None = None,
+        clinica_id: int | None = None,
+        search: str | None = None,
+        page: int = 1,
+        size: int = 20,
+    ) -> tuple[list[Service], int]:
+        """Listar servicios pblicos segn filtros especificados con paginacin a nivel de base de datos.
+
+        Returns:
+            Tuple de (lista de servicios, total de resultados sin paginar)
+        """
         pass
 
 
