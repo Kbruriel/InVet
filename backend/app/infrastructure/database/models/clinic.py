@@ -1,6 +1,6 @@
 """Modelo de clinica."""
 
-from datetime import datetime
+from datetime import UTC, datetime
 
 from sqlalchemy import Boolean, Column, DateTime, Integer, String, Text
 from sqlalchemy.orm import relationship
@@ -24,10 +24,17 @@ class Clinic(Base):
     phone = Column(String)
     email = Column(String)
     is_active = Column(Boolean, default=True)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    updated_at = Column(
+        DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC)
+    )
 
-    owners = relationship("Owner", order_by="Owner.id", back_populates="clinic")
+    owners = relationship(
+        "Owner", lazy="noload", order_by="Owner.id", back_populates="clinic"
+    )
     veterinarians = relationship(
-        "Veterinarian", order_by="Veterinarian.id", back_populates="clinic"
+        "Veterinarian",
+        lazy="noload",
+        order_by="Veterinarian.id",
+        back_populates="clinic",
     )
