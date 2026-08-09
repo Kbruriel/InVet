@@ -27,7 +27,7 @@ from app.infrastructure.database.models.owner import Owner as OwnerModel
 from app.infrastructure.database.models.rating_summary import (
     RatingSummary as RatingSummaryModel,
 )
-from app.infrastructure.database.models.service import Service as ServiceModel
+from app.infrastructure.database.models.service_model import Service as ServiceModel
 
 
 class BranchRepositoryImpl(BranchRepository):

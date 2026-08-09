@@ -1,20 +1,25 @@
 """Interfaz del repositorio de sesiones."""
 
 from abc import ABC, abstractmethod
-
-from app.infrastructure.database.models.session import Session
+from typing import Any
 
 
 class SessionRepository(ABC):
-    """Interfaz para el repositorio de sesiones."""
+    """Interfaz para el repositorio de sesiones.
+
+    Las implementaciones concretas deben mapear entre DTOs y modelos ORM.
+    Esta interfaz no conoce la capa de infraestructura.
+    """
 
     @abstractmethod
-    async def create_session(self, session: Session) -> Session:
+    async def create_session(self, session_data: dict[str, Any]) -> dict[str, Any]:
         """Crea una nueva sesion."""
         pass
 
     @abstractmethod
-    async def get_session_by_refresh_token(self, refresh_token: str) -> Session | None:
+    async def get_session_by_refresh_token(
+        self, refresh_token: str
+    ) -> dict[str, Any] | None:
         """Obtiene una sesion por refresh token."""
         pass
 

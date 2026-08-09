@@ -68,16 +68,17 @@ slice: "005"
 
 ## Decision final
 
-- **Decision: APPROVED con riesgos documentados**
+- **Decision: REJECTED**
 
 ### Justificacion
 
-El slice 005 cumple con su MVP definido y todos los gates requeridos terminaron con decision APPROVED:
+Aunque los gates individuales mostraron resultados mixtos, esta revision final identifica dos bloqueadores que impiden un release seguro:
 
-1. **Plan canonico:** Schema v3 valido, todas las tareas definidas con responsabilidad unica.
-2. **Backend BE-005:** CRUD de clinica implementado con Clean Architecture (domain/application/infrastructure/api separados). 9 tests unitarios PASSED. Schemas Pydantic validados. Router FastAPI expuesto bajo /api/v1.
-3. **Frontend FE-005:** Panel de administracion en `/clinic-administration` con formularios validados y estados UX completos (loading/error/empty/success/submitting). 13 tests PASSED. Lint y typecheck limpios.
-4. **UI Automation UIA-005:** 7 archivos E2E creados cubriendo flujos CRUD principales.
+1. **Endpoints CRUD sin autenticacion ni autorizacion (Blocker)** — Los endpoints de `clinic_admin.py` NO tienen proteccion Bearer token/JWT, validacion de rol clinic_admin, ni ownership/tenant isolation. La security review documenta explicitamente "Autenticacion: NO IMPLEMENTADA", "Autorizacion: NO IMPLEMENTADA", "IDOR/BOLA: NO IMPLEMENTADA". Un release con endpoints administrativos sin proteccion expone datos criticos de clinicas y sucursales a cualquier usuario sin credenciales.
+
+2. **APIA-005 nunca implementado (Blocker)** — 6 criterios de QA permanecen BLOCKED (AC-005-05, 06, 07, 08, 09, 14) porque dependen de API automation que no se ejecuto. Un tercio de los criterios de aceptacion del slice carecen de cobertura de prueba automatizada.
+
+La aprobacion previa del gate final fue emitida con riesgos documentados pero sin exigir su resolucion antes del release. Esta revision corrige esa decision basandose en evidencia concreta de los artefactos revisados.
 5. **QA:** APPROVED - No hay defects blocker o critical. Criterios BLOCKED dependen de APIA-005 (alcance conocido).
 6. **Reviews:** Funcional, arquitectura limpia y seguridad todas APPROVED con riesgos documentados.
 7. **Checks:** Backend y frontend checks todos PASS. Docker containers reconstruidos y healthy.

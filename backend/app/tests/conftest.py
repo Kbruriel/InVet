@@ -10,16 +10,16 @@ from sqlalchemy.pool import StaticPool
 os.environ.setdefault("INVET_ALLOW_SQLITE_FALLBACK", "1")
 
 from app.infrastructure.database.models import (  # noqa: E402,F401
-    availability_summary,
-    branch,
-    branch_schedule,
-    clinic,
-    owner,
-    pet,
-    rating_summary,
-    service,
-    user,
-    veterinarian,
+    AvailabilitySummary,
+    Branch,
+    BranchSchedule,
+    Clinic,
+    Owner,
+    Pet,
+    RatingSummary,
+    Service,
+    User,
+    Veterinarian,
 )
 from app.infrastructure.database.models.base import Base  # noqa: E402
 
