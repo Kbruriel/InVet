@@ -15,6 +15,18 @@ def create_app() -> FastAPI:
     )
     app.include_router(api_v1_router, prefix=settings.API_V1_STR)
 
+    # Security runtime validation: ensure SECRET_KEY is not the default in production
+    try:
+        env = settings.ENVIRONMENT.lower()
+    except Exception:
+        env = "development"
+
+    if env in ("prod", "production"):
+        if not settings.SECRET_KEY or settings.SECRET_KEY == "secret-key-for-dev":
+            raise RuntimeError(
+                "In production ENVIRONMENT, SECRET_KEY must be set and not use the default placeholder."
+            )
+
     @app.get("/")
     async def root() -> dict[str, str]:
         return {"message": "InVet Backend API"}

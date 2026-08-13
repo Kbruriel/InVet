@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
+    # Execution environment: 'development', 'staging', 'production'
+    ENVIRONMENT: str = "development"
+
     LOG_LEVEL: str = "INFO"
 
     model_config = SettingsConfigDict(
