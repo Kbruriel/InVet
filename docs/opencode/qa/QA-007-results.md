@@ -40,6 +40,13 @@ cd C:\InVet\frontend; npm run test -- --runInBand --no-cache
 # Resultado: 25 suites passed, 138 tests passed, exit code 0
 ```
 
+## Verificacion Docker
+
+- Docker Compose disponible: No
+- Contenedores aplicables actualizados o recreados: No aplica; esta corrida se ejecuto sin Docker
+- Estado saludable verificado: No aplica
+- Skip justificado, si aplica: Docker no estuvo disponible en esta corrida local
+
 ## Criterios y estados resumidos (evidencia fresca)
 
 | Criterio | Estado | Nivel de evidencia |

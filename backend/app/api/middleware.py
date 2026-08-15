@@ -4,15 +4,15 @@ This is a lightweight, process-local rate limiter intended as a configurable
 mitigation for brute-force endpoints (auth, login). It is NOT a replacement
 for production-grade rate limiting (use API Gateway / Redis-backed limiters).
 """
+
 from __future__ import annotations
 
 import time
-from typing import Dict, List
 
+from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.requests import Request
 from starlette.responses import JSONResponse
 from starlette.status import HTTP_429_TOO_MANY_REQUESTS
-from starlette.middleware.base import BaseHTTPMiddleware
 
 
 class RateLimitMiddleware(BaseHTTPMiddleware):
@@ -22,13 +22,15 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
     conservative for login/register endpoints.
     """
 
-    def __init__(self, app, calls: int = 5, period: int = 10, key_prefix: str = "rl") -> None:
+    def __init__(
+        self, app, calls: int = 5, period: int = 10, key_prefix: str = "rl"
+    ) -> None:
         super().__init__(app)
         self.calls = calls
         self.period = period
         self.key_prefix = key_prefix
         # map key -> list[timestamps]
-        self._store: Dict[str, List[float]] = {}
+        self._store: dict[str, list[float]] = {}
 
     def _get_client_ip(self, request: Request) -> str:
         # Respect X-Forwarded-For when present (API gateway sets it).

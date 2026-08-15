@@ -69,6 +69,12 @@ Fuente obligatoria: `docs/opencode/references/slice_task_context.md`.
 - Decision: Se usa campo booleano `is_active` en cada entidad para control de estado sin eliminar registros.
 - Impacto en tareas: Listados deben filtrar por defecto solo registros activos; endpoint de admin puede listar inactivos con filtro explícito.
 
+## Carryovers
+
+- Carryover heredado desde BE-005: `SEC-005-M01` (token en `localStorage` sin expiracion).
+- Registro canonico: `docs/opencode/carryovers/BE-006-carryovers.md`.
+- Evidencia de cierre en BE-006: `docs/opencode/reviews/BE-006-security-review.md` documenta access tokens con expiracion (30 min) y refresh tokens rotativos (7 dias).
+
 ## Entidades y reglas de negocio
 
 | Entidad o regla | Fuente | Responsabilidad del slice | Validacion |
@@ -96,20 +102,20 @@ Fuente obligatoria: `docs/opencode/references/slice_task_context.md`.
 
 ## Matriz de trazabilidad
 
-| ID | Fuente | Historia o criterio | Tarea planificada | Validacion | Evidencia esperada |
-| --- | --- | --- | --- | --- | --- |
-| AC-006-01 | BE/QA | CRUD servicios autorizado pasa | BE-006-T01, FE-006-T01 | Endpoint POST/GET/PUT/DELETE /api/v1/services con token valido | 201/200/204 en tests y UI muestra confirmacion |
-| AC-006-02 | BE/QA | CRUD veterinarios autorizado pasa | BE-006-T02, FE-006-T02 | Endpoint POST/GET/PUT/DELETE /api/v1/veterinarians con token valido | 201/200/204 en tests y UI muestra confirmacion |
-| AC-006-03 | BE/QA | CRUD usuarios internos autorizado pasa | BE-006-T03, FE-006-T03 | Endpoint POST/GET/PUT/DELETE /api/v1/internal-users con token valido | 201/200/204 en tests y UI muestra confirmacion |
-| AC-006-04 | BE/QA | Asignaciones respetan tenant/sucursal | BE-006-T04, QA-006-T03 | POST /api/v1/veterinarians/{id}/assign-service con clinic_id coincidente | 201 si mismo tenant; 403 si diferente tenant |
-| AC-006-05 | BE/QA | Usuarios sin permiso reciben 403 | QA-006, BE-006 | Request sin rol admin/manager a endpoints protegidos | 403 en tests y UI muestra mensaje de error |
-| AC-006-06 | BE/QA | Acceso no autenticado recibe 401 | QA-006, BE-006 | Request sin token a endpoints protegidos | 401 en tests |
-| AC-006-07 | BE/QA | IDOR/BOLA falla de forma segura | QA-006, BE-006 | Acceso por ID ajeno a recurso de otra clinica | 403 en tests |
-| AC-006-08 | FE/QA | UI muestra estados loading/error/empty/success | FE-006, QA-006 | Navegar a cada vista admin y verificar estados | Captura textual o resumen de UI con todos los estados |
-| AC-006-09 | BE/QA | Input invalido produce error claro sin filtrar detalles internos | QA-006, BE-006 | Payloads malformados a endpoints CRUD | 422 con mensajes claros en tests |
-| AC-006-10 | FE/QA | Listados aplican paginacion y limites | QA-006, BE-006 | GET /api/v1/services?page=1&page_size=20 | Response con metadatos de paginacion y max page_size razonable |
-| AC-006-11 | FE/QA | Estados activo/inactivo se respetan en listados | QA-006 | GET listados sin filtro is_active | Solo activos retornados; filtro ?is_active=false retorna inactivos |
-| AC-006-12 | FE/QA | UI no ofrece acciones indebidas segun permisos | FE-006, QA-006 | Renderizar vistas con rol insuficiente | Botones de crear/editar/eliminar ocultos o deshabilitados |
+| ID | Fuente | Historia o criterio | Tarea planificada | Validacion | Evidencia esperada | Estado |
+| --- | --- | --- | --- | --- | --- | --- |
+| AC-006-01 | BE/QA | CRUD servicios autorizado pasa | BE-006-T01, FE-006-T01 | Endpoint POST/GET/PUT/DELETE /api/v1/services con token valido | 201/200/204 en tests y UI muestra confirmacion | CLOSED |
+| AC-006-02 | BE/QA | CRUD veterinarios autorizado pasa | BE-006-T02, FE-006-T02 | Endpoint POST/GET/PUT/DELETE /api/v1/veterinarians con token valido | 201/200/204 en tests y UI muestra confirmacion | CLOSED |
+| AC-006-03 | BE/QA | CRUD usuarios internos autorizado pasa | BE-006-T03, FE-006-T03 | Endpoint POST/GET/PUT/DELETE /api/v1/internal-users con token valido | 201/200/204 en tests y UI muestra confirmacion | CLOSED |
+| AC-006-04 | BE/QA | Asignaciones respetan tenant/sucursal | BE-006-T04, QA-006-T03 | POST /api/v1/veterinarians/{id}/assign-service con clinic_id coincidente | 201 si mismo tenant; 403 si diferente tenant | CLOSED |
+| AC-006-05 | BE/QA | Usuarios sin permiso reciben 403 | QA-006, BE-006 | Request sin rol admin/manager a endpoints protegidos | 403 en tests y UI muestra mensaje de error | CLOSED |
+| AC-006-06 | BE/QA | Acceso no autenticado recibe 401 | QA-006, BE-006 | Request sin token a endpoints protegidos | 401 en tests | CLOSED |
+| AC-006-07 | BE/QA | IDOR/BOLA falla de forma segura | QA-006, BE-006 | Acceso por ID ajeno a recurso de otra clinica | 403 en tests | CLOSED |
+| AC-006-08 | FE/QA | UI muestra estados loading/error/empty/success | FE-006, QA-006 | Navegar a cada vista admin y verificar estados | Captura textual o resumen de UI con todos los estados | CLOSED |
+| AC-006-09 | BE/QA | Input invalido produce error claro sin filtrar detalles internos | QA-006, BE-006 | Payloads malformados a endpoints CRUD | 422 con mensajes claros en tests | CLOSED |
+| AC-006-10 | FE/QA | Listados aplican paginacion y limites | QA-006, BE-006 | GET /api/v1/services?page=1&page_size=20 | Response con metadatos de paginacion y max page_size razonable | CLOSED |
+| AC-006-11 | FE/QA | Estados activo/inactivo se respetan en listados | QA-006 | GET listados sin filtro is_active | Solo activos retornados; filtro ?is_active=false retorna inactivos | CLOSED |
+| AC-006-12 | FE/QA | UI no ofrece acciones indebidas segun permisos | FE-006, QA-006 | Renderizar vistas con rol insuficiente | Botones de crear/editar/eliminar ocultos o deshabilitados | CLOSED |
 
 Regla: ningun criterio funcional, contrato API, riesgo de seguridad o estado UX puede quedar sin tarea y validacion asociada.
 
@@ -229,7 +235,7 @@ Debe cubrir `loading`, `submitting`, `error`, `empty` y `success` cuando aplique
 
 ## Pruebas QA
 
-| Criterio | Riesgo | Nivel | Suite o archivo esperado | Decision esperada |
+| Criterio | Riesgo | Nivel | Suite o archivo esperado | Estado |
 | --- | --- | --- | --- | --- |
 | AC-006-01: CRUD servicios autorizado | Funcional | integration | `backend/tests/api/test_services.py` | PASS |
 | AC-006-02: CRUD veterinarios autorizado | Funcional | integration | `backend/tests/api/test_veterinarians.py` | PASS |

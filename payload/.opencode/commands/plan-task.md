@@ -14,6 +14,7 @@ Instrucciones:
 2. Usa `BE-00X` como ID canonico y guarda siempre un unico plan compartido en `docs/opencode/plans/BE-00X-plan.md`.
 3. Antes de planificar un nuevo slice, ejecuta `python backend/scripts/validate_slice_plan.py $ARGUMENTS --stage previous`.
    - Si el QA del slice anterior no esta `APPROVED` o sus findings siguen abiertos, no generes un plan nuevo.
+   - Si el plan, el user story o `UIA/APIA` estan stale o faltan, regeneralos en la misma ejecucion y conserva la evidencia vigente.
 4. Lee:
    - `docs/opencode/02_be_fe_qa_task_matrix.md`
    - `docs/opencode/tasks/backend/BE-00X.md`

@@ -25,6 +25,7 @@ Reglas:
 - No modifiques codigo fuente. `edit: allow` se usa solo para el reporte Markdown.
 - Crea siempre `docs/opencode/reviews/BE-00X-security-review.md`.
 - Registra decision `APPROVED` o `REJECTED`, alcance, evidencia y hallazgos.
+- Si el slice tiene carryovers, verifica que no queden gaps de seguridad abiertos entre el plan origen y el plan destino.
 
 Checklist:
 - Autenticacion en endpoints privados.

@@ -8,10 +8,18 @@ class InternalUserCreateSchema(BaseModel):
 
     model_config = ConfigDict(str_strip_whitespace=True)
 
-    user_id: int = Field(..., ge=1, description="ID del usuario de autenticación (BE-005)")
-    nombre: str = Field(..., min_length=1, max_length=200, description="Nombre del usuario interno")
-    rol: str = Field(..., min_length=1, max_length=50, description="Rol del usuario interno")
-    branch_ids: list[int] = Field(default_factory=list, description="Lista de IDs de sucursales")
+    user_id: int = Field(
+        ..., ge=1, description="ID del usuario de autenticación (BE-005)"
+    )
+    nombre: str = Field(
+        ..., min_length=1, max_length=200, description="Nombre del usuario interno"
+    )
+    rol: str = Field(
+        ..., min_length=1, max_length=50, description="Rol del usuario interno"
+    )
+    branch_ids: list[int] = Field(
+        default_factory=list, description="Lista de IDs de sucursales"
+    )
     is_active: bool = Field(True, description="Estado activo/inactivo")
 
 

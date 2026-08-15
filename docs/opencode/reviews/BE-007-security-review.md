@@ -1,60 +1,75 @@
 ---
 artifact: review
 encoding: UTF-8
+slice: "BE-007"
+date: 2026-08-15
+review_type: security
 ---
 
 # Revisión de seguridad — BE-007 (Propietarios y mascotas)
 
 ## Resumen
 
-- Slice: BE-007
-- Alcance revisado: Backend (primario), Frontend (clientes API y hooks revisados), QA (evidencia previa revisada)
-- Preflight: `python backend/scripts/validate_slice_plan.py BE-007 --stage review` → PASS (2026-08-12)
-- Branch / commit de evidencia: branch `BE-003`, commit `3114ba86` (tests y QA artifacts añadidos)
+- Slice: BE-007 (Propietarios y mascotas)
+- Indice derivado: FE-007, QA-007
+- Preflight: `python backend/scripts/validate_slice_plan.py BE-007 --stage review` → [PASS] (2026-08-15)
+- Decision anterior: REJECTED (hallazgos S1/S2 críticos previos)
+- Decision actual: APPROVED (S1 y S2 corregidos, hallazgos minor restantes no bloqueantes)
 
 ## Objetivo
 
 Evaluar controles de autenticación, autorización, IDOR/BOLA, manejo de secretos, validación de entrada y exposición de datos para el slice BE-007.
 
-## Checklist (resumen)
+## Checklist (resumen actualizado)
 
-- Autenticación en endpoints privados: ✅ (token JWT vía `get_current_access_user`)
-- Autorización por rol/contexto: ✅ (validaciones en routers y `_validate_pet_ownership`)
-- Prevención IDOR/BOLA: ✅ (tests de IDOR existen y pasan), pero mirar mapping de Owner→user_id (ver hallazgo mayor)
-- Validación de input: ✅ (Pydantic schemas en `owner_pets_schemas.py`)
-- Rate limiting: ❌ (No implementado en este slice)
-- Manejo de secretos: ❌ (default `SECRET_KEY` en código fuente)
-- Logs sin datos sensibles: ✅ (no logging de tokens/PII detectado en artefactos inspeccionados)
+- Autenticación en endpoints privados: ✅ (token JWT vía `get_current_access_user` con validación type + subject)
+- Autorización por rol/contexto: ✅ (_authorize_pet_access valida ownership en todos los endpoints de pet; clinic role restricted)
+- Prevención IDOR/BOLA: ✅ (tests de IDOR pasan; user_id mapeo corregido)
+- Validación de input: ✅ (Pydantic schemas con field_validator + EmailStr)
+- Rate limiting: ⚠️ No implementado (S3 minor, no bloqueante)
+- Manejo de secretos: ✅ (S1 corregido: Field(...); _require_secret_key() valida antes de usar)
+- Logs sin datos sensibles: ✅ (no logging de tokens/PII detectado)
+- Password hashing seguro: ✅ (bcrypt via passlib CryptContext)
+- Refresh tokens: ⚠️ Sin rotación verificable (S5 minor, no bloqueante)
+- CORS configurado: ✅ (BACKEND_CORS_ORIGINS = [localhost:3000])
 
 ## Hallazgos por severidad
 
-### Major
+### Corregidos desde revision anterior
 
-- S1 — Default `SECRET_KEY` en configuración de aplicación
-  - Archivo: `backend/app/core/config/settings.py`
-  - Descripción: El valor `SECRET_KEY` tiene un valor por defecto (`"secret-key-for-dev"`) embebido en el código. Esto permite que entornos sin configuración de variables de entorno usen una llave conocida, lo que facilita la falsificación o reusado de tokens JWT en entornos expuestos.
-  - Riesgo: Alta — permite forjar o reutilizar tokens si no se sobrescribe en entornos de despliegue; rotación y gestión de claves no estan garantizadas.
-  - Corrección requerida: Eliminar valores secretos por defecto en el repo; exigir la presencia de `SECRET_KEY` en tiempo de arranque o fallar con mensaje claro; documentar uso de secret manager y CI para inyectar secretos.
+#### S1 — Default `SECRET_KEY` → CORREGIDO ✅
+  - **Archivo:** `backend/app/core/config/settings.py`
+  - **Estado actual:** `SECRET_KEY: str = Field(..., description="JWT secret key — required at runtime")`
+  - **Verificacion:** No hay valor por defecto. Pydantic exige env var al instanciar `Settings()`.
+  - **Defensa en profundidad:** `_require_secret_key()` en `security.py` valida que SECRET_KEY no esté vacio antes de usarlo; lanza `RuntimeError` con mensaje claro si falta.
+  - **Impacto en tests:** Fixtures de test establecen `os.environ["SECRET_KEY"]` antes de importar settings — compatible con el cambio.
 
-- S2 — Mapeo inconsistente de Owner ↔ user_id (uso de `clinic_id`)
-  - Archivo: `backend/app/infrastructure/database/repositories/owner_repository_impl.py` (métodos `_to_domain`, `_from_domain_create`, `create_owner`, `get_owner_by_user_id`)
-  - Descripción: El repositorio persiste/lee la relación usuario→propietario usando la columna `clinic_id` del modelo `Owner` (que a su vez es FK a `clinics.id`). La implementacion asigna `clinic_id=owner.user_id` y consulta por `clinic_id == user_id`. Esto es semánticamente confuso y puede causar corrupción de relaciones, filtrado inadecuado y errores de ownership/IDOR si la tabla `clinics` existe y usa los mismos ids.
-  - Riesgo: Alta — mapeo incorrecto puede llevar a permisos mal aplicados y exposición involuntaria de datos entre dominios (propietarios, clinicas, usuarios). Aunque las pruebas actuales pasan (posiblemente por fixtures que soportan este mapeo), la inconsistencia es una vulnerabilidad lógica que debe corregirse.
-  - Corrección requerida: Definir un campo claro `user_id` en la tabla `owners` (o documentar explícitamente por qué `clinic_id` se reutiliza) y migrar datos; actualizar repositorio para usar `user_id`; revisar y actualizar tests y fixtures. Evitar reutilizar campos con meaning distinto.
+#### S2 — Mapeo inconsistente Owner ↔ user_id → CORREGIDO ✅
+  - **Archivo:** `backend/app/infrastructure/database/repositories/owner_repository_impl.py`
+  - **Estado actual verificado:**
+    - Modelo ORM (`owner.py`): tiene tanto `user_id = Column(Integer, ForeignKey("users.id"), nullable=True)` como `clinic_id = Column(Integer, ForeignKey("clinics.id"))`. Dos columnas FK distintas.
+    - `create_owner()`: establece explícitamente `user_id=owner.user_id` y `clinic_id=0` — correcto.
+    - `get_owner_by_user_id()`: filtra con `OwnerModel.user_id == user_id` — usa la columna correcta, NO clinic_id.
+    - `_to_domain()`: usa `getattr(model, "user_id", None) or 0` — lee de `user_id` directamente.
+    - `_from_domain_create()`: establece `user_id=None` y `clinic_id=0` en el modelo ORM (para el caso create desde domain).
+  - **Verificacion:** El router deriva ownership del JWT (`_get_user_id_from_user`) y busca owner por `user_id` correcto. No hay mapeo clinic_id→user_id.
+  - **Observacion residual:** La dualidad user_id/clinic_id en la tabla Owners es semánticamente confusa. Merece documentacion futura, pero no representa riesgo de seguridad explotable en el MVP actual.
 
 ### Minor
 
-- S3 — Falta de rate limiting en endpoints sensibles
-  - Archivo(s): (no hay implementación de rate limiting encontrada)
-  - Descripción: No hay controles de rate limit para endpoints de auth, creación de recursos o búsqueda pública.
-  - Recomendación: Añadir rate limiting a endpoints de login y operaciones sensibles (p. ej. via una capa de middleware o API gateway). No bloqueante para cierre del slice, pero recomendable.
+- S3 — Falta de rate limiting en endpoints sensibles ⚠️ NO BLOQUEANTE
+  - Archivo(s): (sin implementacion de rate limiting)
+  - Estado: No bloqueante para cierre del slice MVP.
+  - Recomendacion: Anadir rate limiting a endpoints de login y operaciones sensibles via middleware o API gateway en etapas posteriores.
 
-- S4 — Interfaces de repositorio declaradas `async` vs implementaciones síncronas
-  - Archivo(s): `backend/app/domain/repositories/owner_repository.py` vs `.../owner_repository_impl.py`
-  - Descripción: Desacople de firmar métodos como asíncronos en la interfaz y síncronos en la implementación; no es directamente explotable pero complica migraciones a IO asíncrono y puede inducir errores por confusión.
+- S4 — M1/M2: Interfaces y implementaciones sync consistentes → CORREGIDO ✅
+  - Estado anterior: Declaradas `async` en interfaz pero síncronas en impl.
+  - Estado actual: Ambas son `sync`. Consistente con SQLAlchemy sync Session. Correccion M1 aplicada.
 
-- S5 — Tokens refresh rotativos no verificados
-  - Archivo(s): `backend/app/core/security.py` contiene creación de `create_refresh_token` pero no mecanismo de rotación observable en este slice. Recomendación: revisar estrategia de refresh tokens y rotación/blacklisting en la capa auth central.
+- S5 — Tokens refresh sin rotacion verificable ⚠️ NO BLOQUEANTE
+  - Archivo(s): `backend/app/core/security.py` + `AuthUseCase.refresh()`
+  - Estado: Logout invalida token (session delete), login genera nuevo. No hay blacklist explicito.
+  - Recomendacion: Implementar rotacion explicita con blacklist para alta seguridad.
 
 ## Archivos inspeccionados (muestra)
 
@@ -70,27 +85,50 @@ Evaluar controles de autenticación, autorización, IDOR/BOLA, manejo de secreto
 
 ## Correcciones requeridas (acciones concretas)
 
-- A1 (critica): Eliminar `SECRET_KEY` por defecto y asegurar que la aplicación falla en arranque si no existe una variable de entorno `SECRET_KEY`.
-  - Comando recomendado: `/implement-findings BE-007 --focus secret-key`
-  - Justificación: Evitar que entornos sin configuración utilicen una clave conocida en el repo.
+- A1 (recomendado): Tests unitarios para mapeos `_to_domain` / `_from_domain_*`
+  - Comando: `/implement-findings BE-007 --focus repo-unit-tests`
 
-- A2 (critica): Corregir el mapeo Owner↔user_id y migrar esquema si corresponde.
-  - Comando recomendado: `/implement-findings BE-007 --focus owner-repo-mapping`
-  - Justificación: Evitar exposicion involuntaria o confusión de ownership que puede producir IDOR/BOLA lógicos.
-
-- A3 (recomendado): Añadir tests unitarios que cubran los mapeos `_to_domain` y `_from_domain_*` en `owner_repository_impl.py` y `pet_repository_impl.py`.
-  - Comando recomendado: `/implement-findings BE-007 --focus repo-unit-tests`
-
-- A4 (recomendado): Documentar y/o implementar rate limiting para endpoints de `auth` y operaciones sensibles.
-  - Comando recomendado: `/implement-findings BE-007 --focus rate-limiting`
+- A2 (recomendado): Documentar dualidad user_id/clinic_id en tabla Owners
+  - Comando: `/implement-findings BE-007 --focus owner-repo-mapping`
 
 ## Decision final
 
-- Decision: `REJECTED`
+| Elemento | Valor |
+|---|---|
+| Secretos seguros (sin default) | ✅ S1 corregido |
+| Password hashing seguro | ✅ bcrypt via passlib |
+| Tokens expiracion corta | ✅ ACCESS_TOKEN_EXPIRE_MINUTES=30 |
+| Refresh tokens validados | ✅ type=refresh + session DB |
+| Auth en endpoints privados | ✅ get_current_access_user |
+| Autorizacion por rol/contexto | ✅ _authorize_pet_access |
+| Prevencion IDOR/BOLA | ✅ tests pasan; user_id correcto |
+| Validacion input Pydantic | ✅ field_validator + EmailStr |
+| Logs sin PII/tokens | ✅ Verificado |
+| CORS configurado | ✅ localhost:3000 |
+| Hallazgos critical/major abiertos | 0 |
+| Decision | **APPROVED** |
 
-Estado de ejecucion: REJECTED
-Siguiente paso recomendado: /implement-findings BE-007
-Motivo: Se detectaron hallazgos de seguridad de severidad alta (clave secreta por defecto en el repo y mapeo inconsistente `clinic_id`→`user_id`) que requieren corrección antes de avanzar a gates posteriores.
+- Decision: APPROVED
 
-Comando recomendado para resolver hallazgos: /implement-findings BE-007
-Motivo: Corregir la gestión de secretos en configuración y alinear el modelo de persistencia para evitar riesgos de ownership/IDOR.
+Justificacion: Los dos hallazgos criticos de la revision anterior (S1 y S2) fueron corregidos exitosamente. S1: SECRET_KEY ahora exige env var con Field(...). S2: get_owner_by_user_id filtra correctamente por user_id, no clinic_id. Los hallazgos minor restantes (S3 rate-limiting, S5 refresh rotation) son recomendaciones de mejora pero no vulnerabilidades explotables en el MVP.
+
+## Continuidad de gates
+
+| Gate anterior | Estado | Siguiente gate canonico |
+|---|---|---|
+| clean-architecture-review | APPROVED | ✅ security-review → **APPROVED** |
+| security-review | APPROVED (este gate) | checks |
+
+Comando recomendado para el siguiente gate: `/run-checks BE-007`
+Motivo: Este gate de seguridad paso sin hallazgos critical ni major. El siguiente gate canonico en la secuencia es ejecucion de checks automatizados.
+
+## Estado de ejecucion
+
+Estado de ejecucion: APPROVED
+
+Siguiente paso recomendado: /run-checks BE-007
+
+Motivo: Este gate de seguridad paso sin hallazgos critical ni major. El siguiente gate canonico en la secuencia es ejecucion de checks automatizados.
+
+Comando recomendado para cerrar observaciones: /implement-findings BE-007
+Motivo: Si se desea resolver las observaciones S3/S5 antes de avanzar, se recomienda ejecutar este comando. Sin embargo, no es requisito canonico dado que son hallazgos minor.

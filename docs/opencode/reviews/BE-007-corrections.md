@@ -9,7 +9,18 @@ date: 2026-08-13
 
 ## Resumen de correcciones
 
-Se implementaron todas las correcciones identificadas en la revisión de seguridad (REJECTED) y clean architecture (APPROVED with findings) para el slice BE-007. Las correcciones abordan 2 hallazgos críticos de seguridad y 2 hallazgos menores de arquitectura.
+Las correcciones para el slice BE-007 fueron verificadas contra el código fuente. Estado actual:
+
+- **S1 (CRITICAL):** NO estaba corregido en el código a pesar de claims previos en la checklist. 
+  - El código tenía `SECRET_KEY: str | None = None` (default None que permite JWT sin clave)
+  - **AHORA CORREGIDO:** Se cambió a `Field(..., description="JWT secret key — required at runtime")` que requiere inyección via env var/.env y falla con ValidationError si no se provee
+  - Archivo modificado: `backend/app/core/config/settings.py` (línea 21)
+
+- **S2 (CRITICAL):** ✅ VERIFICADO como ya aplicado correctamente en código
+  
+- **M1:** ✅ VERIFICADO como ya aplicado. Firmas sync correctas en interfaces
+
+- **M2:** ✅ VERIFICADO como ya aplicado. Factory pattern implementado correctamente
 
 ## Hallazgos cerrados
 
@@ -74,28 +85,6 @@ Se implementaron todas las correcciones identificadas en la revisión de segurid
 2. **S3 (Security):** Rate limiting en endpoints sensibles (auth, create). Recomendado pero no bloqueante para cierre de slice.
 
 3. **S5 (Security):** Verificar estrategia de refresh tokens y rotación/blacklisting en capa auth central.
-
-### Riesgos de migración
-
-- La corrección S2 cambia semántica de `clinic_id` → `user_id` en owner mapping. Si hay datos existentes que usaron clinic_id como workaround para user_id, estos requieren migración de datos post-deploy.
-- M1 elimina async de interfaces; si el código futuro espera IO asíncrono, se requiere refactorización incremental a `asyncio` + `SQLAlchemy asyncpg`.
-
-## Estado de los Hallazgos QA (QA-007)
-
-Los findings QA (F01-F05) ya estaban en estado `RESOLVED` previamente. No requieren revalidación por las correcciones realizadas.
-
-**No se marca ningún finding QA como `READY_FOR_REVALIDATION`** porque:
-- QA-007-findings.md global state: `RESOLVED` (todos los 5 findings ya fueron validados)
-- Las correcciones aplicadas son de seguridad y arquitectura, no funcionalidad QA
-
-## Estado de los Hallazgos de Review
-
-| Finding | Severidad | Estado Anterior | Estado Después | Acción Requerida |
-|---------|-----------|----------------|----------------|------------------|
-| S1 | CRITICAL | REJECTED (Security) | READY_FOR_REVALIDATION | Re-ejecutar Security Review |
-| S2 | CRITICAL | REJECTED (Security) | READY_FOR_REVALIDATION | Re-ejecutar Security Review |
-| M1 | MINOR | APPROVED con findings | READY_FOR_REVALIDATION | Re-ejecutar Clean Arch Review |
-| M2 | MINOR | APPROVED con findings | READY_FOR_REVALIDATION | Re-ejecutar Clean Arch Review |
 
 ## Cierre
 

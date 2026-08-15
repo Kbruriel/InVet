@@ -6,7 +6,7 @@
 | --- | --- |
 | Estado | IMPLEMENTADO |
 | Archivo de pruebas | `InVet_UI_Automation/tests/api/slice-006.spec.ts` |
-| Framework | Playwright (HTTP mode) |
+| Framework | Playwright APIRequestContext |
 | Ejecucion | `npm run test:api -- slice-006` desde `InVet_UI_Automation/` |
 | Cobertura | 28 casos de prueba (S01-S08, V01-V07, U01-U08, A01-A04, U06-U08, P01-P04) |
 
@@ -102,7 +102,8 @@ Plan de cobertura de automatizacion HTTP para los endpoints del slice 006: servi
 
 ## Estrategia tecnica
 
-- Framework: HTTPX + Pytest existente en `backend/app/tests/`.
+- Framework: Playwright APIRequestContext en `InVet_UI_Automation/tests/api/`.
+- Si la corrida depende de PostgreSQL o del runtime del repo, usar Docker como contexto de ejecucion y no dar por valido un resultado de host aislado.
 - Cada caso de prueba debe incluir:
   - Setup de datos necesarios (crear recursos con clinic_id conocido).
   - Ejecucion del request con el auth correspondiente.
@@ -114,6 +115,7 @@ Plan de cobertura de automatizacion HTTP para los endpoints del slice 006: servi
 
 ## Evidencia esperada
 
-- Todos los casos APIA-006-NN marcados como passed en `backend/tests/api/`.
-- Reporte de pytest con conteo total y por categoria (CRUD, auth, permissions, IDOR, pagination).
+- Todos los casos APIA-006-NN marcados como passed en `InVet_UI_Automation/tests/api/slice-006.spec.ts`.
+- Reporte de Playwright/API con conteo total y por categoria (CRUD, auth, permissions, IDOR, pagination).
+- Confirmacion de que todos los contenedores Docker aplicables fueron actualizados o recreados y quedaron saludables cuando Docker aplique.
 - Sin findings de seguridad abiertos.

@@ -45,7 +45,7 @@ Tests:       17 passed, 17 total
 
 ## Estado de los findings
 
-| Finding | Estado anterior | Estado nuevo |
-|---------|----------------|--------------|
-| FINDING-006-001 | OPEN | READY_FOR_REVALIDATION |
-| FINDING-006-002 | OPEN | READY_FOR_REVALIDATION |
+| Finding | Estado | Evidencia |
+|---------|--------|----------|
+| FINDING-006-001 | READY_FOR_REVALIDATION | Antes: OPEN; `service.py` y `veterinarian.py` eliminados; modelos canónicos conservados |
+| FINDING-006-002 | READY_FOR_REVALIDATION | Antes: OPEN; mocks de tests actualizados con `create`, `update` y `fetchOne` |

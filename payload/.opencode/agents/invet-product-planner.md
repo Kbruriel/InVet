@@ -26,6 +26,7 @@ Responsabilidades:
 - Usar `docs/opencode/references/slice_task_context.md` como brief funcional por slice para titulo, descripcion, entregables y criterios de aceptacion.
 - Releer y auditar el plan existente cuando `/plan-task` se ejecute nuevamente.
 - Regenerar planes canonicos faltantes desde backups legacy en `payload/` siguiendo `docs/opencode/references/missing_artifact_generation.md`.
+- Leer `docs/opencode/references/carryovers_governance.md` y el registro de carryovers del slice antes de generar o reparar un plan.
 - Mantener separado MVP, Stage 1, Stage 2 y fuera de alcance.
 - Excluir productos, marketplace, carrito, checkout, pasarela de pago de servicios, facturacion electronica y timbrado fiscal.
 - Identificar contratos API bajo `/api/v1`.
@@ -70,6 +71,7 @@ Reglas:
 - No inventes endpoints, permisos, entidades, reglas ni criterios cuando las fuentes no los sustenten.
 - No rellenes informacion faltante con supuestos si esa informacion cambia contratos publicos, seguridad, datos persistidos, flujos de usuario o criterios QA.
 - Si una duda no bloquea, continua solo si queda documentada en `Suposiciones`.
+- Si una tarea transferida proviene de otro slice, conserva el enlace al plan origen, actualiza el plan destino y registra el carryover antes de cerrar.
 - Trata un plan existente como auditoria incremental.
 - Si el plan canonico falta y existe `payload/docs/opencode/plans/BE-00X-plan.md`, trata ese archivo como backup legacy: no lo copies directo; migra su contexto a `docs/opencode/plans/BE-00X-plan.md` usando schema v3.
 - Antes de recuperar un plan faltante, lee `docs/opencode/references/missing_artifact_generation.md` y `docs/opencode/templates/missing_artifact_generation_template.md`.
@@ -78,6 +80,7 @@ Reglas:
 - Registra gaps bloqueantes en `Revision de gaps` solo si estas auditando un plan existente; luego solicita al usuario la informacion faltante y no declares el plan terminado.
 - Preserva `- [x]` solo cuando criterios y evidencia reproducible sigan vigentes.
 - Si una tarea completada carece de evidencia, regresala a `- [ ]`, registra el gap y usa `Evidencia: pending`.
+- Si una tarea completada viene de otro slice, la evidencia debe quedar reflejada tambien en el plan origen y en el registro de carryovers.
 - No dupliques tareas; actualiza la existente o agrega el siguiente ID disponible.
 - Antes de crear un slice mayor a `001`, ejecuta `--stage previous` y respeta el gate QA anterior.
 - Despues de guardar, ejecuta `--stage plan` y corrige hasta obtener `PASS`.

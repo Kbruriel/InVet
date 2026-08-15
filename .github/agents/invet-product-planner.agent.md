@@ -9,6 +9,7 @@ tools: ['read', 'search', 'edit', 'execute']
 # InVet Product Planner
 
 Use this agent as the GitHub Copilot compatible version of `.opencode/agents/invet-product-planner.md`.
+The repaired plan must use the standard 7-column traceability matrix with `Estado`.
 
 Before acting, read:
 

@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from typing import Any, cast
 
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.domain.entities.veterinarian import (
@@ -13,7 +13,9 @@ from app.domain.entities.veterinarian import (
     VeterinarianServiceAssignment,
 )
 from app.domain.repositories.slice006_repositories import VeterinarianRepository
-from app.infrastructure.database.models.veterinarian_model import Veterinarian as VeterinarianModel
+from app.infrastructure.database.models.veterinarian_model import (
+    Veterinarian as VeterinarianModel,
+)
 
 
 class VeterinarianRepositoryImpl(VeterinarianRepository):
@@ -22,7 +24,9 @@ class VeterinarianRepositoryImpl(VeterinarianRepository):
     def __init__(self, db: Session) -> None:
         self.db = db
 
-    async def get_veterinarian_by_id(self, vet_id: int, clinic_id: int) -> Veterinarian | None:
+    async def get_veterinarian_by_id(
+        self, vet_id: int, clinic_id: int
+    ) -> Veterinarian | None:
         """Obtener un veterinario por ID y clinic_id con tenant isolation."""
         stmt = (
             select(VeterinarianModel)
@@ -64,7 +68,14 @@ class VeterinarianRepositoryImpl(VeterinarianRepository):
         if model is None:
             return None
 
-        for field in ["nombre_completo", "licencia_profesional", "especialidad", "telefono", "email", "is_active"]:
+        for field in [
+            "nombre_completo",
+            "licencia_profesional",
+            "especialidad",
+            "telefono",
+            "email",
+            "is_active",
+        ]:
             if field in data and data[field] is not None:
                 setattr(model, field, data[field])
         model.updated_at = datetime.now(UTC)
@@ -72,7 +83,9 @@ class VeterinarianRepositoryImpl(VeterinarianRepository):
         self.db.refresh(model)
         return self._to_domain(model)
 
-    async def deactivate_veterinarian(self, vet_id: int, clinic_id: int) -> Veterinarian | None:
+    async def deactivate_veterinarian(
+        self, vet_id: int, clinic_id: int
+    ) -> Veterinarian | None:
         """Inactivar un veterinario por ID."""
         stmt = select(VeterinarianModel).where(
             VeterinarianModel.id == vet_id,
@@ -95,7 +108,9 @@ class VeterinarianRepositoryImpl(VeterinarianRepository):
         is_active_only: bool = True,
     ) -> tuple[list[Veterinarian], int]:
         """Listar veterinarios de una clínica con paginación."""
-        base_stmt = select(VeterinarianModel).where(VeterinarianModel.clinic_id == clinic_id)
+        base_stmt = select(VeterinarianModel).where(
+            VeterinarianModel.clinic_id == clinic_id
+        )
         if is_active_only:
             base_stmt = base_stmt.where(VeterinarianModel.is_active.is_(True))
 
@@ -108,9 +123,7 @@ class VeterinarianRepositoryImpl(VeterinarianRepository):
         items = [self._to_domain(r) for r in results]
         return items, total
 
-    async def exists_with_license(
-        self, clinic_id: int, license_number: str
-    ) -> bool:
+    async def exists_with_license(self, clinic_id: int, license_number: str) -> bool:
         """Verificar si ya existe un veterinario con la misma licencia en la clínica."""
         stmt = (
             select(func.count())
@@ -127,7 +140,9 @@ class VeterinarianRepositoryImpl(VeterinarianRepository):
         self, vet_id: int, clinic_id: int
     ) -> list[VeterinarianServiceAssignment]:
         """Obtener servicios asignados a un veterinario."""
-        from app.infrastructure.database.models.assignment_model import VeterinarianServiceAssignment as AssignmentModel
+        from app.infrastructure.database.models.assignment_model import (
+            VeterinarianServiceAssignment as AssignmentModel,
+        )
 
         stmt = (
             select(AssignmentModel)

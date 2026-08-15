@@ -23,16 +23,16 @@ timestamp: 2026-08-08T00:00:00Z
 
 ### Backend
 
-| Criterio | Estado anterior | Estado actual | Evidencia |
+| Criterio | Estado | Evidencia |
 |---|---|---|---|
-| Routers sin lógica de negocio | PARCIAL | APROBADO | Routers delegan a use cases; solo manejan HTTP, dependencias y validación |
-| Casos de uso en application | APROBADO | APROBADO | 4 use cases en app/application/use_cases/ |
-| Dominio independiente de FastAPI/SQLAlchemy | APROBADO | APROBADO | Entidades Pydantic sin dependencias externas |
-| Repositorios detrás de ports/interfaces | APROBADO | APROBADO | ABCs en domain/repositories/ |
-| ORM aislado en infrastructure | APROBADO | APROBADO | Modelos SQLAlchemy en infrastructure/database/models/ |
-| Schemas separados de ORM | APROBADO | APROBADO | DTOs públicos sin campos sensibles |
-| Transacciones y errores controlados | PARCIAL | PARCIAL | Manejo genérico persiste (no bloqueante) |
-| Pruebas unitarias por archivo productivo | RECHAZADO | APROBADO | 15 contract tests + 13 unit tests = 28 tests pasando |
+| Routers sin lógica de negocio | APROBADO | Antes: PARCIAL; routers delegan a use cases y solo manejan HTTP, dependencias y validación |
+| Casos de uso en application | APROBADO | 4 use cases en app/application/use_cases/ |
+| Dominio independiente de FastAPI/SQLAlchemy | APROBADO | Entidades Pydantic sin dependencias externas |
+| Repositorios detrás de ports/interfaces | APROBADO | ABCs en domain/repositories/ |
+| ORM aislado en infrastructure | APROBADO | Modelos SQLAlchemy en infrastructure/database/models/ |
+| Schemas separados de ORM | APROBADO | DTOs públicos sin campos sensibles |
+| Transacciones y errores controlados | PARCIAL | Manejo genérico persiste (no bloqueante) |
+| Pruebas unitarias por archivo productivo | APROBADO | Antes: RECHAZADO; 15 contract tests + 13 unit tests = 28 tests pasando |
 
 ### Frontend
 

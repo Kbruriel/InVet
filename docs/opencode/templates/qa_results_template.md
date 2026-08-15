@@ -42,6 +42,13 @@ python -m black --check .
 python -m mypy app
 ```
 
+## Verificacion Docker
+
+- Docker Compose disponible:
+- Contenedores aplicables actualizados o recreados:
+- Estado saludable verificado:
+- Skip justificado, si aplica:
+
 ## Codigos de salida
 
 - suite:

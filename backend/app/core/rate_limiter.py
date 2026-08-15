@@ -28,7 +28,9 @@ class SimpleRateLimiter:
 
         # Limpiar solicitudes antiguas
         self._requests[client_ip] = [
-            req_time for req_time in self._requests[client_ip] if req_time > window_start
+            req_time
+            for req_time in self._requests[client_ip]
+            if req_time > window_start
         ]
 
         if len(self._requests[client_ip]) >= self.requests_per_minute:

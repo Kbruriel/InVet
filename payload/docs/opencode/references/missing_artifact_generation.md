@@ -30,6 +30,7 @@ Reglas:
 - `UIA-00X.md` debe planear cobertura de navegador desde FE, QA, criterios `AC-00X-NN`, rutas, formularios, estados UX y responsive.
 - `APIA-00X.md` debe planear cobertura HTTP desde BE, QA, criterios `AC-00X-NN`, endpoints, authn/authz, payloads, errores e IDOR/BOLA.
 - Los artefactos auxiliares nuevos quedan con evidencia pendiente; no deben declarar ejecuciones `PASSED` sin que el gate correspondiente las haya producido.
+- Si un artefacto auxiliar existe pero queda desactualizado frente a las fuentes activas, el mismo `/plan-task BE-00X` debe regenerarlo; no se reutiliza evidencia heredada sin revalidacion.
 - Si existe un artefacto auxiliar en `payload/`, usarlo solo como contexto historico y no copiar aprobaciones sin evidencia vigente.
 
 ## Fuentes obligatorias

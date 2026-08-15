@@ -37,6 +37,13 @@ artifact: qa_findings
 - Resultado observado:
 - Evidencia:
 
+## Verificacion Docker
+
+- Docker Compose disponible:
+- Contenedores aplicables actualizados o recreados:
+- Estado saludable verificado:
+- Skip justificado, si aplica:
+
 ## Pasos para reproducir
 
 1. Paso 1

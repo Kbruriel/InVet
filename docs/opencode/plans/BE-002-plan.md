@@ -275,7 +275,7 @@ Fuente obligatoria: `docs/opencode/references/slice_task_context.md`.
 
 ## Pruebas QA
 
-| Criterio | Riesgo | Nivel | Suite o archivo esperado | Decision esperada |
+| Criterio | Riesgo | Nivel | Suite o archivo esperado | Estado |
 | --- | --- | --- | --- | --- |
 | Registro exitoso | Password plano persistido | integration | `backend/app/tests/api/test_auth_api.py` | PASS |
 | Login valido | Tokens incompletos | integration | `backend/app/tests/api/test_auth_api.py` | PASS |

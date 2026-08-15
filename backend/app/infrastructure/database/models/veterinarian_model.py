@@ -2,7 +2,15 @@
 
 from datetime import UTC, datetime
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, UniqueConstraint
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import relationship
 
 from app.infrastructure.database.models.base import Base
@@ -29,7 +37,9 @@ class Veterinarian(Base):
     clinic = relationship("Clinic", lazy="noload", back_populates="veterinarians")
 
     __table_args__ = (
-        UniqueConstraint("clinic_id", "licencia_profesional", name="uq_vet_clinic_license"),
+        UniqueConstraint(
+            "clinic_id", "licencia_profesional", name="uq_vet_clinic_license"
+        ),
     )
 
     def __repr__(self) -> str:

@@ -74,15 +74,15 @@ Fuente obligatoria: `docs/opencode/references/slice_task_context.md`.
 
 ## Matriz de trazabilidad
 
-| ID | Fuente | Historia o criterio | Tarea planificada | Validacion | Evidencia esperada |
-| --- | --- | --- | --- | --- | --- |
-| AC-003-01 | BE/FE/QA | Busqueda anonima de clinicas | BE-003-T01 | Endpoint publico lista clinicas con paginacion | 200 OK con datos publicos, sin auth |
-| AC-003-02 | BE/FE/QA | Filtro por nombre/ubicacion | BE-003-T02 | Endpoint acepta query params de filtro | Filtros aplicados correctamente |
-| AC-003-03 | BE/FE/QA | Listado de sucursales por clinica | BE-003-T03 | Endpoint sucursales con paginacion | Paginacion consistente |
-| AC-003-04 | BE/FE/QA | Listado de servicios publicos | BE-003-T04 | Endpoint servicios con filtros | Filtros combinados funcionan |
-| AC-003-05 | FE-003 | Landing publica con buscador | FE-003-T01 | UI consume endpoints publicos | Estados loading/error/empty/success |
-| AC-003-06 | QA-003 | Datos privados no se exponen | QA-003 | Pruebas IDOR/BOLA en listados | 404 o datos filtrados correctamente |
-| AC-003-07 | QA-003 | Responsive y estados UI | FE-003/QA-003 | UI responsive + estados visuales | Captura textual de UI |
+| ID | Fuente | Historia o criterio | Tarea planificada | Validacion | Evidencia esperada | Estado |
+| --- | --- | --- | --- | --- | --- | --- |
+| AC-003-01 | BE/FE/QA | Busqueda anonima de clinicas | BE-003-T01 | Endpoint publico lista clinicas con paginacion | 200 OK con datos publicos, sin auth | CLOSED |
+| AC-003-02 | BE/FE/QA | Filtro por nombre/ubicacion | BE-003-T02 | Endpoint acepta query params de filtro | Filtros aplicados correctamente | CLOSED |
+| AC-003-03 | BE/FE/QA | Listado de sucursales por clinica | BE-003-T03 | Endpoint sucursales con paginacion | Paginacion consistente | CLOSED |
+| AC-003-04 | BE/FE/QA | Listado de servicios publicos | BE-003-T04 | Endpoint servicios con filtros | Filtros combinados funcionan | CLOSED |
+| AC-003-05 | FE-003 | Landing publica con buscador | FE-003-T01 | UI consume endpoints publicos | Estados loading/error/empty/success | CLOSED |
+| AC-003-06 | QA-003 | Datos privados no se exponen | QA-003 | Pruebas IDOR/BOLA en listados | 404 o datos filtrados correctamente | CLOSED |
+| AC-003-07 | QA-003 | Responsive y estados UI | FE-003/QA-003 | UI responsive + estados visuales | Captura textual de UI | CLOSED |
 
 ## Endpoints esperados
 

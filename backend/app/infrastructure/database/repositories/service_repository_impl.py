@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-import json
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from typing import Any, cast
 
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.domain.entities.service import Service
@@ -20,7 +19,9 @@ class ServiceRepositoryImpl(ServiceRepository):
     def __init__(self, db: Session) -> None:
         self.db = db
 
-    async def get_service_by_id(self, service_id: int, clinic_id: int) -> Service | None:
+    async def get_service_by_id(
+        self, service_id: int, clinic_id: int
+    ) -> Service | None:
         """Obtener un servicio por ID y clinic_id con tenant isolation."""
         stmt = (
             select(ServiceModel)
@@ -53,7 +54,9 @@ class ServiceRepositoryImpl(ServiceRepository):
         domain = self._to_domain(model)
         return domain
 
-    async def update_service(self, service_id: int, clinic_id: int, data: dict[str, Any]) -> Service | None:
+    async def update_service(
+        self, service_id: int, clinic_id: int, data: dict[str, Any]
+    ) -> Service | None:
         """Actualizar campos de un servicio existente."""
         stmt = select(ServiceModel).where(
             ServiceModel.id == service_id,
@@ -75,7 +78,9 @@ class ServiceRepositoryImpl(ServiceRepository):
         self.db.refresh(model)
         return self._to_domain(model)
 
-    async def deactivate_service(self, service_id: int, clinic_id: int) -> Service | None:
+    async def deactivate_service(
+        self, service_id: int, clinic_id: int
+    ) -> Service | None:
         """Inactivar un servicio por ID."""
         stmt = select(ServiceModel).where(
             ServiceModel.id == service_id,

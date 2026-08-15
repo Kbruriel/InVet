@@ -146,7 +146,9 @@ async def change_clinic_status(
 ) -> ClinicReadSchema:
     """Inactivar o reactivar una clínica."""
     if body.active:
-        use_case: ActivateClinicUseCase | DeactivateClinicUseCase = ActivateClinicUseCase(repo)
+        use_case: ActivateClinicUseCase | DeactivateClinicUseCase = (
+            ActivateClinicUseCase(repo)
+        )
     else:
         use_case = DeactivateClinicUseCase(repo)
 

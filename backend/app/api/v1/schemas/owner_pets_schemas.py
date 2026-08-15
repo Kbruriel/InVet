@@ -55,10 +55,16 @@ class OwnerCreateSchema(BaseModel):
 
     model_config = ConfigDict(str_strip_whitespace=True)
 
-    nombre: str = Field(..., min_length=1, max_length=200, description="Nombre completo del propietario")
+    nombre: str = Field(
+        ..., min_length=1, max_length=200, description="Nombre completo del propietario"
+    )
     email: EmailStr = Field(..., description="Correo electrónico del propietario")
-    telefono: str | None = Field(None, max_length=50, description="Teléfono del propietario")
-    direccion: str | None = Field(None, max_length=1000, description="Dirección del propietario")
+    telefono: str | None = Field(
+        None, max_length=50, description="Teléfono del propietario"
+    )
+    direccion: str | None = Field(
+        None, max_length=1000, description="Dirección del propietario"
+    )
 
 
 class OwnerUpdateSchema(BaseModel):
@@ -70,6 +76,7 @@ class OwnerUpdateSchema(BaseModel):
     email: EmailStr | None = None
     telefono: str | None = Field(None, max_length=50)
     direccion: str | None = Field(None, max_length=1000)
+
 
 class OwnerReadSchema(BaseModel):
     """Schema de lectura de un propietario."""
@@ -99,9 +106,13 @@ class PetCreateSchema(BaseModel):
 
     model_config = ConfigDict(str_strip_whitespace=True)
 
-    nombre: str = Field(..., min_length=1, max_length=200, description="Nombre de la mascota")
+    nombre: str = Field(
+        ..., min_length=1, max_length=200, description="Nombre de la mascota"
+    )
     especie: str = Field(..., description="Especie (perro, gato, otro)")
-    raza: str = Field(..., min_length=1, max_length=100, description="Raza de la mascota")
+    raza: str = Field(
+        ..., min_length=1, max_length=100, description="Raza de la mascota"
+    )
     edad: int = Field(..., ge=0, le=50, description="Edad en años (0-50)")
     peso: float | None = Field(None, gt=0, le=500, description="Peso en kg (0-500)")
     fecha_nacimiento: datetime | None = Field(

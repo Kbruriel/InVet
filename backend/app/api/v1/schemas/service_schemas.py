@@ -8,10 +8,18 @@ class ServiceCreateSchema(BaseModel):
 
     model_config = ConfigDict(str_strip_whitespace=True)
 
-    name: str = Field(..., min_length=1, max_length=200, description="Nombre del servicio")
-    description: str | None = Field(None, max_length=2000, description="Descripción del servicio")
-    price: float = Field(..., gt=0, description="Precio del servicio (debe ser positivo)")
-    duration_minutes: int = Field(..., gt=0, description="Duración en minutos (debe ser positivo)")
+    name: str = Field(
+        ..., min_length=1, max_length=200, description="Nombre del servicio"
+    )
+    description: str | None = Field(
+        None, max_length=2000, description="Descripción del servicio"
+    )
+    price: float = Field(
+        ..., gt=0, description="Precio del servicio (debe ser positivo)"
+    )
+    duration_minutes: int = Field(
+        ..., gt=0, description="Duración en minutos (debe ser positivo)"
+    )
     is_active: bool = Field(True, description="Estado activo/inactivo")
 
 

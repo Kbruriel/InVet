@@ -1,5 +1,8 @@
 """ORM models registered for SQLAlchemy metadata."""
 
+from app.infrastructure.database.models.assignment_model import (
+    VeterinarianServiceAssignment,
+)
 from app.infrastructure.database.models.availability_summary import AvailabilitySummary
 from app.infrastructure.database.models.branch import Branch
 from app.infrastructure.database.models.branch_schedule import BranchSchedule
@@ -12,7 +15,6 @@ from app.infrastructure.database.models.service_model import Service
 from app.infrastructure.database.models.session import Session
 from app.infrastructure.database.models.user import User
 from app.infrastructure.database.models.veterinarian_model import Veterinarian
-from app.infrastructure.database.models.assignment_model import VeterinarianServiceAssignment
 
 __all__ = [
     "AvailabilitySummary",

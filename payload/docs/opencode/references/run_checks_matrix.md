@@ -74,6 +74,7 @@ Reglas:
 - Un working tree con cambios pendientes no vuelve incompleto el check de Git; usarlo como evidencia para decidir si aplica Docker.
 - Ejecutar Docker Compose solo si existe archivo compose, Docker esta disponible, no hubo fallos previos y hay cambios pendientes relevantes para `backend`, `frontend`, `docker-compose.yml`, `Dockerfile*` o lockfiles/manifiestos.
 - Si no existe configuracion, falta Docker, hubo fallos previos o no hay cambios relevantes, marcar Docker como `skipped` con motivo verificable.
+- Si Docker Compose se ejecuta, verificar que los contenedores aplicables quedaron actualizados o recreados y saludables antes de reportar el cierre.
 
 ## Modo correccion
 

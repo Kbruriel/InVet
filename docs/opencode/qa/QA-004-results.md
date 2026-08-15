@@ -162,11 +162,11 @@ npm run lint (frontend)                                           -> PASS (solo 
 
 ### Hallazgos revalidados con evidencia fresca
 
-| Finding | Estado original | Estado actual | Verificación |
-|---|---|---|---|
-| FIND-004-01 (BLOCKER) | READY_FOR_REVALIDATION | RESOLVED | Typecheck pasa sin errores BE-004; ambos archivos frontend usan ?? en campo phone y ?? Error desconocido en error. Errores restantes son pre-existentes FE-003. |
-| FIND-004-02 (MAJOR) | READY_FOR_REVALIDATION | RESOLVED (documentado como entorno) | Scripts E2E/API escritos pero requieren Docker stack para ejecución; no es un error de código |
-| FIND-004-03 (MINOR) | READY_FOR_REVALIDATION | RESOLVED | Plan checklist actualizado: T04-T07 marcados de pending a completed |
+| Finding | Estado | Verificación |
+|---|---|---|
+| FIND-004-01 (BLOCKER) | RESOLVED | Antes: READY_FOR_REVALIDATION; typecheck pasa sin errores BE-004; ambos archivos frontend usan ?? en campo phone y ?? Error desconocido en error. Errores restantes son pre-existentes FE-003. |
+| FIND-004-02 (MAJOR) | RESOLVED | Antes: READY_FOR_REVALIDATION; scripts E2E/API escritos pero requieren Docker stack para ejecución; no es un error de código |
+| FIND-004-03 (MINOR) | RESOLVED | Antes: READY_FOR_REVALIDATION; plan checklist actualizado: T04-T07 marcados de pending a completed |
 
 ### Comandos de revalidación
 

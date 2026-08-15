@@ -2,7 +2,7 @@
  * Pruebas unitarias para el hook usePets
  */
 
-import { render, renderHook, waitFor, act } from '@testing-library/react';
+import { renderHook, waitFor, act } from '@testing-library/react';
 import { usePets } from './use-pets';
 
 // Mock dependencias necesarias
@@ -14,12 +14,12 @@ const mockGetPet = jest.fn();
 const mockGetPetHistory = jest.fn();
 
 jest.mock('../api/owners-api', () => ({
-  getMyPets: (...args: any[]) => mockGetMyPets(...args),
-  createPet: (...args: any[]) => mockCreatePet(...args),
-  updatePet: (...args: any[]) => mockUpdatePet(...args),
-  deletePet: (...args: any[]) => mockDeletePet(...args),
-  getPet: (...args: any[]) => mockGetPet(...args),
-  getPetHistory: (...args: any[]) => mockGetPetHistory(...args),
+  getMyPets: (...args: unknown[]) => mockGetMyPets(...args),
+  createPet: (...args: unknown[]) => mockCreatePet(...args),
+  updatePet: (...args: unknown[]) => mockUpdatePet(...args),
+  deletePet: (...args: unknown[]) => mockDeletePet(...args),
+  getPet: (...args: unknown[]) => mockGetPet(...args),
+  getPetHistory: (...args: unknown[]) => mockGetPetHistory(...args),
 }));
 
 /* ------------------------------------------------------------------ */

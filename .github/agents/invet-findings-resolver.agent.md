@@ -19,6 +19,7 @@ Read first:
 
 - `.github/prompts/invet-resolve-findings.prompt.md`
 - `docs/opencode/14_github_copilot_agentic_flow.md`
+- `docs/opencode/references/carryovers_governance.md`
 - `docs/opencode/qa/QA-00X-findings.md`
 - `docs/opencode/reviews/BE-00X-review.md`
 - `docs/opencode/reviews/BE-00X-clean-architecture-review.md`
@@ -33,6 +34,7 @@ Rules:
 - Only QA or the owning review gate can close a finding as `RESOLVED`.
 - Write correction evidence to `docs/opencode/reviews/BE-00X-corrections.md`.
 - Rerun relevant tests and checks before closing.
+- If the correction belongs to a task inherited from another slice, update the source plan and carryover registry with the same evidence before handing it back.
 - End with `Estado de ejecucion: READY_FOR_REVALIDATION|BLOCKED|COMPLETED` before `Siguiente paso recomendado`.
 
 End with:

@@ -4,6 +4,8 @@ import importlib.util
 import sys
 from pathlib import Path
 
+import pytest
+
 REPO_ROOT = Path(__file__).resolve().parents[3]
 VALIDATOR_PATH = REPO_ROOT / "backend/scripts/validate_slice_plan.py"
 
@@ -20,17 +22,20 @@ def _load_validator():
 
 def _minimal_schema_v3_plan(
     objective: str = "Definir contrato backend verificable.",
+    slice_id: str = "999",
 ) -> str:
-    backend_objective = objective
+    backend_plan = f"BE-{slice_id}"
+    frontend_plan = f"FE-{slice_id}"
+    qa_plan = f"QA-{slice_id}"
     return f"""---
 schema_version: 3
-slice: "999"
-canonical_plan: BE-999
+slice: "{slice_id}"
+canonical_plan: {backend_plan}
 status: PLANNED
 encoding: UTF-8
 ---
 
-# BE-999 Plan - Contrato de prueba
+# {backend_plan} Plan - Contrato de prueba
 
 ## Objetivo del slice
 ## Alcance MVP
@@ -59,11 +64,11 @@ encoding: UTF-8
 
 ### Backend
 
-- [ ] BE-999-T01 - Definir contrato
+- [ ] {backend_plan}-T01 - Definir contrato
   Capa: backend
   Tipo: contrato
-  Historia o criterio: AC-999-01
-  Objetivo: {backend_objective}
+  Historia o criterio: AC-{slice_id}-01
+  Objetivo: {objective}
   Responsabilidad unica: Si
   Depende de: Ninguna
   Contexto necesario: tarea backend
@@ -77,13 +82,13 @@ encoding: UTF-8
 
 ### Frontend
 
-- [ ] FE-999-T01 - Implementar cliente
+- [ ] {frontend_plan}-T01 - Implementar cliente
   Capa: frontend
   Tipo: cliente api
-  Historia o criterio: AC-999-01
+  Historia o criterio: AC-{slice_id}-01
   Objetivo: Implementar cliente tipado.
   Responsabilidad unica: Si
-  Depende de: BE-999-T01
+  Depende de: {backend_plan}-T01
   Contexto necesario: contrato frontend
   Contratos usados: endpoint principal
   Entregables: cliente API
@@ -95,13 +100,13 @@ encoding: UTF-8
 
 ### QA
 
-- [ ] QA-999-T01 - Validar criterio
+- [ ] {qa_plan}-T01 - Validar criterio
   Capa: qa
   Tipo: qa
-  Historia o criterio: AC-999-01
+  Historia o criterio: AC-{slice_id}-01
   Objetivo: Validar criterio principal.
   Responsabilidad unica: Si
-  Depende de: BE-999-T01, FE-999-T01
+  Depende de: {backend_plan}-T01, {frontend_plan}-T01
   Contexto necesario: plan canonico
   Contratos usados: matriz trazabilidad
   Entregables: reporte QA
@@ -113,6 +118,39 @@ encoding: UTF-8
 
 ## Definition of Done
 """
+
+
+def _write_plan(repo_root: Path, slice_id: str, plan_text: str) -> None:
+    plan_path = repo_root / "docs" / "opencode" / "plans" / f"BE-{slice_id}-plan.md"
+    plan_path.parent.mkdir(parents=True, exist_ok=True)
+    plan_path.write_text(plan_text, encoding="utf-8")
+
+
+def _write_qa_result(repo_root: Path, slice_id: str, decision: str = "APPROVED") -> None:
+    results_path = repo_root / "docs" / "opencode" / "qa" / f"QA-{slice_id}-results.md"
+    results_path.parent.mkdir(parents=True, exist_ok=True)
+    results_path.write_text(f"- Decision: {decision}\n", encoding="utf-8")
+
+
+def _write_carryover_registry(
+    repo_root: Path,
+    slice_id: str,
+    status: str,
+    closure_evidence: str = "pending",
+) -> None:
+    registry_path = (
+        repo_root / "docs" / "opencode" / "carryovers" / f"BE-{slice_id}-carryovers.md"
+    )
+    registry_path.parent.mkdir(parents=True, exist_ok=True)
+    registry_path.write_text(
+        f"""# BE-{slice_id} Carryovers
+
+| source_plan | source_task | destination_plan | destination_task | reason_postponed | status | owner | updated_at | closure_evidence | source_reference | destination_reference |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| BE-998-plan.md | BE-998-T03 | BE-{slice_id}-plan.md | BE-{slice_id}-T04 | Dependencia externa | {status} | planner | 2026-08-15 | {closure_evidence} | docs/opencode/plans/BE-998-plan.md#L10 | docs/opencode/plans/BE-{slice_id}-plan.md#L20 |
+""",
+        encoding="utf-8",
+    )
 
 
 def test_schema_v3_plan_contract_accepts_atomic_tasks() -> None:
@@ -137,6 +175,61 @@ def test_schema_v3_plan_contract_rejects_composite_objectives_and_mojibake() -> 
     assert any("mojibake" in error for error in errors)
 
 
+@pytest.mark.parametrize("status", ["OPEN", "TRANSFERRED"])
+def test_schema_v3_plan_contract_blocks_open_carryovers_at_qa(
+    tmp_path: Path,
+    status: str,
+) -> None:
+    validator = _load_validator()
+    slice_id = "001"
+    slice_ids = validator.normalize_slice_id(f"BE-{slice_id}")
+    _write_plan(tmp_path, slice_id, _minimal_schema_v3_plan(slice_id=slice_id))
+    _write_qa_result(tmp_path, slice_id)
+    _write_carryover_registry(tmp_path, slice_id, status=status)
+
+    errors = validator.validate_stage(tmp_path, slice_ids, "qa")
+
+    assert any("carryover" in error.lower() and status in error for error in errors)
+
+
+def test_schema_v3_plan_contract_accepts_closed_carryovers_at_qa(
+    tmp_path: Path,
+) -> None:
+    validator = _load_validator()
+    slice_id = "001"
+    slice_ids = validator.normalize_slice_id(f"BE-{slice_id}")
+    _write_plan(tmp_path, slice_id, _minimal_schema_v3_plan(slice_id=slice_id))
+    _write_qa_result(tmp_path, slice_id)
+    _write_carryover_registry(
+        tmp_path,
+        slice_id,
+        status="CLOSED",
+        closure_evidence="docs/opencode/plans/BE-998-plan.md#L10",
+    )
+
+    errors = validator.validate_stage(tmp_path, slice_ids, "qa")
+
+    assert errors == []
+
+
+def test_schema_v3_plan_contract_requires_carryover_registry_when_transfers_are_mentioned(
+    tmp_path: Path,
+) -> None:
+    validator = _load_validator()
+    slice_id = "001"
+    slice_ids = validator.normalize_slice_id(f"BE-{slice_id}")
+    plan = (
+        _minimal_schema_v3_plan(slice_id=slice_id)
+        + "\n## Revision de gaps\n- Una tarea heredada de otro slice quedo postergada y debe registrarse.\n"
+    )
+    _write_plan(tmp_path, slice_id, plan)
+    _write_qa_result(tmp_path, slice_id)
+
+    errors = validator.validate_stage(tmp_path, slice_ids, "qa")
+
+    assert any("registro canonico" in error.lower() for error in errors)
+
+
 def test_schema_v3_contracts_are_synced_with_payload() -> None:
     pairs = [
         (
@@ -151,6 +244,14 @@ def test_schema_v3_contracts_are_synced_with_payload() -> None:
             REPO_ROOT / "docs/opencode/references/spec_kit_reference_improvements.md",
             REPO_ROOT
             / "payload/docs/opencode/references/spec_kit_reference_improvements.md",
+        ),
+        (
+            REPO_ROOT / "docs/opencode/references/carryovers_governance.md",
+            REPO_ROOT / "payload/docs/opencode/references/carryovers_governance.md",
+        ),
+        (
+            REPO_ROOT / "docs/opencode/templates/carryovers_registry_template.md",
+            REPO_ROOT / "payload/docs/opencode/templates/carryovers_registry_template.md",
         ),
     ]
 

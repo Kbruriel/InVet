@@ -150,17 +150,23 @@ class ListVeterinariansUseCase:
         Returns:
             Tuple de (lista de veterinarios, total).
         """
-        return await self.repository.list_by_clinic(clinic_id, page, size, is_active_only)
+        return await self.repository.list_by_clinic(
+            clinic_id, page, size, is_active_only
+        )
 
 
 class AssignServiceToVeterinarianUseCase:
     """Caso de uso para asignar servicio a veterinario."""
 
-    def __init__(self, assignment_repo: AssignmentRepository, vet_repo: VeterinarianRepository) -> None:
+    def __init__(
+        self, assignment_repo: AssignmentRepository, vet_repo: VeterinarianRepository
+    ) -> None:
         self.assignment_repo = assignment_repo
         self.vet_repo = vet_repo
 
-    async def execute(self, vet_id: int, service_id: int, clinic_id: int) -> VeterinarianServiceAssignment | None:
+    async def execute(
+        self, vet_id: int, service_id: int, clinic_id: int
+    ) -> VeterinarianServiceAssignment | None:
         """Asignar un servicio a un veterinario.
 
         Args:
@@ -181,6 +187,7 @@ class AssignServiceToVeterinarianUseCase:
 
         # Validar que el servicio pertenece a la misma clínica
         from app.domain.repositories.slice006_repositories import ServiceRepository
+
         svc_repo: ServiceRepository = self.vet_repo  # type: ignore - will be replaced at router level
         # We'll validate service existence in the router layer
 
@@ -204,4 +211,6 @@ class UnassignServiceFromVeterinarianUseCase:
         Returns:
             True si se desasignó, False si no existía la asignación.
         """
-        return await self.assignment_repo.unassign_service(vet_id, service_id, clinic_id)
+        return await self.assignment_repo.unassign_service(
+            vet_id, service_id, clinic_id
+        )

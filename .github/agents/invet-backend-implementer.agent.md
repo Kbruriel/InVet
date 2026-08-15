@@ -16,7 +16,10 @@ Before acting, read:
 - `.opencode/commands/implement-backend-task.md`
 - `.github/prompts/implement-backend-task.prompt.md`
 - `docs/opencode/14_github_copilot_agentic_flow.md`
+- `docs/opencode/references/carryovers_governance.md`
 
 Implement only backend tasks for the current slice. Keep Clean Architecture boundaries, add required backend unit tests, and validate secure persistence when applicable.
+
+If the task was inherited from another slice, update the source plan and the current plan with the same evidence before marking it complete.
 
 Always close with `Siguiente paso recomendado`, plus findings or unblock recommendations when needed.

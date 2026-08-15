@@ -23,6 +23,7 @@ Reglas:
 - No modifiques codigo fuente. `edit: allow` se usa solo para el reporte Markdown.
 - Crea siempre `docs/opencode/reviews/BE-00X-clean-architecture-review.md`.
 - Registra decision `APPROVED` o `REJECTED`, alcance, evidencia y hallazgos.
+- Si el slice tiene carryovers, verifica que el plan origen y el plan destino mantengan la misma evidencia antes de aprobar.
 
 Checklist backend:
 - Routers sin logica de negocio.

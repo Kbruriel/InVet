@@ -55,7 +55,8 @@ Este archivo define requisitos, no el estado de un slice. Los checks permanecen 
 - [ ] La decision es `APPROVED`, `REJECTED` o `BLOCKED`.
 - [ ] Solo QA cambia findings a `RESOLVED`.
 - [ ] Los resultados y findings estan escritos en UTF-8.
-- [ ] Antes del cierre se valido si habia cambios pendientes que justificaran actualizar contenedores.
+- [ ] Si existen tareas heredadas, el registro `docs/opencode/carryovers/BE-00X-carryovers.md` existe y no tiene estados `OPEN` o `TRANSFERRED`.
+- [ ] Antes del cierre se valido si habia cambios pendientes que justificaran actualizar contenedores y se confirmo que los contenedores Docker aplicables quedaron actualizados o recreados.
 - [ ] El hook de Docker Compose de cierre se ejecuto cuando QA quedo `APPROVED`.
 
 ## `/implement-ui-automation-task FE-00X`
@@ -112,6 +113,7 @@ Este archivo define requisitos, no el estado de un slice. Los checks permanecen 
 - [ ] Se valido si habia cambios pendientes que justificaran actualizar contenedores antes del cierre.
 - [ ] Existe `docs/opencode/checks/BE-00X-checks.md`.
 - [ ] El reporte contiene `Decision: APPROVED`.
+- [ ] Si existen tareas heredadas, el registro de carryovers sigue cerrado o cancelado y coincide con el plan origen.
 - [ ] El hook de Docker Compose de cierre se ejecuto cuando todos los checks aplicables pasaron.
 
 ## `/update-docs BE-00X`
@@ -119,6 +121,7 @@ Este archivo define requisitos, no el estado de un slice. Los checks permanecen 
 - [ ] Plan, QA, reviews y checks estan aprobados.
 - [ ] Contratos, riesgos, decisiones y changelog estan actualizados.
 - [ ] No quedan findings abiertos.
+- [ ] Si existen tareas heredadas, el plan origen, el plan destino y el registro de carryovers muestran la misma evidencia.
 - [ ] El estado final contiene enlaces a evidencia.
 
 ## `/final-gate BE-00X`
@@ -126,5 +129,6 @@ Este archivo define requisitos, no el estado de un slice. Los checks permanecen 
 - [ ] QA, reviews, checks y documentacion estan cerrados.
 - [ ] Se revisaron logs, reintentos mecanicos y correcciones fallidas.
 - [ ] El reviewer final usa una segunda opinion de alta capacidad.
+- [ ] Si existen tareas heredadas, el registro de carryovers esta en `CLOSED` o `CANCELLED` con evidencia reproducible.
 - [ ] Existe `docs/opencode/reviews/BE-00X-final-review.md`.
 - [ ] El reporte contiene `Decision: APPROVED|REJECTED|BLOCKED`.

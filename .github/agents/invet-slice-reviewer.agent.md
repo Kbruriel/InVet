@@ -16,9 +16,12 @@ Before acting, read:
 - `.opencode/commands/review-slice.md`
 - `.github/prompts/review-slice.prompt.md`
 - `docs/opencode/templates/review_findings_template.md`
+- `docs/opencode/references/carryovers_governance.md`
 - `docs/opencode/14_github_copilot_agentic_flow.md`
 
 Review behavior, regressions, traceability, and coverage. Do not implement product fixes in this gate.
+
+If the slice includes carryovers, verify that the source plan, destination plan, and carryover registry all point to the same evidence before approving.
 
 Always close with `Estado de ejecucion` and `Siguiente paso recomendado`, plus findings or unblock recommendations when needed.
 

@@ -12,7 +12,7 @@ Debe producir `docs/opencode/plans/BE-00X-plan.md` y los artefactos `US-00X`, `U
 - Entidades.
 - Reglas.
 - Fuentes y artefactos de contexto.
-- Matriz de trazabilidad criterio -> tarea -> validacion.
+- Matriz de trazabilidad criterio -> tarea -> validacion -> evidencia -> estado.
 - Endpoints.
 - Contrato frontend con rutas, flujos, API, formularios, arquitectura, accesibilidad y pruebas.
 - Contrato de ejecucion Docker y pruebas.
@@ -22,7 +22,8 @@ Debe producir `docs/opencode/plans/BE-00X-plan.md` y los artefactos `US-00X`, `U
 - Politica UTF-8.
 - Definition of Done.
 - Checklist numerado de tareas para backend, frontend y QA.
-- Matriz `Historia -> Criterio -> Backend -> Frontend -> QA -> UIA -> APIA`.
+- Matriz de trazabilidad por criterio con columnas `ID`, `Fuente`, `Historia o criterio`, `Tarea planificada`, `Validacion`, `Evidencia esperada` y `Estado`.
+- Reconciliacion de carryovers en `docs/opencode/carryovers/BE-00X-carryovers.md` cuando existan tareas postergadas o transferidas desde otro slice.
 
 Cada tarea del checklist debe incluir:
 - `- [ ] BE|FE|QA-00X-TNN - Titulo`
@@ -67,6 +68,7 @@ Estados de ejecucion permitidos por familia:
 
 Debe implementar solo tareas backend pendientes del plan:
 - Leer `docs/opencode/plans/BE-00X-plan.md`.
+- Leer `docs/opencode/references/carryovers_governance.md` y `docs/opencode/carryovers/BE-00X-carryovers.md` cuando existan tareas transferidas.
 - Ejecutar el preflight `--stage backend`.
 - Usar objetivo y criterios de aceptacion de cada tarea como contrato.
 - Usar `Tipo`, `Historia o criterio`, `Contexto necesario`, `Contratos usados` y `Resultado esperado` para interpretar cada tarea.
@@ -76,6 +78,7 @@ Debe implementar solo tareas backend pendientes del plan:
 - Marcar `- [x]` solo en tareas backend cuyos criterios quedaron verificados.
 - Registrar evidencia y crear pruebas unitarias de los archivos productivos modificados.
 - Dejar `- [ ]` y documentar bloqueo cuando una tarea no pueda completarse.
+- Si una tarea viene de otro slice, actualizar tambien el plan origen con la misma evidencia o con una referencia explicita al cierre.
 
 Debe cumplir Clean Architecture.
 Hook de cierre: si Docker Compose esta disponible y el comando no quedo bloqueado, ejecutar `docker compose up -d --build --force-recreate db backend frontend`.
@@ -84,6 +87,7 @@ Hook de cierre: si Docker Compose esta disponible y el comando no quedo bloquead
 
 Debe implementar solo tareas frontend pendientes del plan:
 - Leer `docs/opencode/plans/BE-00X-plan.md`.
+- Leer `docs/opencode/references/carryovers_governance.md` y `docs/opencode/carryovers/BE-00X-carryovers.md` cuando existan tareas transferidas.
 - Ejecutar el preflight `--stage frontend`.
 - Usar objetivo y criterios de aceptacion de cada tarea como contrato.
 - Usar `Tipo`, `Historia o criterio`, `Contexto necesario`, `Contratos usados` y `Resultado esperado` para interpretar cada tarea.
@@ -94,6 +98,7 @@ Debe implementar solo tareas frontend pendientes del plan:
 - Marcar `- [x]` solo en tareas frontend cuyos criterios quedaron verificados.
 - Registrar evidencia y crear pruebas unitarias/de componente de los archivos productivos modificados.
 - Dejar `- [ ]` y documentar bloqueo cuando una tarea no pueda completarse.
+- Si una tarea viene de otro slice, actualizar tambien el plan origen con la misma evidencia o con una referencia explicita al cierre.
 
 Debe aplicar el sistema visual InVet.
 Hook de cierre: si Docker Compose esta disponible y el comando no quedo bloqueado, ejecutar `docker compose up -d --build --force-recreate db backend frontend`.
@@ -102,6 +107,7 @@ Hook de cierre: si Docker Compose esta disponible y el comando no quedo bloquead
 
 Debe validar backend + frontend + integracion del slice:
 - Leer `docs/opencode/plans/BE-00X-plan.md`.
+- Leer `docs/opencode/references/carryovers_governance.md` y el registro de carryovers del slice cuando existan tareas transferidas.
 - Intentar auto-recuperacion del entorno antes de bloquear QA usando `python backend/scripts/prepare_qa_env.py --install-deps` o equivalente desde `backend/`.
 - Usar objetivos y criterios de aceptacion del plan para derivar casos QA.
 - Construir matriz de trazabilidad por criterio con riesgo, caso, nivel, suite, comando, resultado, evidencia y estado.
@@ -114,25 +120,29 @@ Debe validar backend + frontend + integracion del slice:
 - Si el backend ya esta corriendo y la suite necesita el mismo contenedor, `docker compose exec backend ...` es valido.
 - No dar por equivalente una corrida local en el host cuando el criterio pide PostgreSQL en contenedor.
 - El contenedor de `frontend` es de runtime por defecto; solo usarlo para pruebas si el flujo de testing lo preparo explicitamente.
+- Antes de bloquearse, validar si todos los contenedores Docker aplicables fueron actualizados o recreados y quedaron saludables; si no aplican cambios relevantes, registrar el skip con causa exacta.
 - Validar que las pruebas fueron recolectadas y ejecutadas de verdad, no solo que el comando termino con exit code cero.
 - Documentar trazabilidad por tarea, comandos, reportes, resultados esperados vs obtenidos y decision final.
 - Validar happy path, negative path, permisos, IDOR/BOLA, responsive, estados de error y regresion.
 - Si persisten archivos productivos BE/FE sin pruebas unitarias explicitas al cierre de la corrida, marcar los criterios afectados en `FAIL`, generar `docs/opencode/qa/QA-00X-findings.md` y emitir `REJECTED`.
 - Marcar `- [x]` solo en tareas QA o de validacion cuyos criterios quedaron verificados.
 - Rechazar tareas compuestas o sin responsabilidad unica como `BLOCKED` por contrato de plan.
+- Si el slice incluye tareas transferidas, validar que el plan actual, el plan origen y el registro de carryovers coinciden antes de aprobar.
 - Solo si falla la auto-recuperacion o si la suite requiere un servicio externo no mockeable, crear `docs/opencode/qa/QA-00X-findings.md` siguiendo `docs/opencode/templates/qa_findings_template.md` para que luego lo consuma `/implement-findings`.
 - Usar `docs/opencode/templates/qa_results_template.md` para `docs/opencode/qa/QA-00X-results.md`.
 - Cierre requerido: el reporte final debe incluir `Estado de ejecucion: APPROVED|REJECTED|BLOCKED` antes de `Siguiente paso recomendado`.
 - `READY_FOR_REVALIDATION` no es un estado de cierre de QA; ese valor pertenece al lifecycle de findings.
 - Si el findings file sigue `READY_FOR_REVALIDATION`, la salida debe reflejar el bloqueo real y derivar al flujo de correcciones, no pedir un auto-rerun del mismo gate.
 Hook de cierre: si QA termina en `APPROVED` y Docker Compose esta disponible, primero validar si existen cambios pendientes que afecten `backend`, `frontend`, `docker-compose.yml`, `Dockerfile*`, `backend/requirements.txt`, `backend/pyproject.toml`, `frontend/package.json` o lockfiles.
+Despues, confirmar que todos los contenedores Docker aplicables fueron actualizados o recreados y quedaron saludables.
 Si no existen cambios pendientes que requieran actualizar contenedores, registrar el skip con la causa exacta y no ejecutar el restart.
-Si existen cambios pendientes, ejecutar `docker compose up -d --build --force-recreate db backend frontend`.
+Si existen cambios pendientes, ejecutar `docker compose up -d --build --force-recreate db backend frontend` y verificar el estado de los contenedores antes de cerrar.
 
 ## `/implement-ui-automation-task FE-00X`
 
 Debe implementar solo tareas de automatizacion UI del slice:
 - Leer `docs/opencode/plans/BE-00X-plan.md`.
+- Leer `docs/opencode/references/carryovers_governance.md` y el registro de carryovers del slice cuando existan tareas transferidas.
 - Leer `docs/opencode/tasks/user-stories/US-00X.md`.
 - Leer `docs/opencode/tasks/ui-automation/UIA-00X.md`.
 - Leer las tasks `BE-00X`, `FE-00X` y `QA-00X` del mismo slice.
@@ -141,11 +151,13 @@ Debe implementar solo tareas de automatizacion UI del slice:
 - Referenciar `US-00X-NN` y `CA-NN`.
 - Ejecutar `npm run test:e2e` y `npm run test:regression`.
 - Documentar evidencia y casos no automatizados.
+- Si la tarea proviene de otro slice, actualizar tambien el plan origen con la misma evidencia o con una referencia explicita al cierre.
 
 ## `/implement-api-automation-task BE-00X`
 
 Debe implementar solo tareas de automatizacion API del slice:
 - Leer `docs/opencode/plans/BE-00X-plan.md`.
+- Leer `docs/opencode/references/carryovers_governance.md` y el registro de carryovers del slice cuando existan tareas transferidas.
 - Leer `docs/opencode/tasks/user-stories/US-00X.md`.
 - Leer `docs/opencode/tasks/api-automation/APIA-00X.md`.
 - Leer las tasks `BE-00X`, `FE-00X` y `QA-00X` del mismo slice.
@@ -154,6 +166,7 @@ Debe implementar solo tareas de automatizacion API del slice:
 - Referenciar `US-00X-NN` y `CA-NN`.
 - Ejecutar `npm run test:api`.
 - Documentar evidencia y casos no automatizados.
+- Si la tarea proviene de otro slice, actualizar tambien el plan origen con la misma evidencia o con una referencia explicita al cierre.
 
 ## `/run-ui-checks FE-00X`
 
@@ -169,9 +182,11 @@ Debe revisar el slice vertical completo desde backend o frontend:
 - Si recibe `FE-00X`, derivar el `BE-00X` equivalente y revisar el mismo slice vertical.
 - Si recibe `QA-00X`, detenerse y redirigir a `/qa-task QA-00X`; no debe remapear silenciosamente.
 - Leer `docs/opencode/plans/BE-00X-plan.md` cuando exista.
+- Leer `docs/opencode/references/carryovers_governance.md` y el registro de carryovers del slice si existen tareas transferidas.
 - Leer `docs/opencode/tasks/backend/BE-00X.md`, `docs/opencode/tasks/frontend/FE-00X.md` y `docs/opencode/tasks/qa/QA-00X.md`.
 - Revisar `git diff` y archivos modificados del slice.
 - Documentar hallazgos en `docs/opencode/reviews/BE-00X-review.md` cuando existan.
+- No aprobar si el slice tiene carryovers abiertos o desalineados entre plan origen, plan destino y registro.
 - Cierre requerido: el reporte final debe incluir `Estado de ejecucion: APPROVED|REJECTED|BLOCKED` antes de `Siguiente paso recomendado`.
 
 ## `/clean-architecture-review`
@@ -180,6 +195,7 @@ Debe revisar la implementacion actual con foco en Clean Architecture:
 - Identifica el slice `BE-00X` afectado a partir del contexto actual.
 - Revisa `git diff` y los archivos modificados.
 - Valida backend por capas y frontend por modularidad.
+- Si el slice tiene carryovers, verifica que el plan origen y el plan destino mantengan la misma evidencia antes de aprobar.
 - Si hay hallazgos, crea `docs/opencode/reviews/BE-00X-clean-architecture-review.md` usando `docs/opencode/templates/review_findings_template.md`.
 - Si no hay hallazgos, reporta estado Aprobado.
 
@@ -189,6 +205,7 @@ Debe revisar la implementacion actual con foco en seguridad:
 - Identifica el slice `BE-00X` afectado a partir del contexto actual.
 - Revisa `git diff` y los archivos modificados.
 - Valida autenticacion, autorizacion, IDOR/BOLA, tokens, logs y exposicion de datos.
+- Si el slice tiene carryovers, verifica que no queden gaps de seguridad abiertos entre el plan origen y el plan destino.
 - Si hay hallazgos, crea `docs/opencode/reviews/BE-00X-security-review.md` usando `docs/opencode/templates/review_findings_template.md`.
 - Si no hay hallazgos, reporta estado Aprobado.
 Hook de cierre: si las correcciones quedan listas y Docker Compose esta disponible, ejecutar `docker compose up -d --build --force-recreate db backend frontend`.
@@ -198,4 +215,5 @@ Hook de cierre: si las correcciones quedan listas y Docker Compose esta disponib
 `/clean-architecture-review`, `/security-review`, `/run-checks` y `/update-docs` son gates obligatorios.
 `/implement-findings` debe aceptar `BE-00X` o `FE-00X`; si recibe `FE-00X`, debe derivar el `BE-00X` equivalente y corregir el mismo slice vertical.
 `/implement-findings` puede consumir `docs/opencode/reviews/BE-00X-review.md`, `docs/opencode/reviews/BE-00X-clean-architecture-review.md`, `docs/opencode/reviews/BE-00X-security-review.md` y `docs/opencode/qa/QA-00X-findings.md`.
+- Si una correccion pertenece a una tarea heredada de otro slice, actualiza tambien el plan origen y el registro de carryovers con la misma evidencia.
 Hook de cierre: si las correcciones quedan listas y Docker Compose esta disponible, ejecutar `docker compose up -d --build --force-recreate db backend frontend`.

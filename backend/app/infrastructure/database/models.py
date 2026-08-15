@@ -69,4 +69,3 @@ class Pet(Base):
     edad = Column(Integer, nullable=False)
     peso = Column(Float, nullable=True)
     fecha_nacimiento = Column(DateTime(timezone=True), nullable=True)
-

@@ -1,8 +1,8 @@
 """Casos de uso para autenticacion."""
 
-from fastapi import HTTPException, status
-
 from datetime import datetime, timedelta
+
+from fastapi import HTTPException, status
 
 from app.api.schemas.auth_schemas import AuthProfileResponse, AuthTokenResponse
 from app.core.security import (
@@ -83,7 +83,11 @@ class AuthUseCase:
                 )
             # rotate: revoke old session before issuing a new one
             try:
-                session_id = int(session.get("id") if isinstance(session, dict) else getattr(session, "id", None))
+                session_id = int(
+                    session.get("id")
+                    if isinstance(session, dict)
+                    else getattr(session, "id", None)
+                )
             except Exception:
                 session_id = None
             if session_id:
@@ -197,7 +201,11 @@ class AuthUseCase:
             if session:
                 # support implementations that return dicts or ORM-like objects
                 try:
-                    session_id = int(session.get("id") if isinstance(session, dict) else getattr(session, "id", None))
+                    session_id = int(
+                        session.get("id")
+                        if isinstance(session, dict)
+                        else getattr(session, "id", None)
+                    )
                 except Exception:
                     session_id = None
                 if session_id:

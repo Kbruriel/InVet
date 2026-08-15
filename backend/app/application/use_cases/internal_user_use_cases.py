@@ -3,9 +3,8 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from typing import Any, Optional
+from typing import Any
 
-from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.domain.entities.internal_user import InternalUser
@@ -15,7 +14,9 @@ from app.domain.repositories.slice006_repositories import InternalUserRepository
 class CreateInternalUserUseCase:
     """Caso de uso para crear un usuario interno."""
 
-    def __init__(self, repository: InternalUserRepository, db: Optional[Session] = None) -> None:
+    def __init__(
+        self, repository: InternalUserRepository, db: Session | None = None
+    ) -> None:
         self.repository = repository
         self.db = db
 
@@ -43,20 +44,26 @@ class CreateInternalUserUseCase:
             raise ValueError("El user_id debe ser mayor a cero.")
 
         # MJR-006-001: Validate that the referenced auth user exists (via repository interface)
-        if hasattr(self.repository, 'check_user_exists') and self.db is not None:
+        if hasattr(self.repository, "check_user_exists") and self.db is not None:
             user_exists = await self.repository.check_user_exists(user_id_val, self.db)
             if not user_exists:
-                raise ValueError(f"El usuario con ID {user_id_val} no existe en el sistema de autenticación.")
+                raise ValueError(
+                    f"El usuario con ID {user_id_val} no existe en el sistema de autenticación."
+                )
 
         # MJR-006-003: Validate branch_ids belong to the same clinic (via repository interface)
         branch_ids = data.get("branch_ids", []) or []
         if branch_ids and self.db is not None:
-            if hasattr(self.repository, 'check_branches_belong_to_clinic'):
-                invalid_branches = await self.repository.check_branches_belong_to_clinic(
-                    [int(bid) for bid in branch_ids], clinic_id, self.db
+            if hasattr(self.repository, "check_branches_belong_to_clinic"):
+                invalid_branches = (
+                    await self.repository.check_branches_belong_to_clinic(
+                        [int(bid) for bid in branch_ids], clinic_id, self.db
+                    )
                 )
                 if invalid_branches:
-                    raise ValueError("Una o más sucursales no pertenecen a esta clínica.")
+                    raise ValueError(
+                        "Una o más sucursales no pertenecen a esta clínica."
+                    )
 
         now = datetime.now(UTC)
         internal_user = InternalUser(
@@ -158,7 +165,9 @@ class ListInternalUsersUseCase:
         Returns:
             Tuple de (lista de usuarios internos, total).
         """
-        return await self.repository.list_by_clinic(clinic_id, page, size, is_active_only)
+        return await self.repository.list_by_clinic(
+            clinic_id, page, size, is_active_only
+        )
 
 
 class AssignBranchToInternalUserUseCase:

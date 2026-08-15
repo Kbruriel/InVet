@@ -1,12 +1,12 @@
 """Implementación del repositorio de mascotas."""
 
-from datetime import UTC, datetime, timezone
-from typing import Optional, cast
+from datetime import UTC, datetime
+from typing import cast
 
-from sqlalchemy import func, select
+from sqlalchemy import func
 from sqlalchemy.orm import Session
 
-from app.domain.entities.owner import Pet, PetCreate, PetHistoryEntry, PetUpdate
+from app.domain.entities.owner import Pet, PetHistoryEntry, PetUpdate
 from app.domain.repositories.owner_repository import PetRepository
 from app.infrastructure.database.models.pet import Pet as PetModel
 
@@ -18,15 +18,17 @@ class PetRepositoryImpl(PetRepository):
         self.db = db
 
     def _to_domain(self, model: PetModel) -> Pet:
-        now = datetime.now(timezone.utc)
+        now = datetime.now(UTC)
         dob = cast(datetime | None, model.date_of_birth)
         if dob and dob.tzinfo is None:
-            dob = dob.replace(tzinfo=timezone.utc)
+            dob = dob.replace(tzinfo=UTC)
 
         edad = 0
         if dob:
-            today = datetime.now(timezone.utc).date()
-            edad = (today.year - dob.year) - ((today.month, today.day) < (dob.month, dob.day))
+            today = datetime.now(UTC).date()
+            edad = (today.year - dob.year) - (
+                (today.month, today.day) < (dob.month, dob.day)
+            )
 
         peso_val = float(model.weight) if model.weight else None
 
@@ -45,7 +47,7 @@ class PetRepositoryImpl(PetRepository):
         """Crear una nueva mascota."""
         dob = pet.fecha_nacimiento
         if dob and dob.tzinfo is None:
-            dob = dob.replace(tzinfo=timezone.utc)
+            dob = dob.replace(tzinfo=UTC)
 
         model = PetModel(
             owner_id=pet.owner_id,
@@ -60,7 +62,7 @@ class PetRepositoryImpl(PetRepository):
         self.db.refresh(model)
         return self._to_domain(model)
 
-    def get_pet_by_id(self, pet_id: int) -> Optional[Pet]:
+    def get_pet_by_id(self, pet_id: int) -> Pet | None:
         """Obtener una mascota por ID (solo activas)."""
         model = (
             self.db.query(PetModel)
@@ -78,9 +80,8 @@ class PetRepositoryImpl(PetRepository):
         """Obtener mascotas paginadas de un propietario."""
         offset = (page - 1) * size
 
-        total_query = (
-            self.db.query(func.count(PetModel.id))
-            .filter(PetModel.owner_id == owner_id, PetModel.is_active.is_(True))
+        total_query = self.db.query(func.count(PetModel.id)).filter(
+            PetModel.owner_id == owner_id, PetModel.is_active.is_(True)
         )
         total = total_query.scalar() or 0
 
@@ -93,13 +94,9 @@ class PetRepositoryImpl(PetRepository):
         )
         return [self._to_domain(m) for m in query], total
 
-    def update_pet(self, pet_id: int, data: PetUpdate) -> Optional[Pet]:
+    def update_pet(self, pet_id: int, data: PetUpdate) -> Pet | None:
         """Actualizar campos de una mascota existente."""
-        model = (
-            self.db.query(PetModel)
-            .filter(PetModel.id == pet_id)
-            .first()
-        )
+        model = self.db.query(PetModel).filter(PetModel.id == pet_id).first()
         if not model:
             return None
 
@@ -116,7 +113,7 @@ class PetRepositoryImpl(PetRepository):
         if data.fecha_nacimiento is not None:
             dob = data.fecha_nacimiento
             if dob.tzinfo is None:
-                dob = dob.replace(tzinfo=timezone.utc)
+                dob = dob.replace(tzinfo=UTC)
             model.date_of_birth = dob
 
         self.db.flush()
@@ -125,16 +122,12 @@ class PetRepositoryImpl(PetRepository):
 
     def delete_pet(self, pet_id: int) -> bool:
         """Eliminar una mascota (soft delete)."""
-        model = (
-            self.db.query(PetModel)
-            .filter(PetModel.id == pet_id)
-            .first()
-        )
+        model = self.db.query(PetModel).filter(PetModel.id == pet_id).first()
         if not model:
             return False
 
         model.is_active = False
-        model.updated_at = datetime.now(timezone.utc)
+        model.updated_at = datetime.now(UTC)
         self.db.flush()
         return True
 

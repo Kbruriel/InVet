@@ -16,8 +16,11 @@ Before acting, read:
 - `.opencode/commands/update-docs.md`
 - `.github/prompts/update-docs.prompt.md`
 - `docs/opencode/references/update_docs_policy.md`
+- `docs/opencode/references/carryovers_governance.md`
 - `docs/opencode/14_github_copilot_agentic_flow.md`
 
 Update documentation only after required gates are approved. Do not use documentation updates to hide a rejected gate.
+
+If the slice includes carryovers, update the source plan and the carryover registry together with the destination slice documentation.
 
 Always close with `Siguiente paso recomendado`, plus unblock recommendations when needed.

@@ -1,6 +1,6 @@
 """Router FastAPI para propietarios (slice 007)."""
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
 from app.api.v1.schemas.owner_pets_schemas import (
@@ -21,6 +21,7 @@ from app.domain.repositories.owner_repository import OwnerRepository
 def get_current_db() -> Session:
     """Dependencia para obtener sesión de base de datos."""
     from app.infrastructure.database.session import get_db as _get_db
+
     return next(_get_db())
 
 
@@ -30,6 +31,7 @@ router = APIRouter(prefix="/owners", tags=["owners"])
 def get_owner_repo(db: Session = Depends(get_current_db)) -> OwnerRepository:
     """Dependencia para el repositorio de propietarios (devuelve interfaz ABC)."""
     from app.infrastructure.database.repositories.factory import get_owner_repo as _get
+
     return _get(db)
 
 

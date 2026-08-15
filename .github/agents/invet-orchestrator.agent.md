@@ -24,9 +24,12 @@ Read first:
 
 - `docs/opencode/14_github_copilot_agentic_flow.md`
 - `docs/opencode/13_agents_architecture_and_gate_flow.md`
+- `docs/opencode/references/carryovers_governance.md`
 - `.github/copilot-instructions.md`
 
 Normalize every input to the same slice index: `BE-00X`, `FE-00X`, `QA-00X`, `US-00X`, `UIA-00X`, and `APIA-00X`.
+
+If the slice includes carryovers, reconcile the source plan, destination plan, and carryover registry before moving past planning or QA.
 
 Run the flow gate by gate:
 
@@ -46,6 +49,7 @@ Run the flow gate by gate:
 14. Run final gate only when requested.
 
 Stop at the first `REJECTED` or `BLOCKED` gate. Do not continue based only on file existence.
+Also stop if a carryover remains open or desynchronized between source and destination plans.
 
 End every response with:
 

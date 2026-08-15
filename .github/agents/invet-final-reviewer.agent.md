@@ -16,8 +16,11 @@ Before acting, read:
 - `.opencode/commands/final-gate.md`
 - `.github/prompts/final-gate.prompt.md`
 - `docs/opencode/templates/review_findings_template.md`
+- `docs/opencode/references/carryovers_governance.md`
 - `docs/opencode/14_github_copilot_agentic_flow.md`
 
 Emit the optional final release decision only after QA, reviews, checks, and docs are closed.
+
+If the slice includes carryovers, confirm that the source plan, destination plan, and carryover registry are synchronized before approving release.
 
 Always close with `Siguiente paso recomendado`, plus findings or unblock recommendations when needed.

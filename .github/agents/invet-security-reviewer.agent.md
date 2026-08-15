@@ -17,8 +17,11 @@ Before acting, read:
 - `.github/prompts/security-review.prompt.md`
 - `docs/opencode/references/security_checklist.md`
 - `docs/opencode/templates/review_findings_template.md`
+- `docs/opencode/references/carryovers_governance.md`
 - `docs/opencode/14_github_copilot_agentic_flow.md`
 
 Review authentication, authorization, IDOR/BOLA, tenant isolation, secrets, logs, and exposure risks. Do not implement product fixes in this gate.
+
+If the slice includes carryovers, verify that no security gaps remain open between the source plan and destination plan before approving.
 
 Always close with `Siguiente paso recomendado`, plus findings or unblock recommendations when needed.

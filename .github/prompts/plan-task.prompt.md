@@ -14,3 +14,4 @@ Before acting, read:
 - `docs/opencode/14_github_copilot_agentic_flow.md`
 
 Create or repair the canonical schema v3 plan and required `US/UIA/APIA` artifacts. Do not implement source code.
+Use the 7-column traceability matrix with `Estado` as required by the plan template.

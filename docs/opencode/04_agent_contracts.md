@@ -17,6 +17,15 @@
 - El `Estado de ejecucion` debe usar el vocabulario permitido por la familia del agente y no mezclarlo con el estado de findings.
 - Los agentes no deben afirmar que un comando es "el unico" que desbloquea el slice; deben declarar el estado actual, el bloqueo real y el siguiente gate verificable.
 
+## Gobernanza de carryovers
+
+- Cuando una tarea se posterga por una razon justificada, el agente responsable debe registrar el carryover en `docs/opencode/carryovers/BE-00X-carryovers.md`.
+- Usa `docs/opencode/templates/carryovers_registry_template.md` como base del registro para no improvisar columnas ni estados.
+- Si una tarea proviene de otro slice, el cierre debe quedar reflejado tanto en el plan destino como en el plan origen con la misma evidencia o con una referencia explicita al cierre.
+- Un carryover no se considera resuelto si el plan origen, el plan destino y el registro no coinciden.
+- QA, reviewers, docs y final gate deben bloquear slices con carryovers abiertos, desalineados o sin evidencia reproducible.
+- `backend/scripts/validate_slice_plan.py --stage qa|review|checks|docs` aplica esa regla de forma deterministica.
+
 ## Responsabilidades
 
 | Agente | Responsabilidad | Gate o salida |
@@ -66,7 +75,7 @@ QA no repara y certifica el mismo gap unitario. Debe emitir `REJECTED`, dejar un
 
 Todos los agentes operativos pueden usar `docker compose` cuando el slice requiera PostgreSQL, backend runtime o frontend runtime en contenedor. La referencia normal es `db` + `backend` para pruebas con persistencia y `frontend` para validacion de UI cuando aplique.
 
-Cuando la validacion requiera PostgreSQL u otro servicio del compose del repo, `invet-qa-validator` ejecuta la suite dentro del contenedor de backend y usa `docker compose` como contexto de prueba. Antes de reiniciar contenedores al cierre, valida si existen cambios pendientes que realmente ameriten rebuild/restart; si no los hay, registra el skip y no fuerza Docker. El contenedor de `frontend` se considera runtime por defecto y no debe asumirse apto para tests salvo que el flujo lo prepare de forma explicita.
+Cuando la validacion requiera PostgreSQL u otro servicio del compose del repo, `invet-qa-validator` ejecuta la suite dentro del contenedor de backend y usa `docker compose` como contexto de prueba. Antes de reiniciar contenedores al cierre, valida si existen cambios pendientes que realmente ameriten rebuild/restart; si no los hay, registra el skip y no fuerza Docker. Si Docker aplica, QA tambien debe confirmar que todos los contenedores relevantes fueron actualizados o recreados y que su estado quedo saludable. El contenedor de `frontend` se considera runtime por defecto y no debe asumirse apto para tests salvo que el flujo lo prepare de forma explicita.
 
 ## Contrato de tarea schema v3
 

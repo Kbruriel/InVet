@@ -18,7 +18,7 @@ encoding: UTF-8
 | Fecha cierre QA | 2026-08-08 |
 | Gates aprobados | plan, secure-persistence, frontend, QA, functional-review, clean-architecture, security, checks |
 | Findings | SEC-005-C01/C02/C03 (auth/IDOR pendientes de APIA-005) |
-| Pendiente | API automation (APIA-005), docs update |
+| Pendiente | API automation (APIA-005) |
 
 ## Objetivo del slice
 
@@ -69,6 +69,12 @@ Fuente obligatoria: `docs/opencode/references/slice_task_context.md`.
 - Decision: Generar plan schema v3 y tareas auxiliares desde las fuentes canónicas activas (BE/FE/QA tasks + slice_task_context).
 - Impacto en tareas: Se crean US-005, UIA-005, APIA-005 como artefactos derivados del plan.
 
+## Carryovers
+
+- Registro canonico: `docs/opencode/carryovers/BE-005-carryovers.md`
+- Carryover abierto: `APIA-005` quedó pendiente al cierre del slice y mantiene bloqueados `AC-005-05`, `AC-005-06`, `AC-005-07`, `AC-005-08`, `AC-005-09` y `AC-005-14` hasta que exista evidencia reproducible.
+- Carryover transferido a BE-006: `SEC-005-M01` (token en `localStorage` sin expiracion) se difirio al siguiente slice y quedo cerrado en BE-006; la evidencia canonica esta en `docs/opencode/carryovers/BE-006-carryovers.md` y en la security review de BE-006.
+
 ## Entidades y reglas de negocio
 
 | Entidad o regla | Fuente | Responsabilidad del slice | Validacion |
@@ -96,23 +102,23 @@ Fuente obligatoria: `docs/opencode/references/slice_task_context.md`.
 
 ## Matriz de trazabilidad
 
-| ID | Fuente | Historia o criterio | Tarea planificada | Validacion | Evidencia esperada |
-| --- | --- | --- | --- | --- | --- |
-| AC-005-01 | BE/FE/QA | Crear clínica con datos validados | BE-005-T01 | POST /api/v1/clinics responde 201 con DTO | Campos obligatorios, formato email/teléfono |
-| AC-005-02 | BE/FE/QA | Actualizar datos de clínica | BE-005-T02 | PUT /api/v1/clinics/{clinic_id} responde 200 | Solo owner/admin puede actualizar |
-| AC-005-03 | BE/FE/QA | Inactivar/reactivar clínica | BE-005-T03 | PATCH /api/v1/clinics/{clinic_id}/status responde 200 | Estado activo/inactivo, solo admin |
-| AC-005-04 | BE/FE/QA | Listar clínicas del tenant | BE-005-T04 | GET /api/v1/clinics?page=1&limit=20 responde 200 | Paginación, solo datos del tenant |
-| AC-005-05 | BE/FE/QA | Crear sucursal vinculada a clínica | BE-005-T05 | POST /api/v1/clinics/{clinic_id}/branches responde 201 | clinic_id como FK, validación de existencia |
-| AC-005-06 | BE/FE/QA | Actualizar datos de sucursal | BE-005-T06 | PUT /api/v1/branches/{branch_id} responde 200 | Solo owner/admin puede actualizar |
-| AC-005-07 | BE/FE/QA | Inactivar/reactivar sucursal | BE-005-T07 | PATCH /api/v1/branches/{branch_id}/status responde 200 | Estado activo/inactivo |
-| AC-005-08 | BE/FE/QA | Gestionar horarios de sucursal | BE-005-T08 | CRUD /api/v1/branches/{branch_id}/schedules | Rangos de hora validados, sin solapamiento |
-| AC-005-09 | BE/FE/QA | Actualizar contacto/ubicación | BE-005-T09 | PUT /api/v1/branches/{branch_id}/contact-location | Sanitización de inputs, coordenadas válidas |
-| AC-005-10 | FE/QA | Panel clínica renderiza datos | FE-005-T01 | GET endpoints responden, UI muestra lista | loading/success/error/empty states |
-| AC-005-11 | FE/QA | Formulario crear/editar clínica | FE-005-T02 | Formulario valida campos obligatorios | Mensajes de error claros, sin leak interno |
-| AC-005-12 | FE/QA | Formulario crear/editar sucursal | FE-005-T03 | Formulario valida campos obligatorios | Validación de horarios y coordenadas |
-| AC-005-13 | QA | Permisos clinic admin | QA-005-T01 | Usuario sin rol recibe 403 | Sin datos devueltos en error |
-| AC-005-14 | QA | IDOR/BOLA falla seguro | QA-005-T02 | Acceso a recurso de otro tenant/branch | 403, sin datos cruzados |
-| AC-005-15 | QA | Estados UI correctos | QA-005-T03 | loading/error/empty/success se muestran | Captura textual o resumen de UI |
+| ID | Fuente | Historia o criterio | Tarea planificada | Validacion | Evidencia esperada | Estado |
+| --- | --- | --- | --- | --- | --- | --- |
+| AC-005-01 | BE/FE/QA | Crear clínica con datos validados | BE-005-T01 | POST /api/v1/clinics responde 201 con DTO | Campos obligatorios, formato email/teléfono | CLOSED |
+| AC-005-02 | BE/FE/QA | Actualizar datos de clínica | BE-005-T02 | PUT /api/v1/clinics/{clinic_id} responde 200 | Solo owner/admin puede actualizar | CLOSED |
+| AC-005-03 | BE/FE/QA | Inactivar/reactivar clínica | BE-005-T03 | PATCH /api/v1/clinics/{clinic_id}/status responde 200 | Estado activo/inactivo, solo admin | CLOSED |
+| AC-005-04 | BE/FE/QA | Listar clínicas del tenant | BE-005-T04 | GET /api/v1/clinics?page=1&limit=20 responde 200 | Paginación, solo datos del tenant | CLOSED |
+| AC-005-05 | BE/FE/QA | Crear sucursal vinculada a clínica | BE-005-T05 | POST /api/v1/clinics/{clinic_id}/branches responde 201 | clinic_id como FK, validación de existencia | BLOCKED |
+| AC-005-06 | BE/FE/QA | Actualizar datos de sucursal | BE-005-T06 | PUT /api/v1/branches/{branch_id} responde 200 | Solo owner/admin puede actualizar | BLOCKED |
+| AC-005-07 | BE/FE/QA | Inactivar/reactivar sucursal | BE-005-T07 | PATCH /api/v1/branches/{branch_id}/status responde 200 | Estado activo/inactivo | BLOCKED |
+| AC-005-08 | BE/FE/QA | Gestionar horarios de sucursal | BE-005-T08 | CRUD /api/v1/branches/{branch_id}/schedules | Rangos de hora validados, sin solapamiento | BLOCKED |
+| AC-005-09 | BE/FE/QA | Actualizar contacto/ubicación | BE-005-T09 | PUT /api/v1/branches/{branch_id}/contact-location | Sanitización de inputs, coordenadas válidas | BLOCKED |
+| AC-005-10 | FE/QA | Panel clínica renderiza datos | FE-005-T01 | GET endpoints responden, UI muestra lista | loading/success/error/empty states | CLOSED |
+| AC-005-11 | FE/QA | Formulario crear/editar clínica | FE-005-T02 | Formulario valida campos obligatorios | Mensajes de error claros, sin leak interno | CLOSED |
+| AC-005-12 | FE/QA | Formulario crear/editar sucursal | FE-005-T03 | Formulario valida campos obligatorios | Validación de horarios y coordenadas | CLOSED |
+| AC-005-13 | QA | Permisos clinic admin | QA-005-T01 | Usuario sin rol recibe 403 | Sin datos devueltos en error | CLOSED |
+| AC-005-14 | QA | IDOR/BOLA falla seguro | QA-005-T02 | Acceso a recurso de otro tenant/branch | 403, sin datos cruzados | BLOCKED |
+| AC-005-15 | QA | Estados UI correctos | QA-005-T03 | loading/error/empty/success se muestran | Captura textual o resumen de UI | CLOSED |
 
 ## Endpoints esperados
 
@@ -212,7 +218,7 @@ Fuente obligatoria: `docs/opencode/references/slice_task_context.md`.
 
 ## Pruebas QA
 
-| Criterio | Riesgo | Nivel | Suite o archivo esperado | Decision esperada |
+| Criterio | Riesgo | Nivel | Suite o archivo esperado | Estado |
 | --- | --- | --- | --- | --- |
 | Crear clínica valida datos | Alto | integration | test_clinic_router.py (create) | PASS |
 | Actualizar clínica ownership | Alto | integration | test_clinic_router.py (update) | PASS |

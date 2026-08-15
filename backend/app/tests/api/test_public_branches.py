@@ -23,8 +23,11 @@ def mock_use_case():
         return_value=PublicBranchesPaginatedResponse(
             data=[
                 PublicBranchListDTO(
-                    id=1, clinic_id=1, name="Sucursal Test",
-                    description="Descripción de prueba", city="Ciudad Test",
+                    id=1,
+                    clinic_id=1,
+                    name="Sucursal Test",
+                    description="Descripción de prueba",
+                    city="Ciudad Test",
                     address="Calle Test 456",
                 )
             ],
@@ -42,7 +45,9 @@ async def async_app(mock_use_case):
     def mock_get_use_case():
         return mock_use_case
 
-    app.dependency_overrides[pub_branches_mod.get_public_branch_list_use_case] = mock_get_use_case
+    app.dependency_overrides[pub_branches_mod.get_public_branch_list_use_case] = (
+        mock_get_use_case
+    )
 
     yield app
 
@@ -52,7 +57,9 @@ async def async_app(mock_use_case):
 class TestListSucursales:
     @pytest.mark.asyncio
     async def test_list_sucursales_returns_200(self, async_app):
-        async with httpx.AsyncClient(transport=httpx.ASGITransport(app=async_app), base_url="http://test") as client:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=async_app), base_url="http://test"
+        ) as client:
             response = await client.get("/sucursales?page=1&size=20")
         assert response.status_code == 200
         data = response.json()
@@ -64,7 +71,9 @@ class TestListSucursales:
 
     @pytest.mark.asyncio
     async def test_list_sucursales_with_clinica_id_filter(self, async_app):
-        async with httpx.AsyncClient(transport=httpx.ASGITransport(app=async_app), base_url="http://test") as client:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=async_app), base_url="http://test"
+        ) as client:
             response = await client.get("/sucursales?clinica_id=5&page=1&size=20")
         assert response.status_code == 200
         data = response.json()
@@ -74,7 +83,9 @@ class TestListSucursales:
     async def test_list_sucursales_validates_page_size(self):
         app = FastAPI()
         app.include_router(router)
-        async with httpx.AsyncClient(transport=httpx.ASGITransport(app=app), base_url="http://test") as client:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app), base_url="http://test"
+        ) as client:
             response = await client.get("/sucursales?page=1&size=0")
             assert response.status_code == 422
             response = await client.get("/sucursales?page=1&size=101")
@@ -82,7 +93,9 @@ class TestListSucursales:
 
     @pytest.mark.asyncio
     async def test_public_branch_dto_does_not_expose_sensitive_fields(self, async_app):
-        async with httpx.AsyncClient(transport=httpx.ASGITransport(app=async_app), base_url="http://test") as client:
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=async_app), base_url="http://test"
+        ) as client:
             response = await client.get("/sucursales?page=1&size=20")
             data = response.json()
         assert "email" not in data["data"][0]

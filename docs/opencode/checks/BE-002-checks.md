@@ -86,7 +86,7 @@ python backend/scripts/validate_slice_plan.py BE-002 --stage checks
 
 ## Correcciones aplicadas durante el gate
 
-| Archivo | Check fallido | Correccion | Resultado final |
+| Archivo | Check fallido | Correccion | Estado |
 |---|---|---|---|
 | `backend/app/api/schemas/auth_schemas.py` | black | `black app/api/schemas/auth_schemas.py` | ✅ PASS |
 | `backend/app/infrastructure/database/repositories/session_repository_impl.py` | mypy (6 errores) | Type ignores para SQLAlchemy async + casts | ✅ PASS |

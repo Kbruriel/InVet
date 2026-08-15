@@ -12,6 +12,11 @@ Slice ID: `BE-00X`, `FE-00X`, or `QA-00X`.
 
 Run the selected gate and write the expected evidence artifact.
 
+## Preflight
+
+- Validate the slice plan with `python backend/scripts/validate_slice_plan.py QA-00X --stage qa` before running criteria; if it fails, treat previous QA output as stale and route the correction to `/plan-task BE-00X`.
+- Recover the environment before declaring `BLOCKED`: install missing dependencies, prepare QA runtime data, and use Docker when the slice depends on PostgreSQL or the repo runtime.
+
 ## Gate Outputs
 
 - QA: `docs/opencode/qa/QA-00X-results.md` and, when needed, `docs/opencode/qa/QA-00X-findings.md`.

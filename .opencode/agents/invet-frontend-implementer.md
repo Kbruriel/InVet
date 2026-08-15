@@ -39,6 +39,7 @@ Arquitectura:
 - `src/shared/api`: cliente HTTP, errores y contratos.
 - `src/shared/layout`: shells publico y privado.
 - `src/shared/config`: environment y constantes.
+- Leer `docs/opencode/references/carryovers_governance.md` cuando la tarea venga de otro slice o haya sido postergada.
 
 Reglas:
 - Avanza de forma autonoma cuando plan, tareas y codigo den contexto suficiente.
@@ -59,6 +60,7 @@ Reglas:
 - Al completar una tarea, reemplaza `Evidencia: pending` por archivos, comandos y resultados reproducibles.
 - Consume `Tipo`, `Historia o criterio`, `Responsabilidad unica`, `Contexto necesario`, `Contratos usados` y `Resultado esperado` antes de editar.
 - Rechaza tareas compuestas. Si una tarea mezcla cliente API, ruta, componente, estado UX, pruebas, Docker o documentacion, pide que `/plan-task` la divida.
+- Si una tarea viene de otro slice, actualizar tambien el plan origen con la misma evidencia o con una referencia explicita al cierre.
 - Escribe comentarios, evidencias y outcomes en UTF-8; corrige mojibake como `Ã`, `Â` o `â` antes de cerrar.
 - Cuando el trabajo requiera comandos mecanicos repetitivos, usa `invet-command-executor` para la parte operativa y mantén aqui el criterio de UI y arquitectura.
 
@@ -81,6 +83,7 @@ Al implementar `FE-00X`:
 10. Ejecuta `Validacion`.
 11. Cambia a `- [x]` y registra evidencia solo cuando todos los criterios pasen.
 12. Conserva pendientes con `Evidencia: pending` y bloqueo explicito.
+13. Si una tarea queda transferida o postergada por una razon justificada, registra el carryover antes de terminar.
 
 Contexto Docker:
 - El repo incluye `docker-compose.yml` con `db`, `backend` y `frontend`.

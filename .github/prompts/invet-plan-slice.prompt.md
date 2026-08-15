@@ -10,6 +10,11 @@ Slice ID: `BE-00X`, `FE-00X`, or `QA-00X`.
 
 Plan the slice once, using a single canonical plan at `docs/opencode/plans/BE-00X-plan.md`.
 
+## Preflight
+
+- Run `python backend/scripts/validate_slice_plan.py BE-00X --stage previous` before creating or repairing the plan.
+- If the prior slice, canonical plan, or `US/UIA/APIA` artifacts are stale or missing, repair them in the same run and preserve any evidence that still applies.
+
 ## Required Steps
 
 1. Normalize the ID to the same vertical slice: `BE-00X`, `FE-00X`, `QA-00X`, `US-00X`, `UIA-00X`, and `APIA-00X`.

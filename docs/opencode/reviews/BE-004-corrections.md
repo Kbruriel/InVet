@@ -52,12 +52,12 @@ No requiere correccion de codigo. Es un bloqueo de entorno.
 
 Se actualizaron 4 tareas en `docs/opencode/plans/BE-004-plan.md`:
 
-| Tarea | Criterio | Estado anterior | Estado nuevo | Evidencia |
+| Tarea | Criterio | Estado | Evidencia |
 |---|---|---|---|---|
-| BE-004-T04 | AC-004-03 | `- [ ]` pending | `- [x]` implemented | `branch_profile.py` contains get_branch_services |
-| BE-004-T05 | AC-004-04 | `- [ ]` pending | `- [x]` implemented | `branch_profile.py` contains get_branch_schedules |
-| BE-004-T06 | AC-004-05 | `- [ ]` pending | `- [x]` implemented | `branch_profile.py` contains get_rating_summary |
-| BE-004-T07 | AC-004-06 | `- [ ]` pending | `- [x]` implemented | `branch_profile.py` contains get_availability |
+| BE-004-T04 | AC-004-03 | READY_FOR_REVALIDATION | Antes: `- [ ]` pending; ahora: `- [x]` implemented; `branch_profile.py` contains get_branch_services |
+| BE-004-T05 | AC-004-04 | READY_FOR_REVALIDATION | Antes: `- [ ]` pending; ahora: `- [x]` implemented; `branch_profile.py` contains get_branch_schedules |
+| BE-004-T06 | AC-004-05 | READY_FOR_REVALIDATION | Antes: `- [ ]` pending; ahora: `- [x]` implemented; `branch_profile.py` contains get_rating_summary |
+| BE-004-T07 | AC-004-06 | READY_FOR_REVALIDATION | Antes: `- [ ]` pending; ahora: `- [x]` implemented; `branch_profile.py` contains get_availability |
 
 ### Justificacion
 

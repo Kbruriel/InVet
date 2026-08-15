@@ -31,8 +31,13 @@ Read first:
 - `.github/prompts/invet-qa-review-close.prompt.md`
 - `docs/opencode/14_github_copilot_agentic_flow.md`
 - `docs/opencode/13_agents_architecture_and_gate_flow.md`
+- `docs/opencode/references/carryovers_governance.md`
 - `docs/opencode/plans/BE-00X-plan.md`
 - Existing QA, review, checks, and findings artifacts for the slice
+
+Preflight:
+- Validate the slice plan first and recover the environment with dependencies or Docker before declaring `BLOCKED`.
+- Treat stale QA evidence as invalid when the plan, filesystem, or git diff show the slice changed since the prior run.
 
 Do not modify product code in QA or review gates. If a product defect is found, document the finding and hand off to `InVet Findings Resolver`.
 
@@ -46,3 +51,4 @@ Continuity rules:
 - For `functional-review`, recommend `clean-architecture-review` after `APPROVED`; do not recommend QA again unless the review preflight could not start because QA is not approved.
 - `READY_FOR_REVALIDATION` remains blocking until QA or the responsible reviewer closes it with evidence.
 - `READY_FOR_REVALIDATION` is a findings state, not a gate state.
+- If the slice includes carryovers, do not approve until the source plan, destination plan, and carryover registry are synchronized with evidence.

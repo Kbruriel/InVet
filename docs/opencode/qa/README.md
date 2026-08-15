@@ -48,10 +48,13 @@ los artefactos que deben revisarse antes de validar un cambio.
    docker compose run --rm backend pytest app/tests/ -q
    ```
 
-5. Ejecutar la validacion frontend o los checks necesarios segun el alcance
+5. Verificar que los contenedores Docker aplicables quedaron actualizados o
+   recreados cuando el slice exige Docker como contexto.
+
+6. Ejecutar la validacion frontend o los checks necesarios segun el alcance
    del slice.
 
-6. Registrar evidencia en:
+7. Registrar evidencia en:
    - `docs/opencode/qa/QA-00X-results.md`
    - `docs/opencode/qa/QA-00X-findings.md` cuando existan hallazgos abiertos
 

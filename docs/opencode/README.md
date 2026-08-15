@@ -47,6 +47,10 @@ Notas:
 - El planner tambien debe crear o actualizar `US-00X`, `UIA-00X` y `APIA-00X`.
 - Los planes nuevos usan schema v3 y se validan con `backend/scripts/validate_slice_plan.py`.
 - Los planes schema v2 son legacy: deben regenerarse con `/plan-task` antes de implementarse.
+- `/plan-task` y `/qa-task` validan primero el contrato vigente y tratan artefactos desactualizados o entornos rotos como insumos de reparacion, no como estado final.
+- `/qa-task` intenta autorecuperar dependencias y contexto Docker antes de bloquearse.
+- Los agentes de UI y API automation validan el plan con stage `qa` y usan Docker cuando el slice depende de PostgreSQL o del runtime del repo.
+- Cuando Docker aplica al cierre, todos los contenedores relevantes deben quedar actualizados o recreados y saludables antes de reportar cierre.
 - Los artefactos operativos se escriben en UTF-8.
 - Para implementar frontend usa `/implement-frontend-task FE-00X`.
 - Para ejecutar QA usa `/qa-task QA-00X`.
@@ -73,8 +77,10 @@ Los archivos de hallazgos esperados son:
 - `14_github_copilot_agentic_flow.md`: version del flujo compatible con GitHub Copilot.
 - `templates`: plantillas Markdown para resultados, hallazgos y correcciones.
 - `templates/slice_plan_template.md`: contrato obligatorio de planes schema v3.
+- `templates/carryovers_registry_template.md`: plantilla para registrar tareas postergadas o transferidas.
 - `templates/missing_artifact_generation_template.md`: solicitud reusable para regenerar artefactos canonicos faltantes.
 - `references/spec_kit_reference_improvements.md`: adaptacion de aprendizajes de `github/spec-kit` al flujo agentico InVet.
+- `references/carryovers_governance.md`: reglas para tareas postergadas y cierres cruzados entre slices.
 - `references/slice_task_context.md`: brief por slice con titulo, descripcion, entregables BE/FE y foco de aceptacion QA.
 - `references/missing_artifact_generation.md`: procedimiento para migrar backups legacy de `payload/` a artefactos canonicos validos.
 - `tasks/backend`: tareas backend.

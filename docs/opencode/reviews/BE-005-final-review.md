@@ -64,7 +64,7 @@ slice: "005"
 | Endpoints sin autenticacion | Critical | APIA-005 | Pendiente (aceptado como riesgo documentado) |
 | IDOR/BOLA sin validacion | Critical | APIA-005 | Pendiente (aceptado como riesgo documentado) |
 | Tenant isolation hardcoded | Critical | APIA-005 | Pendiente (aceptado como riesgo documentado) |
-| Token localStorage sin expiracion | Major | BE-006 | Pendiente |
+| Token localStorage sin expiracion | Major | BE-006 | Cerrado en BE-006 |
 
 ## Decision final
 

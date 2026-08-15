@@ -50,6 +50,13 @@
   - El fix removio el mock sobrante en `addPet` y sincronizo mejor las esperas en el test de `editPet`
 - **Estado actual:** RESOLVED. QA revalido la correccion y cerro el finding.
 
+## Verificacion Docker
+
+- Docker Compose disponible: No
+- Contenedores aplicables actualizados o recreados: No aplica; la corrida de revalidacion se ejecuto sin Docker
+- Estado saludable verificado: No aplica
+- Skip justificado, si aplica: Docker no estuvo disponible en esta corrida local
+
 
 ## Decision sobre nuevas tareas
 
@@ -61,7 +68,7 @@ No quedan hallazgos abiertos ni pendientes de revalidacion en el slice 007.
 
 ## Historial de estados de findings
 
-| Finding | Fecha creacion | Estado actual | Resuelto por |
+| Finding | Fecha creacion | Estado | Resuelto por |
 |---|---|---|---|
 | QA-007-F01 | 2026-08-11 | RESOLVED | Bug fix en codigo del producto (POST/PUT owners) |
 | QA-007-F02 | 2026-08-11 | RESOLVED | Bug fix en codigo del producto (pet delete + soft-filter) |

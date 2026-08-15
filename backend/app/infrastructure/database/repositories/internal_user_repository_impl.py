@@ -3,15 +3,17 @@
 from __future__ import annotations
 
 import json
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from typing import Any, cast
 
-from sqlalchemy import select, func
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.domain.entities.internal_user import InternalUser
 from app.domain.repositories.slice006_repositories import InternalUserRepository
-from app.infrastructure.database.models.internal_user_model import InternalUser as InternalUserModel
+from app.infrastructure.database.models.internal_user_model import (
+    InternalUser as InternalUserModel,
+)
 
 
 class InternalUserRepositoryImpl(InternalUserRepository):
@@ -36,7 +38,9 @@ class InternalUserRepositoryImpl(InternalUserRepository):
 
     async def create_internal_user(self, internal_user: InternalUser) -> InternalUser:
         """Crear un nuevo usuario interno."""
-        branch_ids_json = json.dumps(internal_user.branch_ids) if internal_user.branch_ids else "[]"
+        branch_ids_json = (
+            json.dumps(internal_user.branch_ids) if internal_user.branch_ids else "[]"
+        )
         model = InternalUserModel(
             user_id=internal_user.user_id,
             clinic_id=internal_user.clinic_id,
@@ -101,7 +105,9 @@ class InternalUserRepositoryImpl(InternalUserRepository):
         is_active_only: bool = True,
     ) -> tuple[list[InternalUser], int]:
         """Listar usuarios internos de una clínica con paginación."""
-        base_stmt = select(InternalUserModel).where(InternalUserModel.clinic_id == clinic_id)
+        base_stmt = select(InternalUserModel).where(
+            InternalUserModel.clinic_id == clinic_id
+        )
         if is_active_only:
             base_stmt = base_stmt.where(InternalUserModel.is_active.is_(True))
 

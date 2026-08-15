@@ -1,14 +1,11 @@
 """Interfaces de repositorios para propietarios y mascotas."""
 
 from abc import ABC, abstractmethod
-from typing import Optional
 
 from app.domain.entities.owner import (
     Owner,
-    OwnerCreate,
     OwnerUpdate,
     Pet,
-    PetCreate,
     PetHistoryEntry,
     PetUpdate,
 )
@@ -16,23 +13,24 @@ from app.domain.entities.owner import (
 
 class OwnerRepository(ABC):
     """Interface para el repositorio de propietarios."""
+
     @abstractmethod
     def create_owner(self, owner: Owner) -> Owner:
         """Crear un nuevo propietario. Retorna la entidad con ID asignado."""
         pass
 
     @abstractmethod
-    def get_owner_by_id(self, owner_id: int) -> Optional[Owner]:
+    def get_owner_by_id(self, owner_id: int) -> Owner | None:
         """Obtener un propietario por ID o None si no existe."""
         pass
 
     @abstractmethod
-    def get_owner_by_user_id(self, user_id: int) -> Optional[Owner]:
+    def get_owner_by_user_id(self, user_id: int) -> Owner | None:
         """Obtener un propietario vinculado a un usuario o None si no existe."""
         pass
 
     @abstractmethod
-    def update_owner(self, owner_id: int, data: OwnerUpdate) -> Optional[Owner]:
+    def update_owner(self, owner_id: int, data: OwnerUpdate) -> Owner | None:
         """Actualizar campos de un propietario existente. Retorna None si no existe."""
         pass
 
@@ -46,7 +44,7 @@ class PetRepository(ABC):
         pass
 
     @abstractmethod
-    def get_pet_by_id(self, pet_id: int) -> Optional[Pet]:
+    def get_pet_by_id(self, pet_id: int) -> Pet | None:
         """Obtener una mascota por ID o None si no existe."""
         pass
 
@@ -61,7 +59,7 @@ class PetRepository(ABC):
         pass
 
     @abstractmethod
-    def update_pet(self, pet_id: int, data: PetUpdate) -> Optional[Pet]:
+    def update_pet(self, pet_id: int, data: PetUpdate) -> Pet | None:
         """Actualizar campos de una mascota existente. Retorna None si no existe."""
         pass
 

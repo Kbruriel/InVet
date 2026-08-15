@@ -27,6 +27,7 @@ Before editing code for a slice, read the relevant files:
 
 - `docs/opencode/14_github_copilot_agentic_flow.md`
 - `docs/opencode/13_agents_architecture_and_gate_flow.md`
+- `docs/opencode/references/carryovers_governance.md` when a task was postponed or transferred from another slice
 - `docs/opencode/qa/README.md`
 - `docs/opencode/plans/BE-00X-plan.md`
 - `docs/opencode/tasks/backend/BE-00X.md`
@@ -37,6 +38,7 @@ Before editing code for a slice, read the relevant files:
 - `docs/opencode/tasks/api-automation/APIA-00X.md`
 
 If a required artifact is missing, do not invent its contents. Create or repair the canonical artifact first, using `docs/opencode/templates/slice_plan_template.md` and the rules in `docs/opencode/references/missing_artifact_generation.md` when applicable.
+If a task was transferred from another slice, do not treat it as complete until the destination plan, the source plan, and the carryover registry all show the same closure evidence.
 
 ## Gates
 
@@ -87,6 +89,7 @@ Use these rules:
 - If QA is `REJECTED` or findings are `OPEN`/`IN_PROGRESS`, recommend the findings workflow for `BE-00X`.
 - If findings are `READY_FOR_REVALIDATION`, treat that as a findings state and route through the findings workflow; the resolver hands revalidation back to QA when the corrections are ready.
 - Do not treat `READY_FOR_REVALIDATION` as a completed gate, even if an older results file says `APPROVED`.
+- If a slice includes carryovers, block approval until the current plan, the source plan, and the carryover registry are synchronized with reproducible evidence.
 - After functional review runs and is `APPROVED`, recommend clean architecture review for `BE-00X`; do not send the flow back to QA.
 - Recommend QA from functional review only when the review preflight could not start because QA is not approved or needs revalidation.
 
@@ -118,6 +121,7 @@ Motivo: <what evidence or artifact is missing>
 
 - Preserve UTF-8 in all Markdown and source files.
 - Keep tasks small and tied to one layer: backend, frontend, QA, UI automation, or API automation.
+- If a task is transferred from another slice, update both the destination and source plans with the same evidence and the carryover registry before closing it.
 - Do not combine product implementation with QA gate decisions.
 - Do not let QA implement missing unit tests for product code.
 - Prefer existing architecture, naming, and test patterns.

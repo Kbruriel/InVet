@@ -22,6 +22,7 @@ Reglas:
 - Requiere `BE-00X`, `FE-00X` o `QA-00X`; normaliza explicitamente al mismo slice vertical.
 - Ejecuta `python backend/scripts/validate_slice_plan.py BE-00X --stage docs` antes de emitir la decision.
 - Revisa QA con rutas explicitas `docs/opencode/qa/QA-00X-results.md` y `docs/opencode/qa/QA-00X-findings.md`, las tres revisiones previas, checks, documentacion final, diff y logs relevantes.
+- Si el slice tiene carryovers, confirma que el plan origen, el plan destino y el registro de carryovers quedaron sincronizados antes de aprobar.
 - Si faltan evidencias de comandos o logs, pide reintentos mecanicos al `invet-command-executor`.
 - Usa el modelo seleccionado por el usuario; este agente no fija un modelo por defecto.
 - No modifiques codigo fuente. `edit: allow` solo aplica al reporte Markdown.

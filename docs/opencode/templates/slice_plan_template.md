@@ -60,11 +60,12 @@ Registrar solo supuestos no bloqueantes. Si el supuesto cambia contrato publico,
 
 ## Matriz de trazabilidad
 
-| ID | Fuente | Historia o criterio | Tarea planificada | Validacion | Evidencia esperada |
-| --- | --- | --- | --- | --- | --- |
-| AC-XXX-01 | BE/FE/QA/matriz |  | BE-XXX-T01 |  |  |
+| ID | Fuente | Historia o criterio | Tarea planificada | Validacion | Evidencia esperada | Estado |
+| --- | --- | --- | --- | --- | --- | --- |
+| AC-XXX-01 | BE/FE/QA/matriz |  | BE-XXX-T01 |  |  | OPEN |
 
 Regla: ningun criterio funcional, contrato API, riesgo de seguridad o estado UX puede quedar sin tarea y validacion asociada.
+Regla adicional: el campo `Estado` debe reflejar la situacion actual del criterio con un valor consistente como `OPEN`, `BLOCKED`, `CLOSED` o `CANCELLED`.
 
 ## Endpoints esperados
 
@@ -117,7 +118,7 @@ Debe cubrir `loading`, `submitting`, `error`, `empty` y `success` cuando aplique
 
 ## Pruebas QA
 
-| Criterio | Riesgo | Nivel | Suite o archivo esperado | Decision esperada |
+| Criterio | Riesgo | Nivel | Suite o archivo esperado | Estado |
 | --- | --- | --- | --- | --- |
 |  |  | unit/integration/contract/security/regression/frontend |  | PASS |
 

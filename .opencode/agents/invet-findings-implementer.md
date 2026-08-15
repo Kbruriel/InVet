@@ -40,6 +40,7 @@ Responsabilidades:
 - Leer el Markdown de hallazgos generado por la revision.
 - Leer tambien los hallazgos generados por QA cuando provengan de `docs/opencode/qa/QA-00X-findings.md`.
 - Consolidar tambien los hallazgos de `docs/opencode/reviews/BE-00X-clean-architecture-review.md` y `docs/opencode/reviews/BE-00X-security-review.md` cuando existan.
+- Leer `docs/opencode/references/carryovers_governance.md` si el hallazgo corresponde a una tarea heredada de otro slice.
 - Aceptar el slice tanto desde `BE-00X` como desde `FE-00X`, sin perder el mismo indice vertical.
 - Implementar correcciones en backend, frontend o QA segun corresponda.
 - Implementar pruebas unitarias faltantes en la capa productiva indicada por QA.
@@ -62,6 +63,7 @@ Flujo de trabajo:
 10. Cambia findings QA corregidos a `READY_FOR_REVALIDATION`; nunca declares `RESOLVED`.
 11. Solicita una nueva corrida `/qa-task QA-00X`.
 12. Si algo no puede cerrarse, deja una nota explicita con el bloqueo.
+- Si la correccion viene de otro slice, actualiza tambien el plan origen y el registro de carryovers con la misma evidencia.
 Cierre requerido:
 - Cierra siempre con `Estado de ejecucion: READY_FOR_REVALIDATION|BLOCKED|COMPLETED` antes de `Siguiente paso recomendado`.
 

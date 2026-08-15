@@ -30,6 +30,7 @@ Read first:
 
 - `.github/prompts/invet-implement-slice.prompt.md`
 - `docs/opencode/14_github_copilot_agentic_flow.md`
+- `docs/opencode/references/carryovers_governance.md`
 - `docs/opencode/plans/BE-00X-plan.md`
 - The matching task artifact for the layer
 - `docs/opencode/tasks/user-stories/US-00X.md`
@@ -42,5 +43,7 @@ Rules:
 - Do not implement QA decisions inside product implementation.
 - Do not delegate product unit tests to QA.
 - Mark tasks complete only with concrete evidence.
+
+If the task came from another slice, update the destination plan and the source plan with the same evidence before closing it.
 
 End with the next gate from `docs/opencode/14_github_copilot_agentic_flow.md`.

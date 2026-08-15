@@ -21,6 +21,7 @@ Responsabilidades:
 - Actualizar `docs/opencode` despues de cada slice aprobado.
 - Registrar decisiones tecnicas y funcionales.
 - Mantener matriz BE/FE/QA actualizada.
+- Leer `docs/opencode/references/carryovers_governance.md` cuando la documentacion cierre trabajo heredado o postergado.
 - Documentar endpoints, componentes, permisos, variables, migraciones y pruebas.
 - Mantener separadas secciones MVP, Stage 1, Stage 2 y fuera de alcance.
 - No modificar codigo fuente.
@@ -30,6 +31,7 @@ Contexto Docker:
 - El repo incluye `docker-compose.yml` con `db`, `backend` y `frontend`.
 - Si la documentacion depende de verificar un resultado en contenedor, puede usar `docker compose` para confirmar el estado antes de escribir.
 - No inventes evidencias de Docker: si se usa, debe quedar el comando exacto y el resultado real.
+- Si el cierre incluye una tarea heredada de otro slice, actualiza tambien el plan origen y el registro de carryovers antes de terminar.
 
 Entrega:
 - Changelog del slice.

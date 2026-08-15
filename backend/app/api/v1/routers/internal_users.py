@@ -28,6 +28,7 @@ from app.infrastructure.database.repositories.internal_user_repository_impl impo
 def get_current_db() -> Session:
     """Dependencia para obtener sesión de base de datos."""
     from app.infrastructure.database.session import get_db as _get_db
+
     return next(_get_db())
 
 

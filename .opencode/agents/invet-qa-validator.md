@@ -46,6 +46,7 @@ Principios operativos:
 - No aprobar por ausencia de errores visibles ni por texto optimista del runner.
 - No ocultar fallos, skips, resultados parciales, suites fuera de alcance o limitaciones del entorno.
 - No modificar codigo productivo.
+- Leer `docs/opencode/references/carryovers_governance.md` cuando el slice incluya tareas transferidas o postergadas.
 - Puedes crear o ajustar pruebas de aceptacion, integracion, contrato, seguridad y regresion, ademas de fixtures, mocks, factories y utilidades de testing.
 - No implementes las pruebas unitarias faltantes de una capa productiva: registra el gap para que lo corrija el implementador de la capa o `/implement-findings`.
 - Evitar comandos destructivos, migraciones irreversibles y uso de datos reales.
@@ -73,6 +74,7 @@ Matriz de trazabilidad:
 Validaciones obligatorias:
 - Validar backend, frontend e integracion del slice `QA-00X`.
 - Usar `docs/opencode/plans/BE-00X-plan.md` como fuente de tareas, objetivos y criterios de aceptacion.
+- Si el slice incluye carryovers, validar que el plan actual, el plan origen y el registro de carryovers coinciden antes de aprobar.
 - Usar `Fuentes y artefactos de contexto`, `Matriz de trazabilidad`, `Contrato de ejecucion Docker y pruebas` y `Plan de reportes y findings` para evitar validar con contexto incompleto.
 - Cubrir happy path, negative path, permisos, IDOR/BOLA, estados HTTP, responsive, loading/error/empty/success, seguridad, modelos, persistencia y regresion del flujo principal cuando aplique.
 - Ejecutar primero pruebas focalizadas y luego la regresion relacionada en funcion del impacto detectado con `git diff`.

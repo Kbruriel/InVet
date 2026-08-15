@@ -2,7 +2,16 @@
 
 from datetime import UTC, datetime
 
-from sqlalchemy import Boolean, Column, DateTime, ForeignKey, Integer, String, Text, UniqueConstraint
+from sqlalchemy import (
+    Boolean,
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    String,
+    Text,
+    UniqueConstraint,
+)
 from sqlalchemy.orm import relationship
 
 from app.infrastructure.database.models.base import Base
@@ -17,11 +26,15 @@ class Service(Base):
     clinic_id = Column(Integer, ForeignKey("clinics.id"), nullable=False)
     name = Column(String(200), nullable=False)
     description = Column(Text)
-    price = Column("price", Integer, nullable=False)  # Stored as cents to avoid float issues
+    price = Column(
+        "price", Integer, nullable=False
+    )  # Stored as cents to avoid float issues
     duration_minutes = Column("duration_minutes", Integer, nullable=False)
     is_active = Column(Boolean, default=True)
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
-    updated_at = Column(DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))
+    updated_at = Column(
+        DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC)
+    )
 
     clinic = relationship("Clinic", lazy="noload")
 

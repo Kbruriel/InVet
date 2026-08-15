@@ -21,8 +21,6 @@ from app.application.use_cases.veterinarian_use_cases import (
 )
 from app.core.security import get_current_access_user
 from app.domain.repositories.slice006_repositories import (
-    AssignmentRepository,
-    ServiceRepository,
     VeterinarianRepository,
 )
 from app.infrastructure.database.repositories.assignment_repository_impl import (
@@ -39,6 +37,7 @@ from app.infrastructure.database.repositories.veterinarian_repository_impl impor
 def get_current_db() -> Session:
     """Dependencia para obtener sesión de base de datos."""
     from app.infrastructure.database.session import get_db as _get_db
+
     return next(_get_db())
 
 
@@ -55,7 +54,9 @@ def get_service_repo(db: Session = Depends(get_current_db)) -> ServiceRepository
     return ServiceRepositoryImpl(db)
 
 
-def get_assignment_repo(db: Session = Depends(get_current_db)) -> AssignmentRepositoryImpl:
+def get_assignment_repo(
+    db: Session = Depends(get_current_db),
+) -> AssignmentRepositoryImpl:
     """Dependencia para el repositorio de asignaciones."""
     return AssignmentRepositoryImpl(db)
 

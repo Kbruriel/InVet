@@ -4,7 +4,6 @@ from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.api.v1.schemas.public_branch import PublicBranchesPaginatedResponse
-from app.application.dtos import PublicBranchListDTO
 from app.application.use_cases.public_branches import ListPublicBranchesUseCase
 from app.core.database import get_db
 from app.domain.repositories.branch_repository import BranchRepository

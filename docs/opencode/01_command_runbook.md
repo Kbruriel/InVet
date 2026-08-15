@@ -40,7 +40,7 @@ La secuencia manual equivalente es:
 6. `implement-api-automation-task` recibe el slice backend equivalente, lee `US-00X` y `APIA-00X`, e implementa pruebas HTTP en `InVet_UI_Automation/tests/api`.
 7. `qa-task` recibe el ID QA equivalente `QA-00X`, valida usando objetivos y criterios del plan, y marca tareas QA o de validacion completadas.
 8. `qa-task` documenta evidencia, rechaza gaps unitarios y no repara pruebas unitarias de producto.
-9. Si una corrida necesita PostgreSQL, el flujo canonico es levantar `docker compose up -d db` y ejecutar la suite dentro del contenedor de backend con `docker compose run --rm backend pytest ...`; la ejecucion en host solo es fallback documentado cuando Docker no esta disponible.
+9. Si una corrida necesita PostgreSQL, el flujo canonico es levantar `docker compose up -d db` y ejecutar la suite dentro del contenedor de backend con `docker compose run --rm backend pytest ...`; la ejecucion en host solo es fallback documentado cuando Docker no esta disponible. Antes de cerrar QA o checks, confirmar que los contenedores Docker aplicables fueron actualizados o recreados cuando correspondia.
 10. `review-slice` acepta `BE-00X` o `FE-00X` y siempre deja `docs/opencode/reviews/BE-00X-review.md` con decision.
 11. `clean-architecture-review BE-00X` siempre deja `docs/opencode/reviews/BE-00X-clean-architecture-review.md`.
 12. `security-review BE-00X` siempre deja `docs/opencode/reviews/BE-00X-security-review.md`.
@@ -50,6 +50,7 @@ La secuencia manual equivalente es:
 16. Las revisiones reciben un ID explicito y siempre escriben decision `APPROVED|REJECTED`.
 17. `run-checks BE-00X` deja evidencia Markdown antes de `update-docs BE-00X`.
 18. `final-gate BE-00X` deja un reporte final de release cuando se usa una segunda opinion de alta capacidad.
+19. Si una tarea se posterga o se transfiere desde otro slice, registrar el carryover en `docs/opencode/carryovers/BE-00X-carryovers.md`, reflejar la misma evidencia en el plan origen y el destino, y validar el registro antes de aprobar `qa`, `review`, `checks` o `docs`.
 
 ## Ejemplo: busqueda publica
 

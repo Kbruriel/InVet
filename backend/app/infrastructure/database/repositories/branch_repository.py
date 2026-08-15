@@ -157,9 +157,7 @@ class ServiceRepositoryImpl(ServiceRepository):
 
         Si se proporciona clinica_id sin sucursal_id, se filtran servicios de todas las sucursales de esa clnica.
         """
-        query = self.db.query(ServiceModel).filter(
-            ServiceModel.is_active.is_(True)
-        )
+        query = self.db.query(ServiceModel).filter(ServiceModel.is_active.is_(True))
 
         # Filtrar por sucursal si se proporciona
         if sucursal_id:
@@ -167,8 +165,7 @@ class ServiceRepositoryImpl(ServiceRepository):
         elif clinica_id:
             # Filtrar por todas las sucursales de la clnica
             subquery = self.db.query(BranchModel.id).filter(
-                BranchModel.clinic_id == clinica_id,
-                BranchModel.is_active.is_(True)
+                BranchModel.clinic_id == clinica_id, BranchModel.is_active.is_(True)
             )
             query = query.filter(ServiceModel.branch_id.in_(subquery))
 

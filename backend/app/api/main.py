@@ -2,8 +2,8 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api.middleware import RateLimitMiddleware
 
+from app.api.middleware import RateLimitMiddleware
 from app.api.v1.router import router as api_v1_router
 from app.core.config import settings
 
@@ -45,11 +45,7 @@ def create_app() -> FastAPI:
         # Enforce presence of a real SECRET_KEY in production and refuse common placeholders.
         forbidden = {None, "", "secret-key-for-dev", "change-me-in-production"}
         secret_key = settings.SECRET_KEY
-        if (
-            not secret_key
-            or len(secret_key) < 16
-            or secret_key in forbidden
-        ):
+        if not secret_key or len(secret_key) < 16 or secret_key in forbidden:
             raise RuntimeError(
                 "In production ENVIRONMENT, SECRET_KEY must be set to a strong secret and not use default placeholders."
             )

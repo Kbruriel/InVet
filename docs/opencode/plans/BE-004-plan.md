@@ -90,17 +90,17 @@ Fuente obligatoria: `docs/opencode/references/slice_task_context.md`.
 
 ## Matriz de trazabilidad
 
-| ID | Fuente | Historia o criterio | Tarea planificada | Validacion | Evidencia esperada |
-| --- | --- | --- | --- | --- | --- |
-| AC-004-01 | BE/FE/QA | Perfil publico de sucursal sin auth | BE-004-T01 | GET /api/v1/clinics/branches/{branch_id} responde 200 con datos publicos | DTO limpio, sin campos sensibles |
-| AC-004-02 | BE/FE/QA | Perfil protegido con validacion de acceso | BE-004-T02 | GET /api/v1/clinics/{clinic_id}/{branch_id} requiere auth y valida ownership | 401 sin token, 403 sin acceso |
-| AC-004-03 | BE/FE/QA | Servicios de la sucursal | BE-004-T03 | Endpoint lista servicios ofrecidos por branch_id | Lista con nombre, precio base, activo/inactivo |
-| AC-004-04 | BE/FE/QA | Horarios disponibles | BE-004-T04 | Endpoint devuelve schedules filtrados por fecha | Formato consistente, sin datos internos |
-| AC-004-05 | BE/FE/QA | Resumen de calificaciones | BE-004-T05 | Endpoint calcula promedio y conteo de ratings | Numeros validos, sin datos de usuarios |
-| AC-004-06 | BE/FE/QA | Disponibilidad basica | BE-004-T06 | Endpoint devuelve disponibilidad actual | Estado claro (disponible/no disponible) |
-| AC-004-07 | FE/QA | CTA de solicitud de cita | FE-004-T01 | Boton navega al flujo de citas con branch_id | URL correcta, sin datos sensibles en query |
-| AC-004-08 | QA | ID inexistentes devuelven error seguro | QA-004-T01 | GET con branch_id inexistente devuelve 404 sin leak | Mensaje genérico, sin stack trace |
-| AC-004-09 | QA | Permisos cruzados fallan | QA-004-T02 | Acceso cross-tenant/cross-branch falla con 403 | Sin datos devueltos en error |
+| ID | Fuente | Historia o criterio | Tarea planificada | Validacion | Evidencia esperada | Estado |
+| --- | --- | --- | --- | --- | --- | --- |
+| AC-004-01 | BE/FE/QA | Perfil publico de sucursal sin auth | BE-004-T01 | GET /api/v1/clinics/branches/{branch_id} responde 200 con datos publicos | DTO limpio, sin campos sensibles | CLOSED |
+| AC-004-02 | BE/FE/QA | Perfil protegido con validacion de acceso | BE-004-T02 | GET /api/v1/clinics/{clinic_id}/{branch_id} requiere auth y valida ownership | 401 sin token, 403 sin acceso | CLOSED |
+| AC-004-03 | BE/FE/QA | Servicios de la sucursal | BE-004-T03 | Endpoint lista servicios ofrecidos por branch_id | Lista con nombre, precio base, activo/inactivo | CLOSED |
+| AC-004-04 | BE/FE/QA | Horarios disponibles | BE-004-T04 | Endpoint devuelve schedules filtrados por fecha | Formato consistente, sin datos internos | CLOSED |
+| AC-004-05 | BE/FE/QA | Resumen de calificaciones | BE-004-T05 | Endpoint calcula promedio y conteo de ratings | Numeros validos, sin datos de usuarios | CLOSED |
+| AC-004-06 | BE/FE/QA | Disponibilidad basica | BE-004-T06 | Endpoint devuelve disponibilidad actual | Estado claro (disponible/no disponible) | CLOSED |
+| AC-004-07 | FE/QA | CTA de solicitud de cita | FE-004-T01 | Boton navega al flujo de citas con branch_id | URL correcta, sin datos sensibles en query | CLOSED |
+| AC-004-08 | QA | ID inexistentes devuelven error seguro | QA-004-T01 | GET con branch_id inexistente devuelve 404 sin leak | Mensaje genérico, sin stack trace | CLOSED |
+| AC-004-09 | QA | Permisos cruzados fallan | QA-004-T02 | Acceso cross-tenant/cross-branch falla con 403 | Sin datos devueltos en error | CLOSED |
 
 ## Endpoints esperados
 
@@ -184,7 +184,7 @@ Fuente obligatoria: `docs/opencode/references/slice_task_context.md`.
 
 ## Pruebas QA
 
-| Criterio | Riesgo | Nivel | Suite o archivo esperado | Decision esperada |
+| Criterio | Riesgo | Nivel | Suite o archivo esperado | Estado |
 | --- | --- | --- | --- | --- |
 | Perfil publico sin auth | Medio | integration | test_clinic_router.py (public) | PASS |
 | Perfil protegido con auth | Alto | integration | test_clinic_router.py (protected) | PASS |

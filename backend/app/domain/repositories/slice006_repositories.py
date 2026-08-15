@@ -14,7 +14,9 @@ class ServiceRepository(ABC):
     """Interface para el repositorio de servicios."""
 
     @abstractmethod
-    async def get_service_by_id(self, service_id: int, clinic_id: int) -> Service | None:
+    async def get_service_by_id(
+        self, service_id: int, clinic_id: int
+    ) -> Service | None:
         """Obtener un servicio por ID y clinic_id. Retorna None si no existe."""
         pass
 
@@ -24,12 +26,16 @@ class ServiceRepository(ABC):
         pass
 
     @abstractmethod
-    async def update_service(self, service_id: int, clinic_id: int, data: dict) -> Service | None:
+    async def update_service(
+        self, service_id: int, clinic_id: int, data: dict
+    ) -> Service | None:
         """Actualizar campos de un servicio existente. Retorna None si no existe."""
         pass
 
     @abstractmethod
-    async def deactivate_service(self, service_id: int, clinic_id: int) -> Service | None:
+    async def deactivate_service(
+        self, service_id: int, clinic_id: int
+    ) -> Service | None:
         """Inactivar un servicio por ID. Retorna None si no existe."""
         pass
 
@@ -54,7 +60,9 @@ class VeterinarianRepository(ABC):
     """Interface para el repositorio de veterinarios."""
 
     @abstractmethod
-    async def get_veterinarian_by_id(self, vet_id: int, clinic_id: int) -> Veterinarian | None:
+    async def get_veterinarian_by_id(
+        self, vet_id: int, clinic_id: int
+    ) -> Veterinarian | None:
         """Obtener un veterinario por ID y clinic_id. Retorna None si no existe."""
         pass
 
@@ -71,7 +79,9 @@ class VeterinarianRepository(ABC):
         pass
 
     @abstractmethod
-    async def deactivate_veterinarian(self, vet_id: int, clinic_id: int) -> Veterinarian | None:
+    async def deactivate_veterinarian(
+        self, vet_id: int, clinic_id: int
+    ) -> Veterinarian | None:
         """Inactivar un veterinario por ID. Retorna None si no existe."""
         pass
 
@@ -87,9 +97,7 @@ class VeterinarianRepository(ABC):
         pass
 
     @abstractmethod
-    async def exists_with_license(
-        self, clinic_id: int, license_number: str
-    ) -> bool:
+    async def exists_with_license(self, clinic_id: int, license_number: str) -> bool:
         """Verificar si ya existe un veterinario con la misma licencia en la clínica."""
         pass
 

@@ -196,6 +196,7 @@ Las observaciones registradas (MJR-006-001, MIN-006-001 a MIN-006-004) son mejor
 | ID | Slice | Severidad | Estado | Descripción |
 |---|---|---|---|---|
 | MJR-005-001 | BE-005 | Major | OPEN | Clave secreta hardcoded en `settings.py` — afecta todos los slices posteriores incluyendo BE-006 |
+| SEC-005-M01 | BE-005 | Major | CLOSED | Token en `localStorage` sin expiracion — BE-006 lo cubre con access tokens con expiracion y refresh tokens rotativos |
 
 ## Politica UTF-8
 

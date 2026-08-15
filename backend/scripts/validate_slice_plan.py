@@ -71,6 +71,27 @@ FINAL_STAGES = {"review", "checks", "docs"}
 RESOLVED_FINDING_STATES = {"RESOLVED", "ACCEPTED_RISK"}
 BLOCKING_FINDING_STATES = {"OPEN", "IN_PROGRESS", "READY_FOR_REVALIDATION"}
 REVIEW_SUFFIXES = ("review", "clean-architecture-review", "security-review")
+CARRYOVER_REQUIRED_FIELDS = (
+    "source_plan",
+    "source_task",
+    "destination_plan",
+    "destination_task",
+    "reason_postponed",
+    "status",
+    "owner",
+    "updated_at",
+    "closure_evidence",
+    "source_reference",
+    "destination_reference",
+)
+CARRYOVER_ALLOWED_STATES = {"OPEN", "TRANSFERRED", "CLOSED", "CANCELLED"}
+CARRYOVER_BLOCKING_STATES = {"OPEN", "TRANSFERRED"}
+CARRYOVER_HINT_RE = re.compile(
+    r"\b(?:carryover|carryovers|postergad[oa]s?|posterg|transferid[oa]s?|"
+    r"heredad[oa]s?|plan\s+origen|plan\s+destino|tarea\s+heredada|"
+    r"tarea\s+transferida)\b",
+    re.IGNORECASE,
+)
 SECURE_PERSISTENCE_KEYWORDS = (
     "alembic",
     "auditoria",
@@ -218,6 +239,146 @@ def _validate_plan_metadata(
         errors.append(
             "El plan contiene mojibake probable. Guarda y redacta el artefacto en UTF-8."
         )
+
+    return errors
+
+
+def _carryover_registry_path(repo_root: Path, slice_ids: SliceIds) -> Path:
+    return (
+        repo_root
+        / "docs"
+        / "opencode"
+        / "carryovers"
+        / f"{slice_ids.backend}-carryovers.md"
+    )
+
+
+def _is_markdown_separator_row(cells: list[str]) -> bool:
+    if not cells:
+        return False
+    return all(re.fullmatch(r":?-{3,}:?", cell.replace(" ", "")) for cell in cells)
+
+
+def _normalize_status(value: str) -> str:
+    return _normalize_label(value).upper()
+
+
+def _read_carryover_registry(
+    repo_root: Path,
+    registry_path: Path,
+) -> tuple[list[dict[str, str]], list[str]]:
+    if not registry_path.exists():
+        return [], []
+
+    text = registry_path.read_text(encoding="utf-8")
+    rows: list[dict[str, str]] = []
+    errors: list[str] = []
+    header: list[str] | None = None
+    normalized_required_fields = set(CARRYOVER_REQUIRED_FIELDS)
+
+    for line_number, line in enumerate(text.splitlines(), start=1):
+        stripped = line.strip()
+        if not stripped.startswith("|") or stripped.count("|") < 2:
+            continue
+
+        cells = [cell.strip() for cell in stripped.strip("|").split("|")]
+        if _is_markdown_separator_row(cells):
+            continue
+
+        normalized_cells = [_normalize_label(cell) for cell in cells]
+        if header is None:
+            if normalized_required_fields.issubset(set(normalized_cells)):
+                header = normalized_cells
+            continue
+
+        if len(cells) != len(header):
+            errors.append(
+                f"{registry_path.relative_to(repo_root)} linea {line_number}: "
+                f"la fila de carryover tiene {len(cells)} columnas; se esperaban "
+                f"{len(header)}."
+            )
+            continue
+
+        row = {header[index]: cells[index] for index in range(len(header))}
+        if any(value.strip() for value in row.values()):
+            rows.append(row)
+
+    if header is None:
+        errors.append(
+            f"{registry_path.relative_to(repo_root)} no declara la tabla de "
+            "carryovers esperada."
+        )
+    elif not rows:
+        errors.append(
+            f"{registry_path.relative_to(repo_root)} no contiene filas de carryover."
+        )
+
+    return rows, errors
+
+
+def _validate_carryover_registry_presence(
+    repo_root: Path,
+    slice_ids: SliceIds,
+    plan_text: str,
+) -> list[str]:
+    registry_path = _carryover_registry_path(repo_root, slice_ids)
+    errors: list[str] = []
+    hint_present = bool(CARRYOVER_HINT_RE.search(plan_text))
+
+    if not registry_path.exists():
+        if hint_present:
+            errors.append(
+                f"El plan menciona carryovers o tareas transferidas, pero falta el "
+                f"registro canonico {registry_path.relative_to(repo_root)}."
+            )
+        return errors
+
+    _, registry_errors = _read_carryover_registry(repo_root, registry_path)
+    errors.extend(registry_errors)
+    return errors
+
+
+def _validate_carryover_registry_state(
+    repo_root: Path,
+    slice_ids: SliceIds,
+) -> list[str]:
+    registry_path = _carryover_registry_path(repo_root, slice_ids)
+    if not registry_path.exists():
+        return []
+
+    rows, errors = _read_carryover_registry(repo_root, registry_path)
+    if errors:
+        return errors
+
+    for row_index, row in enumerate(rows, start=1):
+        status = _normalize_status(row.get("status", ""))
+        if status not in CARRYOVER_ALLOWED_STATES:
+            errors.append(
+                f"{registry_path.relative_to(repo_root)} fila {row_index}: "
+                f"estado de carryover invalido {status or 'MISSING'}."
+            )
+            continue
+
+        missing_fields = [
+            field for field in CARRYOVER_REQUIRED_FIELDS if not row.get(field, "").strip()
+        ]
+        if missing_fields:
+            errors.append(
+                f"{registry_path.relative_to(repo_root)} fila {row_index}: faltan "
+                f"campos obligatorios: {', '.join(missing_fields)}."
+            )
+
+        closure_evidence = _normalize_label(row.get("closure_evidence", ""))
+        if status in CARRYOVER_BLOCKING_STATES:
+            errors.append(
+                f"{registry_path.relative_to(repo_root)} fila {row_index}: el "
+                f"carryover sigue abierto con estado {status}."
+            )
+        elif closure_evidence in {"", "pending", "pendiente", "n/a", "na"}:
+            errors.append(
+                f"{registry_path.relative_to(repo_root)} fila {row_index}: el "
+                f"carryover {status} debe incluir closure_evidence verificable."
+            )
 
     return errors
 
@@ -391,7 +552,10 @@ def validate_plan_file(repo_root: Path, slice_ids: SliceIds) -> list[str]:
             f"No existe {plan_path.relative_to(repo_root)}. "
             f"Ejecuta /plan-task {slice_ids.backend}."
         ]
-    return validate_plan_text(plan_path.read_text(encoding="utf-8"), slice_ids)
+    plan_text = plan_path.read_text(encoding="utf-8")
+    errors = validate_plan_text(plan_text, slice_ids)
+    errors.extend(_validate_carryover_registry_presence(repo_root, slice_ids, plan_text))
+    return errors
 
 
 def _read_plan_tasks(repo_root: Path, slice_ids: SliceIds) -> list[PlanTask]:
@@ -605,6 +769,8 @@ def validate_stage(repo_root: Path, slice_ids: SliceIds, stage: str) -> list[str
         errors.extend(validate_secure_persistence_gate(repo_root, slice_ids))
     if stage in FINAL_STAGES:
         errors.extend(validate_current_qa_gate(repo_root, slice_ids))
+    if stage in FINAL_STAGES | {"qa"}:
+        errors.extend(_validate_carryover_registry_state(repo_root, slice_ids))
     if stage in {"checks", "docs"}:
         errors.extend(validate_review_gates(repo_root, slice_ids))
     if stage == "docs":

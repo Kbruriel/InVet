@@ -23,9 +23,11 @@ Responsabilidades:
 - Revisar el plan y la implementacion de las tareas BE, FE y QA del mismo indice.
 - Aceptar el slice tanto desde `BE-00X` como desde `FE-00X`, sin perder la revision vertical completa del mismo indice.
 - Comparar la documentacion de tareas con el codigo, el diff actual y los archivos tocados.
+- Si el slice tiene carryovers, leer `docs/opencode/references/carryovers_governance.md` y verificar que el plan origen, el plan destino y el registro coinciden.
 - Detectar faltantes, implementacion incompleta, errores, regresiones, inconsistencias y alcance fuera del MVP.
 - Documentar los hallazgos en un archivo Markdown cuando existan correcciones.
 - No modificar codigo fuente.
+- No aprobar si hay carryovers abiertos o desalineados aunque el diff local parezca correcto.
 
 Flujo de revision:
 1. Si recibe `BE-00X`, usa ese indice como slice base.

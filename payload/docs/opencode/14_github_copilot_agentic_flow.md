@@ -200,6 +200,8 @@ Copilot solo puede recomendar el gate de review funcional despues de QA si `docs
 
 Si QA queda `REJECTED`, `BLOCKED` o con findings `OPEN`/`IN_PROGRESS`, el siguiente paso recomendado es `invet-resolve-findings.prompt.md` o `implement-findings.prompt.md` con el `BE-00X` equivalente. Si los findings estan `READY_FOR_REVALIDATION`, ese estado pertenece al flujo de correcciones y la revalidacion QA se recomienda desde el resolver, no como auto-rerun del cierre de QA.
 
+Si el slice arrastra carryovers, Copilot debe leer `docs/opencode/references/carryovers_governance.md` y el registro `docs/opencode/carryovers/BE-00X-carryovers.md` antes de aprobar QA o reviews. El validador determinista bloquea estados `OPEN` o `TRANSFERRED` en `qa`, `review`, `checks` y `docs`.
+
 Cuando el gate `functional-review` si se ejecuta y queda `APPROVED`, el siguiente paso recomendado es `clean-architecture-review.prompt.md` o `invet-qa-review-close.prompt.md` con `Gate: clean-architecture-review`, no volver a QA. Solo se recomienda QA desde functional review si el preflight impidio revisar porque QA no estaba aprobado o necesitaba revalidacion.
 
 ## Siguiente paso recomendado

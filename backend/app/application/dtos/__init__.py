@@ -3,8 +3,8 @@
 from __future__ import annotations
 
 from .public_branch_dtos import (
-    PublicBranchListDTO,
     PublicBranchesPaginatedResponse,
+    PublicBranchListDTO,
 )
 from .public_service_dtos import (
     PublicServiceListDTO,

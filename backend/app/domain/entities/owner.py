@@ -3,14 +3,13 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, EmailStr
-
 
 # ---------------------------------------------------------------------------
 # Owner
 # ---------------------------------------------------------------------------
+
 
 class Owner(BaseModel):
     """Entidad de propietario."""
@@ -21,8 +20,8 @@ class Owner(BaseModel):
     user_id: int
     nombre: str
     email: EmailStr
-    telefono: Optional[str] = None
-    direccion: Optional[str] = None
+    telefono: str | None = None
+    direccion: str | None = None
     fecha_creacion: datetime
 
 
@@ -31,22 +30,23 @@ class OwnerCreate(BaseModel):
 
     nombre: str
     email: EmailStr
-    telefono: Optional[str] = None
-    direccion: Optional[str] = None
+    telefono: str | None = None
+    direccion: str | None = None
 
 
 class OwnerUpdate(BaseModel):
     """Schema para actualizar un propietario."""
 
-    nombre: Optional[str] = None
-    email: Optional[EmailStr] = None
-    telefono: Optional[str] = None
-    direccion: Optional[str] = None
+    nombre: str | None = None
+    email: EmailStr | None = None
+    telefono: str | None = None
+    direccion: str | None = None
 
 
 # ---------------------------------------------------------------------------
 # Pet
 # ---------------------------------------------------------------------------
+
 
 class Pet(BaseModel):
     """Entidad de mascota."""
@@ -59,8 +59,8 @@ class Pet(BaseModel):
     especie: str  # perro, gato, otro
     raza: str
     edad: int
-    peso: Optional[float] = None
-    fecha_nacimiento: Optional[datetime] = None
+    peso: float | None = None
+    fecha_nacimiento: datetime | None = None
 
 
 class PetCreate(BaseModel):
@@ -70,19 +70,19 @@ class PetCreate(BaseModel):
     especie: str
     raza: str
     edad: int
-    peso: Optional[float] = None
-    fecha_nacimiento: Optional[datetime] = None
+    peso: float | None = None
+    fecha_nacimiento: datetime | None = None
 
 
 class PetUpdate(BaseModel):
     """Schema para actualizar una mascota."""
 
-    nombre: Optional[str] = None
-    especie: Optional[str] = None
-    raza: Optional[str] = None
-    edad: Optional[int] = None
-    peso: Optional[float] = None
-    fecha_nacimiento: Optional[datetime] = None
+    nombre: str | None = None
+    especie: str | None = None
+    raza: str | None = None
+    edad: int | None = None
+    peso: float | None = None
+    fecha_nacimiento: datetime | None = None
 
 
 class PetListResponse(BaseModel):
@@ -100,9 +100,9 @@ class PetHistoryEntry(BaseModel):
     id: int
     pet_id: int
     fecha: datetime | None = None
-    motivo: Optional[str] = None
-    diagnostico: Optional[str] = None
-    veterinario: Optional[str] = None
+    motivo: str | None = None
+    diagnostico: str | None = None
+    veterinario: str | None = None
 
 
 class PetHistoryListResponse(BaseModel):

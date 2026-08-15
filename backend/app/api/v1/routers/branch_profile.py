@@ -38,7 +38,9 @@ def get_branch_use_case(
     service_repo: ServiceRepository = ServiceRepositoryImpl(db)
     schedule_repo: BranchScheduleRepository = BranchScheduleRepositoryImpl(db)
     rating_repo: RatingSummaryRepository = RatingSummaryRepositoryImpl(db)
-    availability_repo: AvailabilitySummaryRepository = AvailabilitySummaryRepositoryImpl(db)
+    availability_repo: AvailabilitySummaryRepository = (
+        AvailabilitySummaryRepositoryImpl(db)
+    )
 
     return GetBranchPublicProfileUseCase(
         branch_repo, service_repo, schedule_repo, rating_repo, availability_repo
@@ -61,7 +63,9 @@ def get_branch_protected_use_case(
     service_repo: ServiceRepository = ServiceRepositoryImpl(db)
     schedule_repo: BranchScheduleRepository = BranchScheduleRepositoryImpl(db)
     rating_repo: RatingSummaryRepository = RatingSummaryRepositoryImpl(db)
-    availability_repo: AvailabilitySummaryRepository = AvailabilitySummaryRepositoryImpl(db)
+    availability_repo: AvailabilitySummaryRepository = (
+        AvailabilitySummaryRepositoryImpl(db)
+    )
 
     return GetBranchProtectedProfileUseCase(
         branch_repo, service_repo, schedule_repo, rating_repo, availability_repo

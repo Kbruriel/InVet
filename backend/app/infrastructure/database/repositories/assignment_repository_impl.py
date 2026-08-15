@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, UTC
+from datetime import UTC, datetime
 from typing import cast
 
 from sqlalchemy import select
@@ -14,7 +14,9 @@ from app.infrastructure.database.models.assignment_model import (
     VeterinarianServiceAssignment as AssignmentModel,
 )
 from app.infrastructure.database.models.service_model import Service as ServiceModel
-from app.infrastructure.database.models.veterinarian_model import Veterinarian as VeterinarianModel
+from app.infrastructure.database.models.veterinarian_model import (
+    Veterinarian as VeterinarianModel,
+)
 
 
 class AssignmentRepositoryImpl(AssignmentRepository):

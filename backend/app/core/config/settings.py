@@ -1,5 +1,6 @@
 ﻿"""Configuración central de la aplicación."""
 
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -17,8 +18,8 @@ class Settings(BaseSettings):
     POSTGRES_DB: str = "invet"
     DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/invet"
 
-    # Optional at import time so local/test boots do not fail before env bootstrap.
-    SECRET_KEY: str | None = None
+    # SECRET_KEY must be injected via environment variable or .env file. No default allowed.
+    SECRET_KEY: str = Field(..., description="JWT secret key — required at runtime")
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 

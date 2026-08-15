@@ -168,7 +168,9 @@ def create_my_pet(
         pet = use_case.execute(body, owner_id)
         return PetReadSchema.model_validate(pet)
     except ValueError as exc:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)
+        ) from exc
 
 
 # ---------------------------------------------------------------------------
@@ -241,7 +243,9 @@ def update_pet(
             )
         return PetReadSchema.model_validate(updated_pet)
     except ValueError as exc:
-        raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)) from exc
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail=str(exc)
+        ) from exc
 
 
 @pet_router.delete(
@@ -263,7 +267,10 @@ def delete_pet(
     get_pet = GetPetUseCase(pet_repo)
     pet = get_pet.execute(pet_id)
     if not pet:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No se encontró la mascota solicitada.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No se encontró la mascota solicitada.",
+        )
 
     _authorize_pet_access(pet.owner_id, owner_id, user_role)
 
@@ -294,7 +301,10 @@ def pet_history(
     get_pet_uc = GetPetUseCase(pet_repo)
     pet = get_pet_uc.execute(pet_id)
     if not pet:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No se encontró la mascota solicitada.")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="No se encontró la mascota solicitada.",
+        )
 
     _authorize_pet_access(pet.owner_id, owner_id, user_role, allow_clinic=True)
 

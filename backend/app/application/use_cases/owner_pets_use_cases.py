@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime
-from typing import Any
 
 from app.domain.entities.owner import (
     Owner,
@@ -16,10 +15,10 @@ from app.domain.entities.owner import (
 )
 from app.domain.repositories.owner_repository import OwnerRepository, PetRepository
 
-
 # ---------------------------------------------------------------------------
 # Owner Use Cases
 # ---------------------------------------------------------------------------
+
 
 class CreateOwnerUseCase:
     """Caso de uso para crear un propietario."""
@@ -114,6 +113,7 @@ class UpdateOwnerUseCase:
 # ---------------------------------------------------------------------------
 # Pet Use Cases
 # ---------------------------------------------------------------------------
+
 
 class CreatePetUseCase:
     """Caso de uso para crear una mascota."""

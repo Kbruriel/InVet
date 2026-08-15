@@ -47,6 +47,7 @@ Reglas:
 - No avanzar a QA ni a checks si UI automation o API automation fallan.
 - No iniciar un nuevo slice mientras el QA anterior no sea `APPROVED`.
 - Bloquear si un finding esta `OPEN`, `IN_PROGRESS` o `READY_FOR_REVALIDATION`.
+- Bloquear si existe cualquier carryover abierto, desalineado o sin evidencia entre plan origen, plan destino y registro.
 - `RESOLVED` y `ACCEPTED_RISK` no bloquean, pero deben conservar evidencia.
 - Mantener BE/FE/QA con el mismo indice.
 - Backend define contrato antes de frontend.

@@ -59,7 +59,9 @@ class CreateServiceUseCase:
         # Verificar unicidad de nombre por clínica
         exists = await self.repository.exists_with_name(clinic_id, service.name)
         if exists:
-            raise ValueError(f"Ya existe un servicio con el nombre '{service.name}' en esta clínica.")
+            raise ValueError(
+                f"Ya existe un servicio con el nombre '{service.name}' en esta clínica."
+            )
 
         return await self.repository.create_service(service)
 
@@ -160,4 +162,6 @@ class ListServicesUseCase:
         Returns:
             Tuple de (lista de servicios, total).
         """
-        return await self.repository.list_by_clinic(clinic_id, page, size, is_active_only)
+        return await self.repository.list_by_clinic(
+            clinic_id, page, size, is_active_only
+        )

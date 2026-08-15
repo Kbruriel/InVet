@@ -12,6 +12,7 @@ Instrucciones:
 2. Ejecuta `python backend/scripts/validate_slice_plan.py QA-00X --stage qa`.
    - Si falla, no intentes validar criterios ambiguos; documenta `BLOCKED` por contrato de plan, marca cualquier `docs/opencode/qa/QA-00X-results.md` previo como baseline stale y crea o actualiza `docs/opencode/qa/QA-00X-findings.md` con evidencia concreta del preflight.
    - Si el archivo roto es `docs/opencode/plans/BE-00X-plan.md`, solicita `/plan-task BE-00X` como correccion canonica del slice.
+   - Si faltan dependencias o el entorno no levanta, intenta recuperarlo antes de bloquearte: instala dependencias y usa Docker cuando el slice dependa de PostgreSQL o del runtime del repo.
 3. Lee:
    - `docs/opencode/plans/BE-00X-plan.md`
    - `docs/opencode/tasks/qa/QA-00X.md`
@@ -29,6 +30,7 @@ Instrucciones:
    - si `backend/app/tests/conftest.py` reinicia o elimina tablas, no ejecutes una suite destructiva contra la misma base usada por el stack levantado sin aislar antes una base o schema de pruebas;
     - trata el contenedor de `frontend` como runtime por defecto: no asumas que sirve para pruebas sin un flujo de testing explicito.
     - usa los contenedores de backend cuando la suite requiera PostgreSQL en Docker.
+   - antes de bloquear o aprobar, confirma que todos los contenedores Docker aplicables fueron actualizados o recreados y quedaron saludables; si no aplican cambios relevantes, registra el skip con causa exacta.
 5. Usa los `Objetivo` y `Criterios de aceptacion` de cada tarea del plan para derivar una matriz de trazabilidad por criterio:
    - historia o criterio
    - responsabilidad unica
@@ -72,6 +74,7 @@ Instrucciones:
 
 Hook de cierre:
 - Si QA termina en `APPROVED`, Docker Compose esta disponible y el usuario no pidiÃ³ omitirlo, primero validar si existen cambios pendientes que afecten `backend`, `frontend`, `docker-compose.yml`, `Dockerfile*`, `backend/requirements.txt`, `backend/pyproject.toml`, `frontend/package.json` o lockfiles.
+- Si Docker Compose se ejecuta, confirmar que los contenedores aplicables quedaron actualizados o recreados antes de reportar el cierre.
 - Si no existen cambios pendientes que requieran actualizar contenedores, registrar el skip con la causa exacta y no ejecutar el restart.
 - Si existen cambios pendientes, ejecutar `docker compose up -d --build --force-recreate db backend frontend`.
 - Si Docker Compose no esta disponible o QA no fue aprobado, registrar el skip con la causa exacta.

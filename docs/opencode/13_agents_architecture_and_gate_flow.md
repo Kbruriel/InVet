@@ -85,6 +85,7 @@ Ambos usan el modelo seleccionado por el usuario y no fijan una decision de prod
 14. `skipped` solo es valido cuando un check o hook realmente no aplica; entorno roto, dependencia ausente o comando fallido no se convierten en `skipped`.
 15. QA intenta autorecuperar dependencias, `.env.qa` y contexto Docker antes de declarar `BLOCKED`.
 16. La normalizacion de IDs es explicita por comando: BE, FE y QA representan el mismo slice vertical, pero un alias no soportado debe rechazarse y redirigirse al comando correcto.
+17. Si el slice hereda tareas postergadas, el plan origen, el plan destino y el registro de carryovers deben coincidir antes de cerrar QA, reviews, checks o docs.
 
 ## Cambios schema v3 implementados
 
@@ -103,6 +104,7 @@ La arquitectura agentica adopta aprendizajes de `github/spec-kit` sin copiar su 
 | QA autorecuperable | `prepare_qa_env.py`, `.env.qa` y fallback a contenedores | QA intenta reparar dependencias y entorno antes de bloquear el slice |
 | Skips verificables | `git status` y regla estricta de `skipped` | Docker y checks solo se omiten con causa comprobable; no se maquillan fallos |
 | Automatizacion por slice | `US-00X`, `UIA-00X`, `APIA-00X` y `InVet_UI_Automation/` | La planeacion y la implementacion incluyen cobertura funcional visible y contratos HTTP externos |
+| Gobernanza de carryovers | `docs/opencode/references/carryovers_governance.md`, `docs/opencode/carryovers/BE-00X-carryovers.md` y `backend/scripts/validate_slice_plan.py` | QA, reviews, checks y docs bloquean estados abiertos o desalineados antes del cierre |
 
 ## Nuevas capacidades operativas
 
@@ -118,6 +120,8 @@ La funcionalidad agentica actual ya no solo define un orden de gates. Tambien ag
 | Workspace dedicado de automatizacion | `InVet_UI_Automation/` | UI y API automation viven fuera del producto principal, pero forman parte del mismo gate del slice |
 | Cierre Docker condicionado por cambios | `/run-checks`, `/qa-task` y hooks de implementacion | El restart del stack se ejecuta solo si hay cambios relevantes en `backend`, `frontend`, `docker-compose.yml`, `Dockerfile*` o lockfiles/manifiestos |
 | QA con autorecuperacion | `/qa-task` | QA puede instalar dependencias, preparar `.env.qa` y preferir contenedores antes de marcar `BLOCKED` |
+| Preflight de plan y QA | `/plan-task`, `/qa-task` | Plan valida el slice previo antes de crear o reparar artefactos; QA valida el plan vigente y recupera entorno antes de bloquearse |
+| Preflight auto-recuperable UI/API | `/implement-ui-automation-task`, `/implement-api-automation-task` | Los agentes de automatizacion intentan recuperar dependencias, validan que el plan este vigente, usan Docker cuando el slice depende de PostgreSQL o del runtime del repo y no reutilizan evidencia stale antes de bloquear |
 | Validacion UI formal | `/run-ui-checks` | La automatizacion de navegador y regresion UI tiene un gate dedicado antes del cierre tecnico global |
 | Gate final con evidencia mecanica delegada | `/final-gate` | El reviewer final puede pedir logs, reruns o pruebas crudas al ejecutor mecanico antes de decidir release |
 
@@ -765,6 +769,8 @@ Reglas practicas para desbloquear:
 4. Si el fallo viene de producto, corrige producto; si viene de automatizacion, corrige automatizacion; si viene de entorno, corrige entorno.
 5. Si el mismo bloqueo reaparece, escribe el nuevo estado real en el reporte en lugar de copiar la conclusion anterior.
 6. Cuando existan cambios en backend, frontend o automatizacion, reejecuta los gates dependientes en esta secuencia: correccion -> QA -> reviews -> UI checks -> checks -> docs.
+7. Antes de cerrar QA o checks, confirma que todos los contenedores Docker aplicables fueron actualizados o recreados y quedaron saludables cuando Docker fue parte del contrato.
+8. Si hay carryovers, no avances a QA, reviews, checks o docs hasta que el registro, el plan origen y el plan destino compartan la misma evidencia o una referencia explicita al cierre.
 
 ## Definicion de slice cerrado
 
@@ -774,7 +780,7 @@ Un slice esta cerrado solo si se cumplen todas estas condiciones:
 - Existen `US-00X`, `UIA-00X` y `APIA-00X` alineados con el mismo indice del slice.
 - La matriz de trazabilidad cubre criterios, riesgos, contratos, tareas, validacion y evidencia.
 - No quedan tareas compuestas o sin `Responsabilidad unica: Si`.
-- Docker fue actualizado cuando aplicaba, o el skip quedo justificado.
+- Docker fue actualizado o recreado cuando aplicaba, o el skip quedo justificado con causa verificable.
 - Backend y frontend implementaron sus entregables y pruebas unitarias.
 - La automatizacion UI y API del slice fue implementada cuando aplica, con evidencia en `InVet_UI_Automation/`.
 - QA declaro `Decision: APPROVED` con evidencia reproducible.
