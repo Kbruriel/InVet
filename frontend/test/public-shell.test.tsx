@@ -39,7 +39,15 @@ describe("public shell", () => {
       "href",
       "/",
     );
-    expect(screen.getAllByRole("link")).toHaveLength(4);
+    expect(screen.getByRole("link", { name: /iniciar sesion/i })).toHaveAttribute(
+      "href",
+      "/login",
+    );
+    expect(screen.getByRole("link", { name: /registrarse/i })).toHaveAttribute(
+      "href",
+      "/register",
+    );
+    expect(screen.getAllByRole("link")).toHaveLength(6);
   });
 
   it("renders the public footer", () => {

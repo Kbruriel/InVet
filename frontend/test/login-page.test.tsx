@@ -4,7 +4,6 @@ jest.mock("next/navigation", () => ({
 }));
 
 import { render, screen } from "@testing-library/react";
-import { describe, it, expect } from "@jest/globals";
 import LoginPage from "@/app/login/page";
 
 describe("login page", () => {

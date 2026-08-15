@@ -19,6 +19,19 @@ describe('HeroSection', () => {
     expect(screen.getByTestId('search-bar')).toBeInTheDocument();
   });
 
+  it('deberia renderizar accesos a login y registro', () => {
+    render(<HeroSection />);
+
+    expect(screen.getByRole('link', { name: /iniciar sesion/i })).toHaveAttribute(
+      'href',
+      '/login',
+    );
+    expect(screen.getByRole('link', { name: /registrarse/i })).toHaveAttribute(
+      'href',
+      '/register',
+    );
+  });
+
   it('deberia renderizar los chips de categoria', () => {
     render(<HeroSection />);
     expect(screen.getByTestId('category-chips')).toBeInTheDocument();

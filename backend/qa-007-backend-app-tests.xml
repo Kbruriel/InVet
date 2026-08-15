@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites><testsuite name="pytest" errors="0" failures="4" skipped="0" tests="10" time="1.681" timestamp="2026-08-10T21:49:18.878674" hostname="DESKTOP-4GVL3K4"><testcase classname="app.tests.api.test_owners_pets" name="test_list_my_pets_returns_page_size_meta" time="0.086" /><testcase classname="app.tests.api.test_owners_pets" name="test_list_my_pets_paginates_results" time="0.045"><failure message="assert 20 == 5">db_session = &lt;sqlalchemy.orm.session.Session object at 0x000001EEDCC6EED0&gt;
+
+    def test_list_my_pets_paginates_results(db_session):
+        owner = OwnerModel(
+            first_name="Ana",
+            last_name="Perez",
+            email="ana@example.com",
+            phone="809-555-0100",
+            address="Calle 1",
+            clinic_id=11,
+        )
+        db_session.add(owner)
+        db_session.flush()
+    
+        for index in range(6):
+            db_session.add(
+                PetModel(
+                    owner_id=owner.id,
+                    name=f"Milo {index + 1}",
+                    species="perro",
+                    breed="Mestizo",
+                    weight="12.5",
+                )
+            )
+        db_session.commit()
+    
+        client = _build_client(db_session, user_id=11)
+        with client:
+            response = client.get("/api/v1/owners/me/pets?page=2&amp;page_size=5")
+    
+        assert response.status_code == 200
+        data = response.json()
+        assert data["meta"]["page"] == 2
+&gt;       assert data["meta"]["page_size"] == 5
+E       assert 20 == 5
+
+app\tests\api\test_owners_pets.py:101: AssertionError</failure></testcase><testcase classname="app.tests.api.test_owners_pets" name="test_create_owner_profile_returns_created_owner" time="0.039"><failure message="assert 422 == 201&#10; +  where 422 = &lt;Response [422 Unprocessable Entity]&gt;.status_code">db_session = &lt;sqlalchemy.orm.session.Session object at 0x000001EEDB6B4750&gt;
+
+    def test_create_owner_profile_returns_created_owner(db_session):
+        client = _build_client(db_session, user_id=11)
+        with client:
+            response = client.post(
+                "/api/v1/owners",
+                json={
+                    "nombre": "Ana Perez",
+                    "email": "ana@example.com",
+                    "telefono": "809-555-0100",
+                    "direccion": "Calle 1",
+                },
+            )
+    
+&gt;       assert response.status_code == 201
+E       assert 422 == 201
+E        +  where 422 = &lt;Response [422 Unprocessable Entity]&gt;.status_code
+
+app\tests\api\test_owners_pets.py:119: AssertionError</failure></testcase><testcase classname="app.tests.api.test_owners_pets" name="test_update_owner_profile_updates_allowed_fields" time="0.036"><failure message="assert 422 == 200&#10; +  where 422 = &lt;Response [422 Unprocessable Entity]&gt;.status_code">db_session = &lt;sqlalchemy.orm.session.Session object at 0x000001EEDCACF850&gt;
+
+    def test_update_owner_profile_updates_allowed_fields(db_session):
+        owner = OwnerModel(
+            first_name="Ana",
+            last_name="Perez",
+            email="ana@example.com",
+            phone="809-555-0100",
+            address="Calle 1",
+            clinic_id=11,
+        )
+        db_session.add(owner)
+        db_session.commit()
+    
+        client = _build_client(db_session, user_id=11)
+        with client:
+            response = client.put(
+                "/api/v1/owners/me",
+                json={
+                    "nombre": "Ana Maria Perez",
+                    "email": "ana.maria@example.com",
+                    "telefono": "809-555-1111",
+                    "direccion": "Calle 2",
+                },
+            )
+    
+&gt;       assert response.status_code == 200
+E       assert 422 == 200
+E        +  where 422 = &lt;Response [422 Unprocessable Entity]&gt;.status_code
+
+app\tests\api\test_owners_pets.py:150: AssertionError</failure></testcase><testcase classname="app.tests.api.test_owners_pets" name="test_create_pet_update_and_delete_flow" time="0.052"><failure message="assert 200 == 404&#10; +  where 200 = &lt;Response [200 OK]&gt;.status_code">db_session = &lt;sqlalchemy.orm.session.Session object at 0x000001EEDB802CD0&gt;
+
+    def test_create_pet_update_and_delete_flow(db_session):
+        owner = OwnerModel(
+            first_name="Ana",
+            last_name="Perez",
+            email="ana@example.com",
+            phone="809-555-0100",
+            address="Calle 1",
+            clinic_id=11,
+        )
+        db_session.add(owner)
+        db_session.commit()
+    
+        client = _build_client(db_session, user_id=11)
+        with client:
+            create_response = client.post(
+                "/api/v1/owners/me/pets",
+                json={
+                    "nombre": "Milo",
+                    "especie": "perro",
+                    "raza": "Mestizo",
+                    "edad": 4,
+                    "peso": 12.5,
+                },
+            )
+    
+            assert create_response.status_code == 201
+            pet_id = create_response.json()["id"]
+    
+            update_response = client.put(
+                f"/api/v1/pets/{pet_id}",
+                json={
+                    "nombre": "Milo 2",
+                    "especie": "perro",
+                    "raza": "Mestizo",
+                    "edad": 5,
+                    "peso": 13.0,
+                },
+            )
+    
+            assert update_response.status_code == 200
+            assert update_response.json()["nombre"] == "Milo 2"
+    
+            delete_response = client.delete(f"/api/v1/pets/{pet_id}")
+            assert delete_response.status_code == 204
+    
+            get_after_delete_response = client.get(f"/api/v1/pets/{pet_id}")
+    
+&gt;       assert get_after_delete_response.status_code == 404
+E       assert 200 == 404
+E        +  where 200 = &lt;Response [200 OK]&gt;.status_code
+
+app\tests\api\test_owners_pets.py:205: AssertionError</failure></testcase><testcase classname="app.tests.api.test_owners_pets" name="test_other_owner_cannot_access_pet_details" time="0.038" /><testcase classname="app.tests.api.test_owners_pets" name="test_clinic_role_cannot_access_pet_history" time="0.040" /><testcase classname="app.tests.api.test_owners_pets" name="test_create_pet_rejects_invalid_species" time="0.033" /><testcase classname="app.tests.api.test_owners_pets" name="test_pet_history_returns_empty_list_for_owner" time="0.031" /><testcase classname="app.tests.api.test_owners_pets" name="test_pet_history_blocks_other_owner" time="0.032" /></testsuite></testsuites>

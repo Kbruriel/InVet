@@ -82,7 +82,7 @@ describe('fetchPets', () => {
   });
 
   it('deberia setear loading a true durante la carga', async () => {
-    mockGetMyPets.mockReturnValue(new Promise(() => {})); // nunca resuelve
+    mockGetMyPets.mockReturnValueOnce(new Promise(() => {})); // nunca resuelve
 
     const { result } = renderHook(() => usePets());
     expect(result.current.loading).toBe(false);
@@ -169,7 +169,6 @@ describe('addPet', () => {
 
   it('deberia agregar el nuevo pet a la lista', async () => {
     mockCreatePet.mockResolvedValueOnce(petFixture);
-    mockGetMyPets.mockResolvedValueOnce({ items: [], meta: { page: 1, page_size: 20, total: 0 } });
 
     const { result } = renderHook(() => usePets());
     await act(async () => {
@@ -223,13 +222,15 @@ describe('editPet', () => {
       await result.current.fetchPets();
     });
 
+    await waitFor(() => expect(result.current.pets).toHaveLength(1));
+
     // ensure the mock was called and state updated
 
     await act(async () => {
       await result.current.editPet(1, { nombre: 'Firulais Actualizado' });
     });
 
-    expect(result.current.pets.length).toBeGreaterThan(0);
+    await waitFor(() => expect(result.current.pets).toHaveLength(1));
     expect(result.current.pets[0].nombre).toBe('Firulais Actualizado');
     expect(result.current.loading).toBe(false);
   });

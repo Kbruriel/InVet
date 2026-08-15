@@ -137,8 +137,8 @@ cd c:\InVet && python backend/scripts/validate_slice_plan.py BE-006 --stage plan
 
 ## Decision final
 
-- decision: REJECTED
-- justificacion: Backend tests cannot execute due to duplicate SQLAlchemy table definitions (DEF-006-001), which blocks all integration, security, and data validation criteria. TypeScript typecheck also fails for slice-006 test files (DEF-006-002). Gates (secure-persistence and plan) pass, but the core testing infrastructure is broken. QA cannot approve until these blockers are resolved and tests can run successfully.
+- decision: APPROVED
+- justificacion: Backend tests now execute successfully after resolving duplicate SQLAlchemy table definitions (DEF-006-001) and fixing conftest.py imports (DEF-006-003). All 114 backend tests pass. Frontend tests: 17/17 passed. TypeScript: no slice-006 errors. Build: PASS. Gates: both PASS. QA approves the slice for functional review.
 
 ## Revalidacion Final — 2026-08-09
 

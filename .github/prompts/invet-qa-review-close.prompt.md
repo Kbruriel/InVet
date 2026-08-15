@@ -15,6 +15,7 @@ Run the selected gate and write the expected evidence artifact.
 ## Gate Outputs
 
 - QA: `docs/opencode/qa/QA-00X-results.md` and, when needed, `docs/opencode/qa/QA-00X-findings.md`.
+- For QA gate sequencing and handoff rules, use `docs/opencode/qa/README.md`.
 - Functional review: `docs/opencode/reviews/BE-00X-review.md`.
 - Clean architecture review: `docs/opencode/reviews/BE-00X-clean-architecture-review.md`.
 - Security review: `docs/opencode/reviews/BE-00X-security-review.md`.

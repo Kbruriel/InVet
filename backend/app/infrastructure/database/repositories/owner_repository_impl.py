@@ -25,8 +25,7 @@ class OwnerRepositoryImpl(OwnerRepository):
 
         return Owner(
             id=cast(int, model.id),
-            # Prefer explicit user_id column; fallback to clinic_id for legacy records
-            user_id=(getattr(model, "user_id", None) or model.clinic_id or 0),
+            user_id=getattr(model, "user_id", None) or 0,
             nombre=f"{model.first_name} {model.last_name}".strip(),
             email=model.email,
             telefono=model.phone,
@@ -70,9 +69,8 @@ class OwnerRepositoryImpl(OwnerRepository):
             email=owner.email,
             phone=owner.telefono,
             address=owner.direccion,
-            # Set explicit user_id and keep clinic_id for backward compatibility
             user_id=owner.user_id,
-            clinic_id=owner.user_id,
+            clinic_id=0,
             created_at=now,
             updated_at=now,
         )
@@ -90,7 +88,7 @@ class OwnerRepositoryImpl(OwnerRepository):
         """Obtener un propietario vinculado a un usuario."""
         model = (
             self.db.query(OwnerModel)
-            .filter(OwnerModel.clinic_id == user_id)
+            .filter(OwnerModel.user_id == user_id)
             .first()
         )
         return self._to_domain(model) if model else None

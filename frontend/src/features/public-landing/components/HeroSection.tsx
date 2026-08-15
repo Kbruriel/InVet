@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import { PublicSearchBar } from './PublicSearchBar';
 import { CategoryChipsWrapper } from './CategoryChipsWrapper';
 import { HeroBentoVisual } from './HeroBentoVisual';
@@ -20,6 +21,21 @@ export function HeroSection() {
 
         <div className="mt-10">
           <PublicSearchBar />
+        </div>
+
+        <div className="mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          <Link
+            href="/login"
+            className="inline-flex min-w-44 items-center justify-center rounded-full border border-sandy-300 bg-white/80 px-6 py-3 text-sm font-semibold text-slate-700 shadow-sm backdrop-blur transition-colors hover:border-teal hover:text-teal focus:outline-none focus:ring-2 focus:ring-teal focus:ring-offset-2"
+          >
+            Iniciar sesion
+          </Link>
+          <Link
+            href="/register"
+            className="inline-flex min-w-44 items-center justify-center rounded-full bg-teal px-6 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-teal-dark focus:outline-none focus:ring-2 focus:ring-teal focus:ring-offset-2"
+          >
+            Registrarse
+          </Link>
         </div>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-3">

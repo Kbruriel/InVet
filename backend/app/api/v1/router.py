@@ -7,6 +7,8 @@ from app.api.v1.routers.branch_profile import router as branch_router
 from app.api.v1.routers.clinic_admin import router as clinic_admin_router
 from app.api.v1.routers.clinic_search import router as clinic_search_router
 from app.api.v1.routers.internal_users import router as internal_users_router
+from app.api.v1.routers.owners import router as owners_router
+from app.api.v1.routers.pets import owner_pets_router, pet_router
 from app.api.v1.routers.public_branches import router as public_branches_router
 from app.api.v1.routers.public_clinics import router as public_clinics_router
 from app.api.v1.routers.public_services import router as public_services_router
@@ -24,6 +26,9 @@ router.include_router(public_services_router)
 router.include_router(services_router)
 router.include_router(veterinarians_router)
 router.include_router(internal_users_router)
+router.include_router(owners_router)
+router.include_router(owner_pets_router)
+router.include_router(pet_router)
 
 
 @router.get("/")

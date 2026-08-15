@@ -37,6 +37,21 @@ def register_user(client: TestClient, email: str = "ada@example.com"):
     )
 
 
+def test_register_preflight_allows_local_frontend_origin(client):
+    response = client.options(
+        "/api/v1/auth/register",
+        headers={
+            "Origin": "http://localhost:3000",
+            "Access-Control-Request-Method": "POST",
+            "Access-Control-Request-Headers": "content-type",
+        },
+    )
+
+    assert response.status_code == 200
+    assert response.headers["access-control-allow-origin"] == "http://localhost:3000"
+    assert "POST" in response.headers["access-control-allow-methods"]
+
+
 def test_register_auth_user_returns_tokens_and_hashes_password(client, db_session):
     response = register_user(client)
 

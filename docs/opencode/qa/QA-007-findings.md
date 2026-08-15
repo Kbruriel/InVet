@@ -2,7 +2,7 @@
 
 ## Estado global del archivo
 
-- Estado global: `RESOLVED` (todos los findings del slice han sido revalidados y cerrados).
+- Estado global: `RESOLVED` (todos los findings del slice fueron revalidados y cerrados).
 
 ## Hallazgos resueltos
 
@@ -38,12 +38,26 @@
   - Correcciones documentadas en `docs/opencode/reviews/BE-007-corrections.md`
 - **Correccion aplicada:** Se agregaron tests unitarios y se removieron logs de diagnostico temporales; se re-ejecutaron las suites relevantes y QA revalidó el cierre.
 
+### Finding QA-007-F05 (severidad: major, estado: RESOLVED, tipo: flakiness de suite)
+
+- **Criterio(s) afectado(s):** Gate unitario FE para el slice 007.
+- **Descripcion:** La suite `frontend/src/features/owners/hooks/use-pets.test.tsx` quedaba sensible al contexto por un mock sobrante que contaminaba `editPet > deberia actualizar el pet en la lista` cuando corria la bateria completa.
+- **Impacto:** El gate unitario FE quedaba bloqueado hasta estabilizar la prueba y validar que el fix no rompia la suite completa.
+- **Evidencia:**
+  - `npm run test -- --runInBand --no-cache src/features/owners/hooks/use-pets.test.tsx` -> PASS (27 tests)
+  - `npm run test -- --runInBand --no-cache` -> PASS (25 suites, 138 tests)
+  - `python backend/scripts/validate_slice_plan.py QA-007 --stage qa` -> PASS
+  - El fix removio el mock sobrante en `addPet` y sincronizo mejor las esperas en el test de `editPet`
+- **Estado actual:** RESOLVED. QA revalido la correccion y cerro el finding.
+
 
 ## Decision sobre nuevas tareas
 
-No se permiten nuevas tareas BE/FE/UA/APIA relacionadas con el slice 007 hasta que todos los hallazgos abiertos esten en estado `RESOLVED` o `ACCEPTED_RISK`.
+No quedan hallazgos abiertos ni pendientes de revalidacion en el slice 007.
 
-**Hallazgos abiertos pendientes:** F04 (coverage gap de frontend).
+**Hallazgos abiertos pendientes:** ninguno.
+
+**Siguiente paso recomendado:** `/review-slice BE-007`
 
 ## Historial de estados de findings
 
@@ -52,7 +66,8 @@ No se permiten nuevas tareas BE/FE/UA/APIA relacionadas con el slice 007 hasta q
 | QA-007-F01 | 2026-08-11 | RESOLVED | Bug fix en codigo del producto (POST/PUT owners) |
 | QA-007-F02 | 2026-08-11 | RESOLVED | Bug fix en codigo del producto (pet delete + soft-filter) |
 | QA-007-F03 | 2026-08-11 | RESOLVED | Bug fix en codigo del producto (page_size query param) |
-| QA-007-F04 | 2026-08-11 | READY_FOR_REVALIDATION | Archivos de test creados y correcciones aplicadas; pendiente revalidacion de QA |
+| QA-007-F04 | 2026-08-11 | RESOLVED | Archivos de test creados y correcciones aplicadas; QA revalido el cierre |
+| QA-007-F05 | 2026-08-13 | RESOLVED | Mock sobrante en `use-pets.test.tsx` estabilizado; QA revalido el cierre |
 
 ---
 Fin de QA-007-findings.md.

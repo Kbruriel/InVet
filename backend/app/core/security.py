@@ -12,6 +12,15 @@ from app.core.config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+MIN_SECRET_KEY_LENGTH = 16
+
+
+def _require_secret_key() -> str:
+    """Obtener la clave secreta configurada o fallar con un error claro."""
+    secret_key = settings.SECRET_KEY
+    if not secret_key:
+        raise RuntimeError("SECRET_KEY must be configured before using token helpers.")
+    return secret_key
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -33,7 +42,7 @@ def create_access_token(
     )
     to_encode.update({"exp": expire, "type": "access"})
     return cast(
-        str, jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+        str, jwt.encode(to_encode, _require_secret_key(), algorithm=settings.ALGORITHM)
     )
 
 
@@ -44,7 +53,7 @@ def create_refresh_token(
     expire = datetime.utcnow() + (expires_delta if expires_delta else timedelta(days=7))
     to_encode.update({"exp": expire, "type": "refresh"})
     return cast(
-        str, jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+        str, jwt.encode(to_encode, _require_secret_key(), algorithm=settings.ALGORITHM)
     )
 
 
@@ -57,7 +66,7 @@ def create_reset_token(
     )
     to_encode.update({"exp": expire, "type": "reset"})
     return cast(
-        str, jwt.encode(to_encode, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+        str, jwt.encode(to_encode, _require_secret_key(), algorithm=settings.ALGORITHM)
     )
 
 
@@ -65,7 +74,7 @@ def verify_token(token: str) -> dict[str, Any]:
     try:
         return cast(
             dict[str, Any],
-            jwt.decode(token, settings.SECRET_KEY, algorithms=[settings.ALGORITHM]),
+            jwt.decode(token, _require_secret_key(), algorithms=[settings.ALGORITHM]),
         )
     except JWTError as exc:
         raise HTTPException(

@@ -1,6 +1,8 @@
-﻿"""Punto de entrada principal de la aplicación FastAPI."""
+"""Punto de entrada principal de la aplicación FastAPI."""
 
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from app.api.middleware import RateLimitMiddleware
 
 from app.api.v1.router import router as api_v1_router
 from app.core.config import settings
@@ -13,7 +15,25 @@ def create_app() -> FastAPI:
         docs_url="/docs",
         redoc_url="/redoc",
     )
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.BACKEND_CORS_ORIGINS,
+        allow_credentials=False,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
     app.include_router(api_v1_router, prefix=settings.API_V1_STR)
+
+    # Basic, process-local rate limiter for sensitive endpoints (login/register).
+    # Enabled only in non-development/test environments to avoid interfering with tests.
+    try:
+        env = settings.ENVIRONMENT.lower()
+    except Exception:
+        env = "development"
+
+    if env not in ("development", "test"):
+        # This is opt-in and process-local; for production use a redis-backed limiter or API gateway.
+        app.add_middleware(RateLimitMiddleware, calls=5, period=10)
 
     # Security runtime validation: ensure SECRET_KEY is not the default in production
     try:
@@ -22,9 +42,16 @@ def create_app() -> FastAPI:
         env = "development"
 
     if env in ("prod", "production"):
-        if not settings.SECRET_KEY or settings.SECRET_KEY == "secret-key-for-dev":
+        # Enforce presence of a real SECRET_KEY in production and refuse common placeholders.
+        forbidden = {None, "", "secret-key-for-dev", "change-me-in-production"}
+        secret_key = settings.SECRET_KEY
+        if (
+            not secret_key
+            or len(secret_key) < 16
+            or secret_key in forbidden
+        ):
             raise RuntimeError(
-                "In production ENVIRONMENT, SECRET_KEY must be set and not use the default placeholder."
+                "In production ENVIRONMENT, SECRET_KEY must be set to a strong secret and not use default placeholders."
             )
 
     @app.get("/")

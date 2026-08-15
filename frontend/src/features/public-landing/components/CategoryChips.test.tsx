@@ -5,14 +5,17 @@ import { CategoryChips } from './CategoryChips';
 
 // Mock next/navigation - must be at module top level
 const mockPush = jest.fn();
+let mockSearchParams = new URLSearchParams();
+
 jest.mock('next/navigation', () => ({
   useRouter: () => ({ push: mockPush }),
-  useSearchParams: () => new URLSearchParams(),
+  useSearchParams: () => mockSearchParams,
 }));
 
 describe('CategoryChips', () => {
   beforeEach(() => {
     mockPush.mockClear();
+    mockSearchParams = new URLSearchParams();
   });
 
   it('deberia renderizar las tres categorias', () => {
@@ -30,10 +33,7 @@ describe('CategoryChips', () => {
   });
 
   it('deberia aplicar estilo activo al chip seleccionado', () => {
-    // Override the mock to return active category
-    jest.spyOn(jest.requireActual('next/navigation'), 'useSearchParams').mockReturnValue(
-      new URLSearchParams('category=veterinaria')
-    );
+    mockSearchParams = new URLSearchParams('category=veterinaria');
 
     render(<CategoryChips />);
     const activeChip = screen.getByRole('button', { name: /filtrar por veterinaria/i });

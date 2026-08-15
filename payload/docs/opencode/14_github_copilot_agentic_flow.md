@@ -18,6 +18,8 @@ La fuente funcional sigue siendo `docs/opencode/13_agents_architecture_and_gate_
 
 Nota de compatibilidad: `.github/copilot-instructions.md` es la instruccion principal del repositorio. Para que VS Code muestre agentes en el selector, deben existir archivos de agente en `.github/agents/*.agent.md`. Los prompt files `*.prompt.md` siguen siendo utiles como prompts reutilizables; si el IDE no los expone, copia el contenido del prompt correspondiente en Copilot Chat y conserva las mismas reglas de gates y evidencia.
 
+Para QA especificamente, `docs/opencode/qa/README.md` es el runbook corto canonico para la secuencia de comandos y las reglas de handoff.
+
 ## Estructura Copilot
 
 | Archivo | Funcion |
@@ -241,5 +243,6 @@ Esta adaptacion se apoya en la documentacion oficial de GitHub Copilot para:
 - Instrucciones de repositorio en `.github/copilot-instructions.md`.
 - Instrucciones por ruta en `.github/instructions/**/*.instructions.md` cuando se necesiten.
 - Prompt files reutilizables `*.prompt.md`.
+- `docs/opencode/qa/README.md`: runbook canonico de QA para secuencia de comandos y handoff.
 
 En InVet, la version inicial usa instrucciones de repositorio y prompt files. Las instrucciones por ruta pueden agregarse despues si hace falta separar reglas para `backend/`, `frontend/` o `InVet_UI_Automation/`.

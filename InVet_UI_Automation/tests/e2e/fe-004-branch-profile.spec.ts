@@ -15,8 +15,8 @@
 
 import { expect, test } from "@playwright/test";
 
-import { readAutomationEnv } from "../../fixtures/env";
-import { annotateTraceability, attachGherkinScenario } from "../../helpers/traceability";
+import { readAutomationEnv } from "../fixtures/env";
+import { annotateTraceability, attachGherkinScenario } from "../helpers/traceability";
 
 const env = readAutomationEnv();
 

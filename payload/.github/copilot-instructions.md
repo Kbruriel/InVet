@@ -17,6 +17,8 @@ There is one canonical plan per slice: `docs/opencode/plans/BE-00X-plan.md`.
 
 OpenCode slash commands are not available inside GitHub Copilot. When a document says `/plan-task`, `/qa-task`, `/run-checks`, or another slash command, translate it into the equivalent Copilot workflow described in `docs/opencode/14_github_copilot_agentic_flow.md`.
 
+For QA specifically, use `docs/opencode/qa/README.md` as the canonical short runbook for command sequence and handoff rules.
+
 VS Code custom agents for this repository live in `.github/agents/*.agent.md`. Prompt files live in `.github/prompts/*.prompt.md`.
 
 ## Required Context
@@ -25,6 +27,7 @@ Before editing code for a slice, read the relevant files:
 
 - `docs/opencode/14_github_copilot_agentic_flow.md`
 - `docs/opencode/13_agents_architecture_and_gate_flow.md`
+- `docs/opencode/qa/README.md`
 - `docs/opencode/plans/BE-00X-plan.md`
 - `docs/opencode/tasks/backend/BE-00X.md`
 - `docs/opencode/tasks/frontend/FE-00X.md`

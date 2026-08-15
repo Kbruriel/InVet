@@ -26,6 +26,10 @@
         "./src/*"
       ]
     },
+    "types": [
+      "jest",
+      "@testing-library/jest-dom"
+    ],
     "incremental": true
   },
   "include": [

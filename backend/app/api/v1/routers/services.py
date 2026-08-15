@@ -215,7 +215,8 @@ def _get_clinic_id_from_user(current_user: dict) -> int:
     clinic_id = current_user.get("clinic_id")
     if clinic_id is None:
         raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
+            status_code=status.HTTP_401_UNAUTHORIZED,
             detail="No se pudo determinar la clínica del usuario.",
+            headers={"WWW-Authenticate": "Bearer"},
         )
     return int(clinic_id)

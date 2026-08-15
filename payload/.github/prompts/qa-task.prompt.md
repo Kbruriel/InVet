@@ -12,6 +12,7 @@ Before acting, read:
 - `.opencode/agents/invet-qa-validator.md`
 - `docs/opencode/templates/qa_results_template.md`
 - `docs/opencode/templates/qa_findings_template.md`
+- `docs/opencode/qa/README.md`
 - `docs/opencode/14_github_copilot_agentic_flow.md`
 
 Run QA and write reproducible evidence. Do not modify product code to make QA pass.

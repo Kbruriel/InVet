@@ -16,11 +16,13 @@ services:
           "CMD-SHELL",
           "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-invet}",
         ]
-      interval: 5s
+      interval: 10s
       timeout: 5s
-      retries: 10
-      start_period: 10s
+      retries: 5
+      start_period: 30s
     restart: unless-stopped
+    networks:
+      - invet-network
 
   backend:
     build:
@@ -28,7 +30,7 @@ services:
       dockerfile: Dockerfile
     container_name: invet-backend
     environment:
-      APP_ENV: production
+      ENVIRONMENT: production
       PROJECT_NAME: InVet
       API_V1_STR: /api/v1
       POSTGRES_SERVER: db
@@ -36,7 +38,9 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres}
       POSTGRES_DB: ${POSTGRES_DB:-invet}
       DATABASE_URL: postgresql+psycopg2://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@db:5432/${POSTGRES_DB:-invet}
-      SECRET_KEY: ${SECRET_KEY:-change-me-in-production}
+      # SECRET_KEY must be provided by the environment. Do NOT rely on defaults.
+      SECRET_KEY: ${SECRET_KEY}
+      BACKEND_CORS_ORIGINS: '["http://localhost:3000","http://127.0.0.1:3000"]'
       ALGORITHM: HS256
       ACCESS_TOKEN_EXPIRE_MINUTES: 30
       LOG_LEVEL: INFO
@@ -48,6 +52,14 @@ services:
     command: >
       sh -c "python -c \"import app.infrastructure.database.models; from app.infrastructure.database.session import Base, engine; Base.metadata.create_all(bind=engine)\" && uvicorn app.api.main:app --host 0.0.0.0 --port 8000"
     restart: unless-stopped
+    networks:
+      - invet-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8000/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
 
   frontend:
     build:
@@ -55,13 +67,29 @@ services:
       dockerfile: Dockerfile
       args:
         BACKEND_INTERNAL_URL: http://backend:8000
+        NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
     container_name: invet-frontend
+    environment:
+      BACKEND_INTERNAL_URL: http://backend:8000
+      NEXT_PUBLIC_API_URL: http://localhost:8000/api/v1
     ports:
       - "3000:3000"
     depends_on:
       backend:
         condition: service_healthy
     restart: unless-stopped
+    networks:
+      - invet-network
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000 || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
 
 volumes:
   postgres_data:
+
+networks:
+  invet-network:
+    driver: bridge

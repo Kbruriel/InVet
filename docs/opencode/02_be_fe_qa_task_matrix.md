@@ -5,9 +5,9 @@
 | 001 | US-001 | BE-001 | FE-001 | QA-001 | UIA-001 | APIA-001 | Base tecnica y design system | CLOSED |
 | 002 | US-002 | BE-002 | FE-002 | QA-002 | UIA-002 | APIA-002 | Autenticacion y sesion |
 | 003 | US-003 | BE-003 | FE-003 | QA-003 | UIA-003 | APIA-003 | Landing publica y busqueda |
-| 004 | US-004 | BE-004 | FE-004 | QA-004 | UIA-004 | APIA-004 | Perfil publico clinica/sucursal | COMPLETED |
-| 005 | US-005 | BE-005 | FE-005 | QA-005 | UIA-005 | APIA-005 | Administracion de clinica y sucursales | QA_APPROVED (pendiente APIA-005) |
-| 006 | US-006 | BE-006 | FE-006 | QA-006 | UIA-006 | APIA-006 | Servicios, veterinarios y usuarios internos | COMPLETED |
+| 004 | US-004 | BE-004 | FE-004 | QA-004 | UIA-004 | APIA-004 | Perfil publico clinica/sucursal |
+| 005 | US-005 | BE-005 | FE-005 | QA-005 | UIA-005 | APIA-005 | Administracion de clinica y sucursales |
+| 006 | US-006 | BE-006 | FE-006 | QA-006 | UIA-006 | APIA-006 | Servicios, veterinarios y usuarios internos |
 | 007 | US-007 | BE-007 | FE-007 | QA-007 | UIA-007 | APIA-007 | Propietarios y mascotas |
 | 008 | US-008 | BE-008 | FE-008 | QA-008 | UIA-008 | APIA-008 | Solicitud y gestion de citas |
 | 009 | US-009 | BE-009 | FE-009 | QA-009 | UIA-009 | APIA-009 | Consulta medica basica |

@@ -2,6 +2,8 @@
 
 from fastapi import HTTPException, status
 
+from datetime import datetime, timedelta
+
 from app.api.schemas.auth_schemas import AuthProfileResponse, AuthTokenResponse
 from app.core.security import (
     create_access_token,
@@ -51,11 +53,11 @@ class AuthUseCase:
                 last_name=last_name.strip(),
             )
         )
-        return self._issue_tokens(user)
+        return await self._issue_tokens(user)
 
     async def login(self, *, email: str, password: str) -> AuthTokenResponse:
         user = await self._authenticate_user(email=email, password=password)
-        return self._issue_tokens(user)
+        return await self._issue_tokens(user)
 
     async def refresh(self, *, refresh_token: str) -> AuthTokenResponse:
         payload = verify_token(refresh_token)
@@ -68,7 +70,26 @@ class AuthUseCase:
 
         user = await self._get_user_from_subject(payload.get("sub"))
         self._ensure_active_user(user)
-        return self._issue_tokens(user)
+
+        # If a session repository is present, ensure the refresh token is active
+        if self.session_repository:
+            session = await self.session_repository.get_session_by_refresh_token(
+                refresh_token
+            )
+            if not session:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="Refresh token inválido o revocado",
+                )
+            # rotate: revoke old session before issuing a new one
+            try:
+                session_id = int(session.get("id") if isinstance(session, dict) else getattr(session, "id", None))
+            except Exception:
+                session_id = None
+            if session_id:
+                await self.session_repository.revoke_session(session_id)
+
+        return await self._issue_tokens(user)
 
     async def get_profile(self, *, user_id: int) -> AuthProfileResponse:
         user = await self.user_repository.get_user_by_id(user_id)
@@ -131,15 +152,34 @@ class AuthUseCase:
                 detail="Usuario inactivo",
             )
 
-    def _issue_tokens(self, user: User) -> AuthTokenResponse:
+    async def _issue_tokens(self, user: User) -> AuthTokenResponse:
+        """Genera access + refresh tokens y registra la sesión si aplica.
+
+        This method is async because it may call the optional session repository.
+        """
         claims = {
             "sub": str(user.id),
             "email": user.email,
             "role": self._resolve_role(user),
         }
+
+        access = create_access_token(claims)
+        refresh = create_refresh_token(claims)
+
+        # Persist refresh token as session for revocation/rotation
+        if self.session_repository:
+            expires_at = datetime.utcnow() + timedelta(days=7)
+            session_payload = {
+                "user_id": user.id,
+                "refresh_token": refresh,
+                "expires_at": expires_at,
+            }
+            # create_session may return a dict or object depending on impl
+            await self.session_repository.create_session(session_payload)
+
         return AuthTokenResponse(
-            access_token=create_access_token(claims),
-            refresh_token=create_refresh_token(claims),
+            access_token=access,
+            refresh_token=refresh,
             token_type="bearer",
         )
 
@@ -155,7 +195,13 @@ class AuthUseCase:
                 refresh_token
             )
             if session:
-                await self.session_repository.revoke_session(int(session.id))  # type: ignore[arg-type]
+                # support implementations that return dicts or ORM-like objects
+                try:
+                    session_id = int(session.get("id") if isinstance(session, dict) else getattr(session, "id", None))
+                except Exception:
+                    session_id = None
+                if session_id:
+                    await self.session_repository.revoke_session(session_id)
 
         # Revocar todas las sesiones del usuario
         if self.session_repository:
