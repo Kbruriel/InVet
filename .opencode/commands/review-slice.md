@@ -14,6 +14,7 @@ Instrucciones:
 2. Identifica `BE-00X`, `FE-00X` y `QA-00X` equivalentes.
 3. Ejecuta `python backend/scripts/validate_slice_plan.py BE-00X --stage review`.
    - Si QA no esta aprobado o el plan es invalido, deten el review y reporta el gate.
+   - Si existe una tarea aplicable en `- [ ]`, deten el review y devuelve el plan al agente responsable; solo `Estado: CANCELLED` con evidencia verificable queda exento.
    - Si el gate falla porque `QA-00X` no esta `APPROVED` o sus findings siguen bloqueantes, no crees `BE-00X-review.md` y recomienda el comando que destraba QA: `/qa-task QA-00X` cuando haya findings en `READY_FOR_REVALIDATION`, o `/implement-findings BE-00X` cuando sigan `OPEN`/`IN_PROGRESS`.
 4. Lee:
    - `docs/opencode/plans/BE-00X-plan.md` cuando exista.

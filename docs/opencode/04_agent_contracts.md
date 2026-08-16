@@ -25,6 +25,8 @@
 - Un carryover no se considera resuelto si el plan origen, el plan destino y el registro no coinciden.
 - QA, reviewers, docs y final gate deben bloquear slices con carryovers abiertos, desalineados o sin evidencia reproducible.
 - `backend/scripts/validate_slice_plan.py --stage qa|review|checks|docs` aplica esa regla de forma deterministica.
+- Los stages de trabajo `plan`, `backend`, `frontend`, `qa` y `findings` permiten tareas abiertas segun la etapa. Los stages de cierre `review`, `checks` y `docs` bloquean cualquier tarea aplicable en `- [ ]`.
+- Una tarea abierta solo queda exenta del cierre si declara `Estado: CANCELLED` y evidencia verificable; texto informal, `pending`, `N/A`, `OPEN` o `TRANSFERRED` no justifican el cierre.
 
 ## Responsabilidades
 

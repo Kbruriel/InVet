@@ -126,7 +126,9 @@ def _write_plan(repo_root: Path, slice_id: str, plan_text: str) -> None:
     plan_path.write_text(plan_text, encoding="utf-8")
 
 
-def _write_qa_result(repo_root: Path, slice_id: str, decision: str = "APPROVED") -> None:
+def _write_qa_result(
+    repo_root: Path, slice_id: str, decision: str = "APPROVED"
+) -> None:
     results_path = repo_root / "docs" / "opencode" / "qa" / f"QA-{slice_id}-results.md"
     results_path.parent.mkdir(parents=True, exist_ok=True)
     results_path.write_text(f"- Decision: {decision}\n", encoding="utf-8")
@@ -162,6 +164,19 @@ def test_schema_v3_plan_contract_accepts_atomic_tasks() -> None:
     assert errors == []
 
 
+def test_schema_v3_composite_markers_outside_objective_are_allowed() -> None:
+    validator = _load_validator()
+    slice_ids = validator.normalize_slice_id("BE-999")
+    plan = _minimal_schema_v3_plan().replace(
+        "Contexto necesario: tarea backend",
+        "Contexto necesario: `docs/opencode/tasks/backend/BE-999.md`; guia y contrato + pruebas",
+    )
+
+    errors = validator.validate_plan_text(plan, slice_ids)
+
+    assert errors == []
+
+
 def test_schema_v3_plan_contract_rejects_composite_objectives_and_mojibake() -> None:
     validator = _load_validator()
     slice_ids = validator.normalize_slice_id("BE-999")
@@ -173,6 +188,19 @@ def test_schema_v3_plan_contract_rejects_composite_objectives_and_mojibake() -> 
 
     assert any("Objetivo parece compuesto" in error for error in errors)
     assert any("mojibake" in error for error in errors)
+
+
+def test_schema_v3_plan_contract_rejects_noncanonical_task_rows() -> None:
+    validator = _load_validator()
+    slice_ids = validator.normalize_slice_id("BE-999")
+    plan = _minimal_schema_v3_plan().replace(
+        "- [ ] BE-999-T01 - Definir contrato",
+        "- [ ] BE-999-T01: Definir contrato",
+    )
+
+    errors = validator.validate_plan_text(plan, slice_ids)
+
+    assert any("formato no canonico" in error for error in errors)
 
 
 @pytest.mark.parametrize("status", ["OPEN", "TRANSFERRED"])
@@ -210,6 +238,67 @@ def test_schema_v3_plan_contract_accepts_closed_carryovers_at_qa(
     errors = validator.validate_stage(tmp_path, slice_ids, "qa")
 
     assert errors == []
+
+
+def test_qa_preflight_allows_qa_tasks_to_remain_open(tmp_path: Path) -> None:
+    validator = _load_validator()
+    slice_id = "001"
+    slice_ids = validator.normalize_slice_id(f"BE-{slice_id}")
+    _write_plan(tmp_path, slice_id, _minimal_schema_v3_plan(slice_id=slice_id))
+
+    errors = validator.validate_stage(tmp_path, slice_ids, "qa")
+
+    assert errors == []
+
+
+@pytest.mark.parametrize("stage", ["review", "checks", "docs"])
+def test_closure_stages_block_open_applicable_tasks(
+    tmp_path: Path,
+    stage: str,
+) -> None:
+    validator = _load_validator()
+    slice_id = "001"
+    slice_ids = validator.normalize_slice_id(f"BE-{slice_id}")
+    _write_plan(tmp_path, slice_id, _minimal_schema_v3_plan(slice_id=slice_id))
+    _write_qa_result(tmp_path, slice_id)
+
+    errors = validator.validate_stage(tmp_path, slice_ids, stage)
+
+    assert any("BE-001-T01 sigue abierta" in error for error in errors)
+    assert any("FE-001-T01 sigue abierta" in error for error in errors)
+    assert any("QA-001-T01 sigue abierta" in error for error in errors)
+
+
+def test_closure_gate_accepts_cancelled_tasks_with_evidence(tmp_path: Path) -> None:
+    validator = _load_validator()
+    slice_id = "001"
+    slice_ids = validator.normalize_slice_id(f"BE-{slice_id}")
+    plan = _minimal_schema_v3_plan(slice_id=slice_id).replace(
+        "  Evidencia: pending\n  Paralelismo[P]: No",
+        "  Evidencia: docs/opencode/decisions/BE-001-cancellation.md\n"
+        "  Estado: CANCELLED\n"
+        "  Paralelismo[P]: No",
+    )
+    _write_plan(tmp_path, slice_id, plan)
+
+    errors = validator.validate_task_closure_gate(tmp_path, slice_ids)
+
+    assert errors == []
+
+
+def test_closure_gate_rejects_cancelled_tasks_without_evidence(tmp_path: Path) -> None:
+    validator = _load_validator()
+    slice_id = "001"
+    slice_ids = validator.normalize_slice_id(f"BE-{slice_id}")
+    plan = _minimal_schema_v3_plan(slice_id=slice_id).replace(
+        "  Paralelismo[P]: No",
+        "  Estado: CANCELLED\n  Paralelismo[P]: No",
+    )
+    _write_plan(tmp_path, slice_id, plan)
+
+    errors = validator.validate_task_closure_gate(tmp_path, slice_ids)
+
+    assert any("CANCELLED sin evidencia verificable" in error for error in errors)
 
 
 def test_schema_v3_plan_contract_requires_carryover_registry_when_transfers_are_mentioned(
@@ -251,7 +340,8 @@ def test_schema_v3_contracts_are_synced_with_payload() -> None:
         ),
         (
             REPO_ROOT / "docs/opencode/templates/carryovers_registry_template.md",
-            REPO_ROOT / "payload/docs/opencode/templates/carryovers_registry_template.md",
+            REPO_ROOT
+            / "payload/docs/opencode/templates/carryovers_registry_template.md",
         ),
     ]
 

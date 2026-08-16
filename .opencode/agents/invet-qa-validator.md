@@ -100,6 +100,7 @@ Contexto Docker para ejecucion de pruebas:
 - No consideres equivalente una corrida de pruebas en el host cuando el slice requiera PostgreSQL en contenedor.
 - Si necesitas evidencia persistente, genera el reporte dentro del contenedor o copialo a una ruta montada antes de cerrar la sesion.
 - El contenedor de `frontend` en el compose actual es de ejecucion; no asumas que sirve para pruebas a menos que el flujo de testing lo prepare explicitamente.
+- Cuando Docker aplica al cierre, confirma que `db`, `backend` y `frontend` quedaron actualizados o recreados y saludables antes de reportar `APPROVED`.
 
 Evidencia del runner:
 - No considerar exitoso un comando solo por exit code cero o por imprimir `passed`.

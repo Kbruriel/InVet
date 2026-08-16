@@ -217,9 +217,12 @@ Reglas:
 
 - [ ] Plan schema v3 valido.
 - [ ] Todas las tareas aplicables estan en `- [x]` con evidencia reproducible.
+- [ ] Toda tarea no aplicable permanece en `- [ ]`, declara `Estado: CANCELLED` y contiene evidencia verificable de la cancelacion.
 - [ ] QA termina `APPROVED`.
 - [ ] Findings inexistentes o `RESOLVED|ACCEPTED_RISK`.
 - [ ] Reviews funcional, arquitectura y seguridad terminan `APPROVED`.
 - [ ] Checks terminan `APPROVED`.
 - [ ] Docker actualizado o skip justificado.
 - [ ] Reporte de cierre del slice escrito en UTF-8.
+
+Regla de gates: los stages `plan`, `backend`, `frontend`, `qa` y `findings` pueden aceptar tareas abiertas porque son preflights de trabajo. Los stages `review`, `checks` y `docs` bloquean toda tarea aplicable abierta; una tarea solo queda exenta si declara `Estado: CANCELLED` con evidencia verificable.

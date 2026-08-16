@@ -9,6 +9,7 @@ Instrucciones:
 1. Requiere `BE-00X`, `FE-00X` o `QA-00X` y normaliza el mismo indice vertical.
 2. Ejecuta `python backend/scripts/validate_slice_plan.py BE-00X --stage docs`.
 3. Si el preflight falla, no documentes el slice como cerrado.
+   - No cierres documentacion mientras exista una tarea aplicable abierta o una tarea `CANCELLED` sin evidencia verificable.
 4. Revisa implementacion, QA, reviews y checks.
 5. Actualiza `docs/opencode` segun aplique.
 6. Documenta endpoints, componentes, decisiones, riesgos y pendientes.

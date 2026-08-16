@@ -241,6 +241,7 @@ El reporte formal esperado para cierre tecnico es:
 - `docs/opencode/checks/BE-00X-checks.md`
 
 Despues, `/update-docs FE-00X` consolida el cierre documental del slice.
+Estos tres stages de cierre no aceptan tareas aplicables abiertas; solo una tarea `Estado: CANCELLED` con evidencia verificable puede quedar fuera del cierre.
 
 ### 10. Gate final
 
@@ -362,6 +363,8 @@ No debe ejecutarse por reflejo en cada comando. Primero hay que revisar si hubo 
 - `docker-compose.yml`
 - `Dockerfile*`
 - lockfiles o manifiestos de dependencias
+
+Si Docker aplica al cierre, confirma que `db`, `backend` y `frontend` queden actualizados o recreados y saludables antes de dar por aprobado el slice.
 
 ## Reglas de oro
 

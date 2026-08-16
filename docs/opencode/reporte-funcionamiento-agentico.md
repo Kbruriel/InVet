@@ -45,6 +45,8 @@ El sistema agentico de InVet funciona como un ciclo de trabajo con tres capas:
 3. **Validacion**: QA y los gates automatizados confirman que el cambio cumple contrato, seguridad y regresion minima.
 
 La regla central es simple: **si el gate no pasa, la tarea no se cierra**.
+Ademas, los stages `review`, `checks` y `docs` funcionan como gates de cierre estricto: si queda una tarea aplicable abierta o una cancelacion sin evidencia verificable, el slice sigue abierto.
+Cuando el cierre depende de Docker, `db`, `backend` y `frontend` deben quedar actualizados o recreados y saludables; no basta con un arranque parcial.
 
 ## Roles y responsabilidades
 

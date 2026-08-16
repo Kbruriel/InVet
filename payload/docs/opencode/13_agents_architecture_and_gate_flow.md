@@ -86,6 +86,7 @@ Ambos usan el modelo seleccionado por el usuario y no fijan una decision de prod
 15. QA intenta autorecuperar dependencias, `.env.qa` y contexto Docker antes de declarar `BLOCKED`.
 16. La normalizacion de IDs es explicita por comando: BE, FE y QA representan el mismo slice vertical, pero un alias no soportado debe rechazarse y redirigirse al comando correcto.
 17. Si el slice hereda tareas postergadas, el plan origen, el plan destino y el registro de carryovers deben coincidir antes de cerrar QA, reviews, checks o docs.
+18. `review`, `checks` y `docs` son gates de cierre de tareas: bloquean toda tarea aplicable abierta y toda cancelacion sin evidencia verificable. Los stages anteriores conservan tareas abiertas porque funcionan como preflights de trabajo.
 
 ## Cambios schema v3 implementados
 

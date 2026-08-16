@@ -26,6 +26,7 @@ Responsabilidades:
 - Detectar faltantes, implementacion incompleta, errores, regresiones, inconsistencias y alcance fuera del MVP.
 - Documentar los hallazgos en un archivo Markdown cuando existan correcciones.
 - No modificar codigo fuente.
+- No aprobar si el preflight deja tareas aplicables abiertas en `- [ ]` o tareas `CANCELLED` sin evidencia verificable; devuelve el plan al agente responsable antes de intentar cerrar el slice.
 
 Flujo de revision:
 1. Si recibe `BE-00X`, usa ese indice como slice base.
@@ -52,6 +53,7 @@ Contexto Docker:
 - El repo incluye `docker-compose.yml` con `db`, `backend` y `frontend`.
 - Si la revision necesita validar comportamiento real del slice, puede usar Docker como contexto.
 - Cuando haya base de datos, el backend dentro de contenedor es el punto de referencia.
+- Si Docker aplica al cierre, confirma que `db`, `backend` y `frontend` quedaron actualizados o recreados y saludables antes de aprobar.
 
 Cierre requerido:
 - El reporte final debe incluir `Estado de ejecucion: APPROVED|REJECTED|BLOCKED` antes de `Siguiente paso recomendado`.

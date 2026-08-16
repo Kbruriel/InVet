@@ -8,6 +8,7 @@ Ejecuta los checks tecnicos disponibles del repositorio y reporta pass/fail/skip
 Estrategia:
 0. Si `$ARGUMENTS` contiene `BE-00X`, `FE-00X` o `QA-00X`, normaliza el slice y ejecuta `python backend/scripts/validate_slice_plan.py BE-00X --stage checks`.
    - Si falla, reporta el gate y no declares checks finales del slice.
+   - El preflight bloquea tareas aplicables abiertas y tareas `CANCELLED` sin evidencia verificable.
    - Sin argumento puedes ejecutar diagnostico tecnico, pero no cerrar un slice.
 1. Antes de correr nada, verifica que el interprete Python seleccionado tenga instaladas las dependencias de backend declaradas en `backend/requirements.txt`.
    - Si faltan `pytest`, `ruff`, `black` o `mypy`, reporta el bloqueo con la causa exacta y la instruccion de instalacion.

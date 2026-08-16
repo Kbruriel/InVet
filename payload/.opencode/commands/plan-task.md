@@ -47,6 +47,7 @@ Instrucciones:
    - Riesgos de seguridad/IDOR/BOLA.
    - Politica UTF-8.
    - Definition of Done.
+   - Matriz de trazabilidad con columnas `ID`, `Fuente`, `Historia o criterio`, `Tarea planificada`, `Validacion`, `Evidencia esperada` y `Estado`.
 6. Ademas del plan canonico, genera o actualiza:
    - `docs/opencode/tasks/user-stories/US-00X.md`
    - `docs/opencode/tasks/ui-automation/UIA-00X.md`

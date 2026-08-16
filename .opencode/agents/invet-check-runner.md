@@ -59,6 +59,7 @@ Objetivo:
 - Corregir archivos solo si el usuario pidio explicitamente solucionar/corregir/fix errors.
 - Con un ID de slice, ejecutar `--stage checks`; sin ID el resultado es diagnostico y no evidencia de cierre.
 - Con un ID, escribir `docs/opencode/checks/BE-00X-checks.md` con decision reproducible.
+- No declarar cierre tecnico si el preflight del slice deja tareas aplicables abiertas en `- [ ]` o tareas `CANCELLED` sin evidencia verificable.
 
 Checks backend:
 - Desde `backend/`: `python -W ignore::PendingDeprecationWarning -m pytest app/tests -q`.
@@ -87,6 +88,7 @@ Checks DevOps:
 - Antes de reiniciar contenedores al cierre, valida con `git status` si hay cambios pendientes que afecten `backend`, `frontend`, `docker-compose.yml`, `Dockerfile*` o lockfiles/manifiestos de dependencias; si no los hay, registra el skip y omite el restart.
 - `git status` es un check read-only requerido para decidir DevOps; un working tree sucio no vuelve el check `incomplete`, solo debe resumirse como evidencia para decidir si aplica Docker.
 - Usa `skipped` solo cuando el check no aplica o falta herramienta/configuracion; usa `fail` cuando un comando aplicable termina con exit code distinto de cero; usa `blocked/incomplete` solo si el comando requerido no pudo iniciar por una causa ambiental concreta.
+- Cuando Docker aplica al cierre, confirma que los contenedores relevantes quedaron actualizados o recreados y saludables; no basta con que el stack arranque.
 
 Modo correccion:
 - En modo reporte, no editar.
@@ -98,6 +100,7 @@ Contexto Docker:
 - Si un check requiere PostgreSQL o el runtime del frontend dentro de contenedor, usa `docker compose` como contexto de ejecucion.
 - Para backend con DB, el flujo normal es `docker compose up -d db` y luego `docker compose run --rm backend ...`.
 - Registra si el check se ejecuto en host o en contenedor y no los declares equivalentes por defecto.
+- Si el cierre depende de Docker, valida que `db`, `backend` y `frontend` queden actualizados o recreados y con estado saludable antes de reportar `APPROVED`.
 
 Entrega:
 - Tabla de comandos.

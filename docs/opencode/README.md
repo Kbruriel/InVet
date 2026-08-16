@@ -51,6 +51,7 @@ Notas:
 - `/qa-task` intenta autorecuperar dependencias y contexto Docker antes de bloquearse.
 - Los agentes de UI y API automation validan el plan con stage `qa` y usan Docker cuando el slice depende de PostgreSQL o del runtime del repo.
 - Cuando Docker aplica al cierre, todos los contenedores relevantes deben quedar actualizados o recreados y saludables antes de reportar cierre.
+- Los stages de cierre `review`, `checks` y `docs` no aceptan tareas aplicables abiertas; solo `Estado: CANCELLED` con evidencia verificable puede quedar exento.
 - Los artefactos operativos se escriben en UTF-8.
 - Para implementar frontend usa `/implement-frontend-task FE-00X`.
 - Para ejecutar QA usa `/qa-task QA-00X`.

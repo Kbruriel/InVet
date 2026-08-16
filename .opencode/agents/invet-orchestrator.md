@@ -48,6 +48,7 @@ Reglas:
 - No iniciar un nuevo slice mientras el QA anterior no sea `APPROVED`.
 - Bloquear si un finding esta `OPEN`, `IN_PROGRESS` o `READY_FOR_REVALIDATION`.
 - Bloquear si existe cualquier carryover abierto, desalineado o sin evidencia entre plan origen, plan destino y registro.
+- Los stages de cierre `review`, `checks` y `docs` no pueden avanzar si quedan tareas aplicables abiertas en `- [ ]` o tareas `CANCELLED` sin evidencia verificable.
 - `RESOLVED` y `ACCEPTED_RISK` no bloquean, pero deben conservar evidencia.
 - Mantener BE/FE/QA con el mismo indice.
 - Backend define contrato antes de frontend.
@@ -61,3 +62,4 @@ Contexto Docker:
 - El repo incluye `docker-compose.yml` con `db`, `backend` y `frontend`.
 - Si el slice necesita validacion real de infraestructura, coordina la ejecucion dentro de contenedores.
 - Para backend con DB, el recorrido normal es levantar `db` y ejecutar pruebas dentro de `backend`.
+- Si el cierre depende de Docker, confirma que `db`, `backend` y `frontend` quedaron actualizados o recreados y saludables antes de avanzar.

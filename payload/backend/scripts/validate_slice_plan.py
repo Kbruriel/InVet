@@ -14,6 +14,7 @@ SLICE_ID_RE = re.compile(r"^(BE|FE|QA)-(?P<index>\d{3})$", re.IGNORECASE)
 TASK_RE = re.compile(
     r"^- \[(?P<done>[ xX])\] " r"(?P<id>(?:BE|FE|QA)-\d{3}-T\d{2})\s+-\s+\S.*$"
 )
+TASK_LIKE_RE = re.compile(r"^- \[[ xX]\] (?:BE|FE|QA)-\d{3}-T\d{2}\b")
 FIELD_RE = re.compile(r"^\s{2,}(?P<name>[^:]+):\s*(?P<value>.*)$")
 MOJIBAKE_RE = re.compile(r"(?:Ã.|Â.|â..)")
 COMPOSITE_OBJECTIVE_RE = re.compile(
@@ -68,6 +69,15 @@ REQUIRED_TASK_FIELDS = (
 )
 
 FINAL_STAGES = {"review", "checks", "docs"}
+TASK_CLOSURE_STAGES = {"review", "checks", "docs"}
+TASK_BLOCKING_STATES = {
+    "OPEN",
+    "BLOCKED",
+    "IN_PROGRESS",
+    "PENDING",
+    "TRANSFERRED",
+}
+TASK_EXEMPT_STATES = {"CANCELLED"}
 RESOLVED_FINDING_STATES = {"RESOLVED", "ACCEPTED_RISK"}
 BLOCKING_FINDING_STATES = {"OPEN", "IN_PROGRESS", "READY_FOR_REVALIDATION"}
 REVIEW_SUFFIXES = ("review", "clean-architecture-review", "security-review")
@@ -360,7 +370,9 @@ def _validate_carryover_registry_state(
             continue
 
         missing_fields = [
-            field for field in CARRYOVER_REQUIRED_FIELDS if not row.get(field, "").strip()
+            field
+            for field in CARRYOVER_REQUIRED_FIELDS
+            if not row.get(field, "").strip()
         ]
         if missing_fields:
             errors.append(
@@ -508,6 +520,12 @@ def _validate_task(
 
 def validate_plan_text(text: str, expected: SliceIds) -> list[str]:
     errors = _validate_plan_metadata(text, expected)
+    for line_number, line in enumerate(text.splitlines(), start=1):
+        if TASK_LIKE_RE.match(line) and not TASK_RE.match(line):
+            errors.append(
+                f"Linea {line_number}: la tarea usa un formato no canonico; usa "
+                "- [ ] BE|FE|QA-00X-TNN - Titulo."
+            )
     tasks = _parse_tasks(text)
     if not tasks:
         errors.append("El plan no contiene tareas con el formato BE|FE|QA-00X-TNN.")
@@ -554,7 +572,9 @@ def validate_plan_file(repo_root: Path, slice_ids: SliceIds) -> list[str]:
         ]
     plan_text = plan_path.read_text(encoding="utf-8")
     errors = validate_plan_text(plan_text, slice_ids)
-    errors.extend(_validate_carryover_registry_presence(repo_root, slice_ids, plan_text))
+    errors.extend(
+        _validate_carryover_registry_presence(repo_root, slice_ids, plan_text)
+    )
     return errors
 
 
@@ -608,6 +628,37 @@ def validate_secure_persistence_gate(repo_root: Path, slice_ids: SliceIds) -> li
                 f"{task.task_id} pertenece a persistencia segura y no tiene "
                 "evidencia verificable."
             )
+    return errors
+
+
+def validate_task_closure_gate(repo_root: Path, slice_ids: SliceIds) -> list[str]:
+    """Require every applicable task to be closed before post-QA gates."""
+    errors: list[str] = []
+    for task in _read_plan_tasks(repo_root, slice_ids):
+        status = _normalize_status(task.fields.get("estado", ""))
+        evidence = _normalize_label(task.fields.get("evidencia", ""))
+
+        if task.done:
+            if status in TASK_BLOCKING_STATES:
+                errors.append(
+                    f"{task.task_id} esta marcada como completada, pero declara "
+                    f"Estado: {status}."
+                )
+            continue
+
+        if status in TASK_EXEMPT_STATES:
+            if evidence in {"", "pending", "pendiente", "ninguna", "n/a", "na"}:
+                errors.append(
+                    f"{task.task_id} esta CANCELLED sin evidencia verificable que "
+                    "justifique que ya no aplica."
+                )
+            continue
+
+        errors.append(
+            f"{task.task_id} sigue abierta. Antes de review, checks o docs, toda "
+            "tarea aplicable debe estar en - [x] con evidencia reproducible; si ya "
+            "no aplica, declara Estado: CANCELLED y evidencia verificable."
+        )
     return errors
 
 
@@ -767,6 +818,8 @@ def validate_stage(repo_root: Path, slice_ids: SliceIds, stage: str) -> list[str
     errors.extend(validate_previous_slice_gate(repo_root, slice_ids))
     if stage == "secure-persistence":
         errors.extend(validate_secure_persistence_gate(repo_root, slice_ids))
+    if stage in TASK_CLOSURE_STAGES:
+        errors.extend(validate_task_closure_gate(repo_root, slice_ids))
     if stage in FINAL_STAGES:
         errors.extend(validate_current_qa_gate(repo_root, slice_ids))
     if stage in FINAL_STAGES | {"qa"}:

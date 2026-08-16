@@ -2,7 +2,8 @@
 
 from fastapi import APIRouter
 
-from app.api.v1.auth_router import router as auth_router
+from app.api.v1.routers.appointment_router import router as appointment_router
+from app.api.v1.routers.auth_router import router as auth_router
 from app.api.v1.routers.branch_profile import router as branch_router
 from app.api.v1.routers.clinic_admin import router as clinic_admin_router
 from app.api.v1.routers.clinic_search import router as clinic_search_router
@@ -16,6 +17,7 @@ from app.api.v1.routers.services import router as services_router
 from app.api.v1.routers.veterinarians import router as veterinarians_router
 
 router = APIRouter()
+router.include_router(appointment_router)
 router.include_router(auth_router)
 router.include_router(branch_router)
 router.include_router(clinic_admin_router)
@@ -29,6 +31,7 @@ router.include_router(internal_users_router)
 router.include_router(owners_router)
 router.include_router(owner_pets_router)
 router.include_router(pet_router)
+router.include_router(appointment_router)
 
 
 @router.get("/")

@@ -15,3 +15,5 @@ Before acting, read:
 - `docs/opencode/14_github_copilot_agentic_flow.md`
 
 Run applicable backend, frontend, and DevOps checks. Write formal check evidence when a slice ID is provided.
+
+The formal `checks` preflight must block applicable open tasks and `CANCELLED` tasks without verifiable evidence.

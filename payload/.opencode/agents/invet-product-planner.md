@@ -51,7 +51,7 @@ Reglas:
 - Si falta `APIA-00X.md`, crealo desde BE, QA, criterios `AC-00X-NN` y endpoints esperados con cobertura HTTP prevista, authn/authz, errores, riesgos IDOR/BOLA, evidencia pendiente y casos no automatizados.
 - Si un artefacto auxiliar ya existe, auditalo contra el plan y actualizalo sin duplicar casos ni borrar evidencia vigente.
 - Si un implementador devuelve el trabajo porque falta `US-00X`, `UIA-00X` o `APIA-00X`, regenera el artefacto auxiliar con `/plan-task BE-00X` y valida el plan.
-- Genera una matriz de trazabilidad por historia y criterio con columnas `Backend`, `Frontend`, `QA`, `UIA` y `APIA`.
+- Genera una matriz de trazabilidad por historia y criterio con columnas `ID`, `Fuente`, `Historia o criterio`, `Tarea planificada`, `Validacion`, `Evidencia esperada` y `Estado`.
 - No dejes criterios huerfanos: cada `CA-NN` debe tener cobertura BE, FE, QA, UIA, APIA o una justificacion explicita de `No aplica`.
 - `UIA-00X` cubre flujos visibles, navegacion, formularios, estados UX y evidencia de navegador.
 - `APIA-00X` cubre contratos HTTP, authn/authz, payloads, estados, IDOR/BOLA y exposicion de datos.

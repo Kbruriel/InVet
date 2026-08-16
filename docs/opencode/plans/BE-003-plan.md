@@ -210,16 +210,7 @@ Todos los archivos de este slice se crean y modifican con encoding UTF-8. No se 
 
 ## Checklist de tareas
 
-- [x] BE-003-T01: Modelos dominio Clinica/Sucursal/Servicio
-- [x] BE-003-T02: Repositorios con paginacion
-- [x] BE-003-T03: DTOs publicos y validaciones
-- [x] BE-003-T04: Routers FastAPI endpoints
-- [ ] BE-003-T05: Migraciones Alembic
-- [ ] BE-003-T06: Pruebas backend
-- [ ] FE-003-T01: Landing y buscador UI
-- [ ] FE-003-T02: Filtros y resultados
-- [ ] FE-003-T03: Estados UX y responsive
-- [ ] QA-003-T01: Validacion completa slice
+La lista canonica, el estado y la evidencia de cada tarea se mantienen en `Tareas planificadas`; no se duplica un segundo checklist resumido.
 
 ## Definition of done
 

@@ -87,6 +87,8 @@ Este archivo define requisitos, no el estado de un slice. Los checks permanecen 
 
 ## Reviews
 
+- [ ] Todas las tareas aplicables del plan estan en `- [x]` con evidencia reproducible antes del primer review.
+- [ ] Toda tarea abierta no aplicable declara `Estado: CANCELLED` y evidencia verificable.
 - [ ] `/review-slice BE-00X` escribe `BE-00X-review.md`.
 - [ ] `/clean-architecture-review BE-00X` escribe su reporte.
 - [ ] `/security-review BE-00X` escribe su reporte.
@@ -105,6 +107,7 @@ Este archivo define requisitos, no el estado de un slice. Los checks permanecen 
 
 ## `/run-checks BE-00X`
 
+- [ ] No quedan tareas aplicables abiertas ni tareas `CANCELLED` sin evidencia verificable.
 - [ ] QA y reviews estan aprobados.
 - [ ] UI automation y API automation estan aprobadas o justificadas.
 - [ ] `run-ui-checks` ya paso para el slice.
@@ -118,6 +121,7 @@ Este archivo define requisitos, no el estado de un slice. Los checks permanecen 
 
 ## `/update-docs BE-00X`
 
+- [ ] No quedan tareas aplicables abiertas ni inconsistencias entre checkbox, estado y evidencia.
 - [ ] Plan, QA, reviews y checks estan aprobados.
 - [ ] Contratos, riesgos, decisiones y changelog estan actualizados.
 - [ ] No quedan findings abiertos.

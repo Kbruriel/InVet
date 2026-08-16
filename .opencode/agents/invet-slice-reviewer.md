@@ -28,6 +28,7 @@ Responsabilidades:
 - Documentar los hallazgos en un archivo Markdown cuando existan correcciones.
 - No modificar codigo fuente.
 - No aprobar si hay carryovers abiertos o desalineados aunque el diff local parezca correcto.
+- No aprobar si el preflight deja tareas aplicables abiertas en `- [ ]` o tareas `CANCELLED` sin evidencia verificable; devuelve el plan al agente responsable antes de intentar cerrar el slice.
 
 Flujo de revision:
 1. Si recibe `BE-00X`, usa ese indice como slice base.

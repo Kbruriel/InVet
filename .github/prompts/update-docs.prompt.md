@@ -14,3 +14,5 @@ Before acting, read:
 - `docs/opencode/14_github_copilot_agentic_flow.md`
 
 Update docs only after required gates are approved.
+
+Do not close documentation while an applicable plan task remains open or a `CANCELLED` task lacks verifiable evidence.
