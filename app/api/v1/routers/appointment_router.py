@@ -1,0 +1,1 @@
+from backend.app.api.v1.routers.appointment_router import router as router

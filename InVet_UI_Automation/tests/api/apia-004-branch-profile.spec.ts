@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import { annotateTraceability } from "../helpers/traceability";
 
-const API_BASE = process.env.API_BASE_URL || "http://127.0.0.1:8000";
+const API_BASE = process.env.API_BASE_URL || "http://localhost:8000";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -32,10 +32,26 @@ async function getValidBranchId(request: import("@playwright/test").APIRequestCo
   if (response.status() !== 200) return null;
 
   const payload = (await response.json()) as Record<string, unknown>;
-  const items = payload.items as Array<Record<string, unknown>> | undefined;
+  const items = (payload.data ?? payload.items) as
+    | Array<Record<string, unknown>>
+    | undefined;
   if (!items || items.length === 0) return null;
 
   return items[0].id as number;
+}
+
+async function getAccessToken(request: import("@playwright/test").APIRequestContext): Promise<string> {
+  const response = await request.post("/api/v1/auth/register", {
+    data: {
+      email: `branch-profile-${Date.now()}@invet.io`,
+      password: "secret123",
+      firstName: "Branch",
+      lastName: "Profile",
+    },
+  });
+  expect(response.status()).toBe(201);
+  const payload = (await response.json()) as Record<string, unknown>;
+  return String(payload.access_token);
 }
 
 // ---------------------------------------------------------------------------
@@ -123,10 +139,11 @@ test(
       test.skip();
     }
 
-    // Use a valid-looking but unauthorized token
+    const accessToken = await getAccessToken(request);
+
     const response = await request.get(`/api/v1/clinics/branches/${branchId}/${branchId}`, {
       headers: {
-        Authorization: "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c",
+        Authorization: `Bearer ${accessToken}`,
       },
     });
 
@@ -147,7 +164,13 @@ test(
       criteria: ["AC-004-08"],
     });
 
-    const response = await request.get("/api/v1/clinics/branches/999999/999999");
+    const accessToken = await getAccessToken(request);
+
+    const response = await request.get("/api/v1/clinics/branches/999999/999999", {
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    });
     expect(response.status()).toBe(404);
   },
 );

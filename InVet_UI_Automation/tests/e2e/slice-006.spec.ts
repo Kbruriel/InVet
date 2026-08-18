@@ -26,12 +26,45 @@ import { annotateTraceability, attachGherkinScenario } from "../helpers/traceabi
 
 const env = readAutomationEnv();
 
+async function authenticateAs(page: import("@playwright/test").Page, email: string, password: string) {
+  const loginUrl = `${env.apiBaseUrl}${env.loginApiPath}`;
+  const response = await page.request.post(loginUrl, {
+    data: { email, password },
+  });
+
+  expect(response.status()).toBe(200);
+
+  const payload = (await response.json()) as { access_token: string; refresh_token: string };
+  await page.addInitScript(
+    ({ accessToken, refreshToken }) => {
+      localStorage.setItem("access_token", accessToken);
+      localStorage.setItem("refresh_token", refreshToken);
+    },
+    {
+      accessToken: payload.access_token,
+      refreshToken: payload.refresh_token,
+    },
+  );
+}
+
+async function authenticateAdmin(page: import("@playwright/test").Page) {
+  await authenticateAs(page, env.adminEmail, env.adminPassword);
+}
+
+async function authenticateViewer(page: import("@playwright/test").Page) {
+  await authenticateAs(page, env.clinicEmail, env.clinicPassword);
+}
+
 // ===========================================================================
 // TC-UIA-006-01: Listado de servicios con paginacion
 // Criterios: AC-006-03, AC-006-10
 // ===========================================================================
 
 test.describe("services listing - UIA-006", () => {
+  test.beforeEach(async ({ page }) => {
+    await authenticateAdmin(page);
+  });
+
   test(
     "@smoke @regression US-006-01 AC-006-03 AC-006-10 TC-UIA-006-01 servicios listado con paginacion",
     async ({ page }, testInfo) => {
@@ -57,7 +90,7 @@ test.describe("services listing - UIA-006", () => {
       await expect(page).toHaveTitle(/InVet/i);
 
       // Verificar que la pagina cargo (heading admin)
-      const heading = page.getByRole("heading", { name: /Servicios|Administracion/i });
+      const heading = page.getByRole("heading", { level: 1, name: /Servicios|Administracion/i });
       await expect(heading).toBeVisible();
 
       // Verificar tabla o lista de servicios
@@ -65,9 +98,9 @@ test.describe("services listing - UIA-006", () => {
       if (await table.isVisible()) {
         await expect(table).toBeVisible();
         // Columnas esperadas
-        await expect(page.getByText(/Nombre|Service/i)).toBeVisible();
-        await expect(page.getByText(/Precio|Price/i)).toBeVisible();
-        await expect(page.getByText(/Duracion|Duration/i)).toBeVisible();
+        await expect(page.locator("thead th").filter({ hasText: /Nombre|Service/i }).first()).toBeVisible();
+        await expect(page.locator("thead th").filter({ hasText: /Precio|Price/i }).first()).toBeVisible();
+        await expect(page.locator("thead th").filter({ hasText: /Duracion|Duration/i }).first()).toBeVisible();
       }
 
       // Verificar controles de paginacion si hay datos
@@ -114,7 +147,7 @@ test.describe("services listing - UIA-006", () => {
       await page.goto("/admin/services");
 
       // Verificar heading
-      const heading = page.getByRole("heading", { name: /Servicios|Administracion/i });
+      const heading = page.getByRole("heading", { level: 1, name: /Servicios|Administracion/i });
       await expect(heading).toBeVisible();
 
       // Verificar empty state o mensaje de sin datos
@@ -174,22 +207,16 @@ test.describe("services listing - UIA-006", () => {
       await page.goto("/admin/services/create");
 
       // Verificar formulario visible
-      const formHeading = page.getByRole("heading", { name: /Nuevo Servicio|Crear Servicio/i });
+      const formHeading = page.getByRole("heading", { level: 1, name: /Nuevo Servicio|Crear Servicio/i });
       if (await formHeading.isVisible()) {
         await expect(formHeading).toBeVisible();
       }
 
       // Llenar campos del formulario de servicio
-      await page.fill('input[name="name"], input[placeholder*="nombre"], input[name="service_name"]', "Servicio Test UIA");
-      await page.fill('input[name="price"], input[placeholder*="precio"], input[name="service_price"]', "150.00");
-      await page.fill(
-        'input[name="duration"], input[placeholder*="duracion"], input[name="service_duration"]',
-        "30",
-      );
-      await page.fill(
-        'textarea[name="description"], textarea[placeholder*="descripcion"], textarea[name="service_description"]',
-        "Servicio de prueba para automatizacion",
-      );
+      await page.getByLabel(/Nombre del servicio/i).fill("Servicio Test UIA");
+      await page.getByLabel(/^Precio/i).fill("150.00");
+      await page.getByLabel(/Duraci[oó]n/i).fill("30");
+      await page.getByLabel(/Descripci[oó]n/i).fill("Servicio de prueba para automatizacion");
 
       // Submit
       const submitButton = page.getByRole("button", { name: /Guardar|Crear Servicio|Registrar/i });
@@ -286,7 +313,7 @@ test.describe("services listing - UIA-006", () => {
       }
 
       // Intentar con precio negativo
-      await page.fill('input[name="price"], input[placeholder*="precio"]', "-50");
+      await page.getByLabel(/^Precio/i).fill("-50");
       if (await submitButton.isVisible()) {
         await submitButton.click();
 
@@ -337,16 +364,13 @@ test.describe("services listing - UIA-006", () => {
         await editButton.click();
 
         // Verificar que el formulario de edicion cargo con datos
-        const editHeading = page.getByRole("heading", { name: /Editar Servicio|Edit Service/i });
+      const editHeading = page.getByRole("heading", { level: 1, name: /Editar Servicio|Edit Service/i });
         if (await editHeading.isVisible()) {
           await expect(editHeading).toBeVisible();
         }
 
         // Modificar campos
-        await page.fill(
-          'input[name="name"], input[placeholder*="nombre"]',
-          "Servicio Editado UIA",
-        );
+        await page.getByLabel(/Nombre del servicio/i).fill("Servicio Editado UIA");
 
         // Submit
         const submitButton = page.getByRole("button", { name: /Guardar|Actualizar|Save/i });
@@ -425,6 +449,10 @@ test.describe("services listing - UIA-006", () => {
 // ===========================================================================
 
 test.describe("veterinarians listing - UIA-006", () => {
+  test.beforeEach(async ({ page }) => {
+    await authenticateAdmin(page);
+  });
+
   // ===========================================================================
   // TC-UIA-006-07: Listado de veterinarios con paginacion
   // Criterios: AC-006-09, AC-006-10
@@ -454,7 +482,7 @@ test.describe("veterinarians listing - UIA-006", () => {
       await expect(page).toHaveTitle(/InVet/i);
 
       // Verificar heading
-      const heading = page.getByRole("heading", { name: /Veterinarios|Veterinarians|Administracion/i });
+      const heading = page.getByRole("heading", { level: 1, name: /Veterinarios|Veterinarians|Administracion/i });
       await expect(heading).toBeVisible();
 
       // Verificar tabla o lista
@@ -462,9 +490,9 @@ test.describe("veterinarians listing - UIA-006", () => {
       if (await table.isVisible()) {
         await expect(table).toBeVisible();
         // Columnas esperadas
-        await expect(page.getByText(/Nombre|nombre_completo/i)).toBeVisible();
-        await expect(page.getByText(/Licencia|Licence|licencia_profesional/i)).toBeVisible();
-        await expect(page.getByText(/Especialidad|Specialty|especialidad/i)).toBeVisible();
+        await expect(page.locator("thead th").filter({ hasText: /Nombre|nombre_completo/i }).first()).toBeVisible();
+        await expect(page.locator("thead th").filter({ hasText: /Licencia|Licence|licencia_profesional/i }).first()).toBeVisible();
+        await expect(page.locator("thead th").filter({ hasText: /Especialidad|Specialty|especialidad/i }).first()).toBeVisible();
       }
 
       // Verificar paginacion si hay datos
@@ -509,32 +537,17 @@ test.describe("veterinarians listing - UIA-006", () => {
       await page.goto("/admin/veterinarians/create");
 
       // Verificar formulario visible
-      const formHeading = page.getByRole("heading", { name: /Nuevo Veterinario|Crear Veterinario/i });
+      const formHeading = page.getByRole("heading", { level: 1, name: /Nuevo Veterinario|Crear Veterinario/i });
       if (await formHeading.isVisible()) {
         await expect(formHeading).toBeVisible();
       }
 
       // Llenar campos del formulario de veterinario
-      await page.fill(
-        'input[name="nombre_completo"], input[placeholder*="nombre completo"], input[name="full_name"]',
-        "Dr. Juan Perez Test",
-      );
-      await page.fill(
-        'input[name="licencia_profesional"], input[placeholder*="licencia"], input[name="license"]',
-        "LIC-VET-2026-001",
-      );
-      await page.fill(
-        'input[name="especialidad"], input[placeholder*="especialidad"], input[name="specialty"]',
-        "Cirugia Veterinaria",
-      );
-      await page.fill(
-        'input[name="telefono"], input[placeholder*="telefono"], input[name="phone"]',
-        "555-1234",
-      );
-      await page.fill(
-        'input[name="email"], input[placeholder*="correo"], input[type="email"]',
-        "juan@test.com",
-      );
+      await page.getByLabel(/Nombre completo/i).fill("Dr. Juan Perez Test");
+      await page.getByLabel(/Licencia profesional/i).fill("LIC-VET-2026-001");
+      await page.getByLabel(/Especialidad/i).fill("Cirugia Veterinaria");
+      await page.getByLabel(/Tel[eé]fono/i).fill("555-1234");
+      await page.getByLabel(/^Email/i).fill("juan@test.com");
 
       // Submit
       const submitButton = page.getByRole("button", { name: /Guardar|Crear Veterinario|Registrar/i });
@@ -589,18 +602,9 @@ test.describe("veterinarians listing - UIA-006", () => {
       await page.goto("/admin/veterinarians/create");
 
       // Llenar campos con licencia duplicada
-      await page.fill(
-        'input[name="nombre_completo"], input[placeholder*="nombre completo"]',
-        "Dr. Duplicado Test",
-      );
-      await page.fill(
-        'input[name="licencia_profesional"], input[placeholder*="licencia"], input[name="license"]',
-        "LIC-VET-2026-DUP",
-      );
-      await page.fill(
-        'input[name="especialidad"], input[placeholder*="especialidad"]',
-        "Medicina Interna",
-      );
+      await page.getByLabel(/Nombre completo/i).fill("Dr. Duplicado Test");
+      await page.getByLabel(/Licencia profesional/i).fill("LIC-VET-2026-DUP");
+      await page.getByLabel(/Especialidad/i).fill("Medicina Interna");
 
       const submitButton = page.getByRole("button", { name: /Guardar|Crear Veterinario/i });
       if (await submitButton.isVisible()) {
@@ -635,6 +639,10 @@ test.describe("veterinarians listing - UIA-006", () => {
 // ===========================================================================
 
 test.describe("internal users listing - UIA-006", () => {
+  test.beforeEach(async ({ page }) => {
+    await authenticateAdmin(page);
+  });
+
   // ===========================================================================
   // TC-UIA-006-10: Listado de usuarios internos con paginacion
   // Criterios: AC-006-15, AC-006-10
@@ -664,7 +672,7 @@ test.describe("internal users listing - UIA-006", () => {
       await expect(page).toHaveTitle(/InVet/i);
 
       // Verificar heading
-      const heading = page.getByRole("heading", { name: /Usuarios Internos|Internal Users|Administracion/i });
+      const heading = page.getByRole("heading", { level: 1, name: /Usuarios Internos|Internal Users|Administracion/i });
       await expect(heading).toBeVisible();
 
       // Verificar tabla o lista
@@ -672,8 +680,8 @@ test.describe("internal users listing - UIA-006", () => {
       if (await table.isVisible()) {
         await expect(table).toBeVisible();
         // Columnas esperadas
-        await expect(page.getByText(/Nombre|nombre/i)).toBeVisible();
-        await expect(page.getByText(/Rol|Role|rol/i)).toBeVisible();
+        await expect(page.locator("thead th").filter({ hasText: /Nombre|nombre/i }).first()).toBeVisible();
+        await expect(page.locator("thead th").filter({ hasText: /Rol|Role|rol/i }).first()).toBeVisible();
       }
 
       // Verificar paginacion si hay datos
@@ -718,25 +726,19 @@ test.describe("internal users listing - UIA-006", () => {
       await page.goto("/admin/internal-users/create");
 
       // Verificar formulario visible
-      const formHeading = page.getByRole("heading", { name: /Nuevo Usuario|Crear Usuario Interno/i });
+      const formHeading = page.getByRole("heading", { level: 1, name: /Nuevo Usuario|Crear Usuario Interno/i });
       if (await formHeading.isVisible()) {
         await expect(formHeading).toBeVisible();
       }
 
       // Llenar campos del formulario de usuario interno
-      await page.fill(
-        'input[name="user_id"], input[placeholder*="user_id"], input[name="userId"]',
-        "1",
-      );
-      await page.fill(
-        'input[name="nombre"], input[placeholder*="nombre"], input[name="name"]',
-        "Maria Usuario Interno",
-      );
+      await page.getByLabel(/user_id/i).fill("1");
+      await page.getByLabel(/^Nombre$/i).fill("Maria Usuario Interno");
 
       // Seleccionar rol (puede ser un select o botones)
-      const roleSelect = page.locator('select[name="rol"], select[name="role"], [data-testid*="role"]');
+      const roleSelect = page.locator('#rol');
       if (await roleSelect.count() > 0) {
-        await roleSelect.first().selectOption({ label: /admin|manager/i });
+        await roleSelect.first().selectOption("admin");
       } else {
         // Si es un boton/grupo de botones
         const roleButton = page.getByRole("button", { name: /admin|manager/i }).first();
@@ -803,17 +805,9 @@ test.describe("authentication & authorization - UIA-006", () => {
       await page.goto("/admin/services");
 
       // Verificar redireccion a login
-      const loginPath = env.loginPath || "/login";
-      if (page.url().includes(loginPath) || page.url().includes("/login")) {
-        await expect(page.getByRole("textbox", { name: /email/i })).toBeVisible();
-        await expect(page.getByLabel(/password|contrasena/i)).toBeVisible();
-      } else {
-        // Si no redirige, verificar que la pagina muestra error de auth
-        const authError = await page.getByText(/iniciar sesion|login|autenticar|401|no autenticado/i).isVisible();
-        if (authError) {
-          await expect(page.getByText(/iniciar sesion|login|autenticar|401/i)).toBeVisible();
-        }
-      }
+      await page.waitForURL(/\/login/, { timeout: 10000 });
+      await expect(page.getByRole("textbox", { name: /email/i })).toBeVisible();
+      await expect(page.getByLabel(/password|contrasena/i)).toBeVisible();
     },
   );
 
@@ -845,6 +839,7 @@ test.describe("authentication & authorization - UIA-006", () => {
         ],
       });
 
+      await authenticateViewer(page);
       await page.goto("/admin/services");
 
       // Verificar que no hay acciones de admin visibles para rol insuficiente
@@ -871,6 +866,10 @@ test.describe("authentication & authorization - UIA-006", () => {
 // ===========================================================================
 
 test.describe("responsive layout - UIA-006", () => {
+  test.beforeEach(async ({ page }) => {
+    await authenticateAdmin(page);
+  });
+
   // ===========================================================================
   // TC-UIA-006-14: Responsive mobile (375px) y desktop (1440px)
   // Criterios: AC-006-31
@@ -904,7 +903,7 @@ test.describe("responsive layout - UIA-006", () => {
       await page.setViewportSize({ width: 1440, height: 900 });
       await page.goto("/admin/services");
 
-      const desktopHeading = page.getByRole("heading", { name: /Servicios|Administracion/i });
+      const desktopHeading = page.getByRole("heading", { level: 1, name: /Servicios|Administracion/i });
       await expect(desktopHeading).toBeVisible();
 
       // Verificar que no hay desbordamiento horizontal en desktop

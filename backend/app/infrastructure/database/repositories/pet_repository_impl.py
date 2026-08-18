@@ -18,7 +18,7 @@ class PetRepositoryImpl(PetRepository):
         self.db = db
 
     def _to_domain(self, model: PetModel) -> Pet:
-        now = datetime.now(UTC)
+        _now = datetime.now(UTC)
         dob = cast(datetime | None, model.date_of_birth)
         if dob and dob.tzinfo is None:
             dob = dob.replace(tzinfo=UTC)

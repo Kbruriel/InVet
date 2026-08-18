@@ -273,7 +273,7 @@ def _normalize_status(value: str) -> str:
     return _normalize_label(value).upper()
 
 
-def _read_carryover_registry(
+def _read_carryover_registry(  # noqa: C901
     repo_root: Path,
     registry_path: Path,
 ) -> tuple[list[dict[str, str]], list[str]]:

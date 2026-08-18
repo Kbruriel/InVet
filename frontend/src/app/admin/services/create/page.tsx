@@ -4,20 +4,16 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { redirect } from 'next/navigation';
 import { AdminLayout } from '@/features/slice-006/components/admin-layout';
 import { ServiceForm } from '@/features/slice-006/components/service-form';
 import { useServices } from '@/features/slice-006/hooks/use-services';
+import { RequireAuth } from '@/shared/auth/RequireAuth';
 import type { ServiceCreateDTO } from '@/shared/api/slice-006';
 
-export default function CreateServicePage() {
+function CreateServicePageContent() {
   const router = useRouter();
   const { create, submitting } = useServices();
   const [success, setSuccess] = useState(false);
-
-  if (typeof window !== 'undefined' && !localStorage.getItem('access_token')) {
-    redirect('/login');
-  }
 
   const handleSuccess = async () => {
     setSuccess(true);
@@ -47,5 +43,13 @@ export default function CreateServicePage() {
         />
       )}
     </AdminLayout>
+  );
+}
+
+export default function CreateServicePage() {
+  return (
+    <RequireAuth>
+      <CreateServicePageContent />
+    </RequireAuth>
   );
 }

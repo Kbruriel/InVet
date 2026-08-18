@@ -4,13 +4,11 @@ from datetime import UTC, datetime
 from enum import Enum as PyEnum
 
 from sqlalchemy import (
-    Boolean,
     Column,
     DateTime,
     Enum,
     ForeignKey,
     Integer,
-    String,
     Text,
     UniqueConstraint,
 )
@@ -54,12 +52,20 @@ class Appointment(Base):
     clinic_id = Column(Integer, ForeignKey("clinics.id"), nullable=False)
     branch_id = Column(Integer, ForeignKey("branches.id"), nullable=False)
     appointment_type = Column(
-        Enum(_AppointmentType, name="appointment_type_enum"),
+        Enum(
+            _AppointmentType,
+            name="appointment_type_enum",
+            values_callable=lambda e: [m.value for m in e],
+        ),
         nullable=False,
         default=_AppointmentType.CONSULTATION,
     )
     status = Column(
-        Enum(_AppointmentStatus, name="appointment_status_enum"),
+        Enum(
+            _AppointmentStatus,
+            name="appointment_status_enum",
+            values_callable=lambda e: [m.value for m in e],
+        ),
         nullable=False,
         default=_AppointmentStatus.PENDING,
     )

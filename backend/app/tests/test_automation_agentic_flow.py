@@ -18,9 +18,7 @@ def test_automation_flow_is_wired_into_agentic_contracts() -> None:
     plan_task = (REPO_ROOT / ".opencode/commands/plan-task.md").read_text(
         encoding="utf-8"
     )
-    qa_task = (REPO_ROOT / ".opencode/commands/qa-task.md").read_text(
-        encoding="utf-8"
-    )
+    qa_task = (REPO_ROOT / ".opencode/commands/qa-task.md").read_text(encoding="utf-8")
     prompt_contracts = (
         REPO_ROOT / "docs/opencode/03_task_prompt_contracts.md"
     ).read_text(encoding="utf-8")
@@ -45,8 +43,14 @@ def test_automation_flow_is_wired_into_agentic_contracts() -> None:
     assert "/implement-ui-automation-task FE-00X" in prompt_contracts
     assert "/implement-api-automation-task BE-00X" in prompt_contracts
     assert "/run-ui-checks FE-00X" in prompt_contracts
-    assert "contenedores Docker aplicables fueron actualizados o recreados" in prompt_contracts
-    assert "todos los contenedores Docker aplicables fueron actualizados o recreados" in qa_task
+    assert (
+        "contenedores Docker aplicables fueron actualizados o recreados"
+        in prompt_contracts
+    )
+    assert (
+        "todos los contenedores Docker aplicables fueron actualizados o recreados"
+        in qa_task
+    )
     assert "## Verificacion Docker" in qa_results_template
     assert "## Verificacion Docker" in qa_findings_template
     assert "Contenedores aplicables actualizados o recreados" in qa_results_template
@@ -133,7 +137,8 @@ def test_automation_contracts_are_in_sync_with_payload() -> None:
         ),
         (
             REPO_ROOT / "docs/opencode/templates/carryovers_registry_template.md",
-            REPO_ROOT / "payload/docs/opencode/templates/carryovers_registry_template.md",
+            REPO_ROOT
+            / "payload/docs/opencode/templates/carryovers_registry_template.md",
         ),
     ]
 

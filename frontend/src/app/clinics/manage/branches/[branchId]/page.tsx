@@ -5,13 +5,16 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { Card, Button, ErrorBanner, LoadingSpinner } from '@/shared/ui/components';
 import { fetchBranchProtected, BranchProfileProtected } from '@/shared/api/branch-client-protected';
+import { RequireAuth } from '@/shared/auth/RequireAuth';
 
 type UiState = 'loading' | 'success' | 'error';
 
-export default function ProtectedBranchPage() {
+function ProtectedBranchPageContent() {
   const params = useParams();
-  const clinicId = Number(params.clinicId);
-  const branchId = Number(params.branchId);
+  const clinicParam = params.clinicId;
+  const branchParam = params.branchId;
+  const clinicId = Number(Array.isArray(clinicParam) ? clinicParam[0] : clinicParam ?? 1);
+  const branchId = Number(Array.isArray(branchParam) ? branchParam[0] : branchParam);
 
   const [branch, setBranch] = useState<BranchProfileProtected | null>(null);
   const [state, setState] = useState<UiState>('loading');
@@ -168,5 +171,13 @@ export default function ProtectedBranchPage() {
         </Card>
       </section>
     </main>
+  );
+}
+
+export default function ProtectedBranchPage() {
+  return (
+    <RequireAuth>
+      <ProtectedBranchPageContent />
+    </RequireAuth>
   );
 }

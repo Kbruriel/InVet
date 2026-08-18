@@ -9,6 +9,8 @@ Instrucciones:
 0. Ejecuta de forma autonoma. Pregunta solo si falta informacion bloqueante, hay una decision critica de alcance/UX o se requiere una accion destructiva.
 1. Valida el argumento `FE-00X` e identifica `BE-00X` y `QA-00X` del mismo indice.
 2. Identifica el plan canonico `docs/opencode/plans/BE-00X-plan.md`.
+   - Para FE-008, las rutas canónicas son `frontend/src/app/portal/owner/appointments`, `frontend/src/app/portal/owner/appointments/new` y `frontend/src/app/clinic/appointments`.
+   - La UI base corre en `http://localhost:3000` y consume la API en `http://localhost:8000/api/v1`.
 3. Ejecuta `python backend/scripts/validate_slice_plan.py FE-00X --stage frontend` antes de editar codigo.
    - Si falla, deten la implementacion y reporta cada gap.
    - Si el plan es legacy o incompleto, indica `/plan-task FE-00X`.

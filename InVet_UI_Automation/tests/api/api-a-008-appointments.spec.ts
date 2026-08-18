@@ -23,17 +23,62 @@
  */
 
 import { test, expect, TestInfo } from "@playwright/test";
-import type { Request, Response } from "@playwright/test";
+import type { APIRequestContext, APIResponse } from "@playwright/test";
 import { readAutomationEnv } from "../fixtures/env";
 import { annotateTraceability, attachGherkinScenario } from "../helpers/traceability";
 
 const env = readAutomationEnv();
 
+type JsonRecord = Record<string, unknown>;
+
+type AuthPayload = {
+  access_token: string;
+};
+
+type AppointmentRecord = JsonRecord & {
+  id?: number;
+  status?: string;
+  owner_id?: number;
+  pet_id?: number;
+  appointment_type?: string;
+  scheduled_start?: string;
+  scheduled_end?: string;
+  duration_minutes?: number;
+  reason?: string | null;
+  updated_at?: string;
+  new_start?: string;
+  new_end?: string;
+};
+
+type AppointmentCreateResponse = AppointmentRecord & {
+  id: number;
+  status: string;
+};
+
+type AvailabilitySlot = {
+  duration?: number;
+  [key: string]: unknown;
+};
+
+type AppointmentListResponse = {
+  items: AppointmentRecord[];
+  meta?: {
+    total?: number;
+    page?: number;
+    page_size?: number;
+  };
+  total?: number;
+  page?: number;
+  page_size?: number;
+  slots?: AvailabilitySlot[];
+  data?: AvailabilitySlot[];
+};
+
 // ===========================================================================
 // Helpers de autenticacion y datos
 // ===========================================================================
 
-async function loginAsOwner(request: Request): Promise<string> {
+async function loginAsOwner(request: APIRequestContext): Promise<string> {
   test.skip(
     env.loginEmail === "qa@example.com",
     "Provide LOGIN_EMAIL and LOGIN_PASSWORD of a registered owner account to run owner tests.",
@@ -42,11 +87,11 @@ async function loginAsOwner(request: Request): Promise<string> {
     data: { email: env.loginEmail, password: env.loginPassword },
   });
   expect(response.status()).toBe(200);
-  const payload = (await response.json()) as Record<string, unknown>;
-  return String(payload.access_token);
+  const payload = (await response.json()) as AuthPayload;
+  return payload.access_token;
 }
 
-async function loginAsClinic(request: Request): Promise<string> {
+async function loginAsClinic(request: APIRequestContext): Promise<string> {
   test.skip(
     env.clinicEmail === "clinic@invet.local",
     "Provide CLINIC_EMAIL and CLINIC_PASSWORD to run clinic tests.",
@@ -55,28 +100,28 @@ async function loginAsClinic(request: Request): Promise<string> {
     data: { email: env.clinicEmail, password: env.clinicPassword },
   });
   expect(response.status()).toBe(200);
-  const payload = (await response.json()) as Record<string, unknown>;
-  return String(payload.access_token);
+  const payload = (await response.json()) as AuthPayload;
+  return payload.access_token;
 }
 
-async function loginAsVet(request: Request): Promise<string> {
+async function loginAsVet(request: APIRequestContext): Promise<string> {
   test.skip(
-    env.vetEmail === "vet@invet.local",
+    env.vetEmail === "vet@example.com",
     "Provide VET_EMAIL and VET_PASSWORD to run vet tests.",
   );
   const response = await request.post("/api/v1/auth/login", {
     data: { email: env.vetEmail, password: env.vetPassword },
   });
   expect(response.status()).toBe(200);
-  const payload = (await response.json()) as Record<string, unknown>;
-  return String(payload.access_token);
+  const payload = (await response.json()) as AuthPayload;
+  return payload.access_token;
 }
 
 async function createOwnerAppointment(
-  request: Request,
+  request: APIRequestContext,
   token: string,
   futureDate: string,
-): Promise<{ response: Response; id: number }> {
+): Promise<{ response: APIResponse; id: number }> {
   const payload = {
     pet_id: 1,
     veterinarian_id: null,
@@ -91,16 +136,16 @@ async function createOwnerAppointment(
     data: payload,
   });
   expect(response.status()).toBe(201);
-  const body = (await response.json()) as Record<string, unknown>;
+  const body = (await response.json()) as AppointmentCreateResponse;
   return { response, id: Number(body.id) };
 }
 
-async function createVet(request: Request, adminToken: string): Promise<{ response: Response; id: number }> {
+async function createVet(request: APIRequestContext, adminToken: string): Promise<{ response: APIResponse; id: number }> {
   const vetPayload = {
     name: "Dr. Test Vet",
     license_number: "TEST-VET-001",
     clinic_id: 1,
-    email: "vet-test@invet.local",
+    email: "vet-test@example.com",
   };
 
   const response = await request.post("/api/v1/veterinarians", {
@@ -108,7 +153,7 @@ async function createVet(request: Request, adminToken: string): Promise<{ respon
     data: vetPayload,
   });
   expect(response.status()).toBe(201);
-  const body = (await response.json()) as Record<string, unknown>;
+  const body = (await response.json()) as AppointmentRecord;
   return { response, id: Number(body.id) };
 }
 
@@ -522,7 +567,7 @@ test.describe("Appointment creation — APIA-008", () => {
 
       // Intentar con un token diferente (simulado) — si no hay clinica_B seeded, skip
       test.skip(
-        env.clinicEmail === "clinic@invet.local",
+        env.clinicEmail === "clinic@example.com",
         "Requires a second clinic account for cross-branch IDOR testing.",
       );
 
@@ -578,11 +623,15 @@ test.describe("Appointment creation — APIA-008", () => {
 
       // Puede ser 200 o 401 si requiere auth — verificar ambos comportamientos
       if (response.status() === 200) {
-        const body = (await response.json()) as Record<string, unknown>;
-        expect(Array.isArray(body.slots || body.data || body)).toBe(true);
+        const body = (await response.json()) as AppointmentListResponse;
+        const slots: AvailabilitySlot[] = Array.isArray(body.slots)
+          ? body.slots
+          : Array.isArray(body.data)
+            ? body.data
+            : [];
+        expect(Array.isArray(slots)).toBe(true);
 
         // Verificar estructura basica de slots
-        const slots = Array.isArray(body.slots) ? body.slots : Array.isArray(body.data) ? body.data : body;
         if (slots.length > 0) {
           expect(typeof slots[0].duration).not.toBe("undefined");
         }
@@ -631,16 +680,15 @@ test.describe("Appointment creation — APIA-008", () => {
       });
       expect(response.status()).toBe(200);
 
-      const body = (await response.json()) as Record<string, unknown>;
+      const body = (await response.json()) as AppointmentListResponse;
       expect(Array.isArray(body.items)).toBe(true);
       expect(body.items.length).toBeLessThanOrEqual(5);
 
       // Meta debe tener total, page, page_size
-      const meta = body.meta as Record<string, number> | undefined;
-      if (meta) {
-        expect(typeof meta.total).toBe("number");
-        expect(meta.page).toBe(1);
-        expect(meta.page_size).toBe(5);
+      if (body.meta) {
+        expect(typeof body.meta.total).toBe("number");
+        expect(body.meta.page).toBe(1);
+        expect(body.meta.page_size).toBe(5);
       }
     },
   );
@@ -685,19 +733,18 @@ test.describe("Appointment creation — APIA-008", () => {
       });
       expect(response.status()).toBe(200);
 
-      const body = (await response.json()) as Record<string, unknown>;
+      const body = (await response.json()) as AppointmentListResponse;
       expect(Array.isArray(body.items)).toBe(true);
 
       // Todos los items deben ser pending
       if (body.items.length > 0) {
-        for (const item of body.items as Array<Record<string, unknown>>) {
+        for (const item of body.items) {
           expect(String(item.status)).toBe("pending");
         }
       }
 
-      const meta = body.meta as Record<string, number> | undefined;
-      if (meta) {
-        expect(typeof meta.total).toBe("number");
+      if (body.meta) {
+        expect(typeof body.meta.total).toBe("number");
       }
     },
   );
@@ -1014,7 +1061,7 @@ test.describe("Appointment creation — APIA-008", () => {
 
       // Si solo tenemos un vet seeded, skip esta prueba de IDOR entre vets
       test.skip(
-        env.vetEmail === "vet@invet.local",
+        env.vetEmail === "vet@example.com",
         "Requires a second vet account for cross-vet permission testing.",
       );
 

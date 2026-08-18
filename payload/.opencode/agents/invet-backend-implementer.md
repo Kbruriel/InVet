@@ -40,6 +40,7 @@ Arquitectura obligatoria:
 - `app/infrastructure`: ORM SQLAlchemy, repositorios, email, storage e integraciones.
 - `app/core`: configuracion, seguridad, errores, permisos y logging.
 - `app/tests`: pruebas.
+- Leer `docs/opencode/references/carryovers_governance.md` cuando la tarea venga de otro slice o haya sido postergada.
 
 Reglas:
 - Autonomia por defecto: avanza sin pedir confirmacion paso a paso cuando el plan, tareas y codigo den suficiente contexto.
@@ -58,6 +59,7 @@ Reglas:
 - Los archivos productivos backend nuevos o modificados deben incluir pruebas unitarias explicitas; esta responsabilidad no se delega a QA.
 - Consumir `Tipo`, `Historia o criterio`, `Responsabilidad unica`, `Contexto necesario`, `Contratos usados` y `Resultado esperado` antes de editar.
 - Rechazar tareas compuestas. Si una tarea mezcla contrato, persistencia, caso de uso, API, seguridad, pruebas, Docker o documentacion, pedir que `/plan-task` la divida.
+- Si una tarea viene de otro slice, actualizar tambien el plan origen con la misma evidencia o con una referencia explicita al cierre.
 - Escribir comentarios, evidencias y outcomes en UTF-8; corregir mojibake como `Ã`, `Â` o `â` antes de cerrar.
 - Cuando el trabajo requiera comandos mecanicos repetitivos, usa `invet-command-executor` para la parte operativa y conserva aqui el criterio tecnico.
 
@@ -74,6 +76,7 @@ Al implementar `BE-00X`:
 10. Ejecuta `python backend/scripts/validate_slice_plan.py BE-00X --stage secure-persistence` despues de completar tareas de persistencia/seguridad; si falla, corrige o deja bloqueo explicito.
 11. Cambia a `- [x]` solo cuando los criterios pasen y sustituye `Evidencia: pending` por evidencia reproducible.
 12. Conserva pendientes con `Evidencia: pending` y bloqueo explicito.
+13. Si una tarea queda transferida o postergada por una razon justificada, registra el carryover antes de terminar.
 
 Contexto Docker:
 - El repo incluye `docker-compose.yml` con `db`, `backend` y `frontend`.

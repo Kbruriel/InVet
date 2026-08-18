@@ -21,6 +21,7 @@ class ListPublicClinicsUseCase:
         page: int = 1,
         size: int = 20,
         search: str | None = None,
+        service_type: str | None = None,
     ) -> PublicClinicsPaginatedResponse:
         """Listar clnicas pblicas segn criterios especificados.
 
@@ -28,6 +29,7 @@ class ListPublicClinicsUseCase:
             page: Nmero de pgina (comienza en 1)
             size: Tamao de pgina (mximo 100)
             search: Filtro por nombre o ciudad
+            service_type: Filtro por tipo de servicio
 
         Returns:
             Respuesta con resultados paginados
@@ -41,7 +43,7 @@ class ListPublicClinicsUseCase:
         # Ejecutar bsqueda
         clinics = await self.clinic_repo.search_clinics(
             location=search,
-            service_type=None,
+            service_type=service_type,
             page=page,
             size=size,
         )
@@ -53,7 +55,7 @@ class ListPublicClinicsUseCase:
 
         # Obtener conteo total
         total_clinics = await self.clinic_repo.get_clinic_count(
-            location=search, service_type=None
+            location=search, service_type=service_type
         )
 
         # Calcular nmero de pginas

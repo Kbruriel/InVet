@@ -4,8 +4,9 @@ Revision ID: a007_owners_pets
 Revises: a006_services_vets_internal_users
 Create Date: 2026-08-09
 """
-from alembic import op
 import sqlalchemy as sa
+
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision = "a007_owners_pets"

@@ -26,6 +26,13 @@ import { annotateTraceability } from "../../helpers/traceability";
 
 const env = readAutomationEnv();
 
+function normalizeText(value: unknown): string {
+  return String(value)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
 // ===========================================================================
 // APIA-002-01: Registro devuelve tokens (POST /register → 201)
 // Criterio: AC-002-01
@@ -482,7 +489,7 @@ test.describe("auth register - APIA-002", () => {
       expect(response.status()).toBe(401);
       const payload = (await response.json()) as Record<string, unknown>;
       expect(typeof payload.detail).toBe("string");
-      expect(String(payload.detail)).toContain("invalido");
+      expect(normalizeText(payload.detail)).toContain("invalido");
     },
   );
 

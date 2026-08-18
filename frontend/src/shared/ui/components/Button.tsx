@@ -5,6 +5,7 @@ import React from 'react';
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline';
   size?: 'sm' | 'md' | 'lg';
+  isLoading?: boolean;
 }
 
 export function Button({
@@ -13,6 +14,7 @@ export function Button({
   className = '',
   children,
   disabled,
+  isLoading = false,
   ...props
 }: ButtonProps) {
   const baseClasses =
@@ -33,7 +35,8 @@ export function Button({
   return (
     <button
       className={`${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`}
-      disabled={disabled}
+      disabled={disabled || isLoading}
+      aria-busy={isLoading || undefined}
       {...props}
     >
       {children}

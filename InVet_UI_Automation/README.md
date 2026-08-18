@@ -25,7 +25,7 @@ InVet_UI_Automation/
 ## Requisitos
 
 - Node.js 20+
-- Un frontend de InVet accesible en `FRONTEND_BASE_URL`
+- Un frontend de InVet accesible en `http://localhost:3000` para UI/regresión, o en `FRONTEND_BASE_URL` si lo sobreescribes
 - Un backend de InVet accesible en `API_BASE_URL`
 
 ## Instalacion
@@ -38,7 +38,7 @@ npx playwright install
 ## Configuracion
 
 1. Copia `.env.example` a `.env`.
-2. Ajusta `FRONTEND_BASE_URL` y `API_BASE_URL`.
+2. Ajusta `FRONTEND_BASE_URL` y `API_BASE_URL` solo si necesitas otra ruta; por defecto la UI apunta a `http://localhost:3000`.
 3. Si la ruta de login UI aun no existe, deja `LOGIN_UI_ENABLED=false`.
 4. Si quieres validar login real, configura `LOGIN_EMAIL` y `LOGIN_PASSWORD`.
 

@@ -2,29 +2,42 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
+from datetime import datetime
 from typing import Any
 
 from app.domain.entities.appointment import (
     Appointment,
     AppointmentCreate,
     AppointmentStatus,
-    AppointmentType,
 )
 from app.domain.repositories.appointment_repository import AppointmentRepository
 
-
+# Transiciones validas (según BE-008 plan, §Máquina de estados):
+#   pending    -> approved, cancelled, rescheduled
+#   approved   -> confirmed, cancelled, rescheduled
+#   confirmed  -> completed, no_show, cancelled, rescheduled
+#   rescheduled -> pending, cancelled
+#   completed / no_show / cancelled -> TERMINAL (sin transiciones)
 _VALID_TRANSITIONS: dict[str, set[str]] = {
-    AppointmentStatus.PENDING.value: {AppointmentStatus.APPROVED.value},
+    AppointmentStatus.PENDING.value: {
+        AppointmentStatus.APPROVED.value,
+        AppointmentStatus.CANCELLED.value,
+        AppointmentStatus.RESCHEDULED.value,
+    },
     AppointmentStatus.APPROVED.value: {
         AppointmentStatus.CONFIRMED.value,
         AppointmentStatus.CANCELLED.value,
+        AppointmentStatus.RESCHEDULED.value,
     },
     AppointmentStatus.CONFIRMED.value: {
         AppointmentStatus.COMPLETED.value,
         AppointmentStatus.NO_SHOW.value,
         AppointmentStatus.CANCELLED.value,
         AppointmentStatus.RESCHEDULED.value,
+    },
+    AppointmentStatus.RESCHEDULED.value: {
+        AppointmentStatus.PENDING.value,
+        AppointmentStatus.CANCELLED.value,
     },
 }
 
@@ -104,9 +117,7 @@ class UpdateAppointmentUseCase:
         Returns:
             Appointment actualizado o None si no existe.
         """
-        return await self.repository.update_appointment(
-            appointment_id, clinic_id, data
-        )
+        return await self.repository.update_appointment(appointment_id, clinic_id, data)
 
 
 class TransitionAppointmentStatusUseCase:
@@ -164,9 +175,7 @@ class GetAppointmentUseCase:
     def __init__(self, repository: AppointmentRepository) -> None:
         self.repository = repository
 
-    async def execute(
-        self, appointment_id: int, clinic_id: int
-    ) -> Appointment | None:
+    async def execute(self, appointment_id: int, clinic_id: int) -> Appointment | None:
         """Obtener una cita por ID con tenant isolation.
 
         Args:

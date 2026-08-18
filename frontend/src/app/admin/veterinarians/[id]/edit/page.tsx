@@ -4,27 +4,21 @@
 
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { redirect } from 'next/navigation';
 import { AdminLayout } from '@/features/slice-006/components/admin-layout';
 import { VeterinarianForm } from '@/features/slice-006/components/veterinarian-form';
 import { useVeterinarians } from '@/features/slice-006/hooks/use-veterinarians';
+import { RequireAuth } from '@/shared/auth/RequireAuth';
 import type { VeterinarianUpdateDTO } from '@/shared/api/slice-006';
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export default function EditVeterinarianPage({ params }: PageProps) {
+function EditVeterinarianPageContent({ params }: PageProps) {
   const router = useRouter();
   const { id } = use(params);
   const { fetchOne, update, submitting, loading, error } = useVeterinarians();
   const [veterinarian, setVeterinarian] = useState<Awaited<ReturnType<typeof fetchOne>> | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && !localStorage.getItem('access_token')) {
-      redirect('/login');
-    }
-  }, []);
 
   useEffect(() => {
     const load = async () => {
@@ -75,5 +69,13 @@ export default function EditVeterinarianPage({ params }: PageProps) {
         submitting={submitting}
       />
     </AdminLayout>
+  );
+}
+
+export default function EditVeterinarianPage({ params }: PageProps) {
+  return (
+    <RequireAuth>
+      <EditVeterinarianPageContent params={params} />
+    </RequireAuth>
   );
 }

@@ -21,7 +21,7 @@ test('TC-005-01: Login como clinic_admin redirige al panel', async ({ page }) =>
 
   // Entonces navego al panel de administracion (o a la ruta por defecto)
   // La redireccion depende del rol asignado en el backend
-  await page.waitForURL(/.*\/clinic-administration|.*\//, { timeout: 10000 });
+  await page.waitForURL((url) => url.pathname === '/', { timeout: 10000 });
   
   // Verificar que se logro autenticar (no estamos en login ni en error)
   const currentUrl = page.url();

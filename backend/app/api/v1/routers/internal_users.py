@@ -1,5 +1,7 @@
 """Router FastAPI para usuarios internos (slice 006)."""
 
+from collections.abc import Generator
+
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
@@ -25,11 +27,11 @@ from app.infrastructure.database.repositories.internal_user_repository_impl impo
 )
 
 
-def get_current_db() -> Session:
+def get_current_db() -> Generator[Session, None, None]:
     """Dependencia para obtener sesión de base de datos."""
     from app.infrastructure.database.session import get_db as _get_db
 
-    return next(_get_db())
+    yield from _get_db()
 
 
 router = APIRouter(prefix="/internal-users", tags=["internal-users"])

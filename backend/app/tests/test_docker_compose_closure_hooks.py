@@ -71,4 +71,6 @@ def test_closure_hook_phrase_is_present_in_contracts_and_wrapper() -> None:
     assert "El hook de Docker Compose de cierre" in gates_text
     prompt_contracts = REPO_ROOT / "docs/opencode/03_task_prompt_contracts.md"
     prompt_text = prompt_contracts.read_text(encoding="utf-8")
-    assert "contenedores Docker aplicables fueron actualizados o recreados" in prompt_text
+    assert (
+        "contenedores Docker aplicables fueron actualizados o recreados" in prompt_text
+    )

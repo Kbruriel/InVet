@@ -6,6 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.middleware import RateLimitMiddleware
 from app.api.v1.router import router as api_v1_router
 from app.core.config import settings
+from app.infrastructure.database.bootstrap import ensure_runtime_schema
+from app.infrastructure.database.session import engine
 
 
 def create_app() -> FastAPI:
@@ -49,6 +51,9 @@ def create_app() -> FastAPI:
             raise RuntimeError(
                 "In production ENVIRONMENT, SECRET_KEY must be set to a strong secret and not use default placeholders."
             )
+
+    if env == "development":
+        ensure_runtime_schema(engine)
 
     @app.get("/")
     async def root() -> dict[str, str]:

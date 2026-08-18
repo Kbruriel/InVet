@@ -4,27 +4,21 @@
 
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { redirect } from 'next/navigation';
 import { AdminLayout } from '@/features/slice-006/components/admin-layout';
 import { ServiceForm } from '@/features/slice-006/components/service-form';
 import { useServices } from '@/features/slice-006/hooks/use-services';
+import { RequireAuth } from '@/shared/auth/RequireAuth';
 import type { ServiceUpdateDTO } from '@/shared/api/slice-006';
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export default function EditServicePage({ params }: PageProps) {
+function EditServicePageContent({ params }: PageProps) {
   const router = useRouter();
   const { id } = use(params);
   const { fetchOne, update, submitting, loading, error } = useServices();
   const [service, setService] = useState<Awaited<ReturnType<typeof fetchOne>> | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && !localStorage.getItem('access_token')) {
-      redirect('/login');
-    }
-  }, []);
 
   useEffect(() => {
     const load = async () => {
@@ -75,5 +69,13 @@ export default function EditServicePage({ params }: PageProps) {
         submitting={submitting}
       />
     </AdminLayout>
+  );
+}
+
+export default function EditServicePage({ params }: PageProps) {
+  return (
+    <RequireAuth>
+      <EditServicePageContent params={params} />
+    </RequireAuth>
   );
 }

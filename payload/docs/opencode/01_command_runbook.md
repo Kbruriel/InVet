@@ -28,6 +28,43 @@ La secuencia manual equivalente es:
 /final-gate BE-001
 ```
 
+## Runtime y rutas canónicas
+
+- Para levantar el stack completo del repositorio usa:
+
+  ```text
+  docker compose up -d --build --force-recreate db backend frontend
+  ```
+
+- Frontend base: `http://localhost:3000`
+- Backend base: `http://localhost:8000`
+- API base: `/api/v1`
+- UI pública de clínicas: `http://localhost:3000/clinicas`
+- La UI pública de clínicas se implementa en `frontend/src/app/clinicas/page.tsx` y el detalle en `frontend/src/app/clinicas/[clinicId]/page.tsx`.
+- UI de citas del propietario: `http://localhost:3000/portal/owner/appointments`
+- UI de alta de cita: `http://localhost:3000/portal/owner/appointments/new`
+- UI de agenda clínica: `http://localhost:3000/clinic/appointments`
+- API pública de clínicas: `http://localhost:8000/api/v1/clinicas`
+- API de citas: `http://localhost:8000/api/v1/appointments`
+- Los endpoints de BE-008 se implementan en `backend/app/api/v1/routers/appointment_router.py` y sus schemas canónicos viven en `backend/app/api/v1/schemas/appointment_schemas.py`.
+- Las regresiones UI y Playwright deben validar sobre `http://localhost:3000`; no deben apuntar al backend directo para simular navegación de navegador.
+
+## Comandos canónicos por contexto
+
+| Comando | Cuándo usarlo | Qué debe quedar claro en la evidencia |
+|---|---|---|
+| `docker compose up -d --build --force-recreate db backend frontend` | Cargar el entorno completo antes de implementación, QA o regresión | Que el stack quedó arriba con `db`, `backend` y `frontend` saludables |
+| `docker compose up -d db` | Solo cuando se necesita persistencia o pruebas con PostgreSQL | Que la DB quedó disponible para el backend o para una corrida puntual |
+| `docker compose run --rm backend pytest ...` | Pruebas backend que requieren el contenedor y la base de datos | Que la suite corrió dentro del runtime correcto |
+| `/run-ui-checks FE-00X` | Regresión UI y Playwright del slice frontend | Que la UI se validó sobre `http://localhost:3000` |
+| `/run-checks BE-00X` | Checks técnicos del slice backend | Que la evidencia apunta a `http://localhost:8000/api/v1` y deja trazabilidad |
+| `/qa-task QA-00X` | Validación QA formal del slice | Que QA valida el flujo extremo a extremo con URLs y endpoints canónicos |
+
+- Para FE-008, la ruta canónica de validación UI es `http://localhost:3000`.
+- Para BE-008, la ruta canónica de API es `http://localhost:8000/api/v1` y el router vive en `backend/app/api/v1/routers/appointment_router.py`.
+- Para QA-008, la evidencia debe nombrar explícitamente `http://localhost:3000`, `http://localhost:8000` y las rutas `/api/v1/clinicas` y `/api/v1/appointments`.
+- Si un agente menciona cargas de stack, debe dejar visible si usó `docker compose up -d --build --force-recreate db backend frontend` o un fallback documentado.
+
 ## Reglas
 
 1. `plan-task` acepta `BE-00X`, `FE-00X` o `QA-00X`, informa la normalizacion y conserva el mismo indice vertical.

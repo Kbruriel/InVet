@@ -2,7 +2,6 @@
 
 from datetime import datetime
 from enum import Enum as PyEnum
-from typing import Any
 
 from pydantic import BaseModel, ConfigDict, field_validator
 
@@ -35,7 +34,7 @@ class Appointment(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
-    id: int
+    id: int | None = None
     owner_id: int
     pet_id: int
     veterinarian_id: int | None = None
@@ -63,6 +62,7 @@ class AppointmentCreate(BaseModel):
     scheduled_start: datetime
     duration_minutes: int = 30
     reason: str | None = None
+    notes: str | None = None
 
     @field_validator("scheduled_start")
     @classmethod

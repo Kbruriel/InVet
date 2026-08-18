@@ -1,8 +1,7 @@
 """Appointment domain model and AppointmentStatus enum."""
 
-from datetime import date, datetime, timedelta
+from datetime import date, datetime
 from enum import Enum
-from typing import Optional
 
 from pydantic import BaseModel, Field, field_validator
 
@@ -50,10 +49,10 @@ class AppointmentType(str, Enum):
 class Appointment(BaseModel):
     """Domain representation of an appointment."""
 
-    id: Optional[int] = None
+    id: int | None = None
     owner_id: int
     pet_id: int
-    veterinarian_id: Optional[int] = None
+    veterinarian_id: int | None = None
     clinic_id: int
     branch_id: int
     appointment_type: AppointmentType
@@ -61,8 +60,8 @@ class Appointment(BaseModel):
     scheduled_start: datetime
     scheduled_end: datetime
     duration_minutes: int = Field(default=30, ge=15, le=120)
-    reason: Optional[str] = None
-    notes: Optional[str] = None
+    reason: str | None = None
+    notes: str | None = None
     created_by: int
 
     @field_validator("scheduled_end")
@@ -81,14 +80,14 @@ class AppointmentCreateSchema(BaseModel):
     """Schema for creating an appointment."""
 
     pet_id: int = Field(..., gt=0)
-    veterinarian_id: Optional[int] = None
+    veterinarian_id: int | None = None
     clinic_id: int = Field(..., gt=0)
     branch_id: int = Field(..., gt=0)
     appointment_type: AppointmentType
     scheduled_start: datetime = Field(..., description="Must be in the future")
     scheduled_end: datetime
     duration_minutes: int = Field(default=30, ge=15, le=120)
-    reason: Optional[str] = None
+    reason: str | None = None
 
     @field_validator("scheduled_start")
     @classmethod
@@ -109,10 +108,12 @@ class AppointmentCreateSchema(BaseModel):
 class AppointmentUpdateSchema(BaseModel):
     """Schema for updating appointment status."""
 
-    action: str = Field(..., description="approve|confirm|complete|cancel|no_show|reschedule")
-    new_start: Optional[datetime] = None
-    new_end: Optional[datetime] = None
-    reason: Optional[str] = None
+    action: str = Field(
+        ..., description="approve|confirm|complete|cancel|no_show|reschedule"
+    )
+    new_start: datetime | None = None
+    new_end: datetime | None = None
+    reason: str | None = None
 
 
 class AppointmentRescheduleSchema(BaseModel):
@@ -120,7 +121,7 @@ class AppointmentRescheduleSchema(BaseModel):
 
     new_start: datetime = Field(..., description="Must be in the future")
     new_end: datetime
-    reason: Optional[str] = None
+    reason: str | None = None
 
     @field_validator("new_start")
     @classmethod

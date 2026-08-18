@@ -2,8 +2,8 @@
 
 from fastapi import APIRouter
 
+from app.api.v1.auth_router import router as auth_router
 from app.api.v1.routers.appointment_router import router as appointment_router
-from app.api.v1.routers.auth_router import router as auth_router
 from app.api.v1.routers.branch_profile import router as branch_router
 from app.api.v1.routers.clinic_admin import router as clinic_admin_router
 from app.api.v1.routers.clinic_search import router as clinic_search_router

@@ -18,7 +18,7 @@ last_updated: 2026-08-16
 | ORM SQLAlchemy | `backend/app/infrastructure/database/models/appointment.py` | ✅ EXISTS |
 | Repo implementación | `backend/app/infrastructure/database/repositories/appointment_repository_impl.py` | ✅ EXISTS |
 | Casos de uso | `backend/app/application/use_cases/appointment_use_cases.py` | ✅ EXISTS (~350 líneas, 7 use cases) |
-| Esquemas API | `backend/app/api/schemas/appointment_schemas.py` | ✅ EXISTS (~160 líneas, 6 schemas) |
+| Esquemas API | `backend/app/api/v1/schemas/appointment_schemas.py` | ✅ EXISTS (~160 líneas, 6 schemas) |
 | Router FastAPI | `backend/app/api/v1/routers/appointment_router.py` | ✅ EXISTS (todos endpoints registrados) |
 | Migración Alembic | `backend/alembic/versions/a008_appointments.py` | ✅ EXISTING (corregida en 2026-08-16) |
 | Pruebas unitarias | `backend/app/tests/test_appointment_use_cases.py` | ✅ CREATED (2026-08-16) |
@@ -79,8 +79,8 @@ Crear el flujo vertical completo de solicitud, gestión y seguimiento de citas m
 | --- | --- |
 | Titulo | Solicitud y gestión de citas |
 | Descripcion | Crear/solicitar/confirmar/cancelar/reprogramar/marcar no-show/completar citas dentro del MVP, con disponibilidad basica y control de estados. |
-| Entregables backend | Modelo `Appointment`, enums de estado, repositorio, endpoints CRUD + transicion de estados bajo `/api/v1/appointments`, schemas Pydantic, migracion Alembic, pruebas pytest/HTTPX. |
-| Entregables frontend | Flujo de solicitud desde perfil del propietario, vistas de agenda de propietario y agenda clinica, componentes de cambio de estado, feedback visual (loading, submitting, error, success, empty). |
+| Entregables backend | Modelo `Appointment`, enums de estado, repositorio, endpoints CRUD + transicion de estados bajo `/api/v1/appointments` implementados en `backend/app/api/v1/routers/appointment_router.py`, schemas Pydantic en `backend/app/api/v1/schemas/appointment_schemas.py`, migracion Alembic, pruebas pytest/HTTPX. |
+| Entregables frontend | Flujo de solicitud desde perfil del propietario, vistas de agenda de propietario y agenda clinica en `frontend/src/app/portal/owner/appointments` y `frontend/src/app/clinic/appointments`, componentes de cambio de estado, feedback visual (loading, submitting, error, success, empty). |
 | Criterios QA principales | Transiciones validas pasan; transiciones invalidas fallan con error claro; disponibilidad se respeta; permisos por rol (propietario/clinica/veterinario) funcionan; IDOR/BOLA falla de forma segura; estados UI consistentes. |
 
 Fuente obligatoria: `docs/opencode/references/slice_task_context.md`.
@@ -403,7 +403,7 @@ Reglas:
 
 ### Backend
 
-- [ ] BE-008-T01 - Definir modelo Appointment con campos minimos
+- [x] BE-008-T01 - Definir modelo Appointment con campos minimos
   Capa: backend
   Tipo: contrato
   Historia o criterio: AC-008-01, AC-008-20
@@ -416,10 +416,10 @@ Reglas:
   Criterios de aceptacion: Modelo con todos los campos definidos.
   Validacion: `python -c "from app.domain.models.appointment import Appointment; print('OK')"` + revisar modelo.
   Resultado esperado: Modelo de dominio disponible para implementacion.
-  Evidencia: pending
+  Evidencia: Verificado con la implementacion y pruebas del slice BE-008 en 2026-08-17.
   Paralelismo[P]: No
 
-- [ ] BE-008-T01a - Definir enum de estados de cita
+- [x] BE-008-T01a - Definir enum de estados de cita
   Capa: backend
   Tipo: contrato
   Historia o criterio: AC-008-01, AC-008-20
@@ -432,10 +432,10 @@ Reglas:
   Criterios de aceptacion: Enum con valores pending/approved/confirmed/completed/cancelled/no_show/rescheduled.
   Validacion: Revisar enum y sus metodos de validacion de transicion.
   Resultado esperado: Enum de estados disponible para modelo y casos de uso.
-  Evidencia: pending
+  Evidencia: Verificado con la implementacion y pruebas del slice BE-008 en 2026-08-17.
   Paralelismo[P]: No
 
-- [ ] BE-008-T02 - Definir reglas validacion del modelo
+- [x] BE-008-T02 - Definir reglas validacion del modelo
   Capa: backend
   Tipo: contrato
   Historia o criterio: AC-008-01, AC-008-20
@@ -448,10 +448,10 @@ Reglas:
   Criterios de aceptacion: Validacion de campos requeridos. Validacion de rango fechas. Validacion de duracion entre 15 y 120 min.
   Validacion: `python -c "from app.domain.models.appointment import AppointmentCreateSchema; print('OK')"` + revisar schemas.
   Resultado esperado: Schemas validados disponibles para implementacion.
-  Evidencia: pending
+  Evidencia: Verificado con la implementacion y pruebas del slice BE-008 en 2026-08-17.
   Paralelismo[P]: No
 
-- [ ] BE-008-T03 - Crear migracion Alembic para tabla de citas
+- [x] BE-008-T03 - Crear migracion Alembic para tabla de citas
   Capa: backend
   Tipo: persistencia
   Historia o criterio: AC-008-20
@@ -464,10 +464,10 @@ Reglas:
   Criterios de aceptacion: Migracion crea tabla con columnas e indices correctos. Migration reversible (downgrade limpio). Sin loss de data preexistente.
   Validacion: `alembic upgrade head`; migracion down+upgrade sin errores.
   Resultado esperado: Persistencia disponible y migracion verificable.
-  Evidencia: pending
+  Evidencia: Verificado con la implementacion y pruebas del slice BE-008 en 2026-08-17.
   Paralelismo[P]: No
 
-- [ ] BE-008-T04 - Implementar repositorio de citas
+- [x] BE-008-T04 - Implementar repositorio de citas
   Capa: backend
   Tipo: persistencia
   Historia o criterio: AC-008-20
@@ -480,10 +480,10 @@ Reglas:
   Criterios de aceptacion: Repositorio implementa CRUD completo. Busqueda por filtros funciona. Paginacion incluida.
   Validacion: `python -c "from app.infrastructure.repositories.appointment_repository_impl import AppointmentRepository; print('OK')"` + revisar codigo.
   Resultado esperado: Repositorio disponible para casos de uso.
-  Evidencia: pending
+  Evidencia: Verificado con la implementacion y pruebas del slice BE-008 en 2026-08-17.
   Paralelismo[P]: No
 
-- [ ] BE-008-T05 - Implementar caso de uso crear cita
+- [x] BE-008-T05 - Implementar caso de uso crear cita
   Capa: backend
   Tipo: caso de uso
   Historia o criterio: AC-008-01, AC-008-17
@@ -496,10 +496,10 @@ Reglas:
   Criterios de aceptacion: Caso de uso valida ownership del owner. Valida fecha en futuro. Retorna error si slot ocupado.
   Validacion: `pytest -q app/application/test_appointment_create.py` → PASS.
   Resultado esperado: Caso de uso disponible para endpoint.
-  Evidencia: pending
+  Evidencia: Verificado con la implementacion y pruebas del slice BE-008 en 2026-08-17.
   Paralelismo[P]: No
 
-- [ ] BE-008-T06 - Exponer endpoint POST de solicitud de cita
+- [x] BE-008-T06 - Exponer endpoint POST de solicitud de cita
   Capa: backend
   Tipo: api
   Historia o criterio: AC-008-01, AC-008-02
@@ -512,10 +512,10 @@ Reglas:
   Criterios de aceptacion: Endpoint responde 201 con status=pending. Response JSON completo con datos de cita.
   Validacion: `pytest -q -k test_appointments_create` → PASS.
   Resultado esperado: Endpoint de creacion disponible para frontend.
-  Evidencia: pending
+  Evidencia: Verificado con la implementacion y pruebas del slice BE-008 en 2026-08-17.
   Paralelismo[P]: No
 
-- [ ] BE-008-T07 - Exponer endpoint GET de disponibilidad
+- [x] BE-008-T07 - Exponer endpoint GET de disponibilidad
   Capa: backend
   Tipo: api
   Historia o criterio: AC-008-10
@@ -528,10 +528,10 @@ Reglas:
   Criterios de aceptacion: Responde lista de slots basados en horario clinica menos citas existentes. Filtros funcionan. Sin solapamiento.
   Validacion: HTTPX test + consulta manual GET con distintos filtros.
   Resultado esperado: Disponibilidad disponible para frontend scheduling.
-  Evidencia: pending
+  Evidencia: Verificado con la implementacion y pruebas del slice BE-008 en 2026-08-17.
   Paralelismo[P]: No
 
-- [ ] BE-008-T08 - Exponer endpoint GET de listado propietario
+- [x] BE-008-T08 - Exponer endpoint GET de listado propietario
   Capa: backend
   Tipo: api
   Historia o criterio: AC-008-02, AC-008-19
@@ -544,10 +544,10 @@ Reglas:
   Criterios de aceptacion: Listado devuelve max page_size items. Propietario solo ve sus citas. Meta correcto.
   Validacion: `pytest -q -k test_appointments_pagination` → PASS.
   Resultado esperado: Listado propietario listo para frontend.
-  Evidencia: pending
+  Evidencia: Verificado con la implementacion y pruebas del slice BE-008 en 2026-08-17.
   Paralelismo[P]: No
 
-- [ ] BE-008-T09 - Exponer endpoint GET de listado clinica
+- [x] BE-008-T09 - Exponer endpoint GET de listado clinica
   Capa: backend
   Tipo: api
   Historia o criterio: AC-008-19
@@ -560,10 +560,10 @@ Reglas:
   Criterios de aceptacion: Listado filtra por sucursal del clinico. Paginacion consistente.
   Validacion: HTTPX test + consulta manual con diferentes filtros.
   Resultado esperado: Listado clinica listo para frontend.
-  Evidencia: pending
+  Evidencia: Verificado con la implementacion y pruebas del slice BE-008 en 2026-08-17.
   Paralelismo[P]: No
 
-- [ ] BE-008-T10 - Exponer endpoint PUT de transicion de estado
+- [x] BE-008-T10 - Exponer endpoint PUT de transicion de estado
   Capa: backend
   Tipo: api
   Historia o criterio: AC-008-03, AC-008-04
@@ -576,10 +576,10 @@ Reglas:
   Criterios de aceptacion: Transicion valida responde 200. Invalida responde 422. Solo rol correcto puede ejecutar.
   Validacion: `pytest -q -k test_status_transitions` → PASS.
   Resultado esperado: Transiciones disponibles para frontend.
-  Evidencia: pending
+  Evidencia: Verificado con la implementacion y pruebas del slice BE-008 en 2026-08-17.
   Paralelismo[P]: No
 
-- [ ] BE-008-T11 - Implementar endpoint PUT de reprogramacion
+- [x] BE-008-T11 - Implementar endpoint PUT de reprogramacion
   Capa: backend
   Tipo: api
   Historia o criterio: AC-008-09
@@ -592,10 +592,10 @@ Reglas:
   Criterios de aceptacion: Valida nuevos horarios. Rechaza si slot ocupado (409). Solo clinica/vet puede ejecutar.
   Validacion: HTTPX test + consulta manual PUT.
   Resultado esperado: Reprogramacion disponible para frontend.
-  Evidencia: pending
+  Evidencia: Verificado con la implementacion y pruebas del slice BE-008 en 2026-08-17.
   Paralelismo[P]: No
 
-- [ ] BE-008-T12 - Exponer endpoint de cancelacion de citas
+- [x] BE-008-T12 - Exponer endpoint de cancelacion de citas
   Capa: backend
   Tipo: api
   Historia o criterio: AC-008-08, AC-008-16
@@ -608,10 +608,10 @@ Reglas:
   Criterios de aceptacion: Owner puede cancelar citas propias. Clinica puede cancelar de su sucursal. Terminal bloquea con 422.
   Validacion: `pytest -q -k test_appointments_cancel` → PASS.
   Resultado esperado: Cancelacion disponible para frontend.
-  Evidencia: pending
+  Evidencia: Verificado con la implementacion y pruebas del slice BE-008 en 2026-08-17.
   Paralelismo[P]: No
 
-- [ ] BE-008-T13 - Pruebas happy path del endpoint CREATE
+- [x] BE-008-T13 - Pruebas happy path del endpoint CREATE
   Capa: backend
   Tipo: prueba
   Historia o criterio: AC-008-01, AC-008-03
@@ -624,10 +624,10 @@ Reglas:
   Criterios de aceptacion: Tests cubren escenario positivo. Todos PASS sin warnings.
   Validacion: `pytest -q -k test_appointments_create` → PASS.
   Resultado esperado: Endpoint CREATE validado para QA.
-  Evidencia: pending
+  Evidencia: Verificado con la implementacion y pruebas del slice BE-008 en 2026-08-17.
   Paralelismo[P]: No
 
-- [ ] BE-008-T14 - Pruebas happy path de status transitions
+- [x] BE-008-T14 - Pruebas happy path de status transitions
   Capa: backend
   Tipo: prueba
   Historia o criterio: AC-008-04 a AC-008-10
@@ -640,10 +640,10 @@ Reglas:
   Criterios de aceptacion: Tests cubren todas las transiciones validas. Todos PASS sin warnings.
   Validacion: `pytest -q -k test_status_transition` → PASS.
   Resultado esperado: Transiciones de estado validadas para QA.
-  Evidencia: pending
+  Evidencia: Verificado con la implementacion y pruebas del slice BE-008 en 2026-08-17.
   Paralelismo[P]: No
 
-- [ ] BE-008-T15 - Pruebas negative path del endpoint CREATE
+- [x] BE-008-T15 - Pruebas negative path del endpoint CREATE
   Capa: backend
   Tipo: prueba
   Historia o criterio: AC-008-04, AC-008-05, AC-008-14 a AC-008-17
@@ -656,10 +656,10 @@ Reglas:
   Criterios de aceptacion: Tests cubren 401, 403, 422. Mensajes claros sin datos internos.
   Validacion: `pytest -q -k auth` → PASS.
   Resultado esperado: Errores de validacion del endpoint CREATE verificados para QA.
-  Evidencia: pending
+  Evidencia: Verificado con la implementacion y pruebas del slice BE-008 en 2026-08-17.
   Paralelismo[P]: No
 
-- [ ] BE-008-T16 - Pruebas IDOR cruzadas de permisos
+- [x] BE-008-T16 - Pruebas IDOR cruzadas de permisos
   Capa: backend
   Tipo: prueba
   Historia o criterio: AC-008-05, AC-008-14 a AC-008-17
@@ -672,12 +672,12 @@ Reglas:
   Criterios de aceptacion: Tests cruzados owner-to-clinic y clinic-to-owner. Todos retornan 403.
   Validacion: `pytest -q -k idor` → PASS con resultados 403 esperados.
   Resultado esperado: IDOR validado y bloqueado correctamente para QA.
-  Evidencia: pending
+  Evidencia: Verificado con la implementacion y pruebas del slice BE-008 en 2026-08-17.
   Paralelismo[P]: No
 
 ### Frontend
 
-- [ ] FE-008-T01 - Crear feature module de citas
+- [x] FE-008-T01 - Crear feature module de citas
   Capa: frontend
   Tipo: componente
   Historia o criterio: AC-008-11, AC-008-12
@@ -690,10 +690,10 @@ Reglas:
   Criterios de aceptacion: Estructura de carpetas definida. Componentes base listos para implementar.
   Validacion: Verificar directorio y estructura existe. npm run typecheck exit 0 sin errores nuevos.
   Resultado esperado: Feature module base disponible para implementacion.
-  Evidencia: pending
+  Evidencia: Verificado con la implementacion frontend de citas y la bateria UI/Playwright del slice BE-008 en 2026-08-17.
   Paralelismo[P]: No
 
-- [ ] FE-008-T02 - Crear cliente API de citas tipado
+- [x] FE-008-T02 - Crear cliente API de citas tipado
   Capa: frontend
   Tipo: cliente api
   Historia o criterio: AC-008-11, AC-008-12, AC-008-13
@@ -706,10 +706,10 @@ Reglas:
   Criterios de aceptacion: Cliente expone methods para todos los endpoints. Tipos consistentes con backend.
   Validacion: `npm run typecheck` → exit 0.
   Resultado esperado: Cliente API tipado disponible para componentes.
-  Evidencia: pending
+  Evidencia: Verificado con la implementacion frontend de citas y la bateria UI/Playwright del slice BE-008 en 2026-08-17.
   Paralelismo[P]: No
 
-- [ ] FE-008-T03 - Implementar formulario de solicitud de cita
+- [x] FE-008-T03 - Implementar formulario de solicitud de cita
   Capa: frontend
   Tipo: componente
   Historia o criterio: AC-008-11
@@ -722,10 +722,10 @@ Reglas:
   Criterios de aceptacion: Valida campos requeridos. Muestra error si slot ocupado (409). Loading y submitting estados visibles.
   Validacion: Jest test del formulario → PASS.
   Resultado esperado: Formulario funcional para solicitud de citas.
-  Evidencia: pending
+  Evidencia: Verificado con la implementacion frontend de citas y la bateria UI/Playwright del slice BE-008 en 2026-08-17.
   Paralelismo[P]: No
 
-- [ ] FE-008-T04 - Implementar componente de agenda del propietario
+- [x] FE-008-T04 - Implementar componente de agenda del propietario
   Capa: frontend
   Tipo: componente
   Historia o criterio: AC-008-12, AC-008-18
@@ -738,10 +738,10 @@ Reglas:
   Criterios de aceptacion: Tabs filtran citas correctamente. Loading/success/empty/error estados visibles. Paginacion funcional. Responsive.
   Validacion: Jest integration test → PASS + manual responsive test.
   Resultado esperado: Agenda del propietario operativa.
-  Evidencia: pending
+  Evidencia: Verificado con la implementacion frontend de citas y la bateria UI/Playwright del slice BE-008 en 2026-08-17.
   Paralelismo[P]: No
 
-- [ ] FE-008-T05 - Implementar componente de agenda clinica
+- [x] FE-008-T05 - Implementar componente de agenda clinica
   Capa: frontend
   Tipo: componente
   Historia o criterio: AC-008-13
@@ -754,10 +754,10 @@ Reglas:
   Criterios de aceptacion: Acciones segun status. Botones ocultos segun permisos. Modal de confirmacion para acciones criticas.
   Validacion: Jest tests → PASS + manual test con cuenta real.
   Resultado esperado: Agenda clinica operativa.
-  Evidencia: pending
+  Evidencia: Verificado con la implementacion frontend de citas y la bateria UI/Playwright del slice BE-008 en 2026-08-17.
   Paralelismo[P]: No
 
-- [ ] FE-008-T06 - Agregar pruebas frontend de citas
+- [x] FE-008-T06 - Agregar pruebas frontend de citas
   Capa: frontend
   Tipo: prueba
   Historia o criterio: AC-008-18, AC-008-19
@@ -770,12 +770,12 @@ Reglas:
   Criterios de aceptacion: Tests cubren form validation y empty states. `npm run test` → PASS.
   Validacion: `npm run lint` → 0 errors nuevos; `npm run typecheck` → 0 errors; `npm run build` → exit 0.
   Resultado esperado: Frontend validado y listo para QA.
-  Evidencia: pending
+  Evidencia: Verificado con la implementacion frontend de citas y la bateria UI/Playwright del slice BE-008 en 2026-08-17.
   Paralelismo[P]: No
 
 ### QA
 
-- [ ] QA-008-T01 - Ejecutar QA end-to-end del flujo de citas
+- [x] QA-008-T01 - Ejecutar QA end-to-end del flujo de citas
   Capa: qa
   Tipo: qa
   Historia o criterio: AC-008-01 a AC-008-20
@@ -788,10 +788,10 @@ Reglas:
   Criterios de aceptacion: Todos los criterios en matriz deben tener al menos un caso QA. Estados PASS requeridos para todos.
   Validacion: `python backend/scripts/validate_slice_plan.py QA-008 --stage qa`; ejecutar comandos del plan Docker/tests.
   Resultado esperado: Decision QA trazable (APPROVED o REJECTED con findings).
-  Evidencia: pending
+  Evidencia: Verificado con QA-008-results.md, QA-008-findings.md y BE-008-checks.md en 2026-08-17.
   Paralelismo[P]: No
 
-- [ ] QA-008-T02 - Validar seguridad y permisos de citas
+- [x] QA-008-T02 - Validar seguridad y permisos de citas
   Capa: qa
   Tipo: qa
   Historia o criterio: AC-008-14 a AC-008-17
@@ -804,7 +804,7 @@ Reglas:
   Criterios de aceptacion: Pruebas de 401, 403, 422. IDOR/BOLA falla seguro. Defectos documentados en findings si aplica.
   Validacion: Registrar en QA-008-results.md y QA-008-findings.md.
   Resultado esperado: Seguridad validada por QA.
-  Evidencia: pending
+  Evidencia: Verificado con QA-008-results.md, QA-008-findings.md y BE-008-checks.md en 2026-08-17.
   Paralelismo[P]: No
 
 ## Definition of Done

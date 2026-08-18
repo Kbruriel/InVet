@@ -81,6 +81,8 @@ Este archivo define requisitos, no el estado de un slice. Los checks permanecen 
 ## `/run-ui-checks FE-00X`
 
 - [ ] Existe `UIA-00X.md`.
+- [ ] La UI/regresion corre sobre `http://localhost:3000`.
+- [ ] Las rutas relevantes del slice quedaron explicitas en la evidencia (`/clinicas`, `/portal/owner/appointments`, `/portal/owner/appointments/new`, `/clinic/appointments`).
 - [ ] `npm run test:e2e` pasa.
 - [ ] `npm run test:regression` pasa.
 - [ ] Los fallos o skips tienen evidencia verificable.
@@ -111,6 +113,7 @@ Este archivo define requisitos, no el estado de un slice. Los checks permanecen 
 - [ ] QA y reviews estan aprobados.
 - [ ] UI automation y API automation estan aprobadas o justificadas.
 - [ ] `run-ui-checks` ya paso para el slice.
+- [ ] La API del slice corrió sobre `http://localhost:8000/api/v1`.
 - [ ] Tests, lint, formato, tipos y build aplicables pasan.
 - [ ] Cada skip es realmente no aplicable.
 - [ ] Se valido si habia cambios pendientes que justificaran actualizar contenedores antes del cierre.

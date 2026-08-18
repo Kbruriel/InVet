@@ -2,9 +2,10 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+import json
+from datetime import datetime, time
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 
 class Branch(BaseModel):
@@ -60,6 +61,13 @@ class BranchSchedule(BaseModel):
     created_at: datetime
     updated_at: datetime
 
+    @field_validator("open_time", "close_time", mode="before")
+    @classmethod
+    def _format_time(cls, value: str | time) -> str:
+        if isinstance(value, time):
+            return value.strftime("%H:%M")
+        return value
+
 
 class RatingSummary(BaseModel):
     """Entidad de resumen de calificaciones."""
@@ -73,6 +81,13 @@ class RatingSummary(BaseModel):
     review_distribution: str | None  # JSON string con distribución de calificaciones
     created_at: datetime | None = None
     updated_at: datetime | None = None
+
+    @field_validator("review_distribution", mode="before")
+    @classmethod
+    def _format_review_distribution(cls, value: str | dict | None) -> str | None:
+        if isinstance(value, dict):
+            return json.dumps(value, ensure_ascii=False)
+        return value
 
 
 class AvailabilitySummary(BaseModel):

@@ -1,14 +1,16 @@
 """Implementación del repositorio de clínicas con soporte CRUD administrativo."""
 
+import unicodedata
 from datetime import UTC, datetime
 from typing import Any, cast
 
-from sqlalchemy import select
+from sqlalchemy import func, or_, select
 from sqlalchemy.orm import Session
 
 from app.domain.entities.clinic import Clinic
 from app.domain.repositories.clinic_repository import ClinicRepository
 from app.infrastructure.database.models.clinic import Clinic as ClinicModel
+from app.infrastructure.database.models.service_model import Service as ServiceModel
 
 
 class ClinicRepositoryImpl(ClinicRepository):
@@ -56,6 +58,26 @@ class ClinicRepositoryImpl(ClinicRepository):
             updated_at=getattr(clinic, "updated_at", now) or now,
         )
 
+    @staticmethod
+    def _normalize_text(value: str) -> str:
+        normalized = unicodedata.normalize("NFKD", value)
+        return normalized.encode("ascii", "ignore").decode("ascii").lower().strip()
+
+    @staticmethod
+    def _normalized_sql_text(column):
+        normalized = func.lower(column)
+        for source, target in (
+            ("á", "a"),
+            ("é", "e"),
+            ("í", "i"),
+            ("ó", "o"),
+            ("ú", "u"),
+            ("ü", "u"),
+            ("ñ", "n"),
+        ):
+            normalized = func.replace(normalized, source, target)
+        return normalized
+
     # --- Métodos públicos (BE-004) ---
 
     async def search_clinics(
@@ -77,7 +99,25 @@ class ClinicRepositoryImpl(ClinicRepository):
                 | (ClinicModel.address.ilike(f"%{location_lower}%"))
             )
 
-        query = query.offset(offset).limit(size)
+        if service_type:
+            service_type_normalized = self._normalize_text(service_type)
+            service_name = self._normalized_sql_text(ServiceModel.name)
+            service_description = self._normalized_sql_text(ServiceModel.description)
+            query = query.where(
+                select(1)
+                .select_from(ServiceModel)
+                .where(
+                    ServiceModel.clinic_id == ClinicModel.id,
+                    ServiceModel.is_active.is_(True),
+                    or_(
+                        service_name.like(f"%{service_type_normalized}%"),
+                        service_description.like(f"%{service_type_normalized}%"),
+                    ),
+                )
+                .exists()
+            )
+
+        query = query.order_by(ClinicModel.id).offset(offset).limit(size)
         result = self.db.execute(query)
         clinics = result.scalars().all()
 
@@ -94,6 +134,24 @@ class ClinicRepositoryImpl(ClinicRepository):
             query = query.where(
                 (ClinicModel.city.ilike(f"%{location_lower}%"))
                 | (ClinicModel.address.ilike(f"%{location_lower}%"))
+            )
+
+        if service_type:
+            service_type_normalized = self._normalize_text(service_type)
+            service_name = self._normalized_sql_text(ServiceModel.name)
+            service_description = self._normalized_sql_text(ServiceModel.description)
+            query = query.where(
+                select(1)
+                .select_from(ServiceModel)
+                .where(
+                    ServiceModel.clinic_id == ClinicModel.id,
+                    ServiceModel.is_active.is_(True),
+                    or_(
+                        service_name.like(f"%{service_type_normalized}%"),
+                        service_description.like(f"%{service_type_normalized}%"),
+                    ),
+                )
+                .exists()
             )
 
         result = self.db.execute(query)

@@ -1,6 +1,56 @@
 /** Cliente API público para perfil de sucursal (FE-004) */
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+import { resolveApiBase } from './api-base';
+
+const API_BASE = resolveApiBase();
+
+type BackendBranchService = {
+  id: number;
+  name: string;
+  description: string | null;
+  is_active: boolean;
+};
+
+type BackendBranchSchedule = {
+  id: number;
+  day_of_week: number;
+  open_time: string;
+  close_time: string;
+  is_active: boolean;
+};
+
+type BackendRatingSummary = {
+  average_rating: number;
+  total_reviews: number;
+  review_distribution: string | null;
+};
+
+type BackendAvailabilitySummary = {
+  is_available: boolean;
+  next_available_time: string | null;
+  availability_type: string | null;
+};
+
+type BackendBranchProfile = {
+  id: number;
+  clinic_id: number;
+  name: string;
+  description: string | null;
+  address: string;
+  city: string;
+  state: string;
+  country: string;
+  postal_code: string;
+  phone: string | null;
+  email: string | null;
+  is_active: boolean;
+  services: BackendBranchService[];
+  schedules: BackendBranchSchedule[];
+  rating_summary: BackendRatingSummary | null;
+  availability_summary: BackendAvailabilitySummary | null;
+  logo_url?: string | null;
+  logoUrl?: string | null;
+};
 
 // --- DTOs del perfil público ---
 
@@ -50,6 +100,93 @@ export interface BranchProfilePublic {
   availability: AvailabilitySummary | null;
 }
 
+function mapDayOfWeek(value: number): string {
+  const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+  return days[value] || String(value);
+}
+
+function mapBranchService(service: BackendBranchService): BranchService {
+  return {
+    id: service.id,
+    name: service.name,
+    description: service.description,
+    price: null,
+    durationMinutes: null,
+    active: service.is_active,
+  };
+}
+
+function parseReviewDistribution(raw: string | Record<string, number> | null): Record<string, number> {
+  if (!raw) return {};
+  if (typeof raw === 'object') return raw;
+  try {
+    return JSON.parse(raw) as Record<string, number>;
+  } catch {
+    return {};
+  }
+}
+
+function mapRatingSummary(
+  summary: BackendRatingSummary | null,
+  branchId: number,
+): RatingSummary | null {
+  if (!summary) return null;
+
+  return {
+    branchId,
+    average: summary.average_rating,
+    count: summary.total_reviews,
+    distribution: parseReviewDistribution(summary.review_distribution),
+  };
+}
+
+function mapAvailabilitySummary(
+  summary: BackendAvailabilitySummary | null,
+  branchId: number,
+): AvailabilitySummary | null {
+  if (!summary) return null;
+
+  const status = summary.availability_type === 'full'
+    ? 'full'
+    : summary.is_available
+      ? 'available'
+      : 'unavailable';
+
+  return {
+    branchId,
+    status,
+    availableSlots: summary.is_available ? 1 : 0,
+    totalSlots: 1,
+  };
+}
+
+function mapBranchSchedule(schedule: BackendBranchSchedule, branchId: number): BranchSchedule {
+  return {
+    id: schedule.id,
+    branchId,
+    dayOfWeek: mapDayOfWeek(schedule.day_of_week),
+    openTime: schedule.open_time,
+    closeTime: schedule.close_time,
+    isHoliday: !schedule.is_active,
+  };
+}
+
+function mapBranchProfile(payload: BackendBranchProfile): BranchProfilePublic {
+  return {
+    id: payload.id,
+    name: payload.name,
+    description: payload.description,
+    address: payload.address,
+    city: payload.city,
+    phone: payload.phone,
+    logoUrl: payload.logoUrl ?? payload.logo_url ?? null,
+    services: (payload.services ?? []).map(mapBranchService),
+    schedules: (payload.schedules ?? []).map((schedule) => mapBranchSchedule(schedule, payload.id)),
+    rating: mapRatingSummary(payload.rating_summary, payload.id),
+    availability: mapAvailabilitySummary(payload.availability_summary, payload.id),
+  };
+}
+
 // --- Fetchers públicos ---
 
 export async function fetchBranchPublic(branchId: number): Promise<BranchProfilePublic> {
@@ -66,79 +203,27 @@ export async function fetchBranchPublic(branchId: number): Promise<BranchProfile
     throw { status: response.status, detail: (error as { detail?: string }).detail || 'Error al obtener perfil de sucursal' };
   }
 
-  return response.json();
+  const payload = (await response.json()) as BackendBranchProfile;
+  return mapBranchProfile(payload);
 }
 
 export async function fetchBranchServices(branchId: number): Promise<BranchService[]> {
-  const response = await fetch(`${API_BASE}/clinics/branches/${branchId}/services`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  });
-
-  if (!response.ok) {
-    if (response.status === 404) {
-      throw { status: 404, detail: 'Servicios no encontrados para esta sucursal' };
-    }
-    const error = await response.json().catch(() => ({ detail: 'Error desconocido' }));
-    throw { status: response.status, detail: (error as { detail?: string }).detail || 'Error al listar servicios' };
-  }
-
-  return response.json();
+  const profile = await fetchBranchPublic(branchId);
+  return profile.services;
 }
 
 export async function fetchBranchSchedules(branchId: number, date?: string): Promise<BranchSchedule[]> {
-  const query = new URLSearchParams();
-  if (date) query.set('date', date);
-
-  const response = await fetch(`${API_BASE}/clinics/branches/${branchId}/schedules?${query.toString()}`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  });
-
-  if (!response.ok) {
-    if (response.status === 400) {
-      throw { status: 400, detail: 'Fecha inválida' };
-    }
-    if (response.status === 404) {
-      throw { status: 404, detail: 'Horarios no encontrados para esta sucursal' };
-    }
-    const error = await response.json().catch(() => ({ detail: 'Error desconocido' }));
-    throw { status: response.status, detail: (error as { detail?: string }).detail || 'Error al listar horarios' };
-  }
-
-  return response.json();
+  void date;
+  const profile = await fetchBranchPublic(branchId);
+  return profile.schedules;
 }
 
-export async function fetchBranchRatingSummary(branchId: number): Promise<RatingSummary> {
-  const response = await fetch(`${API_BASE}/clinics/branches/${branchId}/rating-summary`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  });
-
-  if (!response.ok) {
-    if (response.status === 404) {
-      throw { status: 404, detail: 'Resumen de calificaciones no encontrado' };
-    }
-    const error = await response.json().catch(() => ({ detail: 'Error desconocido' }));
-    throw { status: response.status, detail: (error as { detail?: string }).detail || 'Error al obtener calificaciones' };
-  }
-
-  return response.json();
+export async function fetchBranchRatingSummary(branchId: number): Promise<RatingSummary | null> {
+  const profile = await fetchBranchPublic(branchId);
+  return profile.rating;
 }
 
-export async function fetchBranchAvailability(branchId: number): Promise<AvailabilitySummary> {
-  const response = await fetch(`${API_BASE}/clinics/branches/${branchId}/availability`, {
-    method: 'GET',
-    headers: { 'Content-Type': 'application/json' },
-  });
-
-  if (!response.ok) {
-    if (response.status === 404) {
-      throw { status: 404, detail: 'Disponibilidad no encontrada para esta sucursal' };
-    }
-    const error = await response.json().catch(() => ({ detail: 'Error desconocido' }));
-    throw { status: response.status, detail: (error as { detail?: string }).detail || 'Error al obtener disponibilidad' };
-  }
-
-  return response.json();
+export async function fetchBranchAvailability(branchId: number): Promise<AvailabilitySummary | null> {
+  const profile = await fetchBranchPublic(branchId);
+  return profile.availability;
 }

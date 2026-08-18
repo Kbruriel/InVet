@@ -23,6 +23,7 @@ class Service(Base):
     __tablename__ = "services"
 
     id = Column(Integer, primary_key=True, index=True)
+    branch_id = Column(Integer, ForeignKey("branches.id"), nullable=False)
     clinic_id = Column(Integer, ForeignKey("clinics.id"), nullable=False)
     name = Column(String(200), nullable=False)
     description = Column(Text)

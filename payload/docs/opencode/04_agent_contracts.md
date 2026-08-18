@@ -16,6 +16,10 @@
 - Cada agente debe cerrar con `Estado de ejecucion`, `Siguiente paso recomendado` y, cuando aplique, `Comando recomendado para resolver hallazgos` o `Comando recomendado para desbloquear el gate`.
 - El `Estado de ejecucion` debe usar el vocabulario permitido por la familia del agente y no mezclarlo con el estado de findings.
 - Los agentes no deben afirmar que un comando es "el unico" que desbloquea el slice; deben declarar el estado actual, el bloqueo real y el siguiente gate verificable.
+- El frontend de validacion corre por defecto en `http://localhost:3000` y el backend en `http://localhost:8000` con API bajo `/api/v1`.
+- Las rutas y archivos canónicos del producto deben quedar explicitados en los artefactos de cada slice: `backend/app/api/v1/routers/*.py`, `backend/app/api/v1/schemas/*.py`, `frontend/src/app/**`, `frontend/src/features/**` y `src/shared/api`.
+- La UI pública de clínicas vive en `frontend/src/app/clinicas/page.tsx` y responde en `http://localhost:3000/clinicas`.
+- Para BE-008, el router canónico es `backend/app/api/v1/routers/appointment_router.py` y la UI canónica vive en `frontend/src/app/portal/owner/appointments`, `frontend/src/app/portal/owner/appointments/new` y `frontend/src/app/clinic/appointments`.
 
 ## Gobernanza de carryovers
 

@@ -9,9 +9,16 @@
 
 import { test, expect } from '@playwright/test';
 
+import { authenticateAdmin } from '../helpers/auth';
+
+test.beforeEach(async ({ page }) => {
+  await authenticateAdmin(page);
+});
+
 test('TC-005-02: Listar clínicas muestra tabla paginada', async ({ page }) => {
   // Navegar al panel de administracion
   await page.goto('/clinic-administration');
+  await expect(page.getByRole('heading', { level: 1, name: /Administracion de Clinicas|Administracion/i })).toBeVisible({ timeout: 15000 });
   
   // Esperar a que la tabla se renderice o muestre empty state
   const table = page.locator('table').first();
@@ -20,8 +27,8 @@ test('TC-005-02: Listar clínicas muestra tabla paginada', async ({ page }) => {
   // Verificar que existe tabla O empty state
   if (await table.isVisible()) {
     // Tabla visible: verificar columnas
-    await expect(page.getByText('Nombre')).toBeVisible();
-    await expect(page.getByText('Estado')).toBeVisible();
+    await expect(page.locator('thead th').filter({ hasText: /^Nombre$/i }).first()).toBeVisible();
+    await expect(page.locator('thead th').filter({ hasText: /^Estado$/i }).first()).toBeVisible();
     
     // Verificar badges de estado
     const badges = page.locator('span.rounded-full');
@@ -40,12 +47,13 @@ test('TC-005-02: Listar clínicas muestra tabla paginada', async ({ page }) => {
     await expect(page.getByText('Registrar Clinica')).toBeVisible();
   } else {
     // Si no hay tabla ni empty state, verificar que la pagina cargo
-    await expect(page.getByRole('heading', { name: /Administracion/i })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 1, name: /Administracion de Clinicas|Administracion/i })).toBeVisible();
   }
 });
 
 test('TC-005-02b: Boton de nueva clinica es visible', async ({ page }) => {
   await page.goto('/clinic-administration');
+  await expect(page.getByRole('heading', { level: 1, name: /Administracion de Clinicas|Administracion/i })).toBeVisible({ timeout: 15000 });
   
   const newClinicButton = page.getByRole('button', { name: /Nueva Clinica/i });
   if (await newClinicButton.isVisible()) {

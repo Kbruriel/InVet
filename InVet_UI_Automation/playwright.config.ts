@@ -4,8 +4,11 @@ import dotenv from "dotenv";
 dotenv.config();
 
 const ci = Boolean(process.env.CI);
-const frontendBaseUrl = process.env.FRONTEND_BASE_URL || "http://127.0.0.1:3001";
-const apiBaseUrl = process.env.API_BASE_URL || "http://127.0.0.1:8000";
+const frontendBaseUrl = process.env.FRONTEND_BASE_URL || "http://localhost:3000";
+const apiBaseUrl = (process.env.API_BASE_URL || "http://localhost:8000")
+  .replace(/\/+$/, "")
+  .replace(/\/api\/v1$/, "")
+  .replace(/^http:\/\/127\.0\.0\.1:8000$/, "http://localhost:8000");
 const uiLifecycleEvents = new Set([
   "test:e2e",
   "test:e2e:all-browsers",

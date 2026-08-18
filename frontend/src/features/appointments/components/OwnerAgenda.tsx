@@ -7,8 +7,9 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { listMyAppointments, getAvailability } from '../api';
-import type { Appointment, AppointmentStatus } from '../types';
+import { useRouter } from 'next/navigation';
+import { listMyAppointments } from '../api';
+import type { Appointment } from '../types';
 import { StatusBadge } from './StatusBadge';
 import { LoadingSpinner } from '@/shared/ui/components/Loading';
 import { ErrorBanner } from '@/shared/ui/components/ErrorBanner';
@@ -29,6 +30,7 @@ const STATUS_TABS: { value: string | 'all'; label: string }[] = [
 ];
 
 export function OwnerAgenda({ ownerId, onAppointmentClick }: OwnerAgendaProps) {
+  const router = useRouter();
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -74,24 +76,6 @@ export function OwnerAgenda({ ownerId, onAppointmentClick }: OwnerAgendaProps) {
     });
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <LoadingSpinner size="large" />
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <ErrorBanner title="Error al cargar las citas" message={error}>
-        <button onClick={() => window.location.reload()} className="text-indigo-600 hover:text-indigo-800 font-medium">
-          Reintentar
-        </button>
-      </ErrorBanner>
-    );
-  }
-
   return (
     <div className="max-w-6xl mx-auto p-6">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Mi agenda de citas</h1>
@@ -115,13 +99,27 @@ export function OwnerAgenda({ ownerId, onAppointmentClick }: OwnerAgendaProps) {
         ))}
       </div>
 
+      {error && (
+        <ErrorBanner
+          message={error}
+          onRetry={() => window.location.reload()}
+          actionLabel="Reintentar"
+        />
+      )}
+
+      {loading && (
+        <div className="flex items-center justify-center py-12">
+          <LoadingSpinner />
+        </div>
+      )}
+
       {/* Empty state */}
-      {filteredAppointments.length === 0 ? (
+      {!loading && filteredAppointments.length === 0 ? (
         <EmptyState
           title={activeTab === 'all' ? 'No tienes citas registradas' : `No hay citas ${STATUS_TABS.find((t) => t.value === activeTab)?.label.toLowerCase()}`}
           description="Puedes solicitar una nueva cita desde tu perfil."
-          ctaText="Solicitar primera cita"
-          ctaHref="/portal/owner/appointments/new"
+          actionLabel="Solicitar primera cita"
+          onAction={() => router.push('/portal/owner/appointments/new')}
         />
       ) : (
         /* Lista de citas */

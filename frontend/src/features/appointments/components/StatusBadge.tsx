@@ -23,18 +23,18 @@ const STATUS_STYLES: Record<string, { bg: string; text: string; label: string }>
     label: 'Confirmada',
   },
   completed: {
-    bg: 'bg-emerald-100',
-    text: 'text-emerald-800',
+    bg: 'bg-green-100',
+    text: 'text-green-800',
     label: 'Completada',
   },
   no_show: {
     bg: 'bg-red-100',
     text: 'text-red-800',
-    label: 'No asistió',
+    label: 'No se presentó',
   },
   cancelled: {
-    bg: 'bg-gray-100',
-    text: 'text-gray-800',
+    bg: 'bg-red-100',
+    text: 'text-red-800',
     label: 'Cancelada',
   },
   rescheduled: {
@@ -55,7 +55,7 @@ export function StatusBadge({ status, className = '' }: StatusBadgeProps) {
   return (
     <span
       className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${style.bg} ${style.text} ${className}`}
-      aria-label={`Estado: ${style.label}`}
+      aria-label={`Cita ${style.label}`}
     >
       {style.label}
     </span>

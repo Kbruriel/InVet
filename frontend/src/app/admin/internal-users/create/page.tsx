@@ -4,20 +4,16 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { redirect } from 'next/navigation';
 import { AdminLayout } from '@/features/slice-006/components/admin-layout';
 import { InternalUserForm } from '@/features/slice-006/components/internal-user-form';
 import { useInternalUsers } from '@/features/slice-006/hooks/use-internal-users';
+import { RequireAuth } from '@/shared/auth/RequireAuth';
 import type { InternalUserCreateDTO } from '@/shared/api/slice-006';
 
-export default function CreateInternalUserPage() {
+function CreateInternalUserPageContent() {
   const router = useRouter();
   const { create, submitting } = useInternalUsers();
   const [success, setSuccess] = useState(false);
-
-  if (typeof window !== 'undefined' && !localStorage.getItem('access_token')) {
-    redirect('/login');
-  }
 
   const handleSuccess = async () => {
     setSuccess(true);
@@ -47,5 +43,13 @@ export default function CreateInternalUserPage() {
         />
       )}
     </AdminLayout>
+  );
+}
+
+export default function CreateInternalUserPage() {
+  return (
+    <RequireAuth>
+      <CreateInternalUserPageContent />
+    </RequireAuth>
   );
 }

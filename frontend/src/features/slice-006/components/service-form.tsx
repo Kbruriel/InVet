@@ -113,8 +113,11 @@ export function ServiceForm({ initialData, onSubmit, onCancel, submitting, onSuc
           required
         />
         <div className="w-full">
-          <label className="mb-1 block text-sm font-medium text-slate-700">Descripción</label>
+          <label htmlFor="service-description" className="mb-1 block text-sm font-medium text-slate-700">
+            Descripción
+          </label>
           <textarea
+            id="service-description"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             rows={3}

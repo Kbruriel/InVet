@@ -3,18 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Card, Button, ErrorBanner, EmptyState, LoadingSpinner } from '@/shared/ui/components';
-import {
-  fetchBranchPublic,
-  fetchBranchServices,
-  fetchBranchSchedules,
-  fetchBranchRatingSummary,
-  fetchBranchAvailability,
-  BranchProfilePublic,
-  BranchService,
-  BranchSchedule,
-  RatingSummary,
-  AvailabilitySummary,
-} from '@/shared/api/branch-client';
+import { fetchBranchPublic, BranchProfilePublic, AvailabilitySummary } from '@/shared/api/branch-client';
 
 type UiState = 'loading' | 'success' | 'error' | 'empty';
 
@@ -55,13 +44,17 @@ function AvailabilityBadge({ availability }: { availability: AvailabilitySummary
   };
   const config = labels[availability.status] || labels.unavailable;
   return (
-    <span className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${config.color}`}>
+    <span
+      role="status"
+      aria-label={config.text}
+      className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${config.color}`}
+    >
       {config.text}
     </span>
   );
 }
 
-function ServicesSection({ services }: { services: BranchService[] }) {
+function ServicesSection({ services }: { services: BranchProfilePublic['services'] }) {
   if (services.length === 0) return null;
 
   return (
@@ -96,7 +89,7 @@ function ServicesSection({ services }: { services: BranchService[] }) {
   );
 }
 
-function SchedulesSection({ schedules }: { schedules: BranchSchedule[] }) {
+function SchedulesSection({ schedules }: { schedules: BranchProfilePublic['schedules'] }) {
   if (schedules.length === 0) return null;
 
   const today = new Date().getDay();
@@ -138,7 +131,7 @@ function SchedulesSection({ schedules }: { schedules: BranchSchedule[] }) {
   );
 }
 
-function RatingSection({ rating }: { rating: RatingSummary | null }) {
+function RatingSection({ rating }: { rating: BranchProfilePublic['rating'] }) {
   if (rating == null || rating.count === 0) return null;
 
   return (
@@ -161,10 +154,6 @@ function RatingSection({ rating }: { rating: RatingSummary | null }) {
 
 export function BranchProfile({ branchId }: BranchProfileProps) {
   const [branch, setBranch] = useState<BranchProfilePublic | null>(null);
-  const [services, setServices] = useState<BranchService[]>([]);
-  const [schedules, setSchedules] = useState<BranchSchedule[]>([]);
-  const [rating, setRating] = useState<RatingSummary | null>(null);
-  const [availability, setAvailability] = useState<AvailabilitySummary | null>(null);
   const [state, setState] = useState<UiState>('loading');
   const [error, setError] = useState<string | null>(null);
 
@@ -172,22 +161,10 @@ export function BranchProfile({ branchId }: BranchProfileProps) {
     setState('loading');
     setError(null);
     try {
-      const [branchData, servicesData, schedulesData, ratingData, availabilityData] =
-        await Promise.all([
-          fetchBranchPublic(branchId),
-          fetchBranchServices(branchId).catch(() => [] as BranchService[]),
-          fetchBranchSchedules(branchId).catch(() => [] as BranchSchedule[]),
-          fetchBranchRatingSummary(branchId).catch(() => null as RatingSummary | null),
-          fetchBranchAvailability(branchId).catch(() => null as AvailabilitySummary | null),
-        ]);
-
+      const branchData = await fetchBranchPublic(branchId);
       setBranch(branchData);
-      setServices(servicesData);
-      setSchedules(schedulesData);
-      setRating(ratingData);
-      setAvailability(availabilityData);
 
-      if (!branchData && servicesData.length === 0) {
+      if (!branchData) {
         setState('empty');
       } else {
         setState('success');
@@ -253,16 +230,16 @@ export function BranchProfile({ branchId }: BranchProfileProps) {
             {branch.phone && (
               <p className="mt-1 text-sm text-slate-600">📞 {branch.phone ?? ''}</p>
             )}
-            {rating && (
-              <div className="mt-2 flex items-center gap-2" aria-label={`Calificación ${rating.average.toFixed(1)} de 5 estrellas`}>
-                <span className="text-lg text-teal">{renderStars(rating.average)}</span>
-                <span className="text-sm font-medium text-slate-700">{rating.average.toFixed(1)}</span>
-                <span className="text-xs text-slate-500">({rating.count})</span>
+            {branch.rating && (
+              <div className="mt-2 flex items-center gap-2" aria-label={`Calificación ${branch.rating.average.toFixed(1)} de 5 estrellas`}>
+                <span className="text-lg text-teal">{renderStars(branch.rating.average)}</span>
+                <span className="text-sm font-medium text-slate-700">{branch.rating.average.toFixed(1)}</span>
+                <span className="text-xs text-slate-500">({branch.rating.count})</span>
               </div>
             )}
-            {availability && (
+            {branch.availability && (
               <div className="mt-2">
-                <AvailabilityBadge availability={availability} />
+                <AvailabilityBadge availability={branch.availability} />
               </div>
             )}
           </div>
@@ -277,13 +254,13 @@ export function BranchProfile({ branchId }: BranchProfileProps) {
         )}
 
         {/* Services */}
-        <ServicesSection services={services} />
+        <ServicesSection services={branch.services} />
 
         {/* Schedules */}
-        <SchedulesSection schedules={schedules} />
+        <SchedulesSection schedules={branch.schedules} />
 
         {/* Rating */}
-        <RatingSection rating={rating} />
+        <RatingSection rating={branch.rating} />
 
         {/* CTA */}
         <div className="mt-6 flex flex-wrap gap-4 border-t border-sandy-300 pt-6">

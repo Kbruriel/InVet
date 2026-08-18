@@ -1,6 +1,8 @@
 /** Cliente API para endpoints publicos (FE-003) */
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+import { resolveApiBase } from './api-base';
+
+const API_BASE = resolveApiBase();
 
 export interface PaginatedResponse<T> {
   items: T[];
@@ -8,6 +10,74 @@ export interface PaginatedResponse<T> {
   page: number;
   limit: number;
   totalPages: number;
+}
+
+type BackendPaginatedResponse<T> = {
+  data?: T[];
+  items?: T[];
+  pagination?: {
+    page?: number;
+    size?: number;
+    limit?: number;
+    total?: number;
+    total_pages?: number;
+    totalPages?: number;
+  };
+  page?: number;
+  limit?: number;
+  total?: number;
+  totalPages?: number;
+};
+
+function normalizeClinicResponse<T>(payload: BackendPaginatedResponse<T>): PaginatedResponse<T> {
+  if (Array.isArray(payload.items)) {
+    const limit = payload.limit ?? payload.items.length;
+    const total = payload.total ?? payload.items.length;
+    return {
+      items: payload.items,
+      total,
+      page: payload.page ?? 1,
+      limit,
+      totalPages:
+        payload.totalPages ?? (limit > 0 ? Math.ceil(total / limit) : 0),
+    };
+  }
+
+  if (Array.isArray(payload.data)) {
+    const pagination = payload.pagination ?? {};
+    const limit = pagination.size ?? pagination.limit ?? payload.limit ?? payload.data.length;
+    const total = pagination.total ?? payload.total ?? payload.data.length;
+    return {
+      items: payload.data,
+      total,
+      page: pagination.page ?? payload.page ?? 1,
+      limit,
+      totalPages:
+        pagination.total_pages ??
+        pagination.totalPages ??
+        payload.totalPages ??
+        (limit > 0 ? Math.ceil(total / limit) : 0),
+    };
+  }
+
+  return {
+    items: [],
+    total: 0,
+    page: 1,
+    limit: 0,
+    totalPages: 0,
+  };
+}
+
+function normalizePublicClinic<T extends Partial<PublicClinic>>(clinic: T): PublicClinic {
+  return {
+    logoUrl: null,
+    rating: null,
+    description: null,
+    address: null,
+    city: null,
+    ...clinic,
+  } as PublicClinic;
 }
 
 // --- Clinics ---
@@ -26,11 +96,18 @@ export async function fetchPublicClinics(params?: {
   page?: number;
   limit?: number;
   search?: string;
+  category?: string;
+  serviceType?: string;
 }): Promise<PaginatedResponse<PublicClinic>> {
   const query = new URLSearchParams();
   if (params?.page) query.set('page', String(params.page));
-  if (params?.limit) query.set('limit', String(params.limit));
+  if (params?.limit) {
+    query.set('limit', String(params.limit));
+    query.set('size', String(params.limit));
+  }
   if (params?.search) query.set('search', params.search);
+  const serviceType = params?.serviceType || params?.category;
+  if (serviceType) query.set('service_type', serviceType);
 
   const response = await fetch(`${API_BASE}/clinicas?${query.toString()}`, {
     method: 'GET',
@@ -45,7 +122,12 @@ export async function fetchPublicClinics(params?: {
     throw { status: response.status, detail: (error as { detail?: string }).detail || 'Error al listar clinicas' };
   }
 
-  return response.json();
+  const payload = (await response.json()) as BackendPaginatedResponse<PublicClinic>;
+  const normalized = normalizeClinicResponse(payload);
+  return {
+    ...normalized,
+    items: normalized.items.map(normalizePublicClinic),
+  };
 }
 
 export async function fetchPublicClinicDetail(id: number): Promise<PublicClinic> {
@@ -62,7 +144,8 @@ export async function fetchPublicClinicDetail(id: number): Promise<PublicClinic>
     throw { status: response.status, detail: (error as { detail?: string }).detail || 'Error al obtener detalle de clinica' };
   }
 
-  return response.json();
+  const payload = (await response.json()) as Partial<PublicClinic>;
+  return normalizePublicClinic(payload);
 }
 
 // --- Branches ---
@@ -82,6 +165,8 @@ export async function fetchPublicBranches(params?: {
   const query = new URLSearchParams();
   if (params?.clinicaId) query.set('clinica_id', String(params.clinicaId));
   if (params?.search) query.set('search', params.search);
+  query.set('limit', '20');
+  query.set('size', '20');
 
   const response = await fetch(`${API_BASE}/sucursales?${query.toString()}`, {
     method: 'GET',
@@ -96,7 +181,9 @@ export async function fetchPublicBranches(params?: {
     throw { status: response.status, detail: (error as { detail?: string }).detail || 'Error al listar sucursales' };
   }
 
-  return response.json();
+  const payload = (await response.json()) as BackendPaginatedResponse<PublicBranch>;
+  const normalized = normalizeClinicResponse(payload);
+  return normalized;
 }
 
 // --- Services ---
@@ -116,6 +203,8 @@ export async function fetchPublicServices(params?: {
   const query = new URLSearchParams();
   if (params?.sucursalId) query.set('sucursal_id', String(params.sucursalId));
   if (params?.clinicaId) query.set('clinica_id', String(params.clinicaId));
+  query.set('limit', '20');
+  query.set('size', '20');
 
   const response = await fetch(`${API_BASE}/servicios?${query.toString()}`, {
     method: 'GET',
@@ -130,5 +219,7 @@ export async function fetchPublicServices(params?: {
     throw { status: response.status, detail: (error as { detail?: string }).detail || 'Error al listar servicios' };
   }
 
-  return response.json();
+  const payload = (await response.json()) as BackendPaginatedResponse<PublicService>;
+  const normalized = normalizeClinicResponse(payload);
+  return normalized;
 }

@@ -8,7 +8,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { listClinicAppointments, transitionStatus } from '../api';
-import type { Appointment } from '../types';
+import type { Appointment, AppointmentStatus } from '../types';
 import { StatusBadge } from './StatusBadge';
 import { LoadingSpinner } from '@/shared/ui/components/Loading';
 import { ErrorBanner } from '@/shared/ui/components/ErrorBanner';
@@ -27,7 +27,12 @@ const STATUS_FILTERS = [
   { value: 'confirmed', label: 'Activas' },
 ];
 
-const ACTIONS_PER_STATUS: Record<string, { action: string; label: string }[]> = {
+type StatusAction = {
+  action: AppointmentStatus;
+  label: string;
+};
+
+const ACTIONS_PER_STATUS: Partial<Record<AppointmentStatus, StatusAction[]>> = {
   pending: [
     { action: 'approved', label: 'Aprobar' },
     { action: 'cancelled', label: 'Cancelar' },
@@ -63,7 +68,10 @@ export function ClinicAgenda({ clinicId, veterinarianId, onAppointmentClick, onS
         if (dateRange.start) params.date_from = dateRange.start;
         if (dateRange.end) params.date_to = dateRange.end;
 
-        const data = await listClinicAppointments(clinicId, params);
+        const data = await listClinicAppointments({
+          ...params,
+          clinic_id: clinicId,
+        });
         if (!cancelled) setAppointments(data.items || []);
       } catch (err: unknown) {
         if (!cancelled) setError(err instanceof Error ? err.message : 'Error al cargar citas de clinica');
@@ -91,28 +99,23 @@ export function ClinicAgenda({ clinicId, veterinarianId, onAppointmentClick, onS
     });
   };
 
-  const handleStatusAction = async (appointmentId: number, action: string) => {
+  const handleStatusAction = async (
+    appointmentId: number,
+    action: AppointmentStatus,
+  ) => {
     if (!window.confirm(`¿Estás seguro de realizar esta acción?`)) return;
 
     try {
-      await transitionStatus(appointmentId, { new_status: action as any });
+      await transitionStatus(appointmentId, { status: action });
       onStatusChange(appointmentId, action);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Error al cambiar el estado');
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <LoadingSpinner size="large" />
-      </div>
-    );
-  }
-
   return (
     <div className="max-w-7xl mx-auto p-6">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Agenda de la clínica</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Agenda clinica</h1>
 
       {/* Filtros */}
       <div className="flex flex-wrap gap-4 mb-6">
@@ -155,15 +158,21 @@ export function ClinicAgenda({ clinicId, veterinarianId, onAppointmentClick, onS
       </div>
 
       {error && (
-        <ErrorBanner title="Error" message={error}>
-          <button onClick={() => window.location.reload()} className="text-indigo-600 hover:text-indigo-800 font-medium">
-            Reintentar
-          </button>
-        </ErrorBanner>
+        <ErrorBanner
+          message={error}
+          onRetry={() => window.location.reload()}
+          actionLabel="Reintentar"
+        />
+      )}
+
+      {loading && (
+        <div className="flex items-center justify-center py-12">
+          <LoadingSpinner />
+        </div>
       )}
 
       {/* Lista de citas */}
-      {filteredAppointments.length === 0 ? (
+      {!loading && filteredAppointments.length === 0 ? (
         <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
           <p className="text-gray-500">No hay citas para los filtros seleccionados.</p>
         </div>

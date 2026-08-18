@@ -12,7 +12,9 @@ class AppointmentRepository(ABC):
     """Interface para el repositorio de citas."""
 
     @abstractmethod
-    async def get_by_id(self, appointment_id: int, clinic_id: int) -> Appointment | None:
+    async def get_by_id(
+        self, appointment_id: int, clinic_id: int
+    ) -> Appointment | None:
         """Obtener una cita por ID y clinic_id con tenant isolation."""
         pass
 

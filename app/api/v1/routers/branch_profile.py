@@ -1,0 +1,1 @@
+from backend.app.api.v1.routers.branch_profile import router as router

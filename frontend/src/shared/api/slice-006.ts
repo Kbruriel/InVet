@@ -1,6 +1,8 @@
 /** Cliente API para slice 006 — Servicios, veterinarios y usuarios internos */
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+import { resolveApiBase } from './api-base';
+
+const API_BASE = resolveApiBase();
 
 /* ── Helpers ─────────────────────────────────────────────────────────────── */
 

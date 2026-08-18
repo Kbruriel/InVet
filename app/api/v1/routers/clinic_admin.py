@@ -1,0 +1,1 @@
+from backend.app.api.v1.routers.clinic_admin import router as router

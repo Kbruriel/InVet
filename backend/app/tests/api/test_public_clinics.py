@@ -59,9 +59,9 @@ async def async_app(mock_use_case):
     def mock_get_use_case():
         return mock_use_case
 
-    app.dependency_overrides[pub_clinics_mod.get_public_clinic_list_use_case] = (
-        mock_get_use_case
-    )
+    app.dependency_overrides[
+        pub_clinics_mod.get_public_clinic_list_use_case
+    ] = mock_get_use_case
 
     yield app
 
@@ -82,6 +82,25 @@ class TestListClinicas:
         assert data["data"][0]["name"] == "Clínica Test"
         assert data["pagination"]["page"] == 1
         assert data["pagination"]["total"] == 1
+
+    @pytest.mark.asyncio
+    async def test_list_clinicas_accepts_service_type_filter(
+        self, async_app, mock_use_case
+    ):
+        async with httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=async_app), base_url="http://test"
+        ) as client:
+            response = await client.get(
+                "/clinicas?page=1&size=20&service_type=estetica"
+            )
+
+        assert response.status_code == 200
+        mock_use_case.execute.assert_awaited_once_with(
+            page=1,
+            size=20,
+            search=None,
+            service_type="estetica",
+        )
 
     @pytest.mark.asyncio
     async def test_list_clinicas_validates_page_size(self):
@@ -128,9 +147,9 @@ class TestGetClinica:
         def mock_get_use_case():
             return mock_use_case
 
-        app.dependency_overrides[pub_clinics_mod.get_public_clinic_list_use_case] = (
-            mock_get_use_case
-        )
+        app.dependency_overrides[
+            pub_clinics_mod.get_public_clinic_list_use_case
+        ] = mock_get_use_case
 
         async with httpx.AsyncClient(
             transport=httpx.ASGITransport(app=app), base_url="http://test"

@@ -41,20 +41,30 @@ los artefactos que deben revisarse antes de validar un cambio.
    docker compose up -d db
    ```
 
-4. Ejecutar la suite relevante de backend dentro del contenedor cuando el
+4. Si hace falta recrear el runtime completo, usar el hook de cierre:
+
+   ```text
+   docker compose up -d --build --force-recreate db backend frontend
+   ```
+
+5. Ejecutar la suite relevante de backend dentro del contenedor cuando el
    slice dependa de PostgreSQL:
 
    ```text
    docker compose run --rm backend pytest app/tests/ -q
    ```
 
-5. Verificar que los contenedores Docker aplicables quedaron actualizados o
+6. Verificar que los contenedores Docker aplicables quedaron actualizados o
    recreados cuando el slice exige Docker como contexto.
 
-6. Ejecutar la validacion frontend o los checks necesarios segun el alcance
+7. Ejecutar la validacion frontend o los checks necesarios segun el alcance
    del slice.
 
-7. Registrar evidencia en:
+   - La UI de validacion corre sobre `http://localhost:3000`.
+   - La API corre sobre `http://localhost:8000/api/v1`.
+   - Para BE-008/FE-008, las rutas canónicas a revisar son `/clinicas`, `/portal/owner/appointments`, `/portal/owner/appointments/new` y `/clinic/appointments`.
+
+8. Registrar evidencia en:
    - `docs/opencode/qa/QA-00X-results.md`
    - `docs/opencode/qa/QA-00X-findings.md` cuando existan hallazgos abiertos
 

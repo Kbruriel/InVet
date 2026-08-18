@@ -59,7 +59,7 @@ test.describe("public branch profile - UIA-004", () => {
         ],
       });
 
-      await page.goto("/clinics/1");
+      await page.goto("/clinics/1", { waitUntil: "networkidle" });
 
       // Verificar que la pagina carga sin errores
       await expect(page).toHaveTitle(/InVet/);
@@ -69,7 +69,7 @@ test.describe("public branch profile - UIA-004", () => {
       await expect(profileSection).toBeVisible();
 
       // Verificar nombre de la sucursal como heading
-      const branchHeading = page.getByRole("heading", { name: /Sucursal|Clinic/i, level: 1 });
+      const branchHeading = page.locator('section[aria-label^="Perfil de"]').getByRole("heading", { level: 1 });
       await expect(branchHeading).toBeVisible();
 
       // Verificar ubicacion (city)
@@ -77,7 +77,7 @@ test.describe("public branch profile - UIA-004", () => {
       await expect(cityLocator).toBeVisible();
 
       // Verificar direccion
-      const addressLocator = page.getByText(/Dirección|Address/i);
+      const addressLocator = page.locator('section[aria-label^="Perfil de"]').locator('p').filter({ hasNotText: /📍|📞/ }).first();
       await expect(addressLocator).toBeVisible();
 
       // Verificar seccion de servicios
@@ -101,7 +101,7 @@ test.describe("public branch profile - UIA-004", () => {
       await expect(ratingSection).toBeVisible();
 
       // Verificar que el rating promedio es visible
-      const ratingAverage = page.getByText(/\d+\.\d/);
+      const ratingAverage = page.locator('section[aria-label^="Perfil de"]').locator('span.text-3xl').first();
       await expect(ratingAverage).toBeVisible();
 
       // Verificar badge de disponibilidad
@@ -155,7 +155,7 @@ test.describe("public branch profile - UIA-004", () => {
         ],
       });
 
-      await page.goto("/clinics/1");
+      await page.goto("/clinics/1", { waitUntil: "networkidle" });
 
       // Verificar seccion de servicios
       const servicesSection = page.getByRole("heading", { name: /Servicios/i });
@@ -213,7 +213,7 @@ test.describe("public branch profile - UIA-004", () => {
         ],
       });
 
-      await page.goto("/clinics/1");
+      await page.goto("/clinics/1", { waitUntil: "networkidle" });
 
       // Verificar seccion de horarios
       const schedulesSection = page.getByRole("heading", { name: /Horarios/i });
@@ -268,7 +268,7 @@ test.describe("public branch profile - UIA-004", () => {
         ],
       });
 
-      await page.goto("/clinics/1");
+      await page.goto("/clinics/1", { waitUntil: "networkidle" });
 
       // Verificar seccion de calificaciones
       const ratingSection = page.getByRole("heading", { name: /Calificaciones/i });
@@ -327,7 +327,7 @@ test.describe("public branch profile - UIA-004", () => {
         ],
       });
 
-      await page.goto("/clinics/1");
+      await page.goto("/clinics/1", { waitUntil: "networkidle" });
 
       // Verificar que hay un badge de disponibilidad o al menos una indicacion de estado
       const availabilityTexts = ["Disponible", "No disponible", "Sin cupos"];
@@ -342,15 +342,7 @@ test.describe("public branch profile - UIA-004", () => {
         }
       }
 
-      // Si no se encontro texto de disponibilidad, verificar que no hay error
-      const errorBanner = page.getByRole("alert").first();
-      if (await errorBanner.isVisible().catch(() => false)) {
-        // Si hay error, la sucursal puede no tener datos de disponibilidad
-        expect(foundAvailability).toBe(false);
-      } else {
-        // Si no hay error, al menos deberia haber alguna indicacion
-        expect(foundAvailability || true).toBe(true); // No bloquear si no hay badge
-      }
+      expect(foundAvailability).toBe(true);
     },
   );
 
@@ -385,7 +377,7 @@ test.describe("public branch profile - UIA-004", () => {
         ],
       });
 
-      await page.goto("/clinics/1");
+      await page.goto("/clinics/1", { waitUntil: "networkidle" });
 
       // Verificar CTA visible
       const ctaButton = page.getByRole("button", { name: /Solicitar cita/i });
@@ -487,7 +479,7 @@ test.describe("public branch profile - UIA-004", () => {
           "se intenta acceder al perfil protegido de una sucursal",
         ],
         when: [
-          "la persona navega a /clinics/1/branches/1 (ruta protegida)",
+          "la persona navega a /clinics/manage/branches/1 (ruta protegida)",
         ],
         then: [
           "la navegacion redirige a /login",
@@ -497,15 +489,18 @@ test.describe("public branch profile - UIA-004", () => {
 
       // Asegurarse de que no hay token de sesion
       await page.context().clearCookies();
-      await page.context().removeStorageEntry({ name: "*", url: env.frontendBaseUrl });
+      await page.goto(env.frontendBaseUrl);
+      await page.evaluate(() => {
+        window.localStorage.clear();
+        window.sessionStorage.clear();
+      });
 
       // Navegar a la ruta protegida
-      await page.goto("/clinics/1/branches/1");
+      await page.goto("/clinics/manage/branches/1");
 
-      // Verificar redireccion a login (el frontend redirige via window.location.href)
-      // El componente ProtectedBranchPage hace redirect directo en el cliente
-      const currentUrl = page.url();
-      expect(currentUrl).toContain("/login");
+      // Verificar redireccion a login
+      await page.waitForURL(/\/login$/, { timeout: 10000 });
+      expect(page.url()).toContain("/login");
     },
   );
 
@@ -553,7 +548,7 @@ test.describe("public branch profile - UIA-004", () => {
         });
       });
 
-      await page.goto("/clinics/1");
+      await page.goto("/clinics/1", { waitUntil: "networkidle" });
 
       // After the delay, verify we see either loading or error state
       const loaded = await page.getByRole("region", { name: /Perfil de/i }).isVisible().catch(() => false);
@@ -641,13 +636,13 @@ test.describe("public branch profile - UIA-004", () => {
         ],
       });
 
-      await page.goto("/clinics/1");
+      await page.goto("/clinicas/1", { waitUntil: "networkidle" });
 
       // Verificar que la pagina carga
       await expect(page).toHaveTitle(/InVet/);
 
       // Verificar heading de la clinica/sucursal
-      const clinicHeading = page.getByRole("heading", { level: 1 });
+      const clinicHeading = page.locator('section[aria-label^="Detalle de"]').getByRole("heading", { level: 1 });
       await expect(clinicHeading).toBeVisible();
 
       // Verificar ubicacion
@@ -695,7 +690,7 @@ test.describe("public branch profile - UIA-004", () => {
         ],
       });
 
-      await page.goto("/clinics/1");
+      await page.goto("/clinics/1", { waitUntil: "networkidle" });
 
       // Verificar enlaces de navegacion
       const backLinks = page.locator('a[href="/clinicas"]');

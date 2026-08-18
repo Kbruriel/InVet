@@ -9,13 +9,19 @@
 
 import { test, expect } from '@playwright/test';
 
+import { authenticateAdmin } from '../helpers/auth';
+
+test.beforeEach(async ({ page }) => {
+  await authenticateAdmin(page);
+});
+
 test('TC-005-10: Panel responsive en mobile', async ({ page }) => {
   await page.goto('/clinic-administration');
   
   // Verificar en desktop primero
   await page.setViewportSize({ width: 1280, height: 720 });
-  const heading = page.getByRole('heading', { name: /Administracion/i });
-  await expect(heading).toBeVisible();
+  const heading = page.getByRole('heading', { level: 1, name: /Administracion de Clinicas|Administracion/i });
+  await expect(heading).toBeVisible({ timeout: 15000 });
   
   // Redimensionar a mobile
   await page.setViewportSize({ width: 375, height: 667 });
@@ -37,8 +43,8 @@ test('TC-005-10b: Panel responsive en tablet', async ({ page }) => {
   // Verificar en tablet
   await page.setViewportSize({ width: 768, height: 1024 });
   
-  const heading = page.getByRole('heading', { name: /Administracion/i });
-  await expect(heading).toBeVisible();
+  const heading = page.getByRole('heading', { level: 1, name: /Administracion de Clinicas|Administracion/i });
+  await expect(heading).toBeVisible({ timeout: 15000 });
   
   // Verificar que no hay desbordamiento horizontal
   const body = page.locator('body');

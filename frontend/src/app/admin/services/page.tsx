@@ -1,16 +1,23 @@
 /** Pagina de listado de servicios (FE-006) */
 
-import { redirect } from 'next/navigation';
+'use client';
+
 import { AdminLayout } from '@/features/slice-006/components/admin-layout';
 import { ServiceList } from '@/features/slice-006/components/service-list';
+import { RequireAuth } from '@/shared/auth/RequireAuth';
 
-export default function ServicesPage() {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-  if (!token) redirect('/login');
-
+function ServicesPageContent() {
   return (
     <AdminLayout title="Servicios">
       <ServiceList />
     </AdminLayout>
+  );
+}
+
+export default function ServicesPage() {
+  return (
+    <RequireAuth>
+      <ServicesPageContent />
+    </RequireAuth>
   );
 }

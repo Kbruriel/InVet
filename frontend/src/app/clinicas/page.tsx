@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
-import { fetchPublicClinics, PublicClinic } from '@/shared/api/public';
+import { fetchPublicClinics, PublicClinic } from '@/shared/api/public-clinics';
 import { Card, Button } from '@/shared/ui/components';
 import { CategoryChipsWrapper } from '@/features/public-landing/components/CategoryChipsWrapper';
 
@@ -23,22 +23,23 @@ function ClinicsContent() {
   const [clinics, setClinics] = useState<PublicClinic[]>([]);
   const [state, setState] = useState<UiState>('loading');
   const [error, setError] = useState<string | null>(null);
-  const [page] = useState(Number(searchParams.get('page')) || 1);
   const [totalPages, setTotalPages] = useState(1);
   const [total, setTotal] = useState(0);
 
+  const page = Number(searchParams.get('page')) || 1;
   const searchQuery = searchParams.get('search') || '';
   const category = searchParams.get('category') || '';
 
-  const loadClinics = useCallback(async (pageNum: number, query?: string) => {
+  const loadClinics = useCallback(async (pageNum: number, query?: string, serviceType?: string) => {
     setState('loading');
     setError(null);
     try {
-      const params: { page: number; limit: number; search?: string } = {
+      const params: { page: number; limit: number; search?: string; category?: string } = {
         page: pageNum,
         limit: 12,
       };
       if (query) params.search = query;
+      if (serviceType) params.category = serviceType;
 
       const result = await fetchPublicClinics(params);
       setClinics(result.items);
@@ -53,7 +54,7 @@ function ClinicsContent() {
   }, []);
 
   useEffect(() => {
-    loadClinics(page, searchQuery || undefined);
+    loadClinics(page, searchQuery || undefined, category || undefined);
   }, [page, searchQuery, category, loadClinics]);
 
   const handlePageChange = (newPage: number) => {

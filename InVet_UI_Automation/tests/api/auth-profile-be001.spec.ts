@@ -1,3 +1,5 @@
+import { randomUUID } from "node:crypto";
+
 import { expect, test } from "@playwright/test";
 
 import { annotateTraceability } from "../helpers/traceability";
@@ -13,7 +15,7 @@ test.describe("BE-001 auth/profile - authenticated and unauthenticated access", 
       criteria: ["AC-001-03"],
     });
 
-    const email = `prof-${Date.now()}@example.com`;
+    const email = `prof-${randomUUID()}@example.com`;
     const registerResponse = await request.post("/api/v1/auth/register", {
       data: { email, password: "secret123", firstName: "Profile", lastName: "User" },
     });

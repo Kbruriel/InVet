@@ -3,6 +3,20 @@ import { annotateTraceability } from "../helpers/traceability";
 
 const API_BASE = process.env.API_BASE_URL || "http://127.0.0.1:8000";
 
+type PublicCatalogResponse = {
+  data: Array<Record<string, unknown>>;
+  pagination: {
+    page: number;
+    size: number;
+    total: number;
+    total_pages: number;
+  };
+  limit?: number;
+  detail?: unknown;
+  error?: unknown;
+  [key: string]: unknown;
+};
+
 function isPublicField(key: string): boolean {
   const sensitiveKeys = [
     "password",
@@ -38,10 +52,10 @@ test.describe("BE-003 public clinics - anonymous access", () => {
       expect(response.status()).toBe(200);
       expect(response.headers()["content-type"]).toContain("application/json");
 
-      const payload = (await response.json()) as Record<string, unknown>;
-      expect(Array.isArray(payload.items)).toBe(true);
-      expect(typeof payload.total).toBe("number");
-      expect(typeof payload.page).toBe("number");
+      const payload = (await response.json()) as PublicCatalogResponse;
+      expect(Array.isArray(payload.data)).toBe(true);
+      expect(typeof payload.pagination.total).toBe("number");
+      expect(typeof payload.pagination.page).toBe("number");
     },
   );
 
@@ -60,18 +74,18 @@ test.describe("BE-003 public clinics - anonymous access", () => {
       const response = await request.get("/api/v1/clinicas?search=test");
       expect(response.status()).toBe(200);
 
-      const payload = (await response.json()) as Record<string, unknown>;
-      expect(Array.isArray(payload.items)).toBe(true);
-      expect(typeof payload.total).toBe("number");
+      const payload = (await response.json()) as PublicCatalogResponse;
+      expect(Array.isArray(payload.data)).toBe(true);
+      expect(typeof payload.pagination.total).toBe("number");
 
       // Every returned item should contain the search term in a public field
-      for (const item of payload.items as Array<Record<string, unknown>>) {
+      for (const item of payload.data) {
         const combined = Object.values(item)
           .filter((v): v is string => typeof v === "string")
           .join(" ")
           .toLowerCase();
         // If search term is provided and items exist, at least one field should match
-        if (payload.total > 0) {
+        if (payload.pagination.total > 0) {
           expect(combined).toContain("test");
         }
       }
@@ -93,7 +107,7 @@ test.describe("BE-003 public clinics - anonymous access", () => {
       const response = await request.get("/api/v1/clinicas?invalid_param=x");
       expect(response.status()).toBe(422);
 
-      const payload = (await response.json()) as Record<string, unknown>;
+      const payload = (await response.json()) as PublicCatalogResponse;
       expect(Array.isArray(payload.detail)).toBe(true);
     },
   );
@@ -113,18 +127,18 @@ test.describe("BE-003 public clinics - anonymous access", () => {
       // First get a valid clinic id from the list endpoint
       const listResponse = await request.get("/api/v1/clinicas?page=1&limit=1");
       expect(listResponse.status()).toBe(200);
-      const listPayload = (await listResponse.json()) as Record<string, unknown>;
+      const listPayload = (await listResponse.json()) as PublicCatalogResponse;
 
-      if ((listPayload.items as Array<Record<string, unknown>>).length === 0) {
+      if (listPayload.data.length === 0) {
         test.skip();
       }
 
-      const clinicId = (listPayload.items as Array<Record<string, unknown>>)[0].id;
+      const clinicId = listPayload.data[0].id;
       const detailResponse = await request.get(`/api/v1/clinicas/${clinicId}`);
       expect(detailResponse.status()).toBe(200);
       expect(detailResponse.headers()["content-type"]).toContain("application/json");
 
-      const payload = (await detailResponse.json()) as Record<string, unknown>;
+      const payload = (await detailResponse.json()) as PublicCatalogResponse;
 
       // PublicClinicDTO should have public fields
       expect(typeof payload.id).toBe("number");
@@ -155,7 +169,7 @@ test.describe("BE-003 public clinics - anonymous access", () => {
       const response = await request.get("/api/v1/clinicas/999999");
       expect(response.status()).toBe(404);
 
-      const payload = (await response.json()) as Record<string, unknown>;
+      const payload = (await response.json()) as PublicCatalogResponse;
       expect(payload.detail || payload.error).toBeTruthy();
     },
   );
@@ -176,10 +190,10 @@ test.describe("BE-003 public clinics - anonymous access", () => {
       expect(response.status()).toBe(200);
       expect(response.headers()["content-type"]).toContain("application/json");
 
-      const payload = (await response.json()) as Record<string, unknown>;
-      expect(Array.isArray(payload.items)).toBe(true);
-      expect(typeof payload.total).toBe("number");
-      expect(typeof payload.page).toBe("number");
+      const payload = (await response.json()) as PublicCatalogResponse;
+      expect(Array.isArray(payload.data)).toBe(true);
+      expect(typeof payload.pagination.total).toBe("number");
+      expect(typeof payload.pagination.page).toBe("number");
     },
   );
 
@@ -198,22 +212,22 @@ test.describe("BE-003 public clinics - anonymous access", () => {
       // Get a valid clinic_id from the clinics list
       const clinicsResponse = await request.get("/api/v1/clinicas?page=1&limit=1");
       expect(clinicsResponse.status()).toBe(200);
-      const clinicsPayload = (await clinicsResponse.json()) as Record<string, unknown>;
+      const clinicsPayload = (await clinicsResponse.json()) as PublicCatalogResponse;
 
-      if ((clinicsPayload.items as Array<Record<string, unknown>>).length === 0) {
+      if (clinicsPayload.data.length === 0) {
         test.skip();
       }
 
-      const clinicId = (clinicsPayload.items as Array<Record<string, unknown>>)[0].id;
+      const clinicId = clinicsPayload.data[0].id;
       const response = await request.get(`/api/v1/sucursales?clinica_id=${clinicId}`);
       expect(response.status()).toBe(200);
 
-      const payload = (await response.json()) as Record<string, unknown>;
-      expect(Array.isArray(payload.items)).toBe(true);
-      expect(typeof payload.total).toBe("number");
+      const payload = (await response.json()) as PublicCatalogResponse;
+      expect(Array.isArray(payload.data)).toBe(true);
+      expect(typeof payload.pagination.total).toBe("number");
 
       // All returned branches should belong to the requested clinic
-      for (const item of payload.items as Array<Record<string, unknown>>) {
+      for (const item of payload.data) {
         expect(item.clinica_id || item.clinic_id).toBe(clinicId);
       }
     },
@@ -235,10 +249,10 @@ test.describe("BE-003 public clinics - anonymous access", () => {
       expect(response.status()).toBe(200);
       expect(response.headers()["content-type"]).toContain("application/json");
 
-      const payload = (await response.json()) as Record<string, unknown>;
-      expect(Array.isArray(payload.items)).toBe(true);
-      expect(typeof payload.total).toBe("number");
-      expect(typeof payload.page).toBe("number");
+      const payload = (await response.json()) as PublicCatalogResponse;
+      expect(Array.isArray(payload.data)).toBe(true);
+      expect(typeof payload.pagination.total).toBe("number");
+      expect(typeof payload.pagination.page).toBe("number");
     },
   );
 
@@ -257,30 +271,30 @@ test.describe("BE-003 public clinics - anonymous access", () => {
       // Get valid IDs from previous endpoints
       const clinicsResponse = await request.get("/api/v1/clinicas?page=1&limit=1");
       expect(clinicsResponse.status()).toBe(200);
-      const clinicsPayload = (await clinicsResponse.json()) as Record<string, unknown>;
+      const clinicsPayload = (await clinicsResponse.json()) as PublicCatalogResponse;
 
-      if ((clinicsPayload.items as Array<Record<string, unknown>>).length === 0) {
+      if (clinicsPayload.data.length === 0) {
         test.skip();
       }
 
-      const clinicId = (clinicsPayload.items as Array<Record<string, unknown>>)[0].id;
+      const clinicId = clinicsPayload.data[0].id;
 
       const branchesResponse = await request.get(`/api/v1/sucursales?clinica_id=${clinicId}&page=1&limit=1`);
       expect(branchesResponse.status()).toBe(200);
-      const branchesPayload = (await branchesResponse.json()) as Record<string, unknown>;
+      const branchesPayload = (await branchesResponse.json()) as PublicCatalogResponse;
 
-      if ((branchesPayload.items as Array<Record<string, unknown>>).length === 0) {
+      if (branchesPayload.data.length === 0) {
         test.skip();
       }
 
-      const branchId = (branchesPayload.items as Array<Record<string, unknown>>)[0].id;
+      const branchId = branchesPayload.data[0].id;
 
       const response = await request.get(`/api/v1/servicios?sucursal_id=${branchId}&clinica_id=${clinicId}`);
       expect(response.status()).toBe(200);
 
-      const payload = (await response.json()) as Record<string, unknown>;
-      expect(Array.isArray(payload.items)).toBe(true);
-      expect(typeof payload.total).toBe("number");
+      const payload = (await response.json()) as PublicCatalogResponse;
+      expect(Array.isArray(payload.data)).toBe(true);
+      expect(typeof payload.pagination.total).toBe("number");
     },
   );
 
@@ -299,9 +313,9 @@ test.describe("BE-003 public clinics - anonymous access", () => {
       // Test clinics endpoint for sensitive field leaks
       const clinicsResponse = await request.get("/api/v1/clinicas?page=1&limit=5");
       expect(clinicsResponse.status()).toBe(200);
-      const clinicsPayload = (await clinicsResponse.json()) as Record<string, unknown>;
+      const clinicsPayload = (await clinicsResponse.json()) as PublicCatalogResponse;
 
-      for (const item of clinicsPayload.items as Array<Record<string, unknown>>) {
+      for (const item of clinicsPayload.data) {
         const keys = Object.keys(item);
         for (const key of keys) {
           expect(isPublicField(key)).toBeTruthy();
@@ -311,9 +325,9 @@ test.describe("BE-003 public clinics - anonymous access", () => {
       // Test sucursales endpoint for sensitive field leaks
       const branchesResponse = await request.get("/api/v1/sucursales?page=1&limit=5");
       expect(branchesResponse.status()).toBe(200);
-      const branchesPayload = (await branchesResponse.json()) as Record<string, unknown>;
+      const branchesPayload = (await branchesResponse.json()) as PublicCatalogResponse;
 
-      for (const item of branchesPayload.items as Array<Record<string, unknown>>) {
+      for (const item of branchesPayload.data) {
         const keys = Object.keys(item);
         for (const key of keys) {
           expect(isPublicField(key)).toBeTruthy();
@@ -323,9 +337,9 @@ test.describe("BE-003 public clinics - anonymous access", () => {
       // Test servicios endpoint for sensitive field leaks
       const servicesResponse = await request.get("/api/v1/servicios?page=1&limit=5");
       expect(servicesResponse.status()).toBe(200);
-      const servicesPayload = (await servicesResponse.json()) as Record<string, unknown>;
+      const servicesPayload = (await servicesResponse.json()) as PublicCatalogResponse;
 
-      for (const item of servicesPayload.items as Array<Record<string, unknown>>) {
+      for (const item of servicesPayload.data) {
         const keys = Object.keys(item);
         for (const key of keys) {
           expect(isPublicField(key)).toBeTruthy();
@@ -359,10 +373,13 @@ test.describe("BE-003 public clinics - anonymous access", () => {
         const status = response.status();
 
         if (status === 422 || status === 404) {
-          const payload = (await response.json()) as Record<string, unknown>;
+          const payload = (await response.json()) as PublicCatalogResponse;
           // FastAPI returns 'detail' for validation errors
-          expect(payload.detail || payload.error).toBeTruthy();
-          expect(typeof payload.detail || typeof payload.error).toBe("string");
+          const errorValue = payload.detail ?? payload.error;
+          expect(errorValue).toBeTruthy();
+          expect(
+            Array.isArray(errorValue) || typeof errorValue === "string",
+          ).toBe(true);
         }
       }
 
@@ -376,10 +393,10 @@ test.describe("BE-003 public clinics - anonymous access", () => {
       for (const endpoint of checkEndpoints) {
         const response = await request.get(endpoint);
         expect(response.status()).toBe(200);
-        const payload = (await response.json()) as Record<string, unknown>;
+        const payload = (await response.json()) as PublicCatalogResponse;
 
-        if (Array.isArray(payload.items)) {
-          for (const item of payload.items as Array<Record<string, unknown>>) {
+        if (Array.isArray(payload.data)) {
+          for (const item of payload.data) {
             const keys = Object.keys(item);
             for (const key of keys) {
               expect(isPublicField(key)).toBeTruthy();

@@ -1,16 +1,23 @@
 /** Pagina de listado de veterinarios (FE-006) */
 
-import { redirect } from 'next/navigation';
+'use client';
+
 import { AdminLayout } from '@/features/slice-006/components/admin-layout';
 import { VeterinarianList } from '@/features/slice-006/components/veterinarian-list';
+import { RequireAuth } from '@/shared/auth/RequireAuth';
 
-export default function VeterinariansPage() {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('access_token') : null;
-  if (!token) redirect('/login');
-
+function VeterinariansPageContent() {
   return (
     <AdminLayout title="Veterinarios">
       <VeterinarianList />
     </AdminLayout>
+  );
+}
+
+export default function VeterinariansPage() {
+  return (
+    <RequireAuth>
+      <VeterinariansPageContent />
+    </RequireAuth>
   );
 }

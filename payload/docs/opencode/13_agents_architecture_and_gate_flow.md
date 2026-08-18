@@ -521,6 +521,24 @@ Schema v3 hace explicito cuando una validacion debe correr en host local, en con
 QA no debe considerar equivalente una corrida local si el plan o el criterio exige PostgreSQL o runtime en contenedor.
 Los hooks de cierre de implementacion, QA y checks deben revisar antes `git status` y solo recrear contenedores cuando existan cambios relevantes para runtime o dependencias.
 
+### Rutas canónicas del runtime
+
+| Caso | Ruta canónica |
+|---|---|
+| Frontend base | `http://localhost:3000` |
+| Backend base | `http://localhost:8000` |
+| API base | `/api/v1` |
+| UI pública de clínicas | `http://localhost:3000/clinicas` |
+| UI de citas del propietario | `http://localhost:3000/portal/owner/appointments` |
+| UI de alta de cita | `http://localhost:3000/portal/owner/appointments/new` |
+| UI de agenda clínica | `http://localhost:3000/clinic/appointments` |
+| API pública de clínicas | `http://localhost:8000/api/v1/clinicas` |
+| API de citas | `http://localhost:8000/api/v1/appointments` |
+| Router BE-008 | `backend/app/api/v1/routers/appointment_router.py` |
+| Schemas BE-008 | `backend/app/api/v1/schemas/appointment_schemas.py` |
+
+Las suites UI y de regresion deben correr sobre `http://localhost:3000`; las suites API deben apuntar al backend en `http://localhost:8000` con rutas bajo `/api/v1`. Si un reporte menciona la UI de clínicas o la agenda de citas, el archivo de referencia debe dejar claro qué ruta de frontend se usó y qué endpoint de backend la alimenta.
+
 ## Autorecuperacion QA
 
 Antes de declarar `BLOCKED`, QA debe intentar:

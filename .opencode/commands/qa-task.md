@@ -13,6 +13,8 @@ Instrucciones:
    - Si falla, no intentes validar criterios ambiguos; documenta `BLOCKED` por contrato de plan, marca cualquier `docs/opencode/qa/QA-00X-results.md` previo como baseline stale y crea o actualiza `docs/opencode/qa/QA-00X-findings.md` con evidencia concreta del preflight.
    - Si el archivo roto es `docs/opencode/plans/BE-00X-plan.md`, solicita `/plan-task BE-00X` como correccion canonica del slice.
    - Si faltan dependencias o el entorno no levanta, intenta recuperarlo antes de bloquearte: instala dependencias y usa Docker cuando el slice dependa de PostgreSQL o del runtime del repo.
+   - La UI de validacion corre sobre `http://localhost:3000`.
+   - La API del slice corre sobre `http://localhost:8000/api/v1`.
 3. Lee:
    - `docs/opencode/plans/BE-00X-plan.md`
    - `docs/opencode/tasks/qa/QA-00X.md`

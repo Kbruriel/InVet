@@ -23,7 +23,7 @@ from app.infrastructure.database.repositories.clinic_repository_impl import (
     ClinicRepositoryImpl,
 )
 
-router = APIRouter(prefix="/api/v1/clinics", tags=["clinic-admin"])
+router = APIRouter(prefix="/clinics", tags=["clinic-admin"])
 
 
 def get_clinic_repo(db: Session = Depends(get_db)) -> ClinicRepositoryImpl:

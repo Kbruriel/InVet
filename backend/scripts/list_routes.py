@@ -5,7 +5,7 @@ import sys
 # Ensure current working directory is on sys.path (run_in_terminal doesn't add it)
 sys.path.insert(0, os.getcwd())
 
-from app.api.main import app
+from app.api.main import app  # noqa: E402
 
 routes = []
 for r in app.router.routes:

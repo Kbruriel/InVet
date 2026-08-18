@@ -34,6 +34,31 @@ describe('API Public Client', () => {
       );
     });
 
+    it('deberia aceptar respuesta del backend con data y pagination', async () => {
+      mockFetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          data: [{ id: 1, name: 'Clinica A', city: 'CDMX' }],
+          pagination: { page: 2, size: 12, total: 24, total_pages: 2 },
+        }),
+      });
+
+      const result = await fetchPublicClinics({ page: 2, limit: 12, category: 'estetica' });
+
+      expect(result.items.length).toBe(1);
+      expect(result.page).toBe(2);
+      expect(result.limit).toBe(12);
+      expect(result.totalPages).toBe(2);
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('service_type=estetica'),
+        expect.anything()
+      );
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('size=12'),
+        expect.anything()
+      );
+    });
+
     it('deberia incluir search en los query params', async () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,

@@ -2,7 +2,6 @@
 
 from datetime import datetime
 from enum import Enum as PyEnum
-from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -36,7 +35,9 @@ class AppointmentCreateSchema(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True)
 
     pet_id: int = Field(..., gt=0, description="ID de la mascota")
-    veterinarian_id: int | None = Field(None, description="ID del veterinario (opcional)")
+    veterinarian_id: int | None = Field(
+        None, description="ID del veterinario (opcional)"
+    )
     clinic_id: int = Field(..., gt=0, description="ID de la clínica")
     branch_id: int = Field(..., gt=0, description="ID de la sucursal")
     appointment_type: AppointmentTypeEnum = Field(
@@ -49,6 +50,14 @@ class AppointmentCreateSchema(BaseModel):
         default=30, ge=15, le=480, description="Duración en minutos (mín 15, máx 480)"
     )
     reason: str | None = Field(None, max_length=2000, description="Motivo de la cita")
+
+    @field_validator("appointment_type", mode="before")
+    @classmethod
+    def normalize_appointment_type(cls, v: object) -> object:
+        """Aceptar tipos de cita en cualquier capitalización."""
+        if isinstance(v, str):
+            return v.strip().lower()
+        return v
 
     @field_validator("scheduled_start")
     @classmethod
@@ -66,7 +75,9 @@ class AppointmentUpdateSchema(BaseModel):
 
     veterinarian_id: int | None = Field(None, description="ID del veterinario")
     scheduled_start: datetime | None = Field(None, description="Nueva fecha programada")
-    duration_minutes: int | None = Field(None, ge=15, le=480, description="Nueva duración")
+    duration_minutes: int | None = Field(
+        None, ge=15, le=480, description="Nueva duración"
+    )
     reason: str | None = Field(None, max_length=2000, description="Motivo de la cita")
     notes: str | None = Field(None, max_length=2000, description="Notas internas")
 
@@ -77,13 +88,23 @@ class StatusTransitionSchema(BaseModel):
     model_config = ConfigDict(str_strip_whitespace=True)
 
     status: AppointmentStatusEnum = Field(..., description="Nuevo estado")
-    notes: str | None = Field(None, max_length=2000, description="Notas de la transición")
+    notes: str | None = Field(
+        None, max_length=2000, description="Notas de la transición"
+    )
     scheduled_start: datetime | None = Field(
         None, description="Nueva fecha (solo para reprogramación)"
     )
     duration_minutes: int | None = Field(
         None, ge=15, le=480, description="Nueva duración (solo para reprogramación)"
     )
+
+    @field_validator("status", mode="before")
+    @classmethod
+    def normalize_status(cls, v: object) -> object:
+        """Aceptar estados en cualquier capitalización."""
+        if isinstance(v, str):
+            return v.strip().lower()
+        return v
 
 
 class AppointmentReadSchema(BaseModel):

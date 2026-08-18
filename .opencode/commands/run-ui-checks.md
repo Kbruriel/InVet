@@ -8,6 +8,8 @@ Ejecuta los checks de UI automation del slice indicado por `$ARGUMENTS`.
 Instrucciones:
 1. Acepta `FE-00X` y deriva el mismo indice vertical.
 2. Verifica que exista `docs/opencode/tasks/ui-automation/UIA-00X.md`.
+   - La UI de validacion debe correr sobre `http://localhost:3000`.
+   - Para el slice 008, las rutas de referencia son `/clinicas`, `/portal/owner/appointments`, `/portal/owner/appointments/new` y `/clinic/appointments`.
 3. Ejecuta desde `InVet_UI_Automation`:
    - `npm run test:e2e`
    - `npm run test:regression`

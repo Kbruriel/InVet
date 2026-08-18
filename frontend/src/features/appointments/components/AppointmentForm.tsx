@@ -11,8 +11,6 @@ import { createAppointment } from '../api';
 import type { AppointmentType } from '../types';
 import { Button } from '@/shared/ui/components/Button';
 import { Input } from '@/shared/ui/components/Input';
-import { LoadingSpinner } from '@/shared/ui/components/Loading';
-import { ErrorBanner } from '@/shared/ui/components/ErrorBanner';
 
 interface Pet {
   id: number;
@@ -21,10 +19,10 @@ interface Pet {
 }
 
 interface AppointmentFormProps {
-  ownerId: number;
-  pets: Pet[];
+  ownerId?: number;
+  pets?: Pet[];
   onSuccess: (appointmentId: number) => void;
-  onError: (message: string) => void;
+  onError?: (message: string) => void;
 }
 
 const APPOINTMENT_TYPES: { value: AppointmentType; label: string }[] = [
@@ -37,6 +35,10 @@ const APPOINTMENT_TYPES: { value: AppointmentType; label: string }[] = [
 ];
 
 export function AppointmentForm({ ownerId, pets, onSuccess, onError }: AppointmentFormProps) {
+  const availablePets = pets ?? [];
+  const resolvedOwnerId = ownerId ?? 1;
+  const handleError = onError ?? (() => {});
+
   const [formData, setFormData] = useState({
     pet_id: '' as string | number,
     veterinarian_id: '' as string | number | null,
@@ -47,7 +49,6 @@ export function AppointmentForm({ ownerId, pets, onSuccess, onError }: Appointme
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (field: string, value: string | number | null) => {
@@ -93,13 +94,12 @@ export function AppointmentForm({ ownerId, pets, onSuccess, onError }: Appointme
     if (!validate()) return;
 
     setSubmitting(true);
-    setLoading(true);
 
     try {
       const data = await createAppointment({
-        owner_id: ownerId,
-        pet_id: formData.pet_id ? Number(formData.pet_id) : null,
-        veterinarian_id: formData.veterinarian_id ? Number(formData.veterinarian_id) : null,
+        owner_id: resolvedOwnerId,
+        pet_id: formData.pet_id ? Number(formData.pet_id) : undefined,
+        veterinarian_id: formData.veterinarian_id ? Number(formData.veterinarian_id) : undefined,
         appointment_type: formData.appointment_type,
         scheduled_start: formData.scheduled_start,
         scheduled_end: formData.scheduled_end,
@@ -109,35 +109,14 @@ export function AppointmentForm({ ownerId, pets, onSuccess, onError }: Appointme
       onSuccess(data.id);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Error al crear la cita';
-      onError(message);
+      handleError(message);
     } finally {
       setSubmitting(false);
-      setLoading(false);
     }
   };
 
-  if (loading && pets.length === 0) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <LoadingSpinner size="large" />
-      </div>
-    );
-  }
-
-  if (pets.length === 0 && !loading) {
-    return (
-      <div className="max-w-2xl mx-auto p-6">
-        <ErrorBanner title="Sin mascotas registradas" message="Primero debes registrar una mascota en tu perfil para poder solicitar una cita.">
-          <a href="/portal/owner/pets/new" className="text-indigo-600 hover:text-indigo-800 font-medium">
-            Registrar mascota
-          </a>
-        </ErrorBanner>
-      </div>
-    );
-  }
-
   return (
-    <div className="max-w-2xl mx-auto p-6">
+    <div className="w-full">
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Solicitar nueva cita</h1>
 
       <form onSubmit={handleSubmit} className="space-y-6" noValidate>
@@ -152,16 +131,28 @@ export function AppointmentForm({ ownerId, pets, onSuccess, onError }: Appointme
             onChange={(e) => handleChange('pet_id', e.target.value)}
             className={`w-full px-3 py-2 border rounded-lg ${errors.pet_id ? 'border-red-500' : 'border-gray-300'} focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500`}
             disabled={submitting}
+            required
             aria-invalid={!!errors.pet_id}
             aria-describedby={errors.pet_id ? 'pet_id-error' : undefined}
           >
             <option value="">Selecciona una mascota</option>
-            {pets.map((pet) => (
+            {availablePets.length > 0 ? (
+              availablePets.map((pet) => (
               <option key={pet.id} value={pet.id}>
                 {pet.name} ({pet.species})
               </option>
-            ))}
+              ))
+            ) : (
+              <option value="" disabled>
+                No hay mascotas registradas
+              </option>
+            )}
           </select>
+          {availablePets.length === 0 && (
+            <p className="mt-1 text-sm text-amber-700">
+              No se encontraron mascotas cargadas para esta sesión.
+            </p>
+          )}
           {errors.pet_id && (
             <p id="pet_id-error" className="mt-1 text-sm text-red-600" role="alert">
               {errors.pet_id}
@@ -180,6 +171,7 @@ export function AppointmentForm({ ownerId, pets, onSuccess, onError }: Appointme
             onChange={(e) => handleChange('appointment_type', e.target.value as AppointmentType)}
             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
             disabled={submitting}
+            required
           >
             {APPOINTMENT_TYPES.map((type) => (
               <option key={type.value} value={type.value}>
@@ -199,7 +191,7 @@ export function AppointmentForm({ ownerId, pets, onSuccess, onError }: Appointme
             type="number"
             placeholder="ID del veterinario"
             value={formData.veterinarian_id || ''}
-            onChange={(value) => handleChange('veterinarian_id', value || null)}
+            onChange={(e) => handleChange('veterinarian_id', e.target.value || null)}
             disabled={submitting}
           />
         </div>
@@ -214,9 +206,10 @@ export function AppointmentForm({ ownerId, pets, onSuccess, onError }: Appointme
               id="scheduled_start"
               type="datetime-local"
               value={formData.scheduled_start}
-              onChange={(value) => handleChange('scheduled_start', value)}
+              onChange={(e) => handleChange('scheduled_start', e.target.value)}
               disabled={submitting}
               min={new Date().toISOString().slice(0, 16)}
+              required
               aria-invalid={!!errors.scheduled_start}
             />
             {errors.scheduled_start && (
@@ -225,15 +218,16 @@ export function AppointmentForm({ ownerId, pets, onSuccess, onError }: Appointme
           </div>
           <div>
             <label htmlFor="scheduled_end" className="block text-sm font-medium text-gray-700 mb-1">
-              Fecha y hora de fin *
+              Fin de cita *
             </label>
             <Input
               id="scheduled_end"
               type="datetime-local"
               value={formData.scheduled_end}
-              onChange={(value) => handleChange('scheduled_end', value)}
+              onChange={(e) => handleChange('scheduled_end', e.target.value)}
               disabled={submitting}
               min={new Date().toISOString().slice(0, 16)}
+              required
               aria-invalid={!!errors.scheduled_end}
             />
             {errors.scheduled_end && (
@@ -264,7 +258,7 @@ export function AppointmentForm({ ownerId, pets, onSuccess, onError }: Appointme
           type="submit"
           variant="primary"
           isLoading={submitting}
-          isDisabled={submitting}
+          disabled={submitting}
           className="w-full"
         >
           {submitting ? 'Enviando...' : 'Solicitar cita'}

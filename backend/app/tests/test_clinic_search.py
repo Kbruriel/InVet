@@ -8,7 +8,9 @@ import pytest
 from app.api.v1.schemas.clinic_search import ClinicSearchResponse
 from app.application.use_cases.clinic_search import SearchClinicsUseCase
 from app.domain.entities.clinic import Clinic
-from app.infrastructure.database.models.clinic import Clinic as ClinicModel
+from app.infrastructure.database.models import Branch as BranchModel
+from app.infrastructure.database.models import Clinic as ClinicModel
+from app.infrastructure.database.models import Service as ServiceModel
 from app.infrastructure.database.repositories.clinic_repository_impl import (
     ClinicRepositoryImpl,
 )
@@ -89,6 +91,25 @@ class TestSearchClinicsUseCase:
             location=None, service_type=None, page=1, size=5
         )
 
+    @pytest.mark.asyncio
+    async def test_execute_with_service_type_filter(
+        self, search_use_case, mock_clinic_repo
+    ):
+        """Test búsqueda con filtro por tipo de servicio."""
+        # Act
+        result = await search_use_case.execute(
+            location="Ciudad A",
+            service_type="estetica",
+            page=1,
+            size=10,
+        )
+
+        # Assert
+        assert isinstance(result, ClinicSearchResponse)
+        mock_clinic_repo.search_clinics.assert_called_once_with(
+            location="Ciudad A", service_type="estetica", page=1, size=10
+        )
+
 
 class TestClinicRepositoryImpl:
     """Tests del repositorio de clínicas."""
@@ -116,3 +137,88 @@ class TestClinicRepositoryImpl:
         assert result.name == "Clínica Legacy"
         assert result.created_at is not None
         assert result.updated_at is not None
+
+    @pytest.mark.asyncio
+    async def test_search_clinics_filters_by_service_type(self, db_session):
+        """Filtra clínicas por servicios asociados con coincidencia tolerante a acentos."""
+        clinic_match = ClinicModel(
+            name="Clínica Estética",
+            address="Calle Uno 123",
+            city="Ciudad A",
+            state="Estado A",
+            country="País A",
+            postal_code="12345",
+            phone=None,
+            email=None,
+            is_active=True,
+        )
+        clinic_other = ClinicModel(
+            name="Clínica General",
+            address="Calle Dos 456",
+            city="Ciudad B",
+            state="Estado B",
+            country="País B",
+            postal_code="67890",
+            phone=None,
+            email=None,
+            is_active=True,
+        )
+        db_session.add_all([clinic_match, clinic_other])
+        db_session.flush()
+        branch_match = BranchModel(
+            clinic_id=clinic_match.id,
+            name="Sucursal Estética",
+            description="Sucursal para estética",
+            address="Calle Uno 123",
+            city="Ciudad A",
+            state="Estado A",
+            country="País A",
+            postal_code="12345",
+        )
+        branch_other = BranchModel(
+            clinic_id=clinic_other.id,
+            name="Sucursal General",
+            description="Sucursal general",
+            address="Calle Dos 456",
+            city="Ciudad B",
+            state="Estado B",
+            country="País B",
+            postal_code="67890",
+        )
+        db_session.add_all([branch_match, branch_other])
+        db_session.flush()
+        db_session.add_all(
+            [
+                ServiceModel(
+                    branch_id=branch_match.id,
+                    clinic_id=clinic_match.id,
+                    name="Estética canina",
+                    description="Baño y corte",
+                    price=5000,
+                    duration_minutes=45,
+                    is_active=True,
+                ),
+                ServiceModel(
+                    branch_id=branch_other.id,
+                    clinic_id=clinic_other.id,
+                    name="Consulta general",
+                    description="Medicina preventiva",
+                    price=4000,
+                    duration_minutes=30,
+                    is_active=True,
+                ),
+            ]
+        )
+        db_session.commit()
+
+        repository = ClinicRepositoryImpl(db_session)
+
+        matched_clinics = await repository.search_clinics(
+            service_type="estetica",
+            page=1,
+            size=10,
+        )
+        matched_count = await repository.get_clinic_count(service_type="estetica")
+
+        assert [clinic.id for clinic in matched_clinics] == [clinic_match.id]
+        assert matched_count == 1

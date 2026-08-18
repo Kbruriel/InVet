@@ -9,6 +9,8 @@ Instrucciones:
 0. Ejecuta de forma autonoma. Pregunta al usuario solo si falta informacion bloqueante, hay una decision critica de alcance/seguridad o se requiere una accion destructiva/migracion irreversible.
 1. Normaliza el argumento a `BE-00X`.
 2. Identifica el plan generado por `/plan-task`: `docs/opencode/plans/BE-00X-plan.md`.
+   - Para BE-008, el router canónico vive en `backend/app/api/v1/routers/appointment_router.py` y los schemas en `backend/app/api/v1/schemas/appointment_schemas.py`.
+   - La API base del repo es `http://localhost:8000/api/v1` y la UI de referencia corre en `http://localhost:3000`.
 3. Ejecuta `python backend/scripts/validate_slice_plan.py BE-00X --stage backend` antes de editar codigo.
    - Si falla, deten la implementacion y reporta cada gap.
    - Si el plan es legacy o incompleto, indica `/plan-task BE-00X`.

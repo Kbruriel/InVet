@@ -15,6 +15,8 @@ Estrategia:
    - Prioriza un entorno local ya preparado, como `backend/.venv` o `.venv`, si existe.
 2. Ejecuta de forma autonoma los checks configurados. Los scripts frontend existentes, `git status`/`git diff` y el hook Docker Compose de cierre estan autorizados por el contrato del agente; pregunta al usuario solo si falta informacion bloqueante, hay una decision critica o se pide una accion destructiva.
 3. Detectar estructura del repo y herramientas configuradas antes de ejecutar.
+   - La UI de regresion corre sobre `http://localhost:3000`.
+   - La API corre sobre `http://localhost:8000/api/v1`.
 4. Backend:
    - Entrar a `backend/` si existe.
    - Ejecutar `python -W ignore::PendingDeprecationWarning -m pytest app/tests -q`.

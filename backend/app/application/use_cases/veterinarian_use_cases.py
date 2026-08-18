@@ -188,7 +188,7 @@ class AssignServiceToVeterinarianUseCase:
         # Validar que el servicio pertenece a la misma clínica
         from app.domain.repositories.slice006_repositories import ServiceRepository
 
-        svc_repo: ServiceRepository = self.vet_repo  # type: ignore - will be replaced at router level
+        _svc_repo: ServiceRepository = self.vet_repo  # type: ignore - will be replaced at router level
         # We'll validate service existence in the router layer
 
         return await self.assignment_repo.assign_service(vet_id, service_id, clinic_id)

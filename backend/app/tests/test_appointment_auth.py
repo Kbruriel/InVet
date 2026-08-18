@@ -1,19 +1,17 @@
 """Tests para autenticación y autorización de citas (AC-008-01, AC-008-02)."""
+
 import pytest
-from unittest.mock import patch, MagicMock
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
 from app.api.v1.app import app
-from app.infrastructure.database.connection import get_db
-from app.infrastructure.database.base import Base
-from app.infrastructure.database.models.user import User as UserModel, UserRole
-from app.infrastructure.database.models.clinic import Clinic as ClinicModel
-
+from app.infrastructure.database.session import Base, get_db
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///:memory:"
-engine = create_engine(SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False})
+engine = create_engine(
+    SQLALCHEMY_DATABASE_URL, connect_args={"check_same_thread": False}
+)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
@@ -48,11 +46,14 @@ def test_list_appointments_unauthenticated(client):
 
 def test_create_appointment_unauthenticated(client):
     """Sin autenticación, POST retorna 401."""
-    response = client.post("/api/v1/appointments", json={
-        "owner_id": 1,
-        "scheduled_start": "2026-12-31T10:00:00",
-        "scheduled_end": "2026-12-31T10:30:00",
-    })
+    response = client.post(
+        "/api/v1/appointments",
+        json={
+            "owner_id": 1,
+            "scheduled_start": "2026-12-31T10:00:00",
+            "scheduled_end": "2026-12-31T10:30:00",
+        },
+    )
     assert response.status_code == 401
 
 

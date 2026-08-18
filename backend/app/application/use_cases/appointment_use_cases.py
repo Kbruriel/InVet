@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import UTC, datetime, timedelta
-from typing import Any
+from datetime import datetime, timedelta
 
 from app.domain.entities.appointment import (
     Appointment,
@@ -53,9 +52,11 @@ class CreateAppointmentUseCase:
         # Validar tipo de cita
         try:
             appt_type = AppointmentType(appointment_type)
-        except ValueError:
+        except ValueError as err:
             valid_types = [t.value for t in AppointmentType]
-            raise ValueError(f"Tipo de cita inválido. Valores válidos: {valid_types}")
+            raise ValueError(
+                f"Tipo de cita inválido. Valores válidos: {valid_types}"
+            ) from err
 
         # Validar duración
         if not (15 <= duration_minutes <= 120):
@@ -224,7 +225,6 @@ class ListAppointmentsByOwnerUseCase:
         """
         return await self.repository.list_by_owner(
             owner_id=owner_id,
-            clinic_id=clinic_id,
             page=page,
             size=size,
         )
@@ -323,8 +323,8 @@ class GetAvailabilityUseCase:
         # Parsear la fecha
         try:
             target_date = datetime.strptime(date_str, "%Y-%m-%d")
-        except ValueError:
-            raise ValueError("La fecha debe estar en formato YYYY-MM-DD")
+        except ValueError as err:
+            raise ValueError("La fecha debe estar en formato YYYY-MM-DD") from err
 
         return await self.repository.get_available_slots(
             veterinarian_id=veterinarian_id,

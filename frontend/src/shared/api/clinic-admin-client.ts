@@ -1,6 +1,8 @@
 /** Cliente API para administracion de clinicas (FE-005) */
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1';
+import { resolveApiBase } from './api-base';
+
+const API_BASE = resolveApiBase();
 
 export interface ClinicCreatePayload {
   name: string;
@@ -87,7 +89,7 @@ export async function fetchClinics(params?: { page?: number; size?: number }): P
   if (params?.page) query.set('page', String(params.page));
   if (params?.size) query.set('size', String(params.size));
 
-  const response = await fetch(`${API_BASE}/clinicas?${query.toString()}`, {
+  const response = await fetch(`${API_BASE}/clinics?${query.toString()}`, {
     method: 'GET',
     headers: authHeaders(),
   });
@@ -96,7 +98,7 @@ export async function fetchClinics(params?: { page?: number; size?: number }): P
 }
 
 export async function createClinic(payload: ClinicCreatePayload): Promise<ClinicRead> {
-  const response = await fetch(`${API_BASE}/clinicas`, {
+  const response = await fetch(`${API_BASE}/clinics`, {
     method: 'POST',
     headers: authHeaders(),
     body: JSON.stringify(payload),
@@ -106,7 +108,7 @@ export async function createClinic(payload: ClinicCreatePayload): Promise<Clinic
 }
 
 export async function updateClinic(clinicId: number, payload: ClinicUpdatePayload): Promise<ClinicRead> {
-  const response = await fetch(`${API_BASE}/clinicas/${clinicId}`, {
+  const response = await fetch(`${API_BASE}/clinics/${clinicId}`, {
     method: 'PUT',
     headers: authHeaders(),
     body: JSON.stringify(payload),
@@ -116,7 +118,7 @@ export async function updateClinic(clinicId: number, payload: ClinicUpdatePayloa
 }
 
 export async function changeClinicStatus(clinicId: number, payload: ClinicStatusPayload): Promise<ClinicRead> {
-  const response = await fetch(`${API_BASE}/clinicas/${clinicId}/status`, {
+  const response = await fetch(`${API_BASE}/clinics/${clinicId}/status`, {
     method: 'PATCH',
     headers: authHeaders(),
     body: JSON.stringify(payload),
@@ -126,7 +128,7 @@ export async function changeClinicStatus(clinicId: number, payload: ClinicStatus
 }
 
 export async function getClinic(clinicId: number): Promise<ClinicRead> {
-  const response = await fetch(`${API_BASE}/clinicas/${clinicId}`, {
+  const response = await fetch(`${API_BASE}/clinics/${clinicId}`, {
     method: 'GET',
     headers: authHeaders(),
   });

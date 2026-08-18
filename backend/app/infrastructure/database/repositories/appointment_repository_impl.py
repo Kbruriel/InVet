@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from datetime import UTC, datetime, timedelta
-from typing import Any, cast
+from typing import Any
 
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -12,13 +12,20 @@ from app.domain.entities.appointment import Appointment
 from app.domain.repositories.appointment_repository import AppointmentRepository
 from app.infrastructure.database.models.appointment import (
     Appointment as AppointmentModel,
+)
+from app.infrastructure.database.models.appointment import (
     _AppointmentStatus,
     _AppointmentType,
 )
 
 
 def _domain_from_model(model: AppointmentModel) -> Appointment:
-    """Convierte un modelo ORM a entidad de dominio."""
+    """Convierte un modelo ORM a entidad de dominio.
+
+    Se pasan los valores crudos (strings) para que la entidad de dominio
+    los resuelva contra sus propios enums (AppointmentType/AppointmentStatus),
+    evitando mezclar los enums internos del ORM con los de dominio.
+    """
     return Appointment(
         id=model.id,
         owner_id=model.owner_id,
@@ -26,8 +33,8 @@ def _domain_from_model(model: AppointmentModel) -> Appointment:
         veterinarian_id=model.veterinarian_id,
         clinic_id=model.clinic_id,
         branch_id=model.branch_id,
-        appointment_type=_AppointmentType(model.appointment_type.value),
-        status=_AppointmentStatus(model.status.value),
+        appointment_type=model.appointment_type.value,
+        status=model.status.value,
         scheduled_start=model.scheduled_start,
         scheduled_end=model.scheduled_end,
         duration_minutes=model.duration_minutes,
@@ -44,7 +51,9 @@ class AppointmentRepositoryImpl(AppointmentRepository):
     def __init__(self, db: Session) -> None:
         self.db = db
 
-    async def get_by_id(self, appointment_id: int, clinic_id: int) -> Appointment | None:
+    async def get_by_id(
+        self, appointment_id: int, clinic_id: int
+    ) -> Appointment | None:
         """Obtener una cita por ID y clinic_id con tenant isolation."""
         stmt = (
             select(AppointmentModel)
@@ -150,9 +159,11 @@ class AppointmentRepositoryImpl(AppointmentRepository):
         size: int = 20,
     ) -> tuple[list[Appointment], int]:
         """Listar citas de un propietario con paginación."""
-        base_stmt = select(AppointmentModel).where(
-            AppointmentModel.owner_id == owner_id
-        ).order_by(AppointmentModel.scheduled_start.desc())
+        base_stmt = (
+            select(AppointmentModel)
+            .where(AppointmentModel.owner_id == owner_id)
+            .order_by(AppointmentModel.scheduled_start.desc())
+        )
 
         count_stmt = select(func.count()).select_from(base_stmt.subquery())
         total = self.db.execute(count_stmt).scalar() or 0
@@ -176,7 +187,9 @@ class AppointmentRepositoryImpl(AppointmentRepository):
         conditions = [AppointmentModel.clinic_id == clinic_id]
 
         if status_filter:
-            conditions.append(AppointmentModel.status == _AppointmentStatus(status_filter))
+            conditions.append(
+                AppointmentModel.status == _AppointmentStatus(status_filter)
+            )
         if veterinarian_id is not None:
             conditions.append(AppointmentModel.veterinarian_id == veterinarian_id)
         if date_from is not None:
@@ -306,26 +319,32 @@ class AppointmentRepositoryImpl(AppointmentRepository):
             for vet_id, bookings in booked_slots.items():
                 for b_start, b_end in bookings:
                     if not (slot_end <= b_start or current >= b_end):
-                        slots.append({
-                            "start": current,
-                            "end": slot_end,
-                            "is_available": False,
-                            "veterinarian_id": vet_id,
-                            "reason": "Cita existente",
-                        })
+                        slots.append(
+                            {
+                                "start": current,
+                                "end": slot_end,
+                                "is_available": False,
+                                "veterinarian_id": vet_id,
+                                "reason": "Cita existente",
+                            }
+                        )
                         break
                 else:
                     continue
                 break
             else:
-                available_vets = list(booked_slots.keys()) + ([None] if None not in booked_slots else [])
+                available_vets = list(booked_slots.keys()) + (
+                    [None] if None not in booked_slots else []
+                )
                 for vid in set(available_vets):
-                    slots.append({
-                        "start": current,
-                        "end": slot_end,
-                        "is_available": True,
-                        "veterinarian_id": vid,
-                    })
+                    slots.append(
+                        {
+                            "start": current,
+                            "end": slot_end,
+                            "is_available": True,
+                            "veterinarian_id": vid,
+                        }
+                    )
                 break
 
             current = slot_end

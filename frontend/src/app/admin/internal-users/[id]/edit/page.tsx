@@ -4,27 +4,21 @@
 
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { redirect } from 'next/navigation';
 import { AdminLayout } from '@/features/slice-006/components/admin-layout';
 import { InternalUserForm } from '@/features/slice-006/components/internal-user-form';
 import { useInternalUsers } from '@/features/slice-006/hooks/use-internal-users';
+import { RequireAuth } from '@/shared/auth/RequireAuth';
 import type { InternalUserUpdateDTO } from '@/shared/api/slice-006';
 
 interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export default function EditInternalUserPage({ params }: PageProps) {
+function EditInternalUserPageContent({ params }: PageProps) {
   const router = useRouter();
   const { id } = use(params);
   const { fetchOne, update, submitting, loading, error } = useInternalUsers();
   const [user, setUser] = useState<Awaited<ReturnType<typeof fetchOne>> | null>(null);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined' && !localStorage.getItem('access_token')) {
-      redirect('/login');
-    }
-  }, []);
 
   useEffect(() => {
     const load = async () => {
@@ -75,5 +69,13 @@ export default function EditInternalUserPage({ params }: PageProps) {
         submitting={submitting}
       />
     </AdminLayout>
+  );
+}
+
+export default function EditInternalUserPage({ params }: PageProps) {
+  return (
+    <RequireAuth>
+      <EditInternalUserPageContent params={params} />
+    </RequireAuth>
   );
 }

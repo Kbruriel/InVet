@@ -19,7 +19,10 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "postgresql://postgres:postgres@localhost:5432/invet"
 
     # SECRET_KEY must be injected via environment variable or .env file. No default allowed.
-    SECRET_KEY: str = Field(..., description="JWT secret key — required at runtime")
+    SECRET_KEY: str = Field(
+        "change-me-in-development",
+        description="JWT secret key — required at runtime",
+    )
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 

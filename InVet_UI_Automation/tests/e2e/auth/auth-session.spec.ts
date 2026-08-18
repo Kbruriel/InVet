@@ -81,7 +81,7 @@ test.describe("login page - UIA-002", () => {
       const forgotLink = page.getByRole("link", { name: /Recuperar password/ });
       await expect(forgotLink).toBeVisible();
 
-      const registerLink = page.getByRole("link", { name: /Registrarse/ });
+      const registerLink = page.getByRole("main").getByRole("link", { name: "Registrarse" });
       await expect(registerLink).toBeVisible();
     },
   );

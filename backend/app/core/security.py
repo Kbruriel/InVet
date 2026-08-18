@@ -1,15 +1,30 @@
 """Funciones de seguridad y manejo de tokens."""
 
+import os
 from datetime import datetime, timedelta
 from typing import Any, cast
+
+# Passlib 1.7.x con bcrypt moderno puede fallar al autodetectar el backend.
+# Activamos el backend puro de Passlib para mantener el hashing estable en tests
+# y en el contenedor de desarrollo sin tocar la semántica funcional de la app.
+os.environ.setdefault("PASSLIB_BUILTIN_BCRYPT", "enabled")
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt  # type: ignore[import-untyped]
 from passlib.context import CryptContext  # type: ignore[import-untyped]
+from passlib.hash import bcrypt as bcrypt_hash  # type: ignore[import-untyped]
+from sqlalchemy.orm import Session
 
 from app.core.config import settings
+from app.infrastructure.database.models.internal_user_model import (
+    InternalUser as InternalUserModel,
+)
+from app.infrastructure.database.models.owner import Owner as OwnerModel
+from app.infrastructure.database.models.user import User as UserModel
+from app.infrastructure.database.session import get_db
 
+bcrypt_hash.set_backend("builtin")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 MIN_SECRET_KEY_LENGTH = 16
@@ -96,7 +111,10 @@ def verify_access_token(token: str) -> dict[str, Any]:
     return payload
 
 
-def get_current_access_user(token: str = Depends(oauth2_scheme)) -> dict[str, Any]:
+def get_current_access_user(
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+) -> dict[str, Any]:
     """Devuelve la identidad del usuario autenticado con un token de acceso."""
     payload = verify_access_token(token)
     subject = payload.get("sub")
@@ -116,8 +134,54 @@ def get_current_access_user(token: str = Depends(oauth2_scheme)) -> dict[str, An
             headers={"WWW-Authenticate": "Bearer"},
         ) from exc
 
-    return {
+    db_user = None
+    if isinstance(db, Session):
+        db_user = db.query(UserModel).filter(UserModel.id == user_id).first()
+        if not db_user:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Usuario no encontrado para el token",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+
+    role = payload.get("role") or (
+        "admin" if db_user and db_user.is_admin else "user"
+    )
+    current_user: dict[str, Any] = {
         "id": user_id,
-        "email": payload.get("email"),
-        "role": payload.get("role", "user"),
+        "user_id": user_id,
+        "email": db_user.email if db_user else payload.get("email", ""),
+        "role": role,
     }
+
+    clinic_id: int | None = (
+        payload.get("clinic_id") if isinstance(payload.get("clinic_id"), int) else None
+    )
+    if clinic_id is None and isinstance(db, Session):
+        owner = (
+            db.query(OwnerModel)
+            .filter(
+                OwnerModel.user_id == user_id,
+                OwnerModel.is_active.is_(True),
+            )
+            .first()
+        )
+        if owner and owner.clinic_id is not None:
+            clinic_id = int(owner.clinic_id)
+        else:
+            internal_user = (
+                db.query(InternalUserModel)
+                .filter(
+                    InternalUserModel.user_id == user_id,
+                    InternalUserModel.is_active.is_(True),
+                )
+                .first()
+            )
+            if internal_user and internal_user.clinic_id is not None:
+                clinic_id = int(internal_user.clinic_id)
+
+    if clinic_id is not None:
+        current_user["clinic_id"] = clinic_id
+        current_user["tenant_id"] = clinic_id
+
+    return current_user
