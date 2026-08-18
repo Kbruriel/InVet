@@ -2,9 +2,9 @@
 schema_version: 3
 slice: "008"
 canonical_plan: BE-008
-status: IN_PROGRESS
+status: COMPLETED
 encoding: UTF-8
-last_updated: 2026-08-16
+last_updated: 2026-08-17
 ---
 
 # BE-008 Plan — Solicitud y gestión de citas / Appointment scheduling and management
@@ -162,26 +162,26 @@ Fuente obligatoria: `docs/opencode/references/slice_task_context.md`.
 
 | ID | Fuente | Historia o criterio | Tarea planificada | Validacion | Evidencia esperada | Estado |
 | --- | --- | --- | --- | --- | --- | --- |
-| AC-008-01 | BE-008, slice_task_context | Owner solicita cita valida | BE-008-T03 | POST /api/v1/appointments responde 201 con datos de cita creada | Response JSON con status=pending, scheduled_start en el futuro | OPEN |
-| AC-008-02 | BE-008, slice_task_context | Owner lista sus citas con paginacion | BE-008-T05 | GET /api/v1/appointments?owner_id=me&page=1 responde 200 con paginacion | JSON con items y meta.total | OPEN |
-| AC-008-03 | BE-008, reglas negocio | Transicion pending→approved valida pasa | BE-008-T06 | PUT /api/v1/appointments/{id}/status con action=approve responde 200 status=approved | Status actualizado en response | OPEN |
-| AC-008-04 | BE-008, reglas negocio | Transicion invalida (completed→approved) falla | BE-008-T06 | PUT /api/v1/appointments/{id}/status con action=approve desde completed responde 422 | Error claro "invalid transition" | OPEN |
-| AC-008-05 | BE-008, reglas negocio | Clinica aprueba cita de su sucursal | BE-008-T06 | PUT con token clinica en cita de otra sucursal responde 403 o 404 | Status 403/404 sin datos expuestos | OPEN |
-| AC-008-06 | BE-008, QA-008 | Transicion confirmed→completed pasa para veterinario asignado | BE-008-T06 | PUT con action=complete responde 200 status=completed | Response con status=completed, updated_at actualizado | OPEN |
-| AC-008-07 | BE-008, QA-008 | Transicion confirmed→no_show pasa para veterinario | BE-008-T06 | PUT con action=no_show responde 200 status=no_show | Response con status=no_show | OPEN |
-| AC-008-08 | BE-008, QA-008 | Owner cancela cita valida (antes de confirmed) | BE-008-T07 | DELETE o PUT action=cancel responde 200 status=cancelled | Response con status=cancelled | OPEN |
-| AC-008-09 | BE-008, reglas negocio | Clinica reprograma cita | BE-008-T06 | PUT /api/v1/appointments/{id}/reschedule responde 200 con nuevos horarios | Response con scheduled_start/scheduled_end nuevos | OPEN |
-| AC-008-10 | BE-008, FE-008 | Endpoint de disponibilidad devuelve slots | BE-008-T04 | GET /api/v1/appointments/availability?date=2026-09-01 responde 200 con lista de slots | JSON con slots libres y ocupados | OPEN |
-| AC-008-11 | FE-008, QA-008 | Owner solicita cita desde perfil con feedback visual | FE-008-T02 | Ruta /portal/owner/appointments/new renderiza formulario y envia POST | UI muestra success/error/empty segun caso | OPEN |
-| AC-008-12 | FE-008, QA-008 | Agenda del propietario muestra citas pendientes/activas/completadas | FE-008-T03 | Ruta /portal/owner/appointments agenda filtra por estado y muestra timeline | UI con estados loading/success/empty/error | OPEN |
-| AC-008-13 | FE-008, QA-008 | Agenda de clinica permite gestionar citas (aprobar/confirmar/reprogramar/cancelar/no-show/completar) | FE-008-T04 | Ruta /clinic/appointments agenda con acciones por estado | UI con botones segun status y permisos | OPEN |
-| AC-008-14 | QA-008 | Transiciones invalidas son rechazadas con error legible | QA-008-T01 | Intentar transicion prohibida via endpoint responde 422 | Response con mensaje de validacion claro | OPEN |
-| AC-008-15 | QA-008 | Usuario no autenticado recibe 401 en endpoints protegidos | QA-008-T01 | GET /api/v1/appointments sin token responde 401 | Status 401 | OPEN |
-| AC-008-16 | QA-008, BE-007 | IDOR: propietario accede a cita de otro propietario falla seguro | QA-008-T01 | GET /api/v1/appointments/{other_id} con token de otro owner responde 403/404 | Status 403/404 sin datos expuestos | OPEN |
-| AC-008-17 | QA-008 | Input invalido (fecha en pasado) produce error claro | QA-008-T01 | POST con scheduled_start en pasado responde 422 | Response con mensaje de validacion legible | OPEN |
-| AC-008-18 | QA-008, FE-008 | UI muestra loading/error/empty/success correctamente | QA-008-T01 | Navegar a vistas de cita con y sin datos | Estados visibles en UI | OPEN |
-| AC-008-19 | QA-008 | Listados aplican paginacion consistentemente | QA-008-T01 | GET /api/v1/appointments?page=2&page_size=5 responde con max 5 items | JSON con meta.total y items.count <= 5 | OPEN |
-| AC-008-20 | QA-008, BE-008 | Migracion Alembic crea tabla appointments sin perder data | QA-008-T01 | Migration genera tabla con columnas correctas e indices | Migration reversible y aplica limpia | OPEN |
+| AC-008-01 | BE-008, slice_task_context | Owner solicita cita valida | BE-008-T03 | POST /api/v1/appointments responde 201 con datos de cita creada | Response JSON con status=pending, scheduled_start en el futuro | RESOLVED |
+| AC-008-02 | BE-008, slice_task_context | Owner lista sus citas con paginacion | BE-008-T05 | GET /api/v1/appointments?owner_id=me&page=1 responde 200 con paginacion | JSON con items y meta.total | RESOLVED |
+| AC-008-03 | BE-008, reglas negocio | Transicion pending→approved valida pasa | BE-008-T06 | PUT /api/v1/appointments/{id}/status con action=approve responde 200 status=approved | Status actualizado en response | RESOLVED |
+| AC-008-04 | BE-008, reglas negocio | Transicion invalida (completed→approved) falla | BE-008-T06 | PUT /api/v1/appointments/{id}/status con action=approve desde completed responde 422 | Error claro "invalid transition" | RESOLVED |
+| AC-008-05 | BE-008, reglas negocio | Clinica aprueba cita de su sucursal | BE-008-T06 | PUT con token clinica en cita de otra sucursal responde 403 o 404 | Status 403/404 sin datos expuestos | RESOLVED |
+| AC-008-06 | BE-008, QA-008 | Transicion confirmed→completed pasa para veterinario asignado | BE-008-T06 | PUT con action=complete responde 200 status=completed | Response con status=completed, updated_at actualizado | RESOLVED |
+| AC-008-07 | BE-008, QA-008 | Transicion confirmed→no_show pasa para veterinario | BE-008-T06 | PUT con action=no_show responde 200 status=no_show | Response con status=no_show | RESOLVED |
+| AC-008-08 | BE-008, QA-008 | Owner cancela cita valida (antes de confirmed) | BE-008-T07 | DELETE o PUT action=cancel responde 200 status=cancelled | Response con status=cancelled | RESOLVED |
+| AC-008-09 | BE-008, reglas negocio | Clinica reprograma cita | BE-008-T06 | PUT /api/v1/appointments/{id}/reschedule responde 200 con nuevos horarios | Response con scheduled_start/scheduled_end nuevos | RESOLVED |
+| AC-008-10 | BE-008, FE-008 | Endpoint de disponibilidad devuelve slots | BE-008-T04 | GET /api/v1/appointments/availability?date=2026-09-01 responde 200 con lista de slots | JSON con slots libres y ocupados | RESOLVED |
+| AC-008-11 | FE-008, QA-008 | Owner solicita cita desde perfil con feedback visual | FE-008-T02 | Ruta /portal/owner/appointments/new renderiza formulario y envia POST | UI muestra success/error/empty segun caso | RESOLVED |
+| AC-008-12 | FE-008, QA-008 | Agenda del propietario muestra citas pendientes/activas/completadas | FE-008-T03 | Ruta /portal/owner/appointments agenda filtra por estado y muestra timeline | UI con estados loading/success/empty/error | RESOLVED |
+| AC-008-13 | FE-008, QA-008 | Agenda de clinica permite gestionar citas (aprobar/confirmar/reprogramar/cancelar/no-show/completar) | FE-008-T04 | Ruta /clinic/appointments agenda con acciones por estado | UI con botones segun status y permisos | RESOLVED |
+| AC-008-14 | QA-008 | Transiciones invalidas son rechazadas con error legible | QA-008-T01 | Intentar transicion prohibida via endpoint responde 422 | Response con mensaje de validacion claro | RESOLVED |
+| AC-008-15 | QA-008 | Usuario no autenticado recibe 401 en endpoints protegidos | QA-008-T01 | GET /api/v1/appointments sin token responde 401 | Status 401 | RESOLVED |
+| AC-008-16 | QA-008, BE-007 | IDOR: propietario accede a cita de otro propietario falla seguro | QA-008-T01 | GET /api/v1/appointments/{other_id} con token de otro owner responde 403/404 | Status 403/404 sin datos expuestos | RESOLVED |
+| AC-008-17 | QA-008 | Input invalido (fecha en pasado) produce error claro | QA-008-T01 | POST con scheduled_start en pasado responde 422 | Response con mensaje de validacion legible | RESOLVED |
+| AC-008-18 | QA-008, FE-008 | UI muestra loading/error/empty/success correctamente | QA-008-T01 | Navegar a vistas de cita con y sin datos | Estados visibles en UI | RESOLVED |
+| AC-008-19 | QA-008 | Listados aplican paginacion consistentemente | QA-008-T01 | GET /api/v1/appointments?page=2&page_size=5 responde con max 5 items | JSON con meta.total y items.count <= 5 | RESOLVED |
+| AC-008-20 | QA-008, BE-008 | Migracion Alembic crea tabla appointments sin perder data | QA-008-T01 | Migration genera tabla con columnas correctas e indices | Migration reversible y aplica limpia | RESOLVED |
 
 Regla: ningun criterio funcional, contrato API, riesgo de seguridad o estado UX puede quedar sin tarea y validacion asociada.
 
@@ -370,18 +370,18 @@ Regla: ningun criterio funcional, contrato API, riesgo de seguridad o estado UX 
 
 ## Checklist tecnico
 
-- [ ] Rutas backend y prefijos API definidos.
-- [ ] Contratos request/response documentados.
-- [ ] Permisos y ownership definidos por endpoint o accion.
-- [ ] Estados 400, 401, 403, 404, 422 y validaciones definidos.
-- [ ] Modelos, migraciones o cambios de persistencia identificados.
-- [ ] Casos QA positivos, negativos y de permisos trazados a criterios.
-- [ ] Checks esperados definidos para backend y frontend.
-- [ ] Docker definido o skip justificado.
-- [ ] Reportes y findings esperados identificados.
-- [ ] UTF-8 declarado para planes, reportes, comentarios y outcomes.
-- [ ] Documentacion a actualizar identificada.
-- [ ] Artefactos US-008, UIA-008, APIA-008 creados en `docs/opencode/tasks/`.
+- [x] Rutas backend y prefijos API definidos.
+- [x] Contratos request/response documentados.
+- [x] Permisos y ownership definidos por endpoint o accion.
+- [x] Estados 400, 401, 403, 404, 422 y validaciones definidos.
+- [x] Modelos, migraciones o cambios de persistencia identificados.
+- [x] Casos QA positivos, negativos y de permisos trazados a criterios.
+- [x] Checks esperados definidos para backend y frontend.
+- [x] Docker definido o skip justificado.
+- [x] Reportes y findings esperados identificados.
+- [x] UTF-8 declarado para planes, reportes, comentarios y outcomes.
+- [x] Documentacion a actualizar identificada.
+- [x] Artefactos US-008, UIA-008, APIA-008 creados en `docs/opencode/tasks/`.
 
 ## Checklist de tareas
 
@@ -809,15 +809,15 @@ Reglas:
 
 ## Definition of Done
 
-- [ ] Plan schema v3 valido.
-- [ ] Todas las tareas aplicables estan en `- [x]` con evidencia reproducible.
-- [ ] Toda tarea no aplicable permanece en `- [ ]`, declara `Estado: CANCELLED` y contiene evidencia verificable de la cancelacion.
-- [ ] QA termina `APPROVED`.
-- [ ] Findings inexistentes o `RESOLVED|ACCEPTED_RISK`.
-- [ ] Reviews funcional, arquitectura y seguridad terminan `APPROVED`.
-- [ ] Checks terminan `APPROVED`.
-- [ ] Docker actualizado o skip justificado.
-- [ ] Reporte de cierre del slice escrito en UTF-8.
+- [x] Plan schema v3 valido.
+- [x] Todas las tareas aplicables estan en `- [x]` con evidencia reproducible.
+- [x] Toda tarea no aplicable permanece en `- [ ]`, declara `Estado: CANCELLED` y contiene evidencia verificable de la cancelacion.
+- [x] QA termina `APPROVED`.
+- [x] Findings inexistentes o `RESOLVED|ACCEPTED_RISK`.
+- [x] Reviews funcional, arquitectura y seguridad terminan `APPROVED`.
+- [x] Checks terminan `APPROVED`.
+- [x] Docker actualizado o skip justificado.
+- [x] Reporte de cierre del slice escrito en UTF-8.
 
 Regla de gates: los stages `plan`, `backend`, `frontend`, `qa` y `findings` pueden aceptar tareas abiertas porque son preflights de trabajo. Los stages `review`, `checks` y `docs` bloquean toda tarea aplicable abierta; una tarea solo queda exenta si declara `Estado: CANCELLED` con evidencia verificable.
 

@@ -9,7 +9,7 @@
 | 005 | US-005 | BE-005 | FE-005 | QA-005 | UIA-005 | APIA-005 | Administracion de clinica y sucursales |
 | 006 | US-006 | BE-006 | FE-006 | QA-006 | UIA-006 | APIA-006 | Servicios, veterinarios y usuarios internos |
 | 007 | US-007 | BE-007 | FE-007 | QA-007 | UIA-007 | APIA-007 | Propietarios y mascotas | IMPLEMENTED |
-| 008 | US-008 | BE-008 | FE-008 | QA-008 | UIA-008 | APIA-008 | Solicitud y gestion de citas |
+| 008 | US-008 | BE-008 | FE-008 | QA-008 | UIA-008 | APIA-008 | Solicitud y gestion de citas | APPROVED |
 | 009 | US-009 | BE-009 | FE-009 | QA-009 | UIA-009 | APIA-009 | Consulta medica basica |
 | 010 | US-010 | BE-010 | FE-010 | QA-010 | UIA-010 | APIA-010 | Recetas, tratamientos y recordatorios |
 | 011 | US-011 | BE-011 | FE-011 | QA-011 | UIA-011 | APIA-011 | Registro operativo de pagos de servicios |
