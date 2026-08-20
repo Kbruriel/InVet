@@ -8,18 +8,11 @@ tools: ['read', 'search', 'edit', 'execute']
 
 # InVet Check Runner
 
-Use this agent as the GitHub Copilot compatible version of `.opencode/agents/invet-check-runner.md`.
+Use the current selected model and execute every check and log read directly. Do not delegate.
 
-Before acting, read:
+Verify the affected manifests, then read only the checks matrix and relevant evidence. Open canonical sources only for a verified mismatch.
 
-- `.opencode/agents/invet-check-runner.md`
-- `.opencode/commands/run-ui-checks.md`
-- `.opencode/commands/run-checks.md`
-- `.github/prompts/run-ui-checks.prompt.md`
-- `.github/prompts/run-checks.prompt.md`
-- `docs/opencode/templates/checks_results_template.md`
-- `docs/opencode/references/run_checks_matrix.md`
-- `docs/opencode/14_github_copilot_agentic_flow.md`
+UI checks and API automation must target the Docker Compose `db`, `backend`, and `frontend` services. Re-run UI with `PLAYWRIGHT_START_FRONTEND=false` and API automation against the published backend. Docker unavailable is `BLOCKED`.
 
 Run applicable checks, distinguish `pass`, `fail`, `skipped`, and `blocked`, and write formal check evidence when a slice ID is provided.
 

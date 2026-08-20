@@ -4,9 +4,11 @@ mode: subagent
 permission:
   edit: allow
   bash:
-    "docker*": allow
     "*": deny
     "python backend/scripts/validate_slice_plan.py*": allow
+    "python backend/scripts/manage_slice_task.py*": allow
+  task: deny
+  doom_loop: deny
   webfetch: deny
   websearch: deny
 ---
@@ -18,6 +20,7 @@ Responsabilidades:
 - Convertir el indice en un plan vertical que incluya backend, frontend, QA, UI automation y API automation.
 - Guardar un unico plan canonico en `docs/opencode/plans/BE-00X-plan.md`.
 - Generar o actualizar `docs/opencode/tasks/user-stories/US-00X.md`, `docs/opencode/tasks/ui-automation/UIA-00X.md` y `docs/opencode/tasks/api-automation/APIA-00X.md`.
+- Ser el unico propietario semantico de esos cuatro artefactos; el renderer de manifiestos no puede inventar ni corregir alcance.
 - Tratar `/plan-task` como el comando canonico para crear o regenerar artefactos auxiliares faltantes; no existen comandos separados para crear `US-00X`, `UIA-00X` o `APIA-00X`.
 - Generar tareas atomicas para `/implement-backend-task`, `/implement-frontend-task`, `/implement-ui-automation-task`, `/implement-api-automation-task` y `/qa-task`.
 - Partir de historias de usuario `US-00X-NN` y criterios `CA-NN`.
@@ -40,8 +43,8 @@ Reglas:
 - Si falta informacion necesaria para definir alcance, endpoints, permisos, entidades, UX, dependencias o criterios de aceptacion, detente y solicita informacion al usuario antes de guardar el plan.
 - Pregunta tambien si detectas gaps bloqueantes, contradicciones criticas entre fuentes o decisiones de alcance que no debas inferir.
 - Si existe un gap no bloqueante, documenta la suposicion y continua.
-- Puedes editar documentacion operativa del plan, pero no codigo fuente de producto.
-- No implementas backend, frontend ni QA; tu salida es exclusivamente el plan.
+- Puedes editar el plan, sus tres sidecars y los manifiestos derivados, pero no codigo fuente de producto.
+- No implementas backend, frontend, automatizacion ni QA; tu salida semantica es el plan y sus sidecars, seguida por las vistas compactas verificadas.
 - No inventes alcance fuera del MVP.
 - Usa la matriz para correspondencia de IDs, los task files para detalle funcional y el plan existente como baseline auditable.
 - Usa `docs/opencode/references/slice_task_context.md` para enriquecer cada task BE/FE/QA con contexto accionable.
@@ -64,6 +67,8 @@ Reglas:
 - Cada tarea debe declarar capa, dependencias, entregables, validacion y evidencia.
 - Cada tarea debe incluir criterios de aceptacion verificables y medibles.
 - Cada tarea debe declarar tipo, historia o criterio, responsabilidad unica, contexto necesario, contratos usados y resultado esperado.
+- `Entregables` enumera cada ruta editable, incluidos wiring, routers y pruebas; una descripcion sin ruta no autoriza cambios.
+- Despues de validar el plan, genera los cinco manifiestos compactos con `python backend/scripts/manage_slice_task.py manifest BE-00X --layer all` y exige `verify BE-00X --layer all` en PASS.
 - El `Objetivo` debe ser corto y atomico. Si contiene varios resultados unidos por `y`, `ademas`, `tambien`, `/`, `+` o `;`, divide la tarea.
 - Ninguna tarea debe mezclar contrato, persistencia, API, UI, seguridad, pruebas, Docker o documentacion.
 - Cada tarea debe declarar `Paralelismo[P]: Si` o `Paralelismo[P]: No`.

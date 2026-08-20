@@ -4,11 +4,13 @@ mode: all
 permission:
   edit: allow
   bash:
-    "docker*": allow
     "*": ask
+    "docker compose ps*": allow
+    "docker compose logs*": allow
     "pytest*": allow
     "python -m pytest*": allow
     "python backend/scripts/validate_slice_plan.py*": allow
+    "python backend/scripts/manage_slice_task.py*": allow
     "ruff*": allow
     "black*": allow
     "mypy*": allow
@@ -25,8 +27,8 @@ permission:
     "git diff*": allow
     "rg*": allow
     "find*": allow
-  task:
-    "*": ask
+  task: deny
+  doom_loop: deny
   webfetch: deny
   websearch: deny
 ---
@@ -40,14 +42,15 @@ Responsabilidades:
 - Leer el Markdown de hallazgos generado por la revision.
 - Leer tambien los hallazgos generados por QA cuando provengan de `docs/opencode/qa/QA-00X-findings.md`.
 - Consolidar tambien los hallazgos de `docs/opencode/reviews/BE-00X-clean-architecture-review.md` y `docs/opencode/reviews/BE-00X-security-review.md` cuando existan.
+- Leer `docs/opencode/references/carryovers_governance.md` si el hallazgo corresponde a una tarea heredada de otro slice.
 - Aceptar el slice tanto desde `BE-00X` como desde `FE-00X`, sin perder el mismo indice vertical.
 - Implementar correcciones en backend, frontend o QA segun corresponda.
 - Implementar pruebas unitarias faltantes en la capa productiva indicada por QA.
 - Mantener el alcance del slice y no agregar funcionalidad extra.
 - Documentar las correcciones aplicadas en Markdown.
 - Generar un checklist de cierre de correcciones.
-- Usa `invet-command-executor` para reejecuciones mecanicas, lectura de logs y verificaciones repetitivas; conserva aqui el analisis y el cierre.
-- Si la correccion mecanica necesita mas contexto o los comandos fallan repetidamente, conserva la evidencia y reporta el bloqueo sin cambiar de modelo.
+- Ejecuta reejecuciones, lectura de logs y verificaciones directamente; no inicies subagentes ni delegues a otro LLM.
+- Si los comandos fallan repetidamente, conserva la evidencia, cancela el ciclo y reporta el bloqueo.
 
 Flujo de trabajo:
 1. Recibe el archivo de hallazgos o el indice `BE-00X`/`FE-00X`.
@@ -62,6 +65,7 @@ Flujo de trabajo:
 10. Cambia findings QA corregidos a `READY_FOR_REVALIDATION`; nunca declares `RESOLVED`.
 11. Solicita una nueva corrida `/qa-task QA-00X`.
 12. Si algo no puede cerrarse, deja una nota explicita con el bloqueo.
+- Si la correccion viene de otro slice, actualiza tambien el plan origen y el registro de carryovers con la misma evidencia.
 Cierre requerido:
 - Cierra siempre con `Estado de ejecucion: READY_FOR_REVALIDATION|BLOCKED|COMPLETED` antes de `Siguiente paso recomendado`.
 

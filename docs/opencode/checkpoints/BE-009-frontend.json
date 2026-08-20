@@ -1,0 +1,56 @@
+{
+  "slice": "BE-009",
+  "layer": "frontend",
+  "tasks": {
+    "FE-009-T01": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-20T00:20:17+00:00",
+      "finished_at": "2026-08-20T00:20:17+00:00",
+      "evidence": "npx jest --verbose src/shared/api/consultation.test.ts -> PASS; frontend/src/shared/api/consultation.ts expone createConsultation/getConsultation/listConsultations con contrato tipado",
+      "changed_files": [
+        "frontend/src/shared/api/consultation.ts",
+        "frontend/src/shared/api/consultation.test.ts"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "FE-009-T02": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-20T00:20:17+00:00",
+      "finished_at": "2026-08-20T00:20:17+00:00",
+      "evidence": "npm run typecheck -> PASS; frontend/src/app/clinic/appointments/[id]/consultation/page.tsx compila y registra consulta con estados loading/error/success/submitting",
+      "changed_files": [
+        "frontend/src/app/clinic/appointments/[id]/consultation/page.tsx"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "FE-009-T03": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-20T00:20:17+00:00",
+      "finished_at": "2026-08-20T00:20:17+00:00",
+      "evidence": "npm run typecheck -> PASS; frontend/src/app/portal/owner/pets/[id]/consultations/page.tsx compila y renderiza historial paginado read-only con empty/loading/error",
+      "changed_files": [
+        "frontend/src/app/portal/owner/pets/[id]/consultations/page.tsx"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "FE-009-T04": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-20T00:20:17+00:00",
+      "finished_at": "2026-08-20T00:20:17+00:00",
+      "evidence": "npm run typecheck -> PASS; frontend/src/app/portal/owner/consultations/[id]/page.tsx compila y muestra detalle read-only con estados empty/loading/error",
+      "changed_files": [
+        "frontend/src/app/portal/owner/consultations/[id]/page.tsx"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    }
+  },
+  "updated_at": "2026-08-20T00:20:17+00:00"
+}

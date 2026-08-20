@@ -15,12 +15,9 @@ Instrucciones:
    - Si faltan dependencias o el entorno no levanta, intenta recuperarlo antes de bloquearte: instala dependencias y usa Docker cuando el slice dependa de PostgreSQL o del runtime del repo.
    - La UI de validacion corre sobre `http://localhost:3000`.
    - La API del slice corre sobre `http://localhost:8000/api/v1`.
-3. Lee:
-   - `docs/opencode/plans/BE-00X-plan.md`
-   - `docs/opencode/tasks/qa/QA-00X.md`
-   - `docs/opencode/tasks/backend/BE-00X.md`
-   - `docs/opencode/tasks/frontend/FE-00X.md`
-   - `docs/opencode/references/slice_task_context.md`
+3. Ejecuta `python backend/scripts/manage_slice_task.py manifest BE-00X --layer all` y `python backend/scripts/manage_slice_task.py verify BE-00X --layer all`; usa el manifiesto QA para operar y los otros cuatro para validar la entrega entre capas. Abre el plan completo solo para resolver contradicciones.
+3.1. Ejecuta QA directamente sin subagentes. Usa `start`, estados visibles y `finish` para cada tarea QA; respeta allowlist, bloquea eliminaciones y cancela a los 30 minutos o tras tres acciones repetidas.
+3.2. Antes de aprobar, verifica evidencia vigente de que UI automation y API automation corrieron contra `db`, `backend` y `frontend` de Docker Compose. Evidencia host, Docker omitido o servicios no disponibles bloquean QA; no los marques `NOT_APPLICABLE`.
 4. Antes de declarar bloqueo por infraestructura:
    - valida dependencias del backend;
    - ejecuta `python backend/scripts/prepare_qa_env.py --install-deps` desde la raiz o `python scripts/prepare_qa_env.py --install-deps` desde `backend/` si faltan dependencias, `.env.qa` o una base utilizable;

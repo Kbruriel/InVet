@@ -4,11 +4,15 @@ mode: all
 permission:
   edit: ask
   bash:
-    "docker*": allow
     "*": ask
+    "docker compose ps*": allow
+    "docker compose logs*": allow
+    "docker compose up -d --build db backend frontend*": allow
+    "docker compose up -d --build --force-recreate db backend frontend*": allow
     "pytest*": allow
     "python -m pytest*": allow
     "python backend/scripts/validate_slice_plan.py*": allow
+    "python backend/scripts/manage_slice_task.py*": allow
     "ruff*": allow
     "python -m ruff*": allow
     "black --check*": allow
@@ -37,8 +41,8 @@ permission:
     "git -C * status*": allow
     "git diff*": allow
     "git -C * diff*": allow
-  task:
-    "*": ask
+  task: deny
+  doom_loop: deny
   webfetch: deny
   websearch: deny
 ---
@@ -51,8 +55,8 @@ Objetivo:
 - Los comandos npm/pnpm/yarn, `git status`, `git diff` y el hook Docker Compose de cierre estan autorizados por este contrato cuando cumplen las reglas del gate; ejecutalos sin pedir confirmacion adicional.
 - Si un check no esta configurado, marcalo como `skipped` con motivo y continua.
 - Detectar herramientas configuradas antes de ejecutar.
-- Usa `invet-command-executor` para lotes mecanicos de comandos y recopilacion de salida cruda; conserva aqui el veredicto pass/fail/skipped.
-- Si un lote de checks/logs requiere mas contexto, conserva la evidencia y reporta el bloqueo sin cambiar de modelo.
+- Ejecuta directamente los lotes de comandos y la recopilacion de salida; no inicies subagentes ni delegues a otro LLM.
+- Si un lote de checks/logs se repite o se estanca, conserva la evidencia, cancela el ciclo y reporta el bloqueo.
 - Ejecutar checks disponibles de backend, frontend y DevOps opcional.
 - Reportar comandos ejecutados, resultado y fallos.
 - No ocultar errores ni convertir skips en pass.
@@ -97,6 +101,8 @@ Modo correccion:
 
 Contexto Docker:
 - El repo incluye `docker-compose.yml` con `db`, `backend` y `frontend`.
+- UI automation y API automation se ejecutan obligatoriamente contra esos servicios Docker publicados; no aceptes procesos host como evidencia equivalente.
+- `run-ui-checks` reejecuta E2E/regresion con `PLAYWRIGHT_START_FRONTEND=false`; `run-checks` reejecuta `npm run test:api` contra el backend Docker.
 - Si un check requiere PostgreSQL o el runtime del frontend dentro de contenedor, usa `docker compose` como contexto de ejecucion.
 - Para backend con DB, el flujo normal es `docker compose up -d db` y luego `docker compose run --rm backend ...`.
 - Registra si el check se ejecuto en host o en contenedor y no los declares equivalentes por defecto.

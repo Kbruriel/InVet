@@ -2,15 +2,10 @@
 
 Equivalent to OpenCode `/run-ui-checks`.
 
-Input: `FE-00X`.
+Input: `BE-00X`, `FE-00X`, or `QA-00X`; normalize to `UIA-00X`.
 
 Use agent: `InVet Check Runner`.
 
-Before acting, read:
+Verify the affected compact manifests, then run UI automation and regression checks directly. Do not delegate or allow formal checks to proceed if UI checks fail.
 
-- `.opencode/commands/run-ui-checks.md`
-- `.opencode/agents/invet-check-runner.md`
-- `docs/opencode/tasks/ui-automation/UIA-00X.md`
-- `docs/opencode/14_github_copilot_agentic_flow.md`
-
-Run UI automation and regression checks. Do not allow formal checks to proceed if UI checks fail.
+Use only the Docker Compose `db`, `backend`, and `frontend` stack and set `PLAYWRIGHT_START_FRONTEND=false`. On PASS recommend `run-checks.prompt.md`; Docker unavailable is `BLOCKED`.

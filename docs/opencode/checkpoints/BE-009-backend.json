@@ -1,0 +1,96 @@
+{
+  "slice": "BE-009",
+  "layer": "backend",
+  "tasks": {
+    "BE-009-T01": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-19T21:26:39+00:00",
+      "finished_at": "2026-08-19T21:30:56+00:00",
+      "evidence": "python -c from app.domain.entities.consultation import Consultation -> campos: ['appointment_id','branch_id','clinic_id','created_by','diagnosis','history','id','pet_id','recommendations','updated_at','veterinarian_id']",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "BE-009-T02": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-19T21:31:18+00:00",
+      "finished_at": "2026-08-19T21:31:31+00:00",
+      "evidence": "dir(ConsultationRepository) -> ['create_consultation','get_by_id','get_by_appointment_id','list_by_clinic','list_by_pet'] (ABC async con clinic_id)",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "BE-009-T03": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-19T21:46:38+00:00",
+      "finished_at": "2026-08-19T21:46:51+00:00",
+      "evidence": "alembic upgrade a009 (creates consultations) + downgrade a008 (drops table) + upgrade a009 (recreates table) all pass on invet_alembic_test; also fixed: a008 down_revision=a007 to unbreak chain, backend/alembic/alembic.ini script_location=alembic + logging section, registered Appointment in models/__init__.py",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "BE-009-T04": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-19T21:47:25+00:00",
+      "finished_at": "2026-08-19T21:47:38+00:00",
+      "evidence": "ConsultationRepositoryImpl is subclass of ConsultationRepository ABC; implements all 5 async methods with clinic_id tenant isolation: get_by_id(consultation_id, clinic_id), get_by_appointment_id(appointment_id, clinic_id), list_by_pet(pet_id, clinic_id, page, size), list_by_clinic(clinic_id, page, size, pet_id)",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "BE-009-T05": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-19T21:49:38+00:00",
+      "finished_at": "2026-08-19T21:49:51+00:00",
+      "evidence": "pytest app/tests/test_consultation_use_cases.py -q -> 8 passed; coverage --branch on consultation_use_cases.py -> 95% (>=80%); file verified UTF-8 clean, no mojibake",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "BE-009-T06": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-19T21:50:26+00:00",
+      "finished_at": "2026-08-19T21:50:39+00:00",
+      "evidence": "ConsultationCreate fields: appointment_id(gt0), pet_id(gt0), clinic_id(opt gt0), branch_id(opt gt0), veterinarian_id(opt ge1), history/diagnosis/recommendations(min1,max10000); ConsultationRead + ConsultationPage import OK",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "BE-009-T07": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-20T00:08:00+00:00",
+      "finished_at": "2026-08-20T00:14:00+00:00",
+      "evidence": "pytest backend/app/tests/test_consultation_use_cases.py backend/app/tests/api/test_consultations_api.py -q -> 14 passed; create_consultation now derives branch/veterinarian from appointment, keeps optional history/recommendations, and POST /api/v1/consultations accepts optional fields",
+      "changed_files": [
+        "backend/app/api/schemas/consultation_schemas.py",
+        "backend/app/application/use_cases/consultation_use_cases.py",
+        "backend/app/api/v1/routers/consultation_router.py",
+        "backend/app/tests/test_consultation_use_cases.py",
+        "backend/app/tests/api/test_consultations_api.py"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "BE-009-T08": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-20T00:14:00+00:00",
+      "finished_at": "2026-08-20T00:20:17+00:00",
+      "evidence": "pytest backend/app/tests/test_consultation_use_cases.py backend/app/tests/api/test_consultations_api.py -q -> 14 passed; GET /api/v1/consultations and GET /api/v1/consultations/{id} now enforce pet ownership for owners while preserving clinic-scoped reads",
+      "changed_files": [
+        "backend/app/api/v1/routers/consultation_router.py",
+        "backend/app/tests/api/test_consultations_api.py"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    }
+  },
+  "updated_at": "2026-08-20T00:20:17+00:00"
+}

@@ -1,130 +1,81 @@
 # InVet Copilot Instructions
 
-Use these instructions whenever GitHub Copilot works in this repository.
+Use these compact rules whenever GitHub Copilot works in this repository.
 
-## Operating Model
+## Runtime model
 
-InVet is developed by vertical slices. A slice uses the same numeric index across:
+- The model selected by the user performs every phase. Do not call `runSubagent`, delegate to another agent, or invoke another LLM.
+- Execute commands, tests, validators, status, diff, and log reads directly with the current model.
+- Safe read-only checks, tests, lint, and validators may run without confirmation. Require confirmation for applied migrations, commits, pushes, destructive operations, or external side effects.
+- Show state changes as `leyendo`, `editando`, `ejecutando pruebas`, `esperando permiso`, or `generacion cancelada`.
+- Do not repeat identical text, tool calls, or actions. After one failed retry, inspect new evidence; cancel after three equivalent actions.
+- A phase must not run longer than 30 minutes. Cancel after 3 minutes without operational progress or a tool call, preserve the checkpoint, and report the exact resume command.
+- Keep one phase below approximately 48,000 context tokens. Near that size, finish the current atomic task, save its checkpoint, and resume in a clean conversation.
+- VS Code limits each agent run to 50 requests. Do not consume the limit trying to complete multiple failed phases.
 
-- `US-00X`
-- `BE-00X`
-- `FE-00X`
-- `QA-00X`
-- `UIA-00X`
-- `APIA-00X`
+## Slice and context
 
-There is one canonical plan per slice: `docs/opencode/plans/BE-00X-plan.md`.
+A slice shares one numeric index across `US`, `BE`, `FE`, `QA`, `UIA`, and `APIA`. Normalize accepted aliases to that index. The canonical plan is `docs/opencode/plans/BE-00X-plan.md`.
 
-OpenCode slash commands are not available inside GitHub Copilot. When a document says `/plan-task`, `/qa-task`, `/run-checks`, or another slash command, translate it into the equivalent Copilot workflow described in `docs/opencode/14_github_copilot_agentic_flow.md`.
+`/plan-task` owns the semantic plan, user story, UI automation sidecar, API automation sidecar, and all five derived manifests. Other phases must not redefine scope.
 
-For QA specifically, use `docs/opencode/qa/README.md` as the canonical short runbook for command sequence and handoff rules.
+For implementation, use only the matching verified manifest:
 
-VS Code custom agents for this repository live in `.github/agents/*.agent.md`. Prompt files live in `.github/prompts/*.prompt.md`.
+- Backend: `docs/opencode/manifests/BE-00X-backend.md`
+- Frontend: `docs/opencode/manifests/BE-00X-frontend.md`
+- UI automation: `docs/opencode/manifests/BE-00X-ui-automation.md`
+- API automation: `docs/opencode/manifests/BE-00X-api-automation.md`
+- QA: `docs/opencode/manifests/BE-00X-qa.md`, plus the other four only for cross-layer handoffs
 
-## Required Context
+Reviews, checks, docs, and final gate use the five manifests as a compact index, then read only relevant evidence reports, diff, and test output. Open the full plan or sidecar only when manifest verification fails or a concrete contradiction requires the canonical source.
 
-Before editing code for a slice, read the relevant files:
+Before a phase, regenerate and verify its manifest. Before QA and closing gates, verify all five with `backend/scripts/manage_slice_task.py`.
 
-- `docs/opencode/14_github_copilot_agentic_flow.md`
-- `docs/opencode/13_agents_architecture_and_gate_flow.md`
-- `docs/opencode/references/carryovers_governance.md` when a task was postponed or transferred from another slice
-- `docs/opencode/qa/README.md`
-- `docs/opencode/plans/BE-00X-plan.md`
-- `docs/opencode/tasks/backend/BE-00X.md`
-- `docs/opencode/tasks/frontend/FE-00X.md`
-- `docs/opencode/tasks/qa/QA-00X.md`
-- `docs/opencode/tasks/user-stories/US-00X.md`
-- `docs/opencode/tasks/ui-automation/UIA-00X.md`
-- `docs/opencode/tasks/api-automation/APIA-00X.md`
+## Task controls
 
-If a required artifact is missing, do not invent its contents. Create or repair the canonical artifact first, using `docs/opencode/templates/slice_plan_template.md` and the rules in `docs/opencode/references/missing_artifact_generation.md` when applicable.
-If a task was transferred from another slice, do not treat it as complete until the destination plan, the source plan, and the carryover registry all show the same closure evidence.
+- Execute one atomic task at a time with `manage_slice_task.py start`, visible `state` transitions, and `finish --result pass|failed|blocked`. Only `pass` completes its checkpoint.
+- The manifest allowlist is derived from `Entregables`. Do not modify files outside it.
+- Do not delete existing files or lines without explicit justification recorded by `finish --allow-deletions`.
+- Adding a router must preserve every previous `include_router(...)` registration.
+- Save a checkpoint after every task. Resume from it; never repeat a completed portion of a slice.
+- A manifest limits context but never replaces the canonical plan, sidecars, QA decisions, review reports, diff, or real test results.
 
-## Gates
+## Mandatory flow
 
-Do not skip gates because a file exists. Use decisions and states inside the artifacts.
+1. Plan the slice and generate/verify all manifests.
+2. Implement backend; its command performs any applicable persistence validation before returning completion.
+3. Implement frontend.
+4. Implement UI automation.
+5. Implement API automation.
+6. Run QA.
+7. Run functional review.
+8. Run clean architecture review.
+9. Run security review.
+10. Run UI checks.
+11. Run formal checks.
+12. Update docs.
+13. Run final gate.
 
-The normal flow is:
+Stop at the first `REJECTED` or `BLOCKED` gate. Findings in `OPEN`, `IN_PROGRESS`, or `READY_FOR_REVALIDATION` block forward progress. Implementers move corrected findings only to `READY_FOR_REVALIDATION`; QA or the owning review gate may mark them `RESOLVED` after fresh evidence.
 
-1. Plan the slice.
-2. Implement backend.
-3. Validate secure persistence with `python backend/scripts/validate_slice_plan.py BE-00X --stage secure-persistence`.
-4. Implement frontend.
-5. Implement UI automation.
-6. Implement API automation.
-7. Run QA.
-8. Run functional review.
-9. Run clean architecture review.
-10. Run security review.
-11. Run UI checks.
-12. Run formal checks.
-13. Update docs.
-14. Run final gate when a second release opinion is requested.
+Never skip a gate merely because an artifact exists. Carryovers must be synchronized between source plan, destination plan, and registry. Closure gates reject applicable open tasks and `CANCELLED` tasks without evidence.
 
-When a gate fails, stop the forward flow, document the failure, recommend the next exact step, and fix through the findings workflow.
+## Scope and quality
 
-## Findings Workflow
+- Preserve UTF-8.
+- Keep backend, frontend, QA, UI automation, and API automation responsibilities separate.
+- Product unit tests belong to the implementing layer, not QA.
+- UI and API automation remain inside `InVet_UI_Automation/`.
+- UI and API automation must run against the Docker Compose `db`, `backend`, and `frontend` services. Docker unavailable is `BLOCKED`; do not replace the stack with host processes.
+- Prefer existing architecture, naming, and test patterns.
+- QA and reviews document defects; they do not modify product code.
 
-Findings are blocking when they are `OPEN`, `IN_PROGRESS`, or `READY_FOR_REVALIDATION`.
-
-State context:
-
-- `OPEN`: the issue is still reproducible and no fix has been accepted yet.
-- `IN_PROGRESS`: the issue is being worked but not ready for revalidation.
-- `READY_FOR_REVALIDATION`: the fix is applied and QA must rerun before anything can close.
-- `RESOLVED`: QA confirmed the fix with fresh evidence.
-- `ACCEPTED_RISK`: QA or a reviewer accepted the risk with explicit justification.
-
-Use these rules:
-
-- QA can create findings and mark corrected findings as `RESOLVED`.
-- QA findings files must include `- Estado global: OPEN|IN_PROGRESS|READY_FOR_REVALIDATION|RESOLVED|ACCEPTED_RISK`.
-- Implementers can fix findings and move QA findings to `READY_FOR_REVALIDATION`.
-- Do not mark a finding `RESOLVED` while implementing the fix.
-- After findings are fixed, rerun QA first, then rerun any affected reviews, UI checks, and checks.
-
-## QA And Review Continuity
-
-- After QA, recommend functional review only when `QA-00X-results.md` says `Decision: APPROVED` and `QA-00X-findings.md` is absent or has global state `RESOLVED`/`ACCEPTED_RISK`.
-- If QA is `REJECTED` or findings are `OPEN`/`IN_PROGRESS`, recommend the findings workflow for `BE-00X`.
-- If findings are `READY_FOR_REVALIDATION`, treat that as a findings state and route through the findings workflow; the resolver hands revalidation back to QA when the corrections are ready.
-- Do not treat `READY_FOR_REVALIDATION` as a completed gate, even if an older results file says `APPROVED`.
-- If a slice includes carryovers, block approval until the current plan, the source plan, and the carryover registry are synchronized with reproducible evidence.
-- After functional review runs and is `APPROVED`, recommend clean architecture review for `BE-00X`; do not send the flow back to QA.
-- Recommend QA from functional review only when the review preflight could not start because QA is not approved or needs revalidation.
-
-## Required Closing Output
-
-Every Copilot task must end with:
+## Required closing output
 
 ```text
 Estado de ejecucion: <APPROVED|REJECTED|BLOCKED|READY_FOR_REVALIDATION|COMPLETED>
-Siguiente paso recomendado: <exact command or prompt name>
+Siguiente paso recomendado: <exact prompt or command>
 Motivo: <why this is the next gate>
 ```
 
-If there are findings:
-
-```text
-Comando recomendado para resolver hallazgos: <exact command or prompt name>
-Motivo: <why findings block the next gate>
-```
-
-If there is a blocker:
-
-```text
-Comando recomendado para desbloquear el gate: <exact command or prompt name>
-Motivo: <what evidence or artifact is missing>
-```
-
-## Implementation Rules
-
-- Preserve UTF-8 in all Markdown and source files.
-- Keep tasks small and tied to one layer: backend, frontend, QA, UI automation, or API automation.
-- If a task is transferred from another slice, update both the destination and source plans with the same evidence and the carryover registry before closing it.
-- Do not combine product implementation with QA gate decisions.
-- Do not let QA implement missing unit tests for product code.
-- Prefer existing architecture, naming, and test patterns.
-- Keep product code changes scoped to the current slice.
-- Keep UI automation and API automation inside `InVet_UI_Automation/`.
-- Use `backend/scripts/validate_slice_plan.py` for deterministic gate checks whenever a stage is available.
+When findings or blockers exist, also provide the exact command that resolves or unblocks the gate.

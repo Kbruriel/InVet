@@ -83,12 +83,13 @@ Debe implementar solo tareas backend pendientes del plan:
 Debe cumplir Clean Architecture.
 Hook de cierre: si Docker Compose esta disponible y el comando no quedo bloqueado, ejecutar `docker compose up -d --build --force-recreate db backend frontend`.
 
-## `/implement-frontend-task FE-00X`
+## `/implement-frontend-task BE-00X|FE-00X|QA-00X`
 
 Debe implementar solo tareas frontend pendientes del plan:
 - Leer `docs/opencode/plans/BE-00X-plan.md`.
 - Leer `docs/opencode/references/carryovers_governance.md` y `docs/opencode/carryovers/BE-00X-carryovers.md` cuando existan tareas transferidas.
 - Ejecutar el preflight `--stage frontend`.
+- Regenerar y verificar `BE-00X-frontend.md`; usarlo como contexto operativo de la capa.
 - Usar objetivo y criterios de aceptacion de cada tarea como contrato.
 - Usar `Tipo`, `Historia o criterio`, `Contexto necesario`, `Contratos usados` y `Resultado esperado` para interpretar cada tarea.
 - Detenerse si `Responsabilidad unica` no es `Si` o si la tarea mezcla responsabilidades independientes.
@@ -138,39 +139,44 @@ Despues, confirmar que todos los contenedores Docker aplicables fueron actualiza
 Si no existen cambios pendientes que requieran actualizar contenedores, registrar el skip con la causa exacta y no ejecutar el restart.
 Si existen cambios pendientes, ejecutar `docker compose up -d --build --force-recreate db backend frontend` y verificar el estado de los contenedores antes de cerrar.
 
-## `/implement-ui-automation-task FE-00X`
+## `/implement-ui-automation-task BE-00X|FE-00X|QA-00X`
 
 Debe implementar solo tareas de automatizacion UI del slice:
 - Leer `docs/opencode/plans/BE-00X-plan.md`.
 - Leer `docs/opencode/references/carryovers_governance.md` y el registro de carryovers del slice cuando existan tareas transferidas.
 - Leer `docs/opencode/tasks/user-stories/US-00X.md`.
 - Leer `docs/opencode/tasks/ui-automation/UIA-00X.md`.
+- Regenerar y verificar `BE-00X-ui-automation.md`; bloquear si el sidecar falta o esta stale.
 - Leer las tasks `BE-00X`, `FE-00X` y `QA-00X` del mismo slice.
 - Implementar specs Playwright en `InVet_UI_Automation/tests/e2e`.
 - Cubrir flujos visibles, navegacion, formularios, redirects y estados UX.
 - Referenciar `US-00X-NN` y `CA-NN`.
-- Ejecutar `npm run test:e2e` y `npm run test:regression`.
+- Levantar/reconstruir `db`, `backend` y `frontend` con Docker Compose y verificar sus servicios.
+- Ejecutar `npm run test:e2e` y `npm run test:regression` contra ese stack con `PLAYWRIGHT_START_FRONTEND=false`; Docker no tiene fallback host.
 - Documentar evidencia y casos no automatizados.
 - Si la tarea proviene de otro slice, actualizar tambien el plan origen con la misma evidencia o con una referencia explicita al cierre.
 
-## `/implement-api-automation-task BE-00X`
+## `/implement-api-automation-task BE-00X|FE-00X|QA-00X`
 
 Debe implementar solo tareas de automatizacion API del slice:
 - Leer `docs/opencode/plans/BE-00X-plan.md`.
 - Leer `docs/opencode/references/carryovers_governance.md` y el registro de carryovers del slice cuando existan tareas transferidas.
 - Leer `docs/opencode/tasks/user-stories/US-00X.md`.
 - Leer `docs/opencode/tasks/api-automation/APIA-00X.md`.
+- Regenerar y verificar `BE-00X-api-automation.md`; bloquear si el sidecar falta o esta stale.
 - Leer las tasks `BE-00X`, `FE-00X` y `QA-00X` del mismo slice.
 - Implementar specs Playwright en `InVet_UI_Automation/tests/api`.
 - Validar payloads, statuses, authn/authz, IDOR/BOLA, aislamiento tenant y datos sensibles.
 - Referenciar `US-00X-NN` y `CA-NN`.
-- Ejecutar `npm run test:api`.
+- Levantar/reconstruir `db`, `backend` y `frontend` con Docker Compose y verificar sus servicios.
+- Ejecutar `npm run test:api` contra el backend publicado por ese stack; Docker no tiene fallback host.
 - Documentar evidencia y casos no automatizados.
 - Si la tarea proviene de otro slice, actualizar tambien el plan origen con la misma evidencia o con una referencia explicita al cierre.
 
-## `/run-ui-checks FE-00X`
+## `/run-ui-checks BE-00X|FE-00X|QA-00X`
 
 Debe ejecutar los checks UI oficiales del proyecto de automatizacion:
+- Confirmar el stack Docker `db`, `backend` y `frontend` antes de Playwright.
 - Correr `npm run test:e2e`.
 - Correr `npm run test:regression`.
 - Reportar evidencia y bloqueos antes de permitir `/run-checks BE-00X`.

@@ -24,9 +24,9 @@ InVet_UI_Automation/
 
 ## Requisitos
 
-- Node.js 20+
-- Un frontend de InVet accesible en `http://localhost:3000` para UI/regresión, o en `FRONTEND_BASE_URL` si lo sobreescribes
-- Un backend de InVet accesible en `API_BASE_URL`
+- Node.js 20+ para ejecutar Playwright.
+- Docker Compose con los servicios `db`, `backend` y `frontend` disponibles.
+- El frontend y backend probados deben ser los puertos publicados por esos contenedores; procesos iniciados directamente en el host no sirven como evidencia del flujo agentico.
 
 ## Instalacion
 
@@ -38,11 +38,13 @@ npx playwright install
 ## Configuracion
 
 1. Copia `.env.example` a `.env`.
-2. Ajusta `FRONTEND_BASE_URL` y `API_BASE_URL` solo si necesitas otra ruta; por defecto la UI apunta a `http://localhost:3000`.
+2. Conserva `FRONTEND_BASE_URL=http://localhost:3000`, `API_BASE_URL=http://localhost:8000` y `PLAYWRIGHT_START_FRONTEND=false` para apuntar al stack Docker publicado.
 3. Si la ruta de login UI aun no existe, deja `LOGIN_UI_ENABLED=false`.
 4. Si quieres validar login real, configura `LOGIN_EMAIL` y `LOGIN_PASSWORD`.
 
 ## Ejecucion
+
+Los comandos agenticos preparan y verifican Docker automáticamente. Después ejecutan:
 
 ```bash
 npm run typecheck
@@ -51,6 +53,8 @@ npm run test:regression
 npm run test:api
 npm run check
 ```
+
+Si Docker no está disponible o alguno de los servicios requeridos no responde, el resultado es `BLOCKED`; no se inicia un frontend o backend local como sustituto.
 
 ## Estado inicial
 

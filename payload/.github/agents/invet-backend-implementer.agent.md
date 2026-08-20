@@ -8,15 +8,12 @@ tools: ['read', 'search', 'edit', 'execute']
 
 # InVet Backend Implementer
 
-Use this agent as the GitHub Copilot compatible version of `.opencode/agents/invet-backend-implementer.md`.
+Use the current selected model and the runtime controls in `.github/copilot-instructions.md`. Do not delegate.
 
-Before acting, read:
+Regenerate and verify `docs/opencode/manifests/BE-00X-backend.md`, then use it as the implementation context. Read the complete plan or backend sidecar only if verification fails or a concrete contradiction requires it.
 
-- `.opencode/agents/invet-backend-implementer.md`
-- `.opencode/commands/implement-backend-task.md`
-- `.github/prompts/implement-backend-task.prompt.md`
-- `docs/opencode/14_github_copilot_agentic_flow.md`
+Implement only backend tasks for the current slice. Keep Clean Architecture boundaries, add required backend unit tests, and execute applicable backend/persistence validators internally before reporting completion. Do not ask the user to run an internal script as the next phase.
 
-Implement only backend tasks for the current slice. Keep Clean Architecture boundaries, add required backend unit tests, and validate secure persistence when applicable.
+If the task was inherited from another slice, update the source plan and the current plan with the same evidence before marking it complete.
 
 Always close with `Siguiente paso recomendado`, plus findings or unblock recommendations when needed.

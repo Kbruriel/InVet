@@ -10,13 +10,15 @@ Estrategia:
    - Si falla, reporta el gate y no declares checks finales del slice.
    - El preflight bloquea tareas aplicables abiertas y tareas `CANCELLED` sin evidencia verificable.
    - Sin argumento puedes ejecutar diagnostico tecnico, pero no cerrar un slice.
+0.1. Para cerrar un slice, regenera y verifica los cinco manifiestos y usa sus allowlists para delimitar los checks afectados; los resultados reales siguen siendo la evidencia autoritativa.
 1. Antes de correr nada, verifica que el interprete Python seleccionado tenga instaladas las dependencias de backend declaradas en `backend/requirements.txt`.
    - Si faltan `pytest`, `ruff`, `black` o `mypy`, reporta el bloqueo con la causa exacta y la instruccion de instalacion.
    - Prioriza un entorno local ya preparado, como `backend/.venv` o `.venv`, si existe.
 2. Ejecuta de forma autonoma los checks configurados. Los scripts frontend existentes, `git status`/`git diff` y el hook Docker Compose de cierre estan autorizados por el contrato del agente; pregunta al usuario solo si falta informacion bloqueante, hay una decision critica o se pide una accion destructiva.
 3. Detectar estructura del repo y herramientas configuradas antes de ejecutar.
-   - La UI de regresion corre sobre `http://localhost:3000`.
-   - La API corre sobre `http://localhost:8000/api/v1`.
+   - UI y API automation requieren `db`, `backend` y `frontend` ejecutandose con Docker Compose.
+   - La UI de regresion corre sobre `http://localhost:3000` publicado por `frontend`.
+   - La API corre sobre `http://localhost:8000/api/v1` publicado por `backend`.
 4. Backend:
    - Entrar a `backend/` si existe.
    - Ejecutar `python -W ignore::PendingDeprecationWarning -m pytest app/tests -q`.
@@ -28,10 +30,13 @@ Estrategia:
    - Usar el gestor detectado por lockfile: pnpm, npm o yarn.
    - Ejecutar lint, typecheck, test y build solo si el script existe.
    - Si el script existe, ejecutar y reportar pass/fail; no pedir confirmacion adicional.
+5.1. API automation:
+   - Confirma que el stack Docker esta disponible; Docker ausente o un servicio requerido no disponible es `blocked`, no `skipped`.
+   - Ejecuta `npm run test:api` desde `InVet_UI_Automation` contra el backend del stack. Una corrida contra un backend host no sirve como evidencia de cierre.
 6. DevOps:
    - Docker Compose de cierre se ejecuta con entorno/configuracion disponible, sin fallos previos y cambios relevantes; esta autorizado por el contrato del agente.
    - Si todos los checks aplicables pasan, primero validar si `git status` muestra cambios pendientes relevantes para `backend`, `frontend`, `docker-compose.yml`, `Dockerfile*` o lockfiles/manifiestos de dependencias.
-   - Si no hay cambios pendientes relevantes, registrar el skip y no reiniciar contenedores.
+   - Si no hay cambios pendientes relevantes, no fuerces recreacion, pero conserva el stack Docker disponible porque sigue siendo obligatorio para UI/API automation.
    - Si hay cambios pendientes relevantes, cerrar con el hook `docker compose up -d --build --force-recreate db backend frontend`.
 7. Reportar comandos ejecutados, resultado, skips justificados y warnings relevantes.
    - Un working tree con cambios pendientes no vuelve `git status` incompleto; resume los cambios y usa esa evidencia para decidir el hook Docker.

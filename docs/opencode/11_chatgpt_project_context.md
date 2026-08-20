@@ -31,8 +31,8 @@ Manual flow:
 ```text
 /plan-task BE-00X|FE-00X|QA-00X
 /implement-backend-task BE-00X
-/implement-frontend-task FE-00X
-/implement-ui-automation-task FE-00X
+/implement-frontend-task BE-00X
+/implement-ui-automation-task BE-00X
 /implement-api-automation-task BE-00X
 /qa-task QA-00X
 /review-slice BE-00X
@@ -40,7 +40,7 @@ Manual flow:
 /qa-task QA-00X
 /clean-architecture-review BE-00X
 /security-review BE-00X
-/run-ui-checks FE-00X
+/run-ui-checks BE-00X
 /run-checks BE-00X
 /update-docs BE-00X
 /final-gate BE-00X
@@ -54,9 +54,7 @@ General rules:
 - QA validates the full slice.
 - All operational agents can use `docker compose` when the slice requires PostgreSQL or container runtime validation. Use `db` + `backend` for data-backed tests and `frontend` for UI/runtime validation when applicable.
 - Reviews, checks, and documentation must be closed before advancing.
-- Use `invet-command-executor` for mechanical command batches, test runs, log collection, and repeat verifications.
-- `invet-command-executor` and its fallback inherit the model selected by the user; no executor pins a default model.
-- Reserve the fallback for checks and logs, failed-command retries, and mechanical fixes that need an isolated retry path.
+- Run commands, tests, diffs, and log collection directly in the active agent. Subagents and alternate model paths are disabled.
 - Use `invet-final-reviewer` for the final release gate after QA, reviews, checks, and docs when a higher-capacity second opinion is needed.
 
 Skill usage rule:
@@ -159,16 +157,6 @@ Important supporting files:
 - Objective: implement review findings, close corrections, and document the result.
 - Expected artifacts: `docs/opencode/reviews/BE-00X-corrections.md` based on `docs/opencode/templates/corrections_checklist_template.md`, plus any slice review files that feed the corrections flow.
 
-`invet-command-executor`
-- Mode: `all`
-- Objective: run command-heavy work, tests, lint, diffs, log collection, and repeat checks with the model selected by the user.
-- Expected artifact: exact command output and any safe mechanical fix requested by the parent agent.
-
-`invet-command-executor-fallback`
-- Mode: `all`
-- Objective: serve as a mechanical fallback when the primary executor is unavailable or an isolated retry path is needed.
-- Expected artifact: exact command output and any safe mechanical fix requested by the parent agent.
-
 `invet-clean-architecture-reviewer`
 - Mode: `subagent`
 - Objective: verify backend layering and frontend modular separation without modifying code.
@@ -207,12 +195,12 @@ Important supporting files:
 - Implements only pending backend tasks from `docs/opencode/plans/BE-00X-plan.md`.
 - Marks completed backend tasks as `- [x]` only after criteria are verified.
 
-`/implement-frontend-task FE-00X`
+`/implement-frontend-task BE-00X|FE-00X|QA-00X`
 - Agent: `invet-frontend-implementer`
 - Implements only pending frontend tasks from `docs/opencode/plans/BE-00X-plan.md`.
 - Marks completed frontend tasks as `- [x]` only after criteria are verified.
 
-`/implement-ui-automation-task FE-00X`
+`/implement-ui-automation-task BE-00X|FE-00X|QA-00X`
 - Agent: `invet-ui-automation-implementer`
 - Implements UI automation specs for the slice and updates `UIA-00X.md`.
 

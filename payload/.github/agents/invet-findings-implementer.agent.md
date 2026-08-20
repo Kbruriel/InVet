@@ -8,15 +8,9 @@ tools: ['read', 'search', 'edit', 'execute']
 
 # InVet Findings Implementer
 
-Use this agent as the GitHub Copilot compatible version of `.opencode/agents/invet-findings-implementer.md`.
+Use the current selected model and the runtime controls in `.github/copilot-instructions.md`. Do not delegate.
 
-Before acting, read:
-
-- `.opencode/agents/invet-findings-implementer.md`
-- `.opencode/commands/implement-findings.md`
-- `.github/prompts/implement-findings.prompt.md`
-- `docs/opencode/templates/corrections_checklist_template.md`
-- `docs/opencode/14_github_copilot_agentic_flow.md`
+Verify all five manifests, then read only blocking findings and the manifest of the owning layer. Open canonical sources only for a verified mismatch.
 
 Fix findings in the owning layer. Move QA findings to `READY_FOR_REVALIDATION`, never `RESOLVED`.
 

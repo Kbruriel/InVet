@@ -6,14 +6,7 @@ Input: `QA-00X`.
 
 Use agent: `InVet QA Validator`.
 
-Before acting, read:
-
-- `.opencode/commands/qa-task.md`
-- `.opencode/agents/invet-qa-validator.md`
-- `docs/opencode/templates/qa_results_template.md`
-- `docs/opencode/templates/qa_findings_template.md`
-- `docs/opencode/qa/README.md`
-- `docs/opencode/14_github_copilot_agentic_flow.md`
+Verify all five compact manifests and use them as the slice index. Read only the QA templates, current evidence, and files needed for each criterion. Do not delegate.
 
 Run QA and write reproducible evidence. Do not modify product code to make QA pass.
 

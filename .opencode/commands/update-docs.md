@@ -8,6 +8,7 @@ Actualiza la documentacion del slice indicado por `$ARGUMENTS`.
 Instrucciones:
 1. Requiere `BE-00X`, `FE-00X` o `QA-00X` y normaliza el mismo indice vertical.
 2. Ejecuta `python backend/scripts/validate_slice_plan.py BE-00X --stage docs`.
+2.1. Regenera y verifica los cinco manifiestos. Documenta cualquier divergencia entre manifiestos, checkpoints, plan y reportes antes de cerrar.
 3. Si el preflight falla, no documentes el slice como cerrado.
    - No cierres documentacion mientras exista una tarea aplicable abierta o una tarea `CANCELLED` sin evidencia verificable.
 4. Revisa implementacion, QA, reviews y checks.

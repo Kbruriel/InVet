@@ -89,7 +89,8 @@ Instrucciones:
    - Si una tarea toca mas de una capa o tipo de trabajo, dividela.
    - Si una tarea necesita varios entregables independientes para ser verificable, dividela.
 10. No implementes codigo fuente en este comando.
-   - `/plan-task` nunca implementa backend, frontend ni QA; solo crea o corrige `docs/opencode/plans/BE-00X-plan.md`.
+   - `/plan-task` es el propietario semantico del plan, `US-00X`, `UIA-00X` y `APIA-00X`.
+   - El script `manage_slice_task.py` solo renderiza manifiestos derivados; no decide alcance ni reemplaza al planificador.
 11. Si falta informacion critica, existen contradicciones entre matriz/tareas o no se pueden derivar criterios de aceptacion medibles:
    - Deten la planificacion solo cuando el gap sea bloqueante.
    - Haz preguntas concretas al usuario antes de guardar el plan final.
@@ -111,9 +112,13 @@ Instrucciones:
    - Divide tareas legacy compuestas en tareas atomicas con todos los campos obligatorios.
    - No declares aprobaciones de QA, reviews o checks desde backups.
 14. Agrega un `Checklist tecnico` obligatorio con validaciones de rutas, contratos API, permisos, migraciones/modelos, estados de error, pruebas, Docker, run-checks, reportes/findings, UTF-8 y documentacion.
-15. Al terminar, ejecuta `python backend/scripts/validate_slice_plan.py BE-00X --stage plan`.
+15. Cada `Entregables` debe enumerar todas las rutas que la tarea puede crear o modificar, incluidos wiring, routers y pruebas; no uses descripciones ambiguas como "registro en main router" sin la ruta exacta.
+16. Al terminar la edicion semantica, ejecuta `python backend/scripts/validate_slice_plan.py BE-00X --stage plan`.
    - No declares la planificacion terminada mientras el validador reporte errores.
-16. Escribe y conserva el plan en UTF-8.
+17. Solo despues de obtener `PASS`, ejecuta `python backend/scripts/manage_slice_task.py manifest BE-00X --layer all` y luego `python backend/scripts/manage_slice_task.py verify BE-00X --layer all`.
+   - No declares la planificacion terminada si falta un sidecar o un manifiesto esta stale.
+   - Cada comando de implementacion consume su manifiesto; los gates de cierre usan los cinco como indice compacto y los reportes como evidencia autoritativa.
+18. Escribe y conserva el plan en UTF-8.
    - Los textos en espanol deben conservar acentos y eñes.
    - Si aparece mojibake como `Ã`, `Â` o `â` en artefactos nuevos, corrige antes de validar.
 Cierre obligatorio:

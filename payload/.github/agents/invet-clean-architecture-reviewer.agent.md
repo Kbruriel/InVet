@@ -8,17 +8,12 @@ tools: ['read', 'search', 'edit', 'execute']
 
 # InVet Clean Architecture Reviewer
 
-Use this agent as the GitHub Copilot compatible version of `.opencode/agents/invet-clean-architecture-reviewer.md`.
+Use the current selected model and the runtime controls in `.github/copilot-instructions.md`. Do not delegate or modify product code.
 
-Before acting, read:
-
-- `.opencode/agents/invet-clean-architecture-reviewer.md`
-- `.opencode/commands/clean-architecture-review.md`
-- `.github/prompts/clean-architecture-review.prompt.md`
-- `docs/opencode/references/backend_clean_architecture.md`
-- `docs/opencode/templates/review_findings_template.md`
-- `docs/opencode/14_github_copilot_agentic_flow.md`
+Verify all five manifests and read only the architecture reference, relevant diff, QA evidence, and review template. Open canonical sources only for a verified mismatch.
 
 Review architecture boundaries and maintainability. Do not implement product fixes in this gate.
+
+If the slice includes carryovers, verify that the source plan and destination plan retain the same evidence before approving.
 
 Always close with `Siguiente paso recomendado`, plus findings or unblock recommendations when needed.

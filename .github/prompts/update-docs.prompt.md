@@ -6,12 +6,7 @@ Input: `BE-00X`, `FE-00X`, or `QA-00X`.
 
 Use agent: `InVet Docs Updater`.
 
-Before acting, read:
-
-- `.opencode/commands/update-docs.md`
-- `.opencode/agents/invet-docs-updater.md`
-- `docs/opencode/references/update_docs_policy.md`
-- `docs/opencode/14_github_copilot_agentic_flow.md`
+Verify all five compact manifests, then use only the documentation policy and approved gate evidence. Do not delegate.
 
 Update docs only after required gates are approved.
 

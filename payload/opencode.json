@@ -1,0 +1,53 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "permission": {
+    "task": "deny",
+    "doom_loop": "deny",
+    "bash": {
+      "*": "ask",
+      "git status*": "allow",
+      "git -C * status*": "allow",
+      "git diff*": "allow",
+      "git -C * diff*": "allow",
+      "git show*": "allow",
+      "rg*": "allow",
+      "Get-ChildItem*": "allow",
+      "Get-Content*": "allow",
+      "pytest*": "allow",
+      "python -m pytest*": "allow",
+      "ruff check*": "allow",
+      "python -m ruff check*": "allow",
+      "black --check*": "allow",
+      "python -m black --check*": "allow",
+      "mypy*": "allow",
+      "python -m mypy*": "allow",
+      "npm test*": "allow",
+      "npm run test*": "allow",
+      "npm run lint*": "allow",
+      "npm run typecheck*": "allow",
+      "npx tsc --noEmit*": "allow",
+      "python backend/scripts/validate_slice_plan.py*": "allow",
+      "python backend/scripts/manage_slice_task.py*": "allow",
+      "docker compose ps*": "allow",
+      "docker compose logs*": "allow",
+      "docker compose up -d --build db backend frontend*": "allow",
+      "docker compose up -d --build --force-recreate db backend frontend*": "allow",
+      "git commit*": "ask",
+      "git push*": "ask",
+      "alembic upgrade*": "ask",
+      "alembic downgrade*": "ask",
+      "alembic revision*": "ask"
+    }
+  },
+  "compaction": {
+    "auto": true,
+    "prune": true,
+    "tail_turns": 6,
+    "preserve_recent_tokens": 24576,
+    "reserved": 8192
+  },
+  "tool_output": {
+    "max_lines": 1000,
+    "max_bytes": 32768
+  }
+}

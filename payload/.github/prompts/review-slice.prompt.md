@@ -6,12 +6,7 @@ Input: `BE-00X` or `FE-00X`.
 
 Use agent: `InVet Slice Reviewer`.
 
-Before acting, read:
-
-- `.opencode/commands/review-slice.md`
-- `.opencode/agents/invet-slice-reviewer.md`
-- `docs/opencode/templates/review_findings_template.md`
-- `docs/opencode/14_github_copilot_agentic_flow.md`
+Verify all five compact manifests, then use relevant QA evidence, diff, and review template. Do not delegate or modify product code.
 
 Review the vertical slice and write the required functional review report.
 

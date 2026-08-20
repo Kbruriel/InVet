@@ -8,17 +8,9 @@ tools: ['read', 'search', 'edit', 'execute']
 
 # InVet QA Validator
 
-Use this agent as the GitHub Copilot compatible version of `.opencode/agents/invet-qa-validator.md`.
+Use the current selected model and the runtime controls in `.github/copilot-instructions.md`. Do not delegate or modify product code.
 
-Before acting, read:
-
-- `.opencode/agents/invet-qa-validator.md`
-- `.opencode/commands/qa-task.md`
-- `.github/prompts/qa-task.prompt.md`
-- `docs/opencode/templates/qa_results_template.md`
-- `docs/opencode/templates/qa_findings_template.md`
-- `docs/opencode/qa/README.md`
-- `docs/opencode/14_github_copilot_agentic_flow.md`
+Verify all five `docs/opencode/manifests/BE-00X-*.md`, use them as the compact slice index, and read only QA templates plus relevant evidence. Open canonical sources only for a verified mismatch.
 
 Run QA with reproducible evidence. Do not modify product code to make QA pass. Findings created here must be revalidated by QA before closing.
 

@@ -18,6 +18,7 @@ Este archivo define requisitos, no el estado de un slice. Los checks permanecen 
 - [ ] Las tareas completadas contienen evidencia reproducible.
 - [ ] El plan no contiene mojibake y conserva UTF-8.
 - [ ] `validate_slice_plan.py --stage plan` termina en `PASS`.
+- [ ] Los cinco manifiestos fueron generados despues del `PASS` y `manage_slice_task.py verify BE-00X --layer all` termina en `PASS`.
 
 ## `/implement-backend-task BE-00X`
 
@@ -31,7 +32,7 @@ Este archivo define requisitos, no el estado de un slice. Los checks permanecen 
 - [ ] El plan contiene evidencia actualizada.
 - [ ] El hook de Docker Compose de cierre se ejecuto cuando aplicaba.
 
-## `/implement-frontend-task FE-00X`
+## `/implement-frontend-task BE-00X|FE-00X|QA-00X`
 
 - [ ] El preflight frontend pasa.
 - [ ] El contrato frontend define rutas, flujos, API, formularios, arquitectura, accesibilidad y pruebas.
@@ -59,29 +60,33 @@ Este archivo define requisitos, no el estado de un slice. Los checks permanecen 
 - [ ] Antes del cierre se valido si habia cambios pendientes que justificaran actualizar contenedores y se confirmo que los contenedores Docker aplicables quedaron actualizados o recreados.
 - [ ] El hook de Docker Compose de cierre se ejecuto cuando QA quedo `APPROVED`.
 
-## `/implement-ui-automation-task FE-00X`
+## `/implement-ui-automation-task BE-00X|FE-00X|QA-00X`
 
 - [ ] Existe `UIA-00X.md`.
 - [ ] Se leyeron `US-00X`, `BE-00X`, `FE-00X`, `QA-00X` y `UIA-00X`.
 - [ ] Los specs se implementaron en `InVet_UI_Automation/tests/e2e`.
 - [ ] Los tests referencian `US-00X-NN` y `CA-NN`.
+- [ ] `db`, `backend` y `frontend` de Docker Compose estan disponibles y la UI no usa un servidor host alternativo.
+- [ ] `PLAYWRIGHT_START_FRONTEND=false` queda registrado en la evidencia.
 - [ ] `npm run test:e2e` pasa o el bloqueo queda documentado.
 - [ ] `npm run test:regression` pasa o el bloqueo queda documentado.
 - [ ] `UIA-00X` contiene evidencia y casos no automatizados.
 
-## `/implement-api-automation-task BE-00X`
+## `/implement-api-automation-task BE-00X|FE-00X|QA-00X`
 
 - [ ] Existe `APIA-00X.md`.
 - [ ] Se leyeron `US-00X`, `BE-00X`, `FE-00X`, `QA-00X` y `APIA-00X`.
 - [ ] Los specs se implementaron en `InVet_UI_Automation/tests/api`.
 - [ ] Los tests referencian `US-00X-NN` y `CA-NN`.
+- [ ] `db`, `backend` y `frontend` de Docker Compose estan disponibles y la API apunta al backend publicado por Docker.
 - [ ] `npm run test:api` pasa o el bloqueo queda documentado.
 - [ ] `APIA-00X` contiene evidencia y casos no automatizados.
 
-## `/run-ui-checks FE-00X`
+## `/run-ui-checks BE-00X|FE-00X|QA-00X`
 
 - [ ] Existe `UIA-00X.md`.
-- [ ] La UI/regresion corre sobre `http://localhost:3000`.
+- [ ] La UI/regresion corre sobre `http://localhost:3000` publicado por el contenedor `frontend`, con `PLAYWRIGHT_START_FRONTEND=false`.
+- [ ] Docker ausente o un servicio no disponible produce `BLOCKED`, no `skipped`.
 - [ ] Las rutas relevantes del slice quedaron explicitas en la evidencia (`/clinicas`, `/portal/owner/appointments`, `/portal/owner/appointments/new`, `/clinic/appointments`).
 - [ ] `npm run test:e2e` pasa.
 - [ ] `npm run test:regression` pasa.
@@ -112,6 +117,7 @@ Este archivo define requisitos, no el estado de un slice. Los checks permanecen 
 - [ ] No quedan tareas aplicables abiertas ni tareas `CANCELLED` sin evidencia verificable.
 - [ ] QA y reviews estan aprobados.
 - [ ] UI automation y API automation estan aprobadas o justificadas.
+- [ ] `npm run test:api` se reejecuto contra el backend Docker durante los checks formales.
 - [ ] `run-ui-checks` ya paso para el slice.
 - [ ] La API del slice corrió sobre `http://localhost:8000/api/v1`.
 - [ ] Tests, lint, formato, tipos y build aplicables pasan.
@@ -135,7 +141,7 @@ Este archivo define requisitos, no el estado de un slice. Los checks permanecen 
 
 - [ ] QA, reviews, checks y documentacion estan cerrados.
 - [ ] Se revisaron logs, reintentos mecanicos y correcciones fallidas.
-- [ ] El reviewer final usa una segunda opinion de alta capacidad.
+- [ ] El reviewer final usa el modelo seleccionado y verifica los cinco manifiestos contra sus fuentes.
 - [ ] Si existen tareas heredadas, el registro de carryovers esta en `CLOSED` o `CANCELLED` con evidencia reproducible.
 - [ ] Existe `docs/opencode/reviews/BE-00X-final-review.md`.
 - [ ] El reporte contiene `Decision: APPROVED|REJECTED|BLOCKED`.

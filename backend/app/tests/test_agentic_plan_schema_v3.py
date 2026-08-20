@@ -321,6 +321,11 @@ def test_schema_v3_plan_contract_requires_carryover_registry_when_transfers_are_
 
 def test_schema_v3_contracts_are_synced_with_payload() -> None:
     pairs = [
+        (REPO_ROOT / "opencode.json", REPO_ROOT / "payload/opencode.json"),
+        (
+            REPO_ROOT / "backend/scripts/manage_slice_task.py",
+            REPO_ROOT / "payload/backend/scripts/manage_slice_task.py",
+        ),
         (
             REPO_ROOT / "backend/scripts/validate_slice_plan.py",
             REPO_ROOT / "payload/backend/scripts/validate_slice_plan.py",

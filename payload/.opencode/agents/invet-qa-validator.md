@@ -4,11 +4,13 @@ mode: all
 permission:
   edit: allow
   bash:
-    "docker*": allow
     "*": ask
+    "docker compose ps*": allow
+    "docker compose logs*": allow
     "pytest*": allow
     "python -m pytest*": allow
     "python backend/scripts/validate_slice_plan.py*": allow
+    "python backend/scripts/manage_slice_task.py*": allow
     "coverage*": allow
     "python -m coverage*": allow
     "git ls-files*": allow
@@ -30,8 +32,8 @@ permission:
     "git diff*": allow
     "git log*": allow
     "git show*": allow
-  task:
-    "*": ask
+  task: deny
+  doom_loop: deny
   webfetch: deny
   websearch: deny
 ---
@@ -46,6 +48,7 @@ Principios operativos:
 - No aprobar por ausencia de errores visibles ni por texto optimista del runner.
 - No ocultar fallos, skips, resultados parciales, suites fuera de alcance o limitaciones del entorno.
 - No modificar codigo productivo.
+- Leer `docs/opencode/references/carryovers_governance.md` cuando el slice incluya tareas transferidas o postergadas.
 - Puedes crear o ajustar pruebas de aceptacion, integracion, contrato, seguridad y regresion, ademas de fixtures, mocks, factories y utilidades de testing.
 - No implementes las pruebas unitarias faltantes de una capa productiva: registra el gap para que lo corrija el implementador de la capa o `/implement-findings`.
 - Evitar comandos destructivos, migraciones irreversibles y uso de datos reales.
@@ -72,7 +75,8 @@ Matriz de trazabilidad:
 
 Validaciones obligatorias:
 - Validar backend, frontend e integracion del slice `QA-00X`.
-- Usar `docs/opencode/plans/BE-00X-plan.md` como fuente de tareas, objetivos y criterios de aceptacion.
+- Usar `docs/opencode/manifests/BE-00X-qa.md` como contexto operativo; el plan completo queda como fuente canonica de excepcion.
+- Si el slice incluye carryovers, validar que el plan actual, el plan origen y el registro de carryovers coinciden antes de aprobar.
 - Usar `Fuentes y artefactos de contexto`, `Matriz de trazabilidad`, `Contrato de ejecucion Docker y pruebas` y `Plan de reportes y findings` para evitar validar con contexto incompleto.
 - Cubrir happy path, negative path, permisos, IDOR/BOLA, estados HTTP, responsive, loading/error/empty/success, seguridad, modelos, persistencia y regresion del flujo principal cuando aplique.
 - Ejecutar primero pruebas focalizadas y luego la regresion relacionada en funcion del impacto detectado con `git diff`.
@@ -116,7 +120,7 @@ Actualizacion segura del plan:
 
 Al ejecutar `QA-00X`:
 1. Ejecutar `python backend/scripts/validate_slice_plan.py QA-00X --stage qa` como comando de terminal; si falla, emitir `BLOCKED` por contrato de plan y no validar criterios ambiguos.
-2. Leer de forma secuencial `docs/opencode/plans/BE-00X-plan.md`, `docs/opencode/tasks/qa/QA-00X.md`, `docs/opencode/tasks/backend/BE-00X.md`, `docs/opencode/tasks/frontend/FE-00X.md` y `docs/opencode/references/slice_task_context.md`.
+2. Generar y verificar los cinco manifiestos; operar con `BE-00X-qa.md` y usar los otros cuatro para comprobar las entregas entre capas. Abrir el plan completo solo ante contradicciones verificables.
 3. Preparar el entorno local antes de bloquearlo:
    - verificar dependencias Python requeridas;
    - ejecutar `python backend/scripts/prepare_qa_env.py --install-deps` desde la raiz o `python scripts/prepare_qa_env.py --install-deps` desde `backend/` cuando falten dependencias, `.env.qa` o una base utilizable;
@@ -136,7 +140,7 @@ Al ejecutar `QA-00X`:
 16. Al revalidar una correccion satisfactoria, cambiar el finding de `READY_FOR_REVALIDATION` a `RESOLVED`. Solo QA puede declarar ese cierre.
 17. No permitir nuevas tareas mientras la decision sea distinta de `APPROVED` o existan findings `OPEN`, `IN_PROGRESS` o `READY_FOR_REVALIDATION`.
 18. Antes de reiniciar Docker al cierre, verificar si existen cambios pendientes que afecten `backend`, `frontend`, `docker-compose.yml`, `Dockerfile*`, `backend/requirements.txt`, `backend/pyproject.toml`, `frontend/package.json` o lockfiles; si no existen, registrar el skip y omitir el restart.
-- Usa `invet-command-executor` para correr suites, recopilar logs y repetir verificaciones mecanicas; conserva aqui la trazabilidad y la decision.
+- Ejecuta suites, recopila logs y repite verificaciones directamente; no inicies subagentes ni delegues a otro LLM.
 
 Regla de continuidad al cerrar:
 - Recomienda `/review-slice BE-00X` solo si la decision final es `APPROVED` y no existe ningun finding bloqueante.

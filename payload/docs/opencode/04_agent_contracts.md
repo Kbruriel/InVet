@@ -8,12 +8,18 @@
 - Cada comando mutable ejecuta `backend/scripts/validate_slice_plan.py`.
 - Los planes nuevos usan `schema_version: 3` y declaran `encoding: UTF-8`.
 - Todas las redacciones, comentarios, evidencias y outcomes operativos se escriben en UTF-8.
-- Las tareas mecanicas de ejecucion pueden delegarse a `invet-command-executor` para conservar el razonamiento en el agente de dominio.
+- Cada agente ejecuta directamente comandos, pruebas y logs con el modelo seleccionado en la sesion; los subagentes estan deshabilitados.
 - Una tarea completada requiere criterios verificados y `Evidencia` reproducible.
 - Un gate fallido detiene el flujo; no se convierte en `skipped`.
 - Cada tarea debe tener responsabilidad unica, tipo declarado, contexto necesario, contratos usados y resultado esperado.
 - Los agentes de implementacion deben rechazar tareas compuestas en lugar de reinterpretarlas.
 - Cada agente debe cerrar con `Estado de ejecucion`, `Siguiente paso recomendado` y, cuando aplique, `Comando recomendado para resolver hallazgos` o `Comando recomendado para desbloquear el gate`.
+- Cada capa consume `docs/opencode/manifests/BE-00X-<capa>.md` como contexto operativo compacto; el plan completo se abre solo para resolver contradicciones.
+- `/plan-task` es el propietario semantico del plan y de `US/UIA/APIA`; `manage_slice_task.py` solo renderiza y verifica los cinco manifiestos derivados mediante hashes de sus fuentes.
+- Backend, frontend y automatizaciones consumen su manifiesto. QA consume los cinco para validar handoffs. Reviews, checks, docs y final gate los usan como indice de alcance, sin reemplazar reportes, diff, checkpoints ni resultados reales.
+- Cada tarea usa `backend/scripts/manage_slice_task.py start|state|finish`, muestra estado observable y guarda checkpoint por capa.
+- La allowlist se deriva de `Entregables`; cambios fuera de ella, eliminaciones sin justificacion o perdida de registros `include_router(...)` bloquean el cierre.
+- Las generaciones del modelo tienen un maximo de 30 minutos y 16,384 tokens de salida; se cancelan tras 3 minutos sin actividad del proveedor y OpenCode bloquea tres llamadas de herramienta identicas mediante `doom_loop`. Los comandos directos con progreso observable no quedan limitados por la duracion de una generacion.
 - El `Estado de ejecucion` debe usar el vocabulario permitido por la familia del agente y no mezclarlo con el estado de findings.
 - Los agentes no deben afirmar que un comando es "el unico" que desbloquea el slice; deben declarar el estado actual, el bloqueo real y el siguiente gate verificable.
 - El frontend de validacion corre por defecto en `http://localhost:3000` y el backend en `http://localhost:8000` con API bajo `/api/v1`.
@@ -37,7 +43,7 @@
 | Agente | Responsabilidad | Gate o salida |
 | --- | --- | --- |
 | `invet-orchestrator` | Ejecuta el slice completo y evita saltar etapas | Bloquea ante plan invalido, QA no aprobado, findings abiertos, reviews o checks rechazados |
-| `invet-product-planner` | Acepta IDs BE/FE/QA, crea el plan vertical schema v3 y actualiza `US/UIA/APIA` | `BE-00X-plan.md` validado y sidecars actualizados |
+| `invet-product-planner` | Acepta IDs BE/FE/QA, crea el plan vertical schema v3, actualiza `US/UIA/APIA` y renderiza manifiestos | Plan, sidecars y cinco manifiestos verificados |
 | `invet-backend-implementer` | Implementa tareas `Capa: backend` y sus pruebas unitarias | Criterios, validacion y evidencia por tarea |
 | `invet-frontend-implementer` | Implementa el contrato frontend y sus pruebas unitarias/de componente | Criterios, validacion y evidencia por tarea |
 | `invet-ui-automation-implementer` | Implementa E2E, formularios, navegacion, redirects y estados UI con Playwright | `UIA-00X.md` con cobertura y evidencia |
@@ -47,9 +53,7 @@
 | `invet-clean-architecture-reviewer` | Revisa capas backend y modularidad frontend | `BE-00X-clean-architecture-review.md` con decision |
 | `invet-security-reviewer` | Revisa autenticacion, autorizacion, IDOR/BOLA y datos | `BE-00X-security-review.md` con decision |
 | `invet-findings-implementer` | Corrige findings y pruebas unitarias faltantes en la capa responsable | Correcciones y estado `READY_FOR_REVALIDATION` |
-| `invet-command-executor` | Ejecuta comandos, tests, lint, lectura de logs y reintentos mecanicos con el modelo seleccionado por el usuario | Salida cruda y evidencia reproducible |
-| `invet-command-executor-fallback` | Respaldo mecanico para comandos y verificaciones que requieran reintentos | Salida cruda y evidencia reproducible |
-| `invet-final-reviewer` | Gate final de release con revision de alta capacidad | `BE-00X-final-review.md` con decision |
+| `invet-final-reviewer` | Gate final de release con el modelo seleccionado | `BE-00X-final-review.md` con decision |
 | `invet-check-runner` | Ejecuta UI checks, tests, lint, format, types y build; valida si hay cambios pendientes antes del cierre Docker | `BE-00X-checks.md` con decision |
 | `invet-docs-updater` | Documenta el cierre despues de aprobar gates | Changelog, contratos y estado final |
 
@@ -79,7 +83,7 @@ QA no repara y certifica el mismo gap unitario. Debe emitir `REJECTED`, dejar un
 
 `READY_FOR_REVALIDATION` pertenece al lifecycle de findings, no al cierre del gate de QA ni de los reviewers. Si un agente de QA o review reporta `Estado de ejecucion`, debe usar solo `APPROVED`, `REJECTED` o `BLOCKED`.
 
-Todos los agentes operativos pueden usar `docker compose` cuando el slice requiera PostgreSQL, backend runtime o frontend runtime en contenedor. La referencia normal es `db` + `backend` para pruebas con persistencia y `frontend` para validacion de UI cuando aplique.
+Todos los agentes operativos pueden usar `docker compose` cuando el slice requiera PostgreSQL, backend runtime o frontend runtime en contenedor. Para UI/API automation, Docker es obligatorio: el sistema bajo prueba siempre es `db` + `backend` + `frontend`, Playwright UI usa `PLAYWRIGHT_START_FRONTEND=false` y una corrida contra procesos host no es evidencia aprobatoria.
 
 Cuando la validacion requiera PostgreSQL u otro servicio del compose del repo, `invet-qa-validator` ejecuta la suite dentro del contenedor de backend y usa `docker compose` como contexto de prueba. Antes de reiniciar contenedores al cierre, valida si existen cambios pendientes que realmente ameriten rebuild/restart; si no los hay, registra el skip y no fuerza Docker. Si Docker aplica, QA tambien debe confirmar que todos los contenedores relevantes fueron actualizados o recreados y que su estado quedo saludable. El contenedor de `frontend` se considera runtime por defecto y no debe asumirse apto para tests salvo que el flujo lo prepare de forma explicita.
 
@@ -130,6 +134,5 @@ OPEN
 - `.opencode`, `docs/opencode` y `backend/scripts` son los archivos operativos del repositorio.
 - `payload` es el espejo distribuible usado por `install-invet-opencode-agents.ps1`.
 - Las pruebas contractuales deben impedir divergencias en agentes, comandos, templates y validadores.
-- `invet-command-executor` es el ejecutor primario y hereda el modelo seleccionado por el usuario.
-- `invet-command-executor-fallback` se mantiene como respaldo operativo, pero no fija un modelo por defecto.
-- `invet-final-reviewer` es el gate final de release y se usa despues de QA, reviews, checks y docs cuando se desea una segunda opinion de alta capacidad.
+- Ningun agente fija, cambia o selecciona un modelo alternativo. Toda la ejecucion usa el modelo seleccionado en la sesion.
+- `invet-final-reviewer` es el gate obligatorio de release despues de QA, reviews, checks y docs y conserva el modelo seleccionado en la sesion.

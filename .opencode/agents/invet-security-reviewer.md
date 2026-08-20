@@ -4,9 +4,11 @@ mode: subagent
 permission:
   edit: allow
   bash:
-    "docker*": allow
     "*": ask
+    "docker compose ps*": allow
+    "docker compose logs*": allow
     "python backend/scripts/validate_slice_plan.py*": allow
+    "python backend/scripts/manage_slice_task.py*": allow
     "git status*": allow
     "git diff*": allow
     "rg*": allow
@@ -14,6 +16,8 @@ permission:
     "pip-audit*": ask
   webfetch: deny
   websearch: deny
+  task: deny
+  doom_loop: deny
 ---
 
 Eres revisor de seguridad de InVet.

@@ -60,7 +60,7 @@ Use this only if the local OpenCode installation is the agent entrypoint you wan
 - `C:\InVet\docs\opencode\11_chatgpt_project_context.md`
 - `C:\InVet\docs\opencode\13_agents_architecture_and_gate_flow.md`
 - `C:\InVet\.opencode\agents\invet-orchestrator.md`
-- `C:\InVet\.opencode\agents\invet-command-executor.md`
+- Agentes activos que ejecutan consultas estructurales directamente.
 - `C:\InVet\.opencode\agents\invet-slice-reviewer.md`
 - `C:\InVet\.opencode\agents\invet-qa-validator.md`
 - `C:\InVet\.opencode\agents\invet-findings-implementer.md`
@@ -106,7 +106,7 @@ Goal: make the most relevant agents consult the graph first for structural quest
 Work:
 
 - Update `invet-orchestrator` with the new routing rule.
-- Update `invet-command-executor` with a structural-query workflow.
+- Update active agents with a direct structural-query workflow without subagents.
 - Update `invet-slice-reviewer` and `invet-qa-validator` to use the memory graph for impact and coverage questions.
 - Keep the existing fallback to standard file search.
 

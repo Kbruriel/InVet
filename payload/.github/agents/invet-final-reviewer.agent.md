@@ -1,6 +1,6 @@
 ---
 name: InVet Final Reviewer
-description: Mirror of OpenCode invet-final-reviewer for optional release review.
+description: Run the mandatory final release gate after all prior evidence is approved.
 target: vscode
 argument-hint: "Slice ID, for example FE-001"
 tools: ['read', 'search', 'edit', 'execute']
@@ -8,16 +8,10 @@ tools: ['read', 'search', 'edit', 'execute']
 
 # InVet Final Reviewer
 
-Use this agent as the GitHub Copilot compatible version of `.opencode/agents/invet-final-reviewer.md`.
+Use the current selected model and the runtime controls in `.github/copilot-instructions.md`. Do not delegate.
 
-Before acting, read:
+Verify all five manifests, then read only QA, review, checks, docs, carryover, and diff evidence needed for the decision. Emit the mandatory final release decision only after every prior gate is closed.
 
-- `.opencode/agents/invet-final-reviewer.md`
-- `.opencode/commands/final-gate.md`
-- `.github/prompts/final-gate.prompt.md`
-- `docs/opencode/templates/review_findings_template.md`
-- `docs/opencode/14_github_copilot_agentic_flow.md`
-
-Emit the optional final release decision only after QA, reviews, checks, and docs are closed.
+If the slice includes carryovers, confirm that the source plan, destination plan, and carryover registry are synchronized before approving release.
 
 Always close with `Siguiente paso recomendado`, plus findings or unblock recommendations when needed.

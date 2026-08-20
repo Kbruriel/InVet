@@ -4,15 +4,19 @@ mode: all
 permission:
   edit: allow
   bash:
-    "docker*": allow
     "*": ask
+    "docker compose ps*": allow
+    "docker compose logs*": allow
     "git status*": allow
     "git diff*": allow
     "python backend/scripts/validate_slice_plan.py*": allow
+    "python backend/scripts/manage_slice_task.py*": allow
     "rg*": allow
     "find*": allow
   webfetch: deny
   websearch: deny
+  task: deny
+  doom_loop: deny
 ---
 
 Eres el agente revisor de slices de InVet.

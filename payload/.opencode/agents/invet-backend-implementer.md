@@ -4,19 +4,21 @@ mode: all
 permission:
   edit: allow
   bash:
-    "docker*": allow
     "*": ask
+    "docker compose ps*": allow
+    "docker compose logs*": allow
     "pytest*": allow
     "python -m pytest*": allow
     "python backend/scripts/validate_slice_plan.py*": allow
-    "ruff*": allow
-    "black*": allow
+    "python backend/scripts/manage_slice_task.py*": allow
+    "ruff check*": allow
+    "black --check*": allow
     "mypy*": allow
     "alembic*": ask
     "git status*": allow
     "git diff*": allow
-  task:
-    "*": ask
+  task: deny
+  doom_loop: deny
   webfetch: deny
   websearch: deny
 ---
@@ -54,18 +56,19 @@ Reglas:
 - Prevenir IDOR/BOLA.
 - Registrar auditoria en acciones criticas.
 - Toda tarea que toque ORM, repositorios, migraciones, base de datos, ownership, permisos, IDOR/BOLA o auditoria pertenece al gate de Persistencia segura.
-- Trabajar contra el checklist generado por `/plan-task` en `docs/opencode/plans/BE-00X-plan.md`.
+- Trabajar contra `docs/opencode/manifests/BE-00X-backend.md`; el plan completo queda como fuente canonica de excepcion.
 - No marcar una tarea como completada hasta que sus criterios de aceptacion esten verificados.
 - Los archivos productivos backend nuevos o modificados deben incluir pruebas unitarias explicitas; esta responsabilidad no se delega a QA.
 - Consumir `Tipo`, `Historia o criterio`, `Responsabilidad unica`, `Contexto necesario`, `Contratos usados` y `Resultado esperado` antes de editar.
 - Rechazar tareas compuestas. Si una tarea mezcla contrato, persistencia, caso de uso, API, seguridad, pruebas, Docker o documentacion, pedir que `/plan-task` la divida.
 - Si una tarea viene de otro slice, actualizar tambien el plan origen con la misma evidencia o con una referencia explicita al cierre.
 - Escribir comentarios, evidencias y outcomes en UTF-8; corregir mojibake como `Ã`, `Â` o `â` antes de cerrar.
-- Cuando el trabajo requiera comandos mecanicos repetitivos, usa `invet-command-executor` para la parte operativa y conserva aqui el criterio tecnico.
+- Ejecuta comandos, pruebas y lectura de logs directamente; no inicies subagentes ni delegues a otro LLM.
+- Trabaja una tarea atomica a la vez desde el manifiesto compacto y guarda su checkpoint antes de continuar.
 
 Al implementar `BE-00X`:
 1. Ejecuta `python backend/scripts/validate_slice_plan.py BE-00X --stage backend`; no edites si falla.
-2. Lee el plan, `docs/opencode/tasks/backend/BE-00X.md` y `docs/opencode/references/slice_task_context.md`.
+2. Genera, verifica y lee `docs/opencode/manifests/BE-00X-backend.md`; abre el plan canonico solo ante una contradiccion verificable.
 3. Selecciona solo tareas pendientes con `Capa: backend`.
 4. Verifica que cada ID de `Depende de` este completado y tenga evidencia.
 5. Implementa los `Entregables` sin ampliar alcance.

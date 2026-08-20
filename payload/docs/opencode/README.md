@@ -2,6 +2,8 @@
 
 Esta carpeta contiene la documentacion operativa para ejecutar InVet por slices verticales usando comandos OpenCode.
 
+Consulta `15_operational_manifests_flow.md` para la propiedad, verificacion y cadena completa de manifiestos operativos.
+
 ## Skills vs agentes OpenCode
 
 Los `invet-*` son agentes OpenCode, no skills Codex. Se ejecutan mediante comandos slash.
@@ -27,8 +29,8 @@ Flujo manual equivalente:
 ```text
 /plan-task BE-00X
 /implement-backend-task BE-00X
-/implement-frontend-task FE-00X
-/implement-ui-automation-task FE-00X
+/implement-frontend-task BE-00X
+/implement-ui-automation-task BE-00X
 /implement-api-automation-task BE-00X
 /qa-task QA-00X
 /review-slice BE-00X
@@ -36,9 +38,10 @@ Flujo manual equivalente:
 /security-review BE-00X
 /implement-findings BE-00X  # solo si hay hallazgos
 /qa-task QA-00X             # repetir despues de correcciones
-/run-ui-checks FE-00X
+/run-ui-checks BE-00X
 /run-checks BE-00X
 /update-docs BE-00X
+/final-gate BE-00X
 ```
 
 Notas:
@@ -53,7 +56,12 @@ Notas:
 - Cuando Docker aplica al cierre, todos los contenedores relevantes deben quedar actualizados o recreados y saludables antes de reportar cierre.
 - Los stages de cierre `review`, `checks` y `docs` no aceptan tareas aplicables abiertas; solo `Estado: CANCELLED` con evidencia verificable puede quedar exento.
 - Los artefactos operativos se escriben en UTF-8.
-- Para implementar frontend usa `/implement-frontend-task FE-00X`.
+- Implementadores, automatizaciones y gates tecnicos aceptan aliases BE/FE/QA del mismo indice; la cadena usa BE como entrada uniforme y QA conserva `/qa-task QA-00X`.
+- `/plan-task` crea plan, `US/UIA/APIA` y los cinco manifiestos; los demas agentes solo regeneran y verifican esas vistas derivadas.
+- En VS Code, `.vscode/settings.json` limita cada ejecucion a 50 solicitudes y `.github/copilot-instructions.md` exige un solo modelo, checkpoints y corte cerca de 48,000 tokens de contexto.
+- `/final-gate` es obligatorio despues de actualizar documentacion.
+- Para implementar frontend usa `/implement-frontend-task BE-00X`.
+- `/implement-backend-task` ejecuta internamente las validaciones tecnicas de backend y persistencia que correspondan; no se agrega un script Python como fase del flujo del usuario.
 - Para ejecutar QA usa `/qa-task QA-00X`.
 - Para revisar un slice puedes usar `/review-slice BE-00X` o `/review-slice FE-00X`.
 - Para cerrar hallazgos puedes usar `/implement-findings BE-00X` o `/implement-findings FE-00X`.

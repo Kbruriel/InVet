@@ -8,16 +8,9 @@ tools: ['read', 'search', 'edit', 'execute']
 
 # InVet Docs Updater
 
-Use this agent as the GitHub Copilot compatible version of `.opencode/agents/invet-docs-updater.md`.
+Use the current selected model and the runtime controls in `.github/copilot-instructions.md`. Do not delegate.
 
-Before acting, read:
-
-- `.opencode/agents/invet-docs-updater.md`
-- `.opencode/commands/update-docs.md`
-- `.github/prompts/update-docs.prompt.md`
-- `docs/opencode/references/update_docs_policy.md`
-- `docs/opencode/references/carryovers_governance.md`
-- `docs/opencode/14_github_copilot_agentic_flow.md`
+Verify all five manifests, then read only the documentation policy and approved gate evidence. Open canonical sources only for a verified mismatch.
 
 Update documentation only after required gates are approved. Do not use documentation updates to hide a rejected gate.
 

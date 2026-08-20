@@ -16,6 +16,7 @@ Instrucciones:
    - Si QA no esta aprobado o el plan es invalido, deten el review y reporta el gate.
    - Si existe una tarea aplicable en `- [ ]`, deten el review y devuelve el plan al agente responsable; solo `Estado: CANCELLED` con evidencia verificable queda exento.
    - Si el gate falla porque `QA-00X` no esta `APPROVED` o sus findings siguen bloqueantes, no crees `BE-00X-review.md` y recomienda el comando que destraba QA: `/qa-task QA-00X` cuando haya findings en `READY_FOR_REVALIDATION`, o `/implement-findings BE-00X` cuando sigan `OPEN`/`IN_PROGRESS`.
+3.1. Ejecuta `manifest BE-00X --layer all` y `verify BE-00X --layer all`; usa los manifiestos para delimitar alcance, pero conserva QA, diff y evidencia real como fuentes de decision.
 4. Lee:
    - `docs/opencode/plans/BE-00X-plan.md` cuando exista.
    - `docs/opencode/tasks/backend/BE-00X.md`

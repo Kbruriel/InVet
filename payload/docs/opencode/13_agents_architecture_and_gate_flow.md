@@ -9,7 +9,7 @@
 | Entrada orquestada | `/execute-slice BE-00X`, `/execute-slice FE-00X` o `/execute-slice QA-00X` |
 | Motor de gates | `backend/scripts/validate_slice_plan.py` |
 | Plan canonico | `docs/opencode/plans/BE-00X-plan.md` |
-| Evidencia de cierre | QA, UI checks, tres revisiones, checks, documentacion y gate final opcional |
+| Evidencia de cierre | QA, UI checks, tres revisiones, checks, documentacion y gate final obligatorio |
 
 Este documento describe la arquitectura operativa actual de los agentes de InVet. Su objetivo es dejar claro como se coordinan, que archivos Markdown intercambian, quien puede modificar codigo y que condiciones bloquean el avance de un slice.
 
@@ -27,7 +27,7 @@ En caso de discrepancia, prevalecen el validador determinista y el contrato del 
 
 ## Inventario recuperado
 
-La restauracion esperada del sistema agentico incluye 16 agentes activos en `.opencode/agents`:
+La restauracion esperada del sistema agentico incluye 14 agentes activos en `.opencode/agents`:
 
 - `invet-orchestrator.md`
 - `invet-product-planner.md`
@@ -43,8 +43,6 @@ La restauracion esperada del sistema agentico incluye 16 agentes activos en `.op
 - `invet-check-runner.md`
 - `invet-docs-updater.md`
 - `invet-final-reviewer.md`
-- `invet-command-executor.md`
-- `invet-command-executor-fallback.md`
 
 Tambien incluye 15 comandos slash en `.opencode/commands`:
 
@@ -64,29 +62,30 @@ Tambien incluye 15 comandos slash en `.opencode/commands`:
 - `/update-docs`
 - `/final-gate`
 
-Los agentes `invet-command-executor` e `invet-command-executor-fallback` no representan gates por si mismos. Son agentes de soporte para ejecutar comandos mecanicos, pruebas, lint, lectura de logs y reintentos reproducibles cuando un agente principal necesita evidencia cruda.
-Ambos usan el modelo seleccionado por el usuario y no fijan una decision de producto, arquitectura o seguridad; esa decision siempre vuelve al agente principal que delego la ejecucion.
+Los comandos mecanicos, pruebas, lint y lectura de logs se ejecutan directamente en el agente activo. No existe una ruta de subagente ni un modelo alternativo para estas operaciones.
 
 ## Principios del sistema
 
 1. Un slice funcional se identifica por un indice compartido: `US-00X`, `BE-00X`, `FE-00X`, `QA-00X`, `UIA-00X` y `APIA-00X` pertenecen al mismo slice `00X`.
 2. Existe un unico plan canonico por slice: `docs/opencode/plans/BE-00X-plan.md`.
-3. `/plan-task` acepta identificadores BE, FE o QA, normaliza al plan canonico BE del mismo indice y actualiza `US/UIA/APIA`.
+3. `/plan-task` acepta identificadores BE, FE o QA, normaliza al plan canonico BE del mismo indice, actualiza `US/UIA/APIA` y genera los cinco manifiestos derivados.
 4. Los agentes se coordinan mediante artefactos Markdown versionables; no dependen de memoria conversacional para decidir si un gate fue aprobado.
 5. Los comandos especializados pueden ejecutarse directamente, pero su preflight aplica los mismos gates que el flujo orquestado.
 6. La existencia de un archivo no equivale a aprobacion. Las decisiones y estados declarados dentro de los artefactos son obligatorios.
 7. QA valida y bloquea, pero no corrige codigo de producto ni implementa las pruebas unitarias que corresponden a BE o FE.
-8. Un slice solo se considera cerrado cuando QA, las tres revisiones y los checks estan aprobados, y la documentacion final fue actualizada.
+8. Un slice solo se considera cerrado cuando QA, UI checks, las tres revisiones, checks, documentacion y final gate estan aprobados.
 9. Los planes nuevos usan schema v3 y deben declarar contexto, trazabilidad, contrato Docker/pruebas, plan de reportes/findings y politica UTF-8.
 10. Las tareas deben ser pequenas, de una sola capa, de un solo tipo y con `Responsabilidad unica: Si`.
 11. Los implementadores no reinterpretan tareas compuestas; las devuelven al planner para division.
 12. Todos los planes, reportes, comentarios, evidencias y outcomes operativos deben conservar UTF-8.
-13. Los agentes principales pueden delegar ejecucion mecanica, reruns y lectura de logs a `invet-command-executor` o `invet-command-executor-fallback`, pero conservan la decision final del gate.
+13. Los agentes ejecutan directamente comandos, reruns y lectura de logs, conservan la decision del gate y cancelan ciclos repetitivos.
 14. `skipped` solo es valido cuando un check o hook realmente no aplica; entorno roto, dependencia ausente o comando fallido no se convierten en `skipped`.
 15. QA intenta autorecuperar dependencias, `.env.qa` y contexto Docker antes de declarar `BLOCKED`.
 16. La normalizacion de IDs es explicita por comando: BE, FE y QA representan el mismo slice vertical, pero un alias no soportado debe rechazarse y redirigirse al comando correcto.
 17. Si el slice hereda tareas postergadas, el plan origen, el plan destino y el registro de carryovers deben coincidir antes de cerrar QA, reviews, checks o docs.
 18. `review`, `checks` y `docs` son gates de cierre de tareas: bloquean toda tarea aplicable abierta y toda cancelacion sin evidencia verificable. Los stages anteriores conservan tareas abiertas porque funcionan como preflights de trabajo.
+19. El planner es propietario del significado; `manage_slice_task.py` solo renderiza y verifica manifiestos con hashes del plan y sidecar. Un manifiesto stale bloquea y vuelve a `/plan-task`.
+20. Implementadores, automatizaciones y gates tecnicos aceptan aliases BE, FE o QA del mismo indice; QA y review conservan sus reglas explicitas. Ningun alias cambia la responsabilidad del agente.
 
 ## Cambios schema v3 implementados
 
@@ -101,10 +100,11 @@ La arquitectura agentica adopta aprendizajes de `github/spec-kit` sin copiar su 
 | Reportes | `Plan de reportes y findings` | Cada agente sabe que artefacto produce y quien lo consume |
 | UTF-8 | `encoding: UTF-8` y politica UTF-8 | Se evitan redacciones, comentarios y outcomes con encoding roto |
 | Validador | `validate_slice_plan.py` exige schema v3 | Los gaps se detectan antes de iniciar implementacion |
-| Delegacion mecanica | `invet-command-executor` y `fallback` | Los agentes principales pueden pedir evidencia cruda y reintentos sin mezclar criterio mecanico con criterio funcional |
+| Ejecucion directa | Agente activo | Comandos y evidencia se obtienen sin lanzar otro LLM ni cambiar el modelo seleccionado |
 | QA autorecuperable | `prepare_qa_env.py`, `.env.qa` y fallback a contenedores | QA intenta reparar dependencias y entorno antes de bloquear el slice |
 | Skips verificables | `git status` y regla estricta de `skipped` | Docker y checks solo se omiten con causa comprobable; no se maquillan fallos |
 | Automatizacion por slice | `US-00X`, `UIA-00X`, `APIA-00X` y `InVet_UI_Automation/` | La planeacion y la implementacion incluyen cobertura funcional visible y contratos HTTP externos |
+| Manifiestos verificables | `manage_slice_task.py manifest|verify` | Contexto compacto por capa con hashes de plan/sidecar; detecta faltantes y vistas stale sin trasladar decisiones semanticas al script |
 | Gobernanza de carryovers | `docs/opencode/references/carryovers_governance.md`, `docs/opencode/carryovers/BE-00X-carryovers.md` y `backend/scripts/validate_slice_plan.py` | QA, reviews, checks y docs bloquean estados abiertos o desalineados antes del cierre |
 
 ## Nuevas capacidades operativas
@@ -113,7 +113,7 @@ La funcionalidad agentica actual ya no solo define un orden de gates. Tambien ag
 
 | Capacidad | Donde vive | Impacto en el flujo |
 |---|---|---|
-| Delegacion mecanica a ejecutores | `invet-orchestrator`, `invet-check-runner`, `invet-qa-validator`, `invet-findings-implementer`, `invet-final-reviewer` | Los agentes de criterio delegan comandos repetitivos, reruns, logs y validaciones crudas sin perder propiedad del gate |
+| Ejecucion mecanica directa | `invet-orchestrator`, `invet-check-runner`, `invet-qa-validator`, `invet-findings-implementer`, `invet-final-reviewer` | Cada agente ejecuta sus comandos, reruns, logs y validaciones sin subagentes |
 | Findings por slice o por archivo | `/implement-findings` | El agente puede entrar por `BE-00X`, `FE-00X` o una ruta puntual de hallazgos y consolidar correcciones del mismo slice |
 | Review vertical con entrada FE | `/review-slice BE-00X|FE-00X` | Frontend puede disparar la revision del mismo slice sin duplicar reportes ni inventar otro indice |
 | Redireccion explicita de QA | `/review-slice`, `review` stage | Si alguien intenta revisar con `QA-00X`, el flujo no remapea silenciosamente; exige `/qa-task QA-00X` |
@@ -122,9 +122,9 @@ La funcionalidad agentica actual ya no solo define un orden de gates. Tambien ag
 | Cierre Docker condicionado por cambios | `/run-checks`, `/qa-task` y hooks de implementacion | El restart del stack se ejecuta solo si hay cambios relevantes en `backend`, `frontend`, `docker-compose.yml`, `Dockerfile*` o lockfiles/manifiestos |
 | QA con autorecuperacion | `/qa-task` | QA puede instalar dependencias, preparar `.env.qa` y preferir contenedores antes de marcar `BLOCKED` |
 | Preflight de plan y QA | `/plan-task`, `/qa-task` | Plan valida el slice previo antes de crear o reparar artefactos; QA valida el plan vigente y recupera entorno antes de bloquearse |
-| Preflight auto-recuperable UI/API | `/implement-ui-automation-task`, `/implement-api-automation-task` | Los agentes de automatizacion intentan recuperar dependencias, validan que el plan este vigente, usan Docker cuando el slice depende de PostgreSQL o del runtime del repo y no reutilizan evidencia stale antes de bloquear |
+| Preflight auto-recuperable UI/API | `/implement-ui-automation-task`, `/implement-api-automation-task` | Los agentes validan el plan, preparan obligatoriamente `db`, `backend` y `frontend` con Docker Compose y bloquean sin fallback host cuando el stack no esta disponible |
 | Validacion UI formal | `/run-ui-checks` | La automatizacion de navegador y regresion UI tiene un gate dedicado antes del cierre tecnico global |
-| Gate final con evidencia mecanica delegada | `/final-gate` | El reviewer final puede pedir logs, reruns o pruebas crudas al ejecutor mecanico antes de decidir release |
+| Gate final con evidencia mecanica directa | `/final-gate` | El reviewer final ejecuta directamente logs o reruns necesarios antes de decidir release |
 
 ## Entradas operativas
 
@@ -139,31 +139,31 @@ El identificador puede ser BE, FE o QA. El orquestador normaliza el indice y con
 ### Ejecucion especializada
 
 ```text
-/plan-task FE-001
+/plan-task BE-001
 /implement-backend-task BE-001
-/implement-frontend-task FE-001
-/implement-ui-automation-task FE-001
+/implement-frontend-task BE-001
+/implement-ui-automation-task BE-001
 /implement-api-automation-task BE-001
 /qa-task QA-001
-/review-slice FE-001
-/clean-architecture-review FE-001
-/security-review FE-001
-/run-ui-checks FE-001
-/implement-findings FE-001
-/run-checks FE-001
-/update-docs FE-001
-/final-gate FE-001
+/review-slice BE-001
+/clean-architecture-review BE-001
+/security-review BE-001
+/run-ui-checks BE-001
+/implement-findings BE-001
+/run-checks BE-001
+/update-docs BE-001
+/final-gate BE-001
 ```
 
 Cada comando especializado ejecuta un preflight para comprobar que sus prerequisitos ya existen y estan aprobados. Esto evita que una invocacion directa omita los gates del orquestador.
 
 `/run-checks` sin identificador conserva un uso diagnostico general, pero no genera evidencia formal ni cierra un slice. Para el gate de cierre debe utilizarse `/run-checks BE-00X`, `/run-checks FE-00X` o `/run-checks QA-00X`.
 
-`/final-gate` es opcional y solo se usa cuando se desea una segunda opinion de alta capacidad antes de liberar el slice.
+`/final-gate` es obligatorio en `/execute-slice`; usa el modelo seleccionado y verifica la coherencia final sin cambiar de modelo.
 
 Normalizaciones y rechazos relevantes:
 
-- `/plan-task`, `/run-checks`, `/update-docs` y `/final-gate` aceptan `BE-00X`, `FE-00X` o `QA-00X` y normalizan al mismo slice vertical.
+- `/plan-task`, implementadores, automatizaciones, `/run-ui-checks`, `/run-checks`, `/update-docs` y `/final-gate` aceptan `BE-00X`, `FE-00X` o `QA-00X` y normalizan al mismo slice vertical.
 - `/review-slice` acepta `BE-00X` o `FE-00X`; si recibe `QA-00X`, debe rechazar esa entrada y redirigir a `/qa-task QA-00X`.
 - `/implement-findings` acepta `BE-00X`, `FE-00X` o una ruta de hallazgos; si entra por FE, deriva al mismo `BE-00X` vertical.
 
@@ -184,21 +184,20 @@ Despues del plan, cada area se implementa con su comando especializado y luego s
 ```text
 /plan-task FE-001
 /implement-backend-task BE-001
-python backend/scripts/validate_slice_plan.py BE-001 --stage secure-persistence
-/implement-frontend-task FE-001
-/implement-ui-automation-task FE-001
+/implement-frontend-task BE-001
+/implement-ui-automation-task BE-001
 /implement-api-automation-task BE-001
 /qa-task QA-001
 /review-slice FE-001
 /clean-architecture-review FE-001
 /security-review FE-001
-/run-ui-checks FE-001
+/run-ui-checks BE-001
 /run-checks FE-001
 /update-docs FE-001
-/final-gate FE-001
+/final-gate BE-001
 ```
 
-`/final-gate` es el ultimo comando de la ruta cuando se activa la segunda opinion de release. Si no se usa gate final, el ultimo comando normal es `/update-docs FE-001` despues de `/run-checks FE-001` aprobado.
+`/final-gate` es el ultimo comando obligatorio de la ruta. Usa el mismo modelo seleccionado y solo decide despues de `/update-docs BE-001` y `/run-checks BE-001` aprobados.
 
 Si QA, UI checks, reviews o checks encuentran hallazgos, el slice no avanza por otro camino paralelo. Primero se corrigen los hallazgos y despues se vuelve a ejecutar el gate que los detecto y los gates que dependian de el:
 
@@ -208,7 +207,7 @@ Si QA, UI checks, reviews o checks encuentran hallazgos, el slice no avanza por 
 /review-slice FE-001
 /clean-architecture-review FE-001
 /security-review FE-001
-/run-ui-checks FE-001
+/run-ui-checks BE-001
 /run-checks FE-001
 ```
 
@@ -216,7 +215,7 @@ La regla practica es:
 
 - Si falla QA, ejecutar `/implement-findings BE|FE-00X` y despues repetir `/qa-task QA-00X`.
 - Si falla una review, ejecutar `/implement-findings BE|FE-00X` y despues repetir QA y las reviews afectadas.
-- Si falla `/run-ui-checks`, ejecutar `/implement-findings BE|FE-00X`, repetir QA cuando el producto cambio, y volver a ejecutar `/run-ui-checks FE-00X`.
+- Si falla `/run-ui-checks`, ejecutar `/implement-findings BE|FE-00X`, repetir QA cuando el producto cambio, y volver a ejecutar `/run-ui-checks BE-00X`.
 - Si falla `/run-checks`, ejecutar `/implement-findings BE|FE-00X` o corregir el bloqueo operativo reportado, y despues repetir los gates impactados antes de cerrar.
 - Si el hallazgo queda como `READY_FOR_REVALIDATION`, todavia bloquea. Solo QA o el reviewer responsable puede cerrarlo como `RESOLVED` o aceptarlo como `ACCEPTED_RISK` con justificacion.
 
@@ -226,10 +225,10 @@ Cuando QA ya esta aprobado y no hay findings bloqueantes, se continua con los ga
 /review-slice FE-001
 /clean-architecture-review FE-001
 /security-review FE-001
-/run-ui-checks FE-001
+/run-ui-checks BE-001
 /run-checks FE-001
 /update-docs FE-001
-/final-gate FE-001
+/final-gate BE-001
 ```
 
 Los gates despues de QA no son decorativos: una aprobacion de QA por si sola no cierra el slice. El cierre requiere reviews, UI checks cuando aplican, checks formales, documentacion y, si fue activado, final gate.
@@ -241,21 +240,20 @@ Cada comando del flujo debe cerrar con una recomendacion explicita del siguiente
 | Comando que termina | Si el gate queda aprobado y sin findings | Si hay findings o el gate queda bloqueado |
 |---|---|---|
 | `/plan-task BE|FE|QA-00X` | Sugerir `/implement-backend-task BE-00X` | Sugerir el comando que desbloquea el plan, normalmente `/plan-task BE-00X` o `/qa-task QA-00Y` si el bloqueo viene del slice anterior |
-| `/implement-backend-task BE-00X` | Sugerir `python backend/scripts/validate_slice_plan.py BE-00X --stage secure-persistence` y luego `/implement-frontend-task FE-00X` | Sugerir `/implement-backend-task BE-00X` para completar tareas pendientes o `/implement-findings BE-00X` si el hallazgo ya quedo formalizado |
-| `secure-persistence` | Sugerir `/implement-frontend-task FE-00X` | Sugerir volver a backend o `/implement-findings BE-00X` segun el artefacto que reporto el problema |
-| `/implement-frontend-task FE-00X` | Sugerir `/implement-ui-automation-task FE-00X` | Sugerir `/implement-frontend-task FE-00X` para completar tareas pendientes o `/implement-findings FE-00X` si ya existe hallazgo formal |
-| `/implement-ui-automation-task FE-00X` | Sugerir `/implement-api-automation-task BE-00X` | Sugerir `/implement-ui-automation-task FE-00X` o `/plan-task BE-00X` si falta `UIA-00X` |
+| `/implement-backend-task BE-00X` | Ejecutar internamente sus validadores aplicables y sugerir `/implement-frontend-task BE-00X` | Sugerir `/implement-backend-task BE-00X` para completar tareas pendientes o `/implement-findings BE-00X` si el hallazgo ya quedo formalizado |
+| `/implement-frontend-task BE-00X` | Sugerir `/implement-ui-automation-task BE-00X` | Sugerir `/implement-frontend-task BE-00X` para completar tareas pendientes o `/implement-findings BE-00X` si ya existe hallazgo formal |
+| `/implement-ui-automation-task BE-00X` | Sugerir `/implement-api-automation-task BE-00X` | Sugerir `/implement-ui-automation-task BE-00X` o `/plan-task BE-00X` si falta `UIA-00X` |
 | `/implement-api-automation-task BE-00X` | Sugerir `/qa-task QA-00X` | Sugerir `/implement-api-automation-task BE-00X` o `/plan-task BE-00X` si falta `APIA-00X` |
 | `/qa-task QA-00X` | Sugerir `/review-slice BE-00X` solo si `Decision: APPROVED` y no hay findings bloqueantes | Sugerir `/implement-findings BE-00X` si hay findings `OPEN`/`IN_PROGRESS`; si todo quedo `READY_FOR_REVALIDATION`, seguir el flujo de correcciones y dejar que el resolver vuelva a impulsar la revalidacion QA; si el bloqueo es de contrato o artefacto faltante, sugerir `/plan-task BE-00X` |
 | `/review-slice FE|BE-00X` | Sugerir `/clean-architecture-review BE-00X` cuando el review se ejecuto y quedo `APPROVED` | Sugerir `/implement-findings BE-00X` si el review se ejecuto y quedo `REJECTED`; sugerir `/qa-task QA-00X` solo si el preflight impidio revisar porque QA no esta aprobado o necesita revalidacion |
 | `/clean-architecture-review FE|BE-00X` | Sugerir `/security-review FE-00X` | Sugerir `/implement-findings FE-00X` |
-| `/security-review FE|BE-00X` | Sugerir `/run-ui-checks FE-00X` | Sugerir `/implement-findings FE-00X` |
-| `/run-ui-checks FE-00X` | Sugerir `/run-checks FE-00X` | Sugerir `/implement-findings FE-00X` |
+| `/security-review FE|BE-00X` | Sugerir `/run-ui-checks BE-00X` | Sugerir `/implement-findings BE-00X` |
+| `/run-ui-checks BE-00X` | Sugerir `/run-checks BE-00X` | Sugerir `/implement-findings BE-00X` |
 | `/run-checks BE|FE|QA-00X` | Sugerir `/update-docs FE-00X` | Sugerir `/implement-findings FE-00X` o el comando operativo que desbloquea el check fallido |
-| `/update-docs BE|FE|QA-00X` | Sugerir `/final-gate FE-00X` si se desea segunda opinion; si no, declarar que no quedan comandos obligatorios del slice | Sugerir volver al gate rechazado anterior; `/update-docs` no debe usarse para maquillar un gate pendiente |
+| `/update-docs BE|FE|QA-00X` | Sugerir `/final-gate BE-00X`, siempre obligatorio | Sugerir volver al gate rechazado anterior; `/update-docs` no debe usarse para maquillar un gate pendiente |
 | `/final-gate BE|FE|QA-00X` | Declarar slice cerrado y sugerir iniciar el siguiente slice con `/plan-task BE-00Y` cuando exista un nuevo indice | Sugerir `/implement-findings FE-00X` o el gate exacto cuya evidencia quedo incompleta |
 | `/implement-findings BE|FE-00X` | Sugerir `/qa-task QA-00X` como primer gate de revalidacion y luego repetir reviews, UI checks y checks afectados | Si el finding no pudo corregirse, mantener `READY_FOR_REVALIDATION` o `OPEN` y sugerir el comando de la capa responsable o `/plan-task BE-00X` si el hallazgo nace de un contrato roto |
-| `/execute-slice BE|FE|QA-00X` | Sugerir el siguiente gate pendiente si el flujo se detuvo antes del cierre; si completo todo, sugerir `/final-gate FE-00X` cuando sea opcional o declarar slice cerrado | Sugerir el comando exacto para reanudar desde el primer gate fallido, normalmente `/implement-findings FE-00X`, `/qa-task QA-00X` o `/plan-task BE-00X` |
+| `/execute-slice BE|FE|QA-00X` | Sugerir el siguiente gate pendiente; solo declarar cierre despues de `/final-gate BE-00X` aprobado | Sugerir el comando exacto para reanudar desde el primer gate fallido, normalmente `/implement-findings BE-00X`, `/qa-task QA-00X` o `/plan-task BE-00X` |
 
 Para mantener la continuidad del flujo, la recomendacion debe incluir el comando exacto y el motivo. Formato esperado al cierre:
 
@@ -276,9 +274,9 @@ La pregunta clave es separar producto de automatizacion:
 | Trabajo | Donde se implementa | Comando | Artefacto de plan/evidencia |
 |---|---|---|---|
 | API de producto | `backend/` | `/implement-backend-task BE-00X` | Tareas `BE-00X-TNN` en `BE-00X-plan.md` |
-| UI de producto | `frontend/` o la app frontend vigente del repo | `/implement-frontend-task FE-00X` | Tareas `FE-00X-TNN` en `BE-00X-plan.md` |
-| UI automation | `InVet_UI_Automation/` | `/implement-ui-automation-task FE-00X` | `docs/opencode/tasks/ui-automation/UIA-00X.md` y tareas `UIA-00X-TNN` |
-| API automation | `InVet_UI_Automation/` | `/implement-api-automation-task BE-00X` | `docs/opencode/tasks/api-automation/APIA-00X.md` y tareas `APIA-00X-TNN` |
+| UI de producto | `frontend/` o la app frontend vigente del repo | `/implement-frontend-task BE-00X` | Tareas `FE-00X-TNN` en `BE-00X-plan.md` |
+| UI automation | `InVet_UI_Automation/` | `/implement-ui-automation-task BE-00X` | `docs/opencode/tasks/ui-automation/UIA-00X.md` y manifiesto UIA verificado |
+| API automation | `InVet_UI_Automation/` | `/implement-api-automation-task BE-00X` | `docs/opencode/tasks/api-automation/APIA-00X.md` y manifiesto APIA verificado |
 | QA funcional | Suites QA y reportes bajo `docs/opencode/qa/` | `/qa-task QA-00X` | `QA-00X-results.md` y findings |
 
 En otras palabras: el planner genera el plan para BE, FE, QA, UIA y APIA en una sola pasada. Los implementadores no vuelven a planear el slice; solo consumen las tareas que les corresponden. Si falta una tarea de UI automation o API automation, el flujo correcto es volver a `/plan-task` para completar el plan, no inventar la cobertura dentro del implementador.
@@ -348,10 +346,9 @@ flowchart TD
     D --> D2["Analizar gaps, trazabilidad y granularidad"]
     D2 --> E{"Plan valido"}
     E -- "No" --> Y["BLOCKED: corregir o regenerar el plan"]
-    E -- "Si" --> F["Implementar backend"]
-    F --> F2{"Persistencia segura aprobada"}
-    F2 -- "No" --> J
-    F2 -- "Si" --> G["Implementar frontend"]
+    E -- "Si" --> F["Implementar backend y ejecutar sus validadores internos"]
+    F -- "Falla" --> J
+    F -- "Aprobado" --> G["Implementar frontend"]
     G --> G2["Implementar automatizacion UI"]
     G2 --> G3["Implementar automatizacion API"]
     G3 --> H["Ejecutar QA"]
@@ -371,7 +368,7 @@ flowchart TD
     P --> Q{"Checks APPROVED"}
     Q -- "No" --> J
     Q -- "Si" --> R["Actualizar documentacion"]
-    R --> S{"Activar gate final opcional"}
+    R --> S{"Ejecutar gate final obligatorio"}
     S -- "No" --> T["Slice cerrado"]
     S -- "Si" --> U["/final-gate BE-00X"]
     U --> V{"Final review APPROVED"}
@@ -384,23 +381,22 @@ El orden canonico administrado por el orquestador es:
 1. `/plan-task BE|FE|QA-00X`
 2. Analisis de gaps, trazabilidad, granularidad y UTF-8 dentro del plan.
 3. `/implement-backend-task BE-00X`
-4. Gate de Persistencia segura: `python backend/scripts/validate_slice_plan.py BE-00X --stage secure-persistence`
-5. `/implement-frontend-task FE-00X`
-6. `/implement-ui-automation-task FE-00X`
-7. `/implement-api-automation-task BE-00X`
-8. `/qa-task QA-00X`
-9. `/review-slice BE-00X`
-10. `/clean-architecture-review BE-00X`
-11. `/security-review BE-00X`
-12. `/run-ui-checks FE-00X`
-13. `/implement-findings BE-00X`, solo cuando existen hallazgos bloqueantes
-14. Repetir QA, UI checks y las revisiones afectadas despues de corregir
-15. `/run-checks BE-00X`
-16. `/update-docs BE-00X`
-17. `/final-gate BE-00X`, solo si se activa la segunda opinion de release
+4. `/implement-frontend-task BE-00X`
+5. `/implement-ui-automation-task BE-00X`
+6. `/implement-api-automation-task BE-00X`
+7. `/qa-task QA-00X`
+8. `/review-slice BE-00X`
+9. `/clean-architecture-review BE-00X`
+10. `/security-review BE-00X`
+11. `/run-ui-checks BE-00X`
+12. `/implement-findings BE-00X`, solo cuando existen hallazgos bloqueantes
+13. Repetir QA, UI checks y las revisiones afectadas despues de corregir
+14. `/run-checks BE-00X`
+15. `/update-docs BE-00X`
+16. `/final-gate BE-00X`, obligatorio para cerrar el slice
 
 Los prefijos mostrados en este orden son convencionales. El validador normaliza BE, FE y QA al mismo indice de slice.
-Durante este flujo, el orquestador y los agentes especializados pueden delegar lotes mecanicos de comandos, logs o reintentos a `invet-command-executor` y, si hace falta mas robustez, a `invet-command-executor-fallback`.
+Durante este flujo, el agente activo ejecuta directamente los lotes mecanicos, logs y reintentos con el modelo seleccionado en la sesion.
 
 ## Responsabilidades por agente
 
@@ -419,9 +415,7 @@ Durante este flujo, el orquestador y los agentes especializados pueden delegar l
 | Findings Implementer | `/implement-findings` | Corregir hallazgos en codigo y pruebas del propietario correcto desde un slice o un archivo puntual de findings | Si | Correcciones en `READY_FOR_REVALIDATION` |
 | Check Runner | `/run-checks` y `/run-ui-checks` | Ejecutar la suite integral, distinguir `pass/fail/skipped/blocked` y decidir si aplica cierre Docker | No deberia corregir producto salvo modo correccion explicito | `BE-00X-checks.md` con decision |
 | Documentation Agent | `/update-docs` | Consolidar documentacion y cierre despues de todos los gates, normalizando el mismo slice vertical | Solo documentacion | Documentacion final actualizada |
-| Final Reviewer | `/final-gate` | Emitir una segunda opinion de release y pedir evidencia mecanica adicional cuando haga falta | No, excepto su reporte Markdown | `BE-00X-final-review.md` con decision |
-| Command Executor | Delegado por agentes principales | Ejecutar comandos mecanicos, pruebas, lint, inspeccion de diff y lectura de logs usando el modelo elegido por el usuario | Solo cambios mecanicos dentro del alcance delegado | Comandos ejecutados, salida sintetizada y bloqueos |
-| Command Executor Fallback | Delegado por agentes principales | Respaldar al ejecutor primario cuando se requiere mas contexto o robustez, sin redefinir el modelo de trabajo | Solo cambios mecanicos dentro del alcance delegado | Evidencia mecanica alternativa o reintentos |
+| Final Reviewer | `/final-gate` | Verificar el cierre global y ejecutar evidencia mecanica adicional cuando haga falta | No, excepto su reporte Markdown | `BE-00X-final-review.md` con decision |
 
 ## Contrato del plan schema v3
 
@@ -456,7 +450,7 @@ Debe cubrir explicitamente contexto, trazabilidad, frontend, automatizacion, Doc
 
 El plan canonico debe coordinar entregables `BE`, `FE`, `QA`, `UIA` y `APIA`, y crear o actualizar los artefactos `US-00X.md`, `UIA-00X.md` y `APIA-00X.md`.
 
-Cada tarea usa el formato `- [ ] BE|FE|QA|UIA|APIA-00X-TNN - Titulo` e incluye:
+Cada tarea del plan usa el formato `- [ ] BE|FE|QA-00X-TNN - Titulo`; UIA y APIA mantienen sus casos en sidecars y manifiestos propios. Cada tarea del plan incluye:
 
 | Campo | Proposito |
 |---|---|
@@ -666,7 +660,7 @@ Los agentes de decision pueden apoyarse en los ejecutores mecanicos para produci
 |---|---|---|---|
 | Inicio -> Plan | Gate del slice anterior valido | Plan schema v3 | Slice anterior bloqueado |
 | Plan -> Backend | Plan valido | Implementacion BE y unit tests | Plan incompleto, legacy, sin trazabilidad, con tareas compuestas o con UTF-8 roto |
-| Backend -> Persistencia segura | Backend implementado | Tareas de persistencia/seguridad completadas con evidencia | Repositorios, migraciones, ownership, permisos o IDOR/BOLA pendientes |
+| Backend -> Frontend | `/implement-backend-task` aprobado, incluidas sus validaciones internas aplicables | Backend y contratos listos con evidencia | Repositorios, migraciones, ownership, permisos, IDOR/BOLA o pruebas pendientes |
 | Plan/Backend -> Frontend | Plan frontend explicito y contratos disponibles | Implementacion FE y unit tests | Gap de UX, API, dependencias o contrato frontend incompleto |
 | Frontend -> Automatizacion | `US-00X`, `UIA-00X` y `APIA-00X` existen y el slice tiene comportamiento verificable | Automatizacion UI y API implementada cuando aplica | Cobertura faltante, artefactos ausentes o evidencia incompleta |
 | Implementacion -> QA | Entregables y validaciones del plan disponibles | `Decision: APPROVED` | Criterios FAIL, infraestructura no reproducible, unit tests ausentes, automatizacion faltante o reportes stale |
@@ -699,18 +693,17 @@ Para operar paso a paso:
 ```text
 /plan-task FE-001
 /implement-backend-task BE-001
-python backend/scripts/validate_slice_plan.py BE-001 --stage secure-persistence
-/implement-frontend-task FE-001
-/implement-ui-automation-task FE-001
+/implement-frontend-task BE-001
+/implement-ui-automation-task BE-001
 /implement-api-automation-task BE-001
 /qa-task QA-001
 /review-slice FE-001
 /clean-architecture-review FE-001
 /security-review FE-001
-/run-ui-checks FE-001
-/run-checks FE-001
-/update-docs FE-001
-/final-gate FE-001
+/run-ui-checks BE-001
+/run-checks BE-001
+/update-docs BE-001
+/final-gate BE-001
 ```
 
 Si hay findings:
@@ -721,18 +714,18 @@ Si hay findings:
 /review-slice FE-001
 /clean-architecture-review FE-001
 /security-review FE-001
-/run-ui-checks FE-001
+/run-ui-checks BE-001
 ```
 
 Cuando todos los gates estan aprobados:
 
 ```text
-/run-checks FE-001
-/update-docs FE-001
-/final-gate FE-001
+/run-checks BE-001
+/update-docs BE-001
+/final-gate BE-001
 ```
 
-El gate final es opcional y se usa cuando hace falta una segunda opinion de alta capacidad antes de liberar el slice.
+El gate final es obligatorio, usa el modelo seleccionado y valida que los artefactos y la evidencia no diverjan antes de liberar el slice.
 
 ## Flujo completo BE/FE/QA con UI y API automation
 
@@ -742,17 +735,17 @@ La ruta canónica para completar un slice vertical `BE-00X / FE-00X / QA-00X` es
 |---|---|---|---|
 | 1. Plan | `/plan-task BE-00X` | "Lee el contexto del slice 00X, genera o actualiza `docs/opencode/plans/BE-00X-plan.md` con schema v3, crea o actualiza `US-00X`, `UIA-00X` y `APIA-00X`, valida con `backend/scripts/validate_slice_plan.py --stage plan` y al cerrar reporta `Estado de ejecucion` y `Siguiente paso recomendado`." | Plan canonico v3 listo, trazabilidad completa y tareas atomicas definidas |
 | 2. Backend | `/implement-backend-task BE-00X` | "Implementa solo las tareas `Capa: backend` pendientes del plan, agrega pruebas unitarias para todo cambio productivo, valida `secure-persistence` cuando aplique y no toques frontend ni automatizacion." | Backend funcional y con evidencia de pruebas |
-| 3. Frontend | `/implement-frontend-task FE-00X` | "Implementa solo las tareas `Capa: frontend` pendientes, conserva el sistema visual del proyecto, agrega pruebas de componente o unidad y reporta los archivos tocados con evidencia." | Frontend funcional y verificable |
-| 4. UI automation | `/implement-ui-automation-task FE-00X` | "Implementa las especificaciones Playwright en `InVet_UI_Automation/tests/e2e` para los criterios `US-00X-NN` y `CA-NN`, cubre navegación, formularios y estados UX, y documenta evidencia y casos no automatizados." | Cobertura UI/E2E lista para `run-ui-checks` |
-| 5. API automation | `/implement-api-automation-task BE-00X` | "Implementa las especificaciones Playwright en `InVet_UI_Automation/tests/api` para contratos HTTP, authn/authz, payloads y riesgos como IDOR/BOLA, y documenta evidencia y gaps." | Cobertura API lista para `run-checks` y QA |
+| 3. Frontend | `/implement-frontend-task BE-00X` | "Implementa solo las tareas `Capa: frontend` pendientes, conserva el sistema visual del proyecto, agrega pruebas de componente o unidad y reporta los archivos tocados con evidencia." | Frontend funcional y verificable |
+| 4. UI automation | `/implement-ui-automation-task BE-00X` | "Implementa Playwright E2E, prepara el stack Docker `db/backend/frontend`, desactiva el frontend local de Playwright y ejecuta UI/regresion contra los puertos publicados." | `COMPLETED` recomienda `/implement-api-automation-task BE-00X`; fallo recomienda UI/findings; Docker caido queda `BLOCKED` |
+| 5. API automation | `/implement-api-automation-task BE-00X` | "Implementa Playwright API, prepara el stack Docker y ejecuta HTTP contra el backend publicado, sin fallback host." | `COMPLETED` recomienda `/qa-task QA-00X`; fallo recomienda API/findings; Docker caido queda `BLOCKED` |
 | 6. QA | `/qa-task QA-00X` | "Valida el slice completo con la matriz de trazabilidad, auto-recupera dependencias y entorno antes de bloquear, ejecuta suites reales, genera `QA-00X-results.md` y `QA-00X-findings.md` y solo aprueba si no quedan findings bloqueantes." | Decision `APPROVED`, `REJECTED` o `BLOCKED` con evidencia |
 | 7. Review funcional | `/review-slice FE-00X` | "Revisa el slice vertical completo desde el diff, el plan y los artefactos BE/FE/QA; si falta QA, redirige a `/qa-task QA-00X`; si hay hallazgos, documentalos sin inventar otro indice." | Decision funcional del slice |
 | 8. Clean architecture | `/clean-architecture-review FE-00X` | "Revisa capas, dependencias y modularidad; reporta hallazgos concretos y no modifiques producto." | Decision arquitectonica |
 | 9. Security | `/security-review FE-00X` | "Revisa autenticacion, autorizacion, exposure de datos, tokens e IDOR/BOLA; si hay hallazgos, crea el reporte correspondiente y marca el estado real." | Decision de seguridad |
-| 10. UI checks | `/run-ui-checks FE-00X` | "Ejecuta `npm run test:e2e` y `npm run test:regression` dentro de `InVet_UI_Automation`, reporta pass/fail/skipped con causa verificable y no escondas fallos de configuracion." | Evidencia UI aprobada o bloqueada |
-| 11. Checks tecnicos | `/run-checks BE-00X` | "Ejecuta backend, frontend y DevOps segun el contrato del repo, distingue pass/fail/skipped con motivos reales y deja evidencia reproducible." | Reporte tecnico integral |
+| 10. UI checks | `/run-ui-checks BE-00X` | "Reejecuta UI/regresion contra `db/backend/frontend` de Docker con `PLAYWRIGHT_START_FRONTEND=false`; no uses fallback host." | `APPROVED` recomienda `/run-checks BE-00X`; fallo vuelve al propietario; entorno caido queda `BLOCKED` |
+| 11. Checks tecnicos | `/run-checks BE-00X` | "Ejecuta backend/frontend y reejecuta API automation contra el backend Docker; distingue pass/fail/blocked con evidencia." | `APPROVED` recomienda `/update-docs BE-00X`; fallo vuelve al propietario |
 | 12. Documentacion | `/update-docs BE-00X` | "Actualiza contratos, riesgos, decisiones y changelog solo despues de QA, reviews y checks aprobados." | Documentacion final cerrada |
-| 13. Release opcional | `/final-gate FE-00X` | "Emite una segunda opinion de release, valida evidencia mecanica adicional si hace falta y aprueba solo si ya no quedan bloqueos." | Decision final de release |
+| 13. Release obligatorio | `/final-gate BE-00X` | "Verifica el cierre global, valida evidencia mecanica adicional si hace falta y aprueba solo si ya no quedan bloqueos." | Decision final de release |
 
 ### Mapa operativo por capa
 
@@ -770,14 +763,14 @@ Cuando un gate falla, el objetivo no es volver a lanzar el mismo comando ciegame
 |---|---|---|---|
 | Plan invalido o incompleto | Schema v3, trazabilidad, `US/UIA/APIA`, UTF-8 y tareas atomicas | Regenerar el plan desde cero antes de implementar | `/plan-task BE-00X` |
 | Backend con fallos | Codigo productivo, pruebas unitarias, contratos y persistencia | Corregir la capa backend y repetir su validacion | `/implement-backend-task BE-00X` |
-| Frontend con fallos | Rutas, componentes, estados UX, pruebas de UI de componente | Corregir la capa frontend y repetir su validacion | `/implement-frontend-task FE-00X` |
-| UI automation faltante o rota | Specs Playwright, selectores, trazabilidad `US/CA` | Corregir la automatizacion UI y repetir `run-ui-checks` | `/implement-ui-automation-task FE-00X` |
+| Frontend con fallos | Rutas, componentes, estados UX, pruebas de UI de componente | Corregir la capa frontend y repetir su validacion | `/implement-frontend-task BE-00X` |
+| UI automation faltante o rota | Specs Playwright, selectores, trazabilidad `US/CA` | Corregir la automatizacion UI y repetir `run-ui-checks` | `/implement-ui-automation-task BE-00X` |
 | API automation faltante o rota | Specs HTTP, authn/authz, payloads, contratos | Corregir la automatizacion API y repetir los checks | `/implement-api-automation-task BE-00X` |
 | QA rechazado | Findings abiertos, criterios FAIL, pruebas faltantes | Corregir hallazgos y volver a ejecutar QA | `/implement-findings BE-00X` seguido de `/qa-task QA-00X` |
 | Review rechazado | Hallazgos funcionales, arquitectonicos o de seguridad | Corregir el diff y luego reejecutar QA y reviews afectados | `/implement-findings FE-00X` |
-| `run-ui-checks` fallido | Login route, frontend runtime, selectores, fixtures, entorno | Corregir la capa UI o la automatizacion y repetir el gate UI | `/implement-ui-automation-task FE-00X` o `/implement-frontend-task FE-00X` |
+| `run-ui-checks` fallido | Login route, frontend runtime, selectores, fixtures, entorno | Corregir la capa UI o la automatizacion y repetir el gate UI | `/implement-ui-automation-task BE-00X` o `/implement-frontend-task BE-00X` |
 | `run-checks` fallido | Lint, typecheck, build, tests, Docker o DB | Corregir el componente que fallo y repetir el check completo | `/implement-findings BE-00X` o el comando propietario del fallo |
-| Bloqueo de entorno | Dependencias ausentes, Docker caido, DB inaccesible | Reparar el entorno antes de volver a evaluar | `docker compose up -d db` o el preflight del agente |
+| Bloqueo de entorno | Dependencias ausentes, Docker caido, DB inaccesible | El agente propietario intenta recuperar el stack y conserva checkpoint | Repetir el mismo comando de fase cuando el entorno este disponible |
 | Finding en `READY_FOR_REVALIDATION` | La correccion esta lista pero no revalidada por QA | No volver a correr reviews en bucle; primero revalidar QA | `/qa-task QA-00X` |
 
 Reglas practicas para desbloquear:

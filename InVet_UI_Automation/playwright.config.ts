@@ -19,10 +19,12 @@ const uiLifecycleEvents = new Set([
   "check",
 ]);
 const launchedFromPlaywrightCli = process.argv.some((arg) => arg.includes("tests/e2e") || arg.includes("tests") || arg.includes("playwright"));
+const startFrontendSetting = process.env.PLAYWRIGHT_START_FRONTEND;
 const shouldStartFrontend =
-  process.env.PLAYWRIGHT_START_FRONTEND === "true" ||
-  uiLifecycleEvents.has(process.env.npm_lifecycle_event || "") ||
-  (process.env.npm_lifecycle_event === undefined && launchedFromPlaywrightCli);
+  startFrontendSetting === "true" ||
+  (startFrontendSetting === undefined &&
+    (uiLifecycleEvents.has(process.env.npm_lifecycle_event || "") ||
+      (process.env.npm_lifecycle_event === undefined && launchedFromPlaywrightCli)));
 
 function frontendPort(): string {
   return new URL(frontendBaseUrl).port || "3000";

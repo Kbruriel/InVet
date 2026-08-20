@@ -2,15 +2,8 @@
 
 Equivalent to OpenCode `/implement-frontend-task`.
 
-Input: `FE-00X`.
+Input: `BE-00X`, `FE-00X`, or `QA-00X`; normalize to `FE-00X`.
 
 Use agent: `InVet Frontend Implementer`.
 
-Before acting, read:
-
-- `.opencode/commands/implement-frontend-task.md`
-- `.opencode/agents/invet-frontend-implementer.md`
-- `docs/opencode/references/frontend_visual_alignment.md`
-- `docs/opencode/14_github_copilot_agentic_flow.md`
-
-Implement only frontend product UI and frontend tests. UI automation belongs to the UI automation gate.
+Regenerate and verify `docs/opencode/manifests/BE-00X-frontend.md`; use it as context and allowlist. Implement only frontend product UI and frontend tests with the selected model. UI automation belongs to its gate.

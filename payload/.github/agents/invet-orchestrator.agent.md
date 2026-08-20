@@ -1,62 +1,28 @@
 ---
 name: InVet Orchestrator
-description: Execute an InVet slice gate by gate and stop at the first failed gate.
+description: Execute an InVet slice with the selected model, one checkpointed phase at a time.
 target: vscode
-argument-hint: "Slice ID, for example FE-001"
-tools: ['read', 'search', 'edit', 'execute', 'agent']
-agents: ['InVet Planner', 'InVet Implementer', 'InVet QA Reviewer', 'InVet Findings Resolver']
-handoffs:
-  - label: Plan Slice
-    agent: InVet Planner
-    prompt: Plan or repair the current InVet slice using the canonical schema v3 plan.
-    send: false
-  - label: Resolve Findings
-    agent: InVet Findings Resolver
-    prompt: Resolve the blocking findings for this InVet slice and prepare them for QA revalidation.
-    send: false
+argument-hint: "Slice ID, for example BE-001"
+tools: ['read', 'search', 'edit', 'execute']
 ---
 
 # InVet Orchestrator
 
-Coordinate the complete InVet agentic flow for one vertical slice.
+Execute the complete slice with the currently selected model. Never call a subagent or another LLM. Commands, tests, validators, diffs, and logs run directly.
 
-Read first:
+Normalize `BE-00X`, `FE-00X`, or `QA-00X` to the shared index. Use the mandatory flow and runtime controls from `.github/copilot-instructions.md`.
 
-- `docs/opencode/14_github_copilot_agentic_flow.md`
-- `docs/opencode/13_agents_architecture_and_gate_flow.md`
-- `.github/copilot-instructions.md`
+At the start of every phase:
 
-Normalize every input to the same slice index: `BE-00X`, `FE-00X`, `QA-00X`, `US-00X`, `UIA-00X`, and `APIA-00X`.
+1. Inspect its checkpoint and skip only atomic tasks already completed with valid evidence.
+2. Regenerate and verify the applicable compact manifest.
+3. Read that manifest, not the complete plan. Open a canonical source only for a verified mismatch.
+4. Announce `leyendo`; then report each state change.
 
-Run the flow gate by gate:
+Execute one atomic task at a time with `manage_slice_task.py start`, `state`, and `finish`. Respect its allowlist, deletion protection, and router invariants. Stop on the first failed gate, failed control, or blocking finding.
 
-1. Plan slice.
-2. Implement backend.
-3. Run `python backend/scripts/validate_slice_plan.py BE-00X --stage secure-persistence`.
-4. Implement frontend.
-5. Implement UI automation.
-6. Implement API automation.
-7. Run QA.
-8. Run functional review.
-9. Run clean architecture review.
-10. Run security review.
-11. Run UI checks.
-12. Run formal checks.
-13. Update docs.
-14. Run final gate only when requested.
+If the phase approaches 48,000 context tokens, 50 requests, 30 minutes, 3 minutes without operational progress, or three equivalent actions, save the current checkpoint, report `generacion cancelada`, and return the exact command that resumes from that checkpoint.
 
-Stop at the first `REJECTED` or `BLOCKED` gate. Do not continue based only on file existence.
+The final gate is mandatory after documentation. A slice is closed only when QA, reviews, UI checks, formal checks, docs, and final gate are approved.
 
-End every response with:
-
-```text
-Siguiente paso recomendado: <exact next prompt, agent, or command>
-Motivo: <why this is the next gate>
-```
-
-If there are findings, also include:
-
-```text
-Comando recomendado para resolver hallazgos: InVet Findings Resolver
-Motivo: Los findings bloquean el avance hasta revalidacion.
-```
+Always finish with the required closing output from `.github/copilot-instructions.md`.

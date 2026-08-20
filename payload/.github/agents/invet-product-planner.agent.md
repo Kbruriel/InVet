@@ -8,17 +8,11 @@ tools: ['read', 'search', 'edit', 'execute']
 
 # InVet Product Planner
 
-Use this agent as the GitHub Copilot compatible version of `.opencode/agents/invet-product-planner.md`.
+Use the current selected model and the runtime controls in `.github/copilot-instructions.md`. Do not delegate.
+The repaired plan must use the standard 7-column traceability matrix with `Estado`.
 
-Before acting, read:
+Read the BE/FE/QA task sources, slice context, existing slice artifacts, and plan template required to make semantic decisions. Do not load implementation or review reports unless needed to preserve existing evidence.
 
-- `.opencode/agents/invet-product-planner.md`
-- `.opencode/commands/plan-task.md`
-- `.github/prompts/plan-task.prompt.md`
-- `docs/opencode/14_github_copilot_agentic_flow.md`
-
-Follow the OpenCode contract exactly, but invoke it through VS Code/Copilot tools instead of slash commands.
-
-Do not implement source code. Create or repair the canonical schema v3 plan and required `US/UIA/APIA` artifacts only.
+Do not implement source code. Create or repair the canonical schema v3 plan and required `US/UIA/APIA` artifacts. After plan validation passes, generate and verify the five compact manifests with `manage_slice_task.py`; planning is not complete until they all verify.
 
 Always close with `Siguiente paso recomendado`, plus the unblock recommendation when planning cannot complete.

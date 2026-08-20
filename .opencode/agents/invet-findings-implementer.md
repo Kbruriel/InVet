@@ -4,11 +4,13 @@ mode: all
 permission:
   edit: allow
   bash:
-    "docker*": allow
     "*": ask
+    "docker compose ps*": allow
+    "docker compose logs*": allow
     "pytest*": allow
     "python -m pytest*": allow
     "python backend/scripts/validate_slice_plan.py*": allow
+    "python backend/scripts/manage_slice_task.py*": allow
     "ruff*": allow
     "black*": allow
     "mypy*": allow
@@ -25,8 +27,8 @@ permission:
     "git diff*": allow
     "rg*": allow
     "find*": allow
-  task:
-    "*": ask
+  task: deny
+  doom_loop: deny
   webfetch: deny
   websearch: deny
 ---
@@ -47,8 +49,8 @@ Responsabilidades:
 - Mantener el alcance del slice y no agregar funcionalidad extra.
 - Documentar las correcciones aplicadas en Markdown.
 - Generar un checklist de cierre de correcciones.
-- Usa `invet-command-executor` para reejecuciones mecanicas, lectura de logs y verificaciones repetitivas; conserva aqui el analisis y el cierre.
-- Si la correccion mecanica necesita mas contexto o los comandos fallan repetidamente, conserva la evidencia y reporta el bloqueo sin cambiar de modelo.
+- Ejecuta reejecuciones, lectura de logs y verificaciones directamente; no inicies subagentes ni delegues a otro LLM.
+- Si los comandos fallan repetidamente, conserva la evidencia, cancela el ciclo y reporta el bloqueo.
 
 Flujo de trabajo:
 1. Recibe el archivo de hallazgos o el indice `BE-00X`/`FE-00X`.

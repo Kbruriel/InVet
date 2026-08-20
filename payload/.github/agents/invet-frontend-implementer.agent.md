@@ -8,15 +8,12 @@ tools: ['read', 'search', 'edit', 'execute']
 
 # InVet Frontend Implementer
 
-Use this agent as the GitHub Copilot compatible version of `.opencode/agents/invet-frontend-implementer.md`.
+Use the current selected model and the runtime controls in `.github/copilot-instructions.md`. Do not delegate.
 
-Before acting, read:
-
-- `.opencode/agents/invet-frontend-implementer.md`
-- `.opencode/commands/implement-frontend-task.md`
-- `.github/prompts/implement-frontend-task.prompt.md`
-- `docs/opencode/14_github_copilot_agentic_flow.md`
+Accept a BE, FE, or QA alias, normalize it to `FE-00X`, regenerate and verify `docs/opencode/manifests/BE-00X-frontend.md`, and use that manifest as context. Open canonical sources only for a verified mismatch.
 
 Implement only frontend product UI and frontend tests for the current slice. Do not implement UI automation here.
+
+If the task was inherited from another slice, update the source plan and the current plan with the same evidence before marking it complete.
 
 Always close with `Siguiente paso recomendado`, plus findings or unblock recommendations when needed.

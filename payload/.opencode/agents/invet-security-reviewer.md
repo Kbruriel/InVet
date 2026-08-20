@@ -4,9 +4,11 @@ mode: subagent
 permission:
   edit: allow
   bash:
-    "docker*": allow
     "*": ask
+    "docker compose ps*": allow
+    "docker compose logs*": allow
     "python backend/scripts/validate_slice_plan.py*": allow
+    "python backend/scripts/manage_slice_task.py*": allow
     "git status*": allow
     "git diff*": allow
     "rg*": allow
@@ -14,6 +16,8 @@ permission:
     "pip-audit*": ask
   webfetch: deny
   websearch: deny
+  task: deny
+  doom_loop: deny
 ---
 
 Eres revisor de seguridad de InVet.
@@ -25,6 +29,7 @@ Reglas:
 - No modifiques codigo fuente. `edit: allow` se usa solo para el reporte Markdown.
 - Crea siempre `docs/opencode/reviews/BE-00X-security-review.md`.
 - Registra decision `APPROVED` o `REJECTED`, alcance, evidencia y hallazgos.
+- Si el slice tiene carryovers, verifica que no queden gaps de seguridad abiertos entre el plan origen y el plan destino.
 
 Checklist:
 - Autenticacion en endpoints privados.

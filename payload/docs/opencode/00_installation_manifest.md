@@ -27,8 +27,14 @@ usa el comando slash:
 ```text
 .opencode/agents/*.md
 .opencode/commands/*.md
+.github/agents/*.agent.md
+.github/prompts/*.prompt.md
+.github/copilot-instructions.md
+.vscode/settings.json
+opencode.json
 docs/opencode/**/*.md
 backend/scripts/validate_slice_plan.py
+backend/scripts/manage_slice_task.py
 ```
 
 El paquete instala el contrato de planes schema v3, incluyendo `docs/opencode/references/spec_kit_reference_improvements.md`, politica UTF-8 y validacion de tareas con responsabilidad unica.
@@ -40,6 +46,8 @@ El paquete instala el contrato de planes schema v3, incluyendo `docs/opencode/re
 /plan-task
 /implement-backend-task
 /implement-frontend-task
+/implement-ui-automation-task
+/implement-api-automation-task
 /qa-task
 /review-slice
 /implement-findings
@@ -47,6 +55,7 @@ El paquete instala el contrato de planes schema v3, incluyendo `docs/opencode/re
 /security-review
 /run-checks
 /update-docs
+/final-gate
 ```
 
 ## Agentes instalados

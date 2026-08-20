@@ -4,9 +4,11 @@ mode: all
 permission:
   edit: allow
   bash:
-    "docker*": allow
     "*": ask
+    "docker compose ps*": allow
+    "docker compose logs*": allow
     "python backend/scripts/validate_slice_plan.py*": allow
+    "python backend/scripts/manage_slice_task.py*": allow
     "npm run lint*": allow
     "npm run typecheck*": allow
     "npm run test*": allow
@@ -17,8 +19,8 @@ permission:
     "pnpm build*": allow
     "git status*": allow
     "git diff*": allow
-  task:
-    "*": ask
+  task: deny
+  doom_loop: deny
   webfetch: deny
   websearch: deny
 ---
@@ -39,6 +41,7 @@ Arquitectura:
 - `src/shared/api`: cliente HTTP, errores y contratos.
 - `src/shared/layout`: shells publico y privado.
 - `src/shared/config`: environment y constantes.
+- Leer `docs/opencode/references/carryovers_governance.md` cuando la tarea venga de otro slice o haya sido postergada.
 
 Reglas:
 - Avanza de forma autonoma cuando plan, tareas y codigo den contexto suficiente.
@@ -59,8 +62,10 @@ Reglas:
 - Al completar una tarea, reemplaza `Evidencia: pending` por archivos, comandos y resultados reproducibles.
 - Consume `Tipo`, `Historia o criterio`, `Responsabilidad unica`, `Contexto necesario`, `Contratos usados` y `Resultado esperado` antes de editar.
 - Rechaza tareas compuestas. Si una tarea mezcla cliente API, ruta, componente, estado UX, pruebas, Docker o documentacion, pide que `/plan-task` la divida.
+- Si una tarea viene de otro slice, actualizar tambien el plan origen con la misma evidencia o con una referencia explicita al cierre.
 - Escribe comentarios, evidencias y outcomes en UTF-8; corrige mojibake como `Ã`, `Â` o `â` antes de cerrar.
-- Cuando el trabajo requiera comandos mecanicos repetitivos, usa `invet-command-executor` para la parte operativa y mantén aqui el criterio de UI y arquitectura.
+- Ejecuta comandos, pruebas y lectura de logs directamente; no inicies subagentes ni delegues a otro LLM.
+- Trabaja una tarea atomica a la vez desde el manifiesto compacto y guarda su checkpoint antes de continuar.
 
 Alineacion visual:
 - Aplica `docs/opencode/references/frontend_visual_alignment.md`.
@@ -70,7 +75,7 @@ Alineacion visual:
 
 Al implementar `FE-00X`:
 1. Ejecuta `python backend/scripts/validate_slice_plan.py FE-00X --stage frontend`; no edites si falla.
-2. Lee el plan canonico y las tareas `FE-00X` y `BE-00X`.
+2. Genera, verifica y lee `docs/opencode/manifests/BE-00X-frontend.md`; abre el plan canonico solo ante una contradiccion verificable.
 3. Verifica el `Contrato de implementacion frontend`: rutas, flujos, API, formularios, arquitectura, accesibilidad y pruebas.
 4. Si falta el workspace y el slice define base tecnica, crea Next.js, TypeScript, Tailwind local, scripts `lint/typecheck/test/build`, `src/` y pruebas basicas.
 5. Selecciona solo tareas pendientes con `Capa: frontend`.
@@ -81,6 +86,7 @@ Al implementar `FE-00X`:
 10. Ejecuta `Validacion`.
 11. Cambia a `- [x]` y registra evidencia solo cuando todos los criterios pasen.
 12. Conserva pendientes con `Evidencia: pending` y bloqueo explicito.
+13. Si una tarea queda transferida o postergada por una razon justificada, registra el carryover antes de terminar.
 
 Contexto Docker:
 - El repo incluye `docker-compose.yml` con `db`, `backend` y `frontend`.

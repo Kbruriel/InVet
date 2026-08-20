@@ -2,16 +2,13 @@
 
 Equivalent to OpenCode `/implement-ui-automation-task`.
 
-Input: `FE-00X`.
+Input: `BE-00X`, `FE-00X`, or `QA-00X`; normalize to `UIA-00X`.
 
 Use agent: `InVet UI Automation Implementer`.
 
-Before acting, read:
+Regenerate and verify `docs/opencode/manifests/BE-00X-ui-automation.md`; use it as context and allowlist. Do not delegate.
 
-- `.opencode/commands/implement-ui-automation-task.md`
-- `.opencode/agents/invet-ui-automation-implementer.md`
-- `docs/opencode/tasks/ui-automation/UIA-00X.md`
-- `docs/opencode/14_github_copilot_agentic_flow.md`
+Run E2E and regression only against the Docker Compose `db`, `backend`, and `frontend` stack with `PLAYWRIGHT_START_FRONTEND=false`. On PASS recommend `implement-api-automation-task.prompt.md`; Docker unavailable is `BLOCKED`.
 
 Preflight:
 - Validate the slice plan through `backend/scripts/validate_slice_plan.py --stage qa` before closing the task.
