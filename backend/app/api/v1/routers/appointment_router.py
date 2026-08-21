@@ -82,7 +82,7 @@ def _get_clinic_id_from_user(current_user: dict) -> int:
     summary="Obtener disponibilidad de horarios",
 )
 async def get_appointment_availability(
-    date: datetime = Query(..., description="Fecha a consultar (YYYY-MM-DD)"),
+    date: str = Query(..., description="Fecha a consultar (YYYY-MM-DD)"),
     veterinarian_id: int
     | None = Query(None, description="ID del veterinario (opcional)"),
     clinic_id: int | None = Query(None, description="ID de la clínica"),
@@ -105,17 +105,25 @@ async def get_appointment_availability(
     if clinic_id is None:
         clinic_id = _get_clinic_id_from_user(current_user)
 
+    try:
+        query_date = datetime.strptime(date, "%Y-%m-%d")
+    except ValueError as exc:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail="La fecha debe estar en formato YYYY-MM-DD",
+        ) from exc
+
     use_case = GetAvailabilityUseCase(repo)
     slots = await use_case.execute(
         veterinarian_id=veterinarian_id,
         clinic_id=clinic_id,
         branch_id=branch_id,
-        date=date,
+        date=query_date,
         slot_duration_minutes=slot_duration,
     )
 
     return AvailabilityResponseSchema(
-        date=date.strftime("%Y-%m-%d"),
+        date=date,
         slots=[AvailabilitySlotSchema(**s) for s in slots],
         meta={
             "veterinarian_id": veterinarian_id,

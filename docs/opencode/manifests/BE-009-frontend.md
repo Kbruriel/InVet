@@ -2,9 +2,9 @@
 manifest_version: 1
 slice: "009"
 layer: frontend
-generated_at: 2026-08-19T23:46:58+00:00
+generated_at: 2026-08-21T17:54:21+00:00
 source_plan: docs/opencode/plans/BE-009-plan.md
-source_plan_sha256: c767e142f4beb6c6e703e79223d2709261d2a6c438e28005a57f341b5c39e332
+source_plan_sha256: e2f99a172c4892887dc10f998c345fd25a16a9644b3e3d7e64d335f42344688e
 source_task: docs/opencode/tasks/frontend/FE-009.md
 source_task_sha256: 06f77f66f65a89b389428bc5b09068a1c7ad07e24b6ef2d167371458cc27a8dc
 ---
@@ -41,7 +41,7 @@ source_task_sha256: 06f77f66f65a89b389428bc5b09068a1c7ad07e24b6ef2d167371458cc27
 
 ## Tareas
 
-### FE-009-T01 - PENDIENTE
+### FE-009-T01 - COMPLETADA
 - Tipo: cliente api
 - Criterio: AC-009-07, AC-009-09
 - Objetivo: Implementar cliente API tipado para operaciones de consulta.
@@ -53,7 +53,7 @@ source_task_sha256: 06f77f66f65a89b389428bc5b09068a1c7ad07e24b6ef2d167371458cc27
 - Validacion: `cd frontend && npx tsc --noEmit` sin errores; typecheck pasa.
 - Resultado: Cliente API verificable por componentes y QA.
 
-### FE-009-T02 - PENDIENTE
+### FE-009-T02 - COMPLETADA
 - Tipo: componente
 - Criterio: AC-009-08, AC-009-10
 - Objetivo: Implementar formulario clinico para registrar consulta desde agenda veterinaria.
@@ -65,7 +65,7 @@ source_task_sha256: 06f77f66f65a89b389428bc5b09068a1c7ad07e24b6ef2d167371458cc27
 - Validacion: `cd frontend && npm run lint && npm run typecheck` sin errores.
 - Resultado: Formulario usable por veterinario para registrar consulta.
 
-### FE-009-T03 - PENDIENTE
+### FE-009-T03 - COMPLETADA
 - Tipo: componente
 - Criterio: AC-009-03, AC-009-05, AC-009-09, AC-009-13
 - Objetivo: Implementar listado paginado de consultas para una mascota en portal del propietario.
@@ -77,7 +77,7 @@ source_task_sha256: 06f77f66f65a89b389428bc5b09068a1c7ad07e24b6ef2d167371458cc27
 - Validacion: `cd frontend && npm run lint && npm run typecheck` sin errores.
 - Resultado: Historial visualizable por propietario con paginacion.
 
-### FE-009-T04 - PENDIENTE
+### FE-009-T04 - COMPLETADA
 - Tipo: componente
 - Criterio: AC-009-04, AC-009-13
 - Objetivo: Mostrar datos completos de una consulta en solo lectura para el propietario.

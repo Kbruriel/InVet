@@ -2,11 +2,11 @@
 manifest_version: 1
 slice: "009"
 layer: backend
-generated_at: 2026-08-19T23:46:58+00:00
+generated_at: 2026-08-21T17:54:21+00:00
 source_plan: docs/opencode/plans/BE-009-plan.md
-source_plan_sha256: c767e142f4beb6c6e703e79223d2709261d2a6c438e28005a57f341b5c39e332
+source_plan_sha256: e2f99a172c4892887dc10f998c345fd25a16a9644b3e3d7e64d335f42344688e
 source_task: docs/opencode/tasks/backend/BE-009.md
-source_task_sha256: 98baaae7d48a12692aea392b679de44ae8adeb35ce57062cd177bf7317301238
+source_task_sha256: 986dafb7b4f4807f4243b1b4ef231fd0517e8be8eb438db96a6ef3025b08b5f8
 ---
 
 # BE-009 - manifiesto compacto backend
@@ -34,7 +34,7 @@ source_task_sha256: 98baaae7d48a12692aea392b679de44ae8adeb35ce57062cd177bf731730
 - `backend/app/domain/entities/consultation.py`
 - `backend/app/domain/repositories/consultation_repository.py`
 - `backend/app/infrastructure/database/models/consultation.py`
-- `backend/app/infrastructure/repositories/consultation_repository_impl.py`
+- `backend/app/infrastructure/database/repositories/consultation_repository_impl.py`
 - `backend/app/tests/**`
 - `backend/tests/**`
 - `docs/opencode/checkpoints/BE-009-backend.json`
@@ -43,7 +43,7 @@ source_task_sha256: 98baaae7d48a12692aea392b679de44ae8adeb35ce57062cd177bf731730
 
 ## Tareas
 
-### BE-009-T01 - PENDIENTE
+### BE-009-T01 - COMPLETADA
 - Tipo: contrato
 - Criterio: AC-009-01, AC-009-06
 - Objetivo: Definir entidad de dominio Consultation con constraint unique appointment_id.
@@ -55,7 +55,7 @@ source_task_sha256: 98baaae7d48a12692aea392b679de44ae8adeb35ce57062cd177bf731730
 - Validacion: `python -c "from app.domain.entities.consultation import Consultation; print(Consultation.model_fields.keys())"` verifica campos.
 - Resultado: Entidad de dominio disponible para contrato repositorio.
 
-### BE-009-T02 - PENDIENTE
+### BE-009-T02 - COMPLETADA
 - Tipo: contrato
 - Criterio: AC-009-01, AC-009-06
 - Objetivo: Definir protocolo abstracto de repositorio con metodos create, get_by_id, list_by_pet, list_by_clinic.
@@ -67,7 +67,7 @@ source_task_sha256: 98baaae7d48a12692aea392b679de44ae8adeb35ce57062cd177bf731730
 - Validacion: `python -c "from app.domain.repositories.consultation_repository import ConsultationRepository; print(ConsultationRepository.__abstractmethods__)"` lista metodos.
 - Resultado: Contrato repositorio disponible para implementacion de infraestructura.
 
-### BE-009-T03 - PENDIENTE
+### BE-009-T03 - COMPLETADA
 - Tipo: persistencia
 - Criterio: AC-009-06, AC-009-14
 - Objetivo: Crear modelo SQLAlchemy para tabla consultations con indices.
@@ -79,19 +79,19 @@ source_task_sha256: 98baaae7d48a12692aea392b679de44ae8adeb35ce57062cd177bf731730
 - Validacion: `alembic upgrade head && alembic downgrade -1 && alembic upgrade head` sin errores.
 - Resultado: Tabla consultations disponible en base de datos.
 
-### BE-009-T04 - PENDIENTE
+### BE-009-T04 - COMPLETADA
 - Tipo: persistencia
 - Criterio: AC-009-01, AC-009-06
 - Objetivo: Implementar ConsultationRepository con logica de persistencia.
 - Depende de: BE-009-T02, BE-009-T03
 - Contexto: `docs/opencode/tasks/backend/BE-009.md`; contrato repositorio; modelo ORM creado en T03
 - Contratos: AC-009-01, AC-009-06
-- Entregables: `backend/app/infrastructure/repositories/consultation_repository_impl.py`
+- Entregables: `backend/app/infrastructure/database/repositories/consultation_repository_impl.py`
 - Aceptacion: Implementa create, get_by_id, list_by_pet, list_by_clinic. Paginacion funcional en list_by_* sin error.
-- Validacion: `python -c "from app.infrastructure.repositories.consultation_repository_impl import ConsultationRepositoryImpl; print('OK')"` + revisar codigo.
+- Validacion: `python -c "from app.infrastructure.database.repositories.consultation_repository_impl import ConsultationRepositoryImpl; print('OK')"` + revisar codigo.
 - Resultado: Repositorio disponible para casos de uso.
 
-### BE-009-T05 - PENDIENTE
+### BE-009-T05 - COMPLETADA
 - Tipo: caso de uso
 - Criterio: AC-009-01, AC-009-02, AC-009-06, AC-009-11
 - Objetivo: Implementar caso de uso create_consultation con validacion de negocio.
@@ -103,7 +103,7 @@ source_task_sha256: 98baaae7d48a12692aea392b679de44ae8adeb35ce57062cd177bf731730
 - Validacion: `pytest backend/app/tests/test_consultation_use_cases.py -q` con coverage >= 80%.
 - Resultado: Casos de uso listos para consumo por routers.
 
-### BE-009-T06 - PENDIENTE
+### BE-009-T06 - COMPLETADA
 - Tipo: contrato
 - Criterio: AC-009-07, AC-009-10
 - Objetivo: Definir schemas Pydantic de request para endpoint de consulta.
@@ -115,7 +115,7 @@ source_task_sha256: 98baaae7d48a12692aea392b679de44ae8adeb35ce57062cd177bf731730
 - Validacion: `python -c "from app.api.schemas.consultation_schemas import ConsultationCreate; print('OK')"` + revisar schemas.
 - Resultado: Schemas validados disponibles para implementacion de endpoint.
 
-### BE-009-T07 - PENDIENTE
+### BE-009-T07 - COMPLETADA
 - Tipo: api
 - Criterio: AC-009-01, AC-009-02, AC-009-07, AC-009-10
 - Objetivo: Exponer endpoint POST para creacion de consultas que responde 201.
@@ -127,7 +127,7 @@ source_task_sha256: 98baaae7d48a12692aea392b679de44ae8adeb35ce57062cd177bf731730
 - Validacion: `pytest backend/app/tests/api/test_consultations_api.py::test_create_consultation -q` → PASS.
 - Resultado: Endpoint de creacion disponible para frontend clinico.
 
-### BE-009-T08 - PENDIENTE
+### BE-009-T08 - COMPLETADA
 - Tipo: api
 - Criterio: AC-009-04, AC-009-05, AC-009-09, AC-009-12
 - Objetivo: Exponer endpoint GET de lista paginada.

@@ -100,7 +100,7 @@ test.describe("services listing - UIA-006", () => {
         // Columnas esperadas
         await expect(page.locator("thead th").filter({ hasText: /Nombre|Service/i }).first()).toBeVisible();
         await expect(page.locator("thead th").filter({ hasText: /Precio|Price/i }).first()).toBeVisible();
-        await expect(page.locator("thead th").filter({ hasText: /Duracion|Duration/i }).first()).toBeVisible();
+        await expect(page.locator("thead th").filter({ hasText: /Duraci[óo]n|Duration/i }).first()).toBeVisible();
       }
 
       // Verificar controles de paginacion si hay datos

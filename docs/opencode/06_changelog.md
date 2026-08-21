@@ -1,5 +1,72 @@
 # 06 — Changelog by Slice
 
+## BE-009: Consulta médica básica — CLOSED (2026-08-21)
+
+### Summary
+
+Este slice implementa el registro de consulta médica sobre citas completadas: creación de consulta con diagnóstico, historia clínica y recomendaciones; lectura por id para clínicos y propietario; listado paginado con filtro por mascota. Cubre el flujo clínico mínimo del MVP sin recetas ni notificaciones (BE-010/BE-013). Backend BE-009 + frontend FE-009 + QA-009. Todos los gates APPROVED.
+
+### Gates Result
+
+| Gate | Decision | Evidencia |
+| --- | --- | --- |
+| Plan slice | APPROVED | `docs/opencode/plans/BE-009-plan.md` (AC-009-01..14) |
+| QA-009 | APPROVED | `docs/opencode/qa/QA-009-results.md` |
+| Functional review | APPROVED | `docs/opencode/reviews/BE-009-review.md` |
+| Clean Architecture | APPROVED | `docs/opencode/reviews/BE-009-clean-architecture-review.md` |
+| Security review | APPROVED | `docs/opencode/reviews/BE-009-security-review.md` |
+| UI checks | APPROVED | `docs/opencode/checks/BE-009-ui-checks.md` (e2e 75/0, regression 63/0) |
+| Checks | APPROVED | `docs/opencode/checks/BE-009-checks.md` |
+
+### Backend Implementation
+
+| Componente | Archivo(s) | Estado |
+|-----------|-----------|--------|
+| Domain entity | `backend/app/domain/entities/consultation.py` | ✅ Done |
+| Repository port | `backend/app/domain/repositories/consultation_repository.py` | ✅ Done |
+| Use cases | `backend/app/application/use_cases/consultation_use_cases.py` (Create/Get/List + errores de dominio) | ✅ Done |
+| ORM model + repo impl | `backend/app/infrastructure/database/models/consultation.py` + `repositories/consultation_repository_impl.py` | ✅ Done |
+| Pydantic schemas | `backend/app/api/schemas/consultation_schemas.py` | ✅ Done |
+| Router | `backend/app/api/v1/routers/consultation_router.py` | ✅ Done |
+| Alembic migration | tabla `consultations` con unique `(appointment_id, clinic_id)` | ✅ Migrated |
+
+### API Endpoints
+
+| Method | Route | Auth | Descripción |
+|--------|-------|------|-------------|
+| `POST` | `/api/v1/consultations` | Bearer — rol clínico (vet/staff/clinic/admin) | Registrar consulta sobre una cita completada; 409 por duplicado, 422 si cita no completada, 403 si no es de la clínica |
+| `GET` | `/api/v1/consultations/{id}` | Bearer | Detalle; 404 para clínica ajena o owner de otra mascota |
+| `GET` | `/api/v1/consultations` | Bearer | Listado paginado (`page`, `page_size<=100`, filtro `pet_id`); owner exige `pet_id` |
+
+### Decisión de diseño relevante
+
+- `created_by` resuelve a `internal_users.id` por tenant vía `_resolve_created_by`; es nulo para propietarios/externos y nunca aceptado desde el payload.
+- Deduplicación por `(appointment_id, clinic_id)` con unique index + guard en use case; el endpoint responde 409 sin exponer detalles internos.
+- El propietario solo accede al historial de sus mascotas (422 si no envía `pet_id` en list; 404 si la mascota no es suya).
+
+### Fixes aplicados en este gate (fuera de alcance de BE-009 pero bloqueantes de la suite)
+
+- **BE-008** `appointment_router.py`: `date: datetime` → `date: str = Query(...)` + `strptime` con `raise ... from exc`; el contrato (FE client, schema docstring, tests) usa `YYYY-MM-DD`.
+- **BE-001** `auth-refresh-be001.spec.ts`: email de test ahora incluye `Date.now()` + `Math.random()` para evitar colisiones de milisegundo entre workers de Playwright.
+- **In-slice**: `api-a-009-consultations.spec.ts` tipo local `ConsultationCreateResponse` alineado con el response real (`appointment_id`, `pet_id`); import `timedelta` en `test_consultation_use_cases.py`; `# noqa: C901` en `test_consultations_api.py`.
+
+### Riesgos y pendientes (no bloqueantes)
+
+| Severidad | Item | Acción |
+|-----------|------|--------|
+| Minor | Sin header `Idempotency-Key` en `POST /consultations` (cubierto por unique index + 409) | Documentar en spec; considerar en Stage 2 |
+| Minor | Sin rate-limiting en `POST /consultations` | `fastapi-limiter` en Stage 2 |
+| Minor | Auditoría de acciones críticas (tabla `consultation_audit_log`) | Stage 2 (fuera de alcance MVP) |
+
+### Verificación final
+
+- Backend: `pytest app/tests` 232 passed / 1 skipped / 0 failed; `ruff` PASS; `mypy` PASS (165 files).
+- Frontend: `jest` 154 passed; `lint` PASS; `typecheck` PASS; `build` PASS.
+- Playwright: `test:e2e` 75/0, `test:regression` 63/0, `test:api` 72/0.
+- Preflight: `validate_slice_plan.py BE-009 --stage checks` PASS y `--stage docs` PASS; manifiestos `manage_slice_task.py verify BE-009 --layer all` PASS.
+
+---
+
 ## BE-006: Servicios, veterinarios y usuarios internos (Clinic Management Core)
 
 ### Summary

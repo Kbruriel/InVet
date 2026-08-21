@@ -36,6 +36,21 @@ class InternalUserRepositoryImpl(InternalUserRepository):
             return None
         return self._to_domain(result)
 
+    async def get_by_user_id(
+        self, user_id: int, clinic_id: int, active_only: bool = True
+    ) -> InternalUser | None:
+        """Resolver el usuario interno activo vinculado a una cuenta de autenticación."""
+        stmt = select(InternalUserModel).where(
+            InternalUserModel.user_id == user_id,
+            InternalUserModel.clinic_id == clinic_id,
+        )
+        if active_only:
+            stmt = stmt.where(InternalUserModel.is_active.is_(True))
+        result = self.db.execute(stmt).scalars().first()
+        if result is None:
+            return None
+        return self._to_domain(result)
+
     async def create_internal_user(self, internal_user: InternalUser) -> InternalUser:
         """Crear un nuevo usuario interno."""
         branch_ids_json = (

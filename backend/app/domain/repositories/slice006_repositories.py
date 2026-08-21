@@ -120,6 +120,22 @@ class InternalUserRepository(ABC):
         pass
 
     @abstractmethod
+    async def get_by_user_id(
+        self, user_id: int, clinic_id: int, active_only: bool = True
+    ) -> InternalUser | None:
+        """Obtener el usuario interno activo vinculado a una cuenta de autenticación.
+
+        Args:
+            user_id: ID de la cuenta de autenticación (``users.id``).
+            clinic_id: Tenant isolation por clínica.
+            active_only: Solo usuarios activos (``is_active=True``).
+
+        Returns:
+            Entidad ``InternalUser`` o ``None`` si no existe un vínculo activo.
+        """
+        pass
+
+    @abstractmethod
     async def create_internal_user(self, internal_user: InternalUser) -> InternalUser:
         """Crear un nuevo usuario interno. Retorna la entidad con ID asignado."""
         pass

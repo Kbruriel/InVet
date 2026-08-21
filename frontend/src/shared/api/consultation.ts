@@ -45,7 +45,7 @@ export interface ConsultationListParams {
   clinic_id?: number;
 }
 
-const BASE_PATH = '/api/v1/consultations';
+const BASE_PATH = '/consultations';
 
 export async function createConsultation(
   data: ConsultationCreateData,

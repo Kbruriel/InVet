@@ -13,7 +13,7 @@ test.describe("BE-001 auth/refresh - token refresh flow", () => {
       criteria: ["AC-001-03"],
     });
 
-    registrationEmail = `rfrsh-${Date.now()}@example.com`;
+    registrationEmail = `rfrsh-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com`;
     const registerResponse = await request.post("/api/v1/auth/register", {
       data: {
         email: registrationEmail,
@@ -101,7 +101,7 @@ test.describe("BE-001 auth/refresh - token refresh flow", () => {
       // Register and grab the access token to use it as refresh token (must fail).
       const registerResponse = await request.post("/api/v1/auth/register", {
         data: {
-          email: `misuse-${Date.now()}@example.com`,
+          email: `misuse-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@example.com`,
           password: "secret123",
           firstName: "Misuse",
           lastName: "Test",

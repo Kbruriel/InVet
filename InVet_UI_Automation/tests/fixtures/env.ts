@@ -13,6 +13,10 @@ export type AutomationEnv = {
   vetPassword: string;
   adminEmail: string;
   adminPassword: string;
+  ownerEmail: string;
+  ownerPassword: string;
+  foreignOwnerEmail: string;
+  foreignOwnerPassword: string;
 };
 
 function readBoolean(value: string | undefined, fallback: boolean): boolean {
@@ -45,5 +49,13 @@ export function readAutomationEnv(): AutomationEnv {
     vetPassword: process.env.VET_PASSWORD || "secret123",
     adminEmail: process.env.ADMIN_EMAIL || "admin@example.com",
     adminPassword: process.env.ADMIN_PASSWORD || "secret123",
+    // BE-009 owner happy-path fixtures (see _ensure_owner_consultation_fixtures
+    // in backend bootstrap). ownerEmail owns pet 1000 + consultation 1000;
+    // foreignOwnerEmail owns pet 1001 + consultation 1001 (used to assert the
+    // BOLA isolation check on the owner UI).
+    ownerEmail: process.env.OWNER_EMAIL || "owner1@invet.com",
+    ownerPassword: process.env.OWNER_PASSWORD || "secret123",
+    foreignOwnerEmail: process.env.FOREIGN_OWNER_EMAIL || "owner2@invet.com",
+    foreignOwnerPassword: process.env.FOREIGN_OWNER_PASSWORD || "secret123",
   };
 }

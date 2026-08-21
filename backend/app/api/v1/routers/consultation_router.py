@@ -22,10 +22,13 @@ from app.application.use_cases.consultation_use_cases import (
     OwnershipError,
 )
 from app.core.security import get_current_access_user
-from app.domain.entities.consultation import ConsultationCreate as ConsultationCreateDomain
+from app.domain.entities.consultation import (
+    ConsultationCreate as ConsultationCreateDomain,
+)
 from app.domain.repositories.appointment_repository import AppointmentRepository
 from app.domain.repositories.consultation_repository import ConsultationRepository
 from app.domain.repositories.owner_repository import OwnerRepository, PetRepository
+from app.domain.repositories.slice006_repositories import InternalUserRepository
 
 router = APIRouter(prefix="/consultations", tags=["consultations"])
 
@@ -80,6 +83,17 @@ def get_owner_repo(
     return _get(db)
 
 
+def get_internal_user_repo(
+    db: Session = Depends(get_current_db),
+) -> InternalUserRepository:
+    """Dependencia para el repositorio de usuarios internos (resolución ``created_by``)."""
+    from app.infrastructure.database.repositories.factory import (
+        get_internal_user_repo as _get,
+    )
+
+    return _get(db)
+
+
 def _extract_user_id(current_user: dict) -> int:
     """Extraer user_id del usuario autenticado."""
     user_id = current_user.get("user_id") or current_user.get("id")
@@ -124,6 +138,19 @@ def _require_write_role(current_user: dict) -> None:
         )
 
 
+async def _resolve_created_by(
+    internal_user_repo: InternalUserRepository, user_id: int, clinic_id: int
+) -> int | None:
+    """``consultations.created_by`` referencia ``internal_users.id`` (no ``users.id``).
+
+    Resuelve el usuario interno vinculado al ``user_id`` autenticado dentro de la
+    clínica del tenant, o ``None`` cuando el usuario es un propietario/externo
+    sin registro interno.
+    """
+    internal_user = await internal_user_repo.get_by_user_id(user_id, clinic_id)
+    return internal_user.id if internal_user else None
+
+
 def _build_pet_owner_resolver(pet_repo: PetRepository):
     """Construye una función async que resuelve el owner de una mascota."""
 
@@ -147,10 +174,12 @@ def _build_pet_owner_resolver(pet_repo: PetRepository):
 )
 async def create_consultation(
     payload: ConsultationCreate,
+    db: Session = Depends(get_current_db),
     current_user: dict = Depends(get_current_access_user),
     consultation_repo: ConsultationRepository = Depends(get_consultation_repo),
     appointment_repo: AppointmentRepository = Depends(get_appointment_repo),
     pet_repo: PetRepository = Depends(get_pet_repo),
+    internal_user_repo: InternalUserRepository = Depends(get_internal_user_repo),
 ) -> ConsultationRead:
     """Registrar una consulta para una cita en estado ``completed``.
 
@@ -161,7 +190,8 @@ async def create_consultation(
     """
     _require_write_role(current_user)
     clinic_id = _get_clinic_id_from_user(current_user)
-    created_by = _extract_user_id(current_user)
+    user_id = _extract_user_id(current_user)
+    created_by = await _resolve_created_by(internal_user_repo, user_id, clinic_id)
 
     use_case = CreateConsultationUseCase(
         consultation_repository=consultation_repo,

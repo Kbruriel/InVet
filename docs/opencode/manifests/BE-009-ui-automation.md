@@ -2,9 +2,9 @@
 manifest_version: 1
 slice: "009"
 layer: ui-automation
-generated_at: 2026-08-19T23:46:58+00:00
+generated_at: 2026-08-21T17:54:21+00:00
 source_plan: docs/opencode/plans/BE-009-plan.md
-source_plan_sha256: c767e142f4beb6c6e703e79223d2709261d2a6c438e28005a57f341b5c39e332
+source_plan_sha256: e2f99a172c4892887dc10f998c345fd25a16a9644b3e3d7e64d335f42344688e
 source_task: docs/opencode/tasks/ui-automation/UIA-009.md
 source_task_sha256: ef797e282077006eee42f53687e3951c32b7dcd98c562bed7da8799d17d15449
 ---

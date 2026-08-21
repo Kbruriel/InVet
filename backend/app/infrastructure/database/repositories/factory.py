@@ -9,11 +9,15 @@ from sqlalchemy.orm import Session
 from app.domain.repositories.appointment_repository import AppointmentRepository
 from app.domain.repositories.consultation_repository import ConsultationRepository
 from app.domain.repositories.owner_repository import OwnerRepository, PetRepository
+from app.domain.repositories.slice006_repositories import InternalUserRepository
 from app.infrastructure.database.repositories.appointment_repository_impl import (
     AppointmentRepositoryImpl,
 )
 from app.infrastructure.database.repositories.consultation_repository_impl import (
     ConsultationRepositoryImpl,
+)
+from app.infrastructure.database.repositories.internal_user_repository_impl import (
+    InternalUserRepositoryImpl,
 )
 from app.infrastructure.database.repositories.owner_repository_impl import (
     OwnerRepositoryImpl,
@@ -41,3 +45,8 @@ def get_appointment_repo(db: Session) -> AppointmentRepository:
 def get_consultation_repo(db: Session) -> ConsultationRepository:
     """Obtener una instancia del repositorio de consultas médicas."""
     return ConsultationRepositoryImpl(db)
+
+
+def get_internal_user_repo(db: Session) -> InternalUserRepository:
+    """Obtener una instancia del repositorio de usuarios internos."""
+    return InternalUserRepositoryImpl(db)

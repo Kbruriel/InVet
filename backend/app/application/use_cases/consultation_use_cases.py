@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Awaitable, Callable
+from collections.abc import Awaitable, Callable
 
 from app.domain.entities.appointment import AppointmentStatus
 from app.domain.entities.consultation import (
@@ -11,7 +11,6 @@ from app.domain.entities.consultation import (
 )
 from app.domain.repositories.appointment_repository import AppointmentRepository
 from app.domain.repositories.consultation_repository import ConsultationRepository
-
 
 # Resuelve el owner_id de una mascota (inyectado por el router para no
 # acoplar el caso de uso a un repositorio de mascotas concreto).
@@ -56,7 +55,7 @@ class CreateConsultationUseCase:
         self,
         consultation_repository: ConsultationRepository,
         appointment_repository: AppointmentRepository,
-        pet_owner_resolver: "PetOwnerResolver | None" = None,
+        pet_owner_resolver: PetOwnerResolver | None = None,
     ) -> None:
         self.consultation_repository = consultation_repository
         self.appointment_repository = appointment_repository

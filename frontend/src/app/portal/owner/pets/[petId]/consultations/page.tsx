@@ -63,7 +63,7 @@ function clampText(value: string, fallback: string): string {
 export default function OwnerPetConsultationsPage() {
   const params = useParams();
   const router = useRouter();
-  const petParam = params.id;
+  const petParam = params.petId;
   const petId = Number(Array.isArray(petParam) ? petParam[0] : petParam);
 
   const [consultations, setConsultations] = useState<Consultation[]>([]);

@@ -1,5 +1,6 @@
 """Casos de uso para autenticacion."""
 
+import asyncio
 from datetime import datetime, timedelta
 
 from fastapi import HTTPException, status
@@ -113,7 +114,16 @@ class AuthUseCase:
 
     async def _authenticate_user(self, *, email: str, password: str) -> User:
         user = await self.user_repository.get_user_by_email(email.lower())
-        if not user or not verify_password(password, user.hashed_password):
+        if user is None:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Credenciales invalidas",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        verified = await asyncio.to_thread(
+            verify_password, password, user.hashed_password
+        )
+        if not verified:
             raise HTTPException(
                 status_code=status.HTTP_401_UNAUTHORIZED,
                 detail="Credenciales invalidas",

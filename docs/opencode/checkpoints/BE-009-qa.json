@@ -1,0 +1,66 @@
+{
+  "slice": "BE-009",
+  "layer": "qa",
+  "tasks": {
+    "QA-009-T01": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-20T20:32:15+00:00",
+      "finished_at": "2026-08-20T20:34:07+00:00",
+      "evidence": "pytest consultations 14/14 pass (2.01s) + UIA C1/C2/C3 pass chromium (2.4s). FakeSession fixture extended for db.query API used by _resolve_created_by.",
+      "outcome": "pass",
+      "changed_files": [
+        "backend/app/tests/api/test_consultations_api.py"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "QA-009-T02": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-20T20:34:28+00:00",
+      "finished_at": "2026-08-20T20:36:19+00:00",
+      "evidence": "APIA-009 A07 422-legible; use-cases 9/9 pass (not_completed 422, duplicate 409, not_found 404). No internal details leaked.",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "QA-009-T03": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-20T20:38:45+00:00",
+      "finished_at": "2026-08-20T20:47:10+00:00",
+      "evidence": "401 unauth (POST/GET detail/list); 403 cross-clinic create (admin->99999); owner isolation pytest 3/3 (own 200/foreign 404/list-own 200); APIA A02/A04 401",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "QA-009-T04": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-20T20:55:16+00:00",
+      "finished_at": "2026-08-20T20:55:36+00:00",
+      "evidence": "UIA-009 e2e chromium 5/5 (C1-C5); APIA-009 api 3/3 executed (A02/A04 401, A07 422), 11 intentionally owner-gated (ACs covered by pytest); frontend typecheck clean, lint 0 errors, jest 27 suites/154 tests pass",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "QA-009-T05": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-20T20:55:48+00:00",
+      "finished_at": "2026-08-20T21:03:53+00:00",
+      "evidence": "QA-009-results.md escrita (Decision: APPROVED, AC-009-01..14 cubiertos); alembic a009 vigente como head, reversible; 14/14 ACs con evidencia; sin findings abiertos",
+      "outcome": "pass",
+      "changed_files": [
+        "docs/opencode/qa/QA-009-results.md"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    }
+  },
+  "updated_at": "2026-08-20T21:03:53+00:00"
+}

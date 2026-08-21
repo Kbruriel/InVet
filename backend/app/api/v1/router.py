@@ -28,6 +28,11 @@ router.include_router(internal_users_router)
 router.include_router(owners_router)
 router.include_router(owner_pets_router)
 router.include_router(pet_router)
+router.include_router(public_branches_router)
+router.include_router(public_clinics_router)
+router.include_router(public_services_router)
+router.include_router(services_router)
+router.include_router(veterinarians_router)
 
 
 @router.get("/")

@@ -28,7 +28,7 @@ describe('consultation api client', () => {
     await listConsultations({ pet_id: 44, page: 2, page_size: 10 });
 
     expect(mockedApiClient.get).toHaveBeenCalledWith(
-      '/api/v1/consultations?page=2&page_size=10&pet_id=44',
+      '/consultations?page=2&page_size=10&pet_id=44',
     );
   });
 
@@ -49,7 +49,7 @@ describe('consultation api client', () => {
 
     await getConsultation(9);
 
-    expect(mockedApiClient.get).toHaveBeenCalledWith('/api/v1/consultations/9');
+    expect(mockedApiClient.get).toHaveBeenCalledWith('/consultations/9');
   });
 
   it('creates consultations with optional text fields', async () => {
@@ -73,7 +73,7 @@ describe('consultation api client', () => {
       diagnosis: 'diagnosis',
     });
 
-    expect(mockedApiClient.post).toHaveBeenCalledWith('/api/v1/consultations', {
+    expect(mockedApiClient.post).toHaveBeenCalledWith('/consultations', {
       appointment_id: 2,
       pet_id: 1,
       diagnosis: 'diagnosis',

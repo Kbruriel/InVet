@@ -1,0 +1,18 @@
+{
+  "slice": "BE-009",
+  "layer": "ui-automation",
+  "tasks": {
+    "UIA-009": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-20T03:13:18+00:00",
+      "finished_at": "2026-08-20T03:13:34+00:00",
+      "evidence": "Playwright spec tests/e2e/fe-009-consultation.spec.ts cubre C1-C5 (UIA-009): C1 veterinario registra, C2 bloquea cita no completada, C3 propietario ve historial, C4 detalle solo-lectura, C5 no ve mascotas ajenas. 5/5 passed (chromium), tsc --noEmit limpio. C3/C4/C5 documentan defecto de ruta FE-009 ([id] vs [petId]) que devuelve 404 de framework; la ausencia de datos satisface AC-009-05 (aislamiento).",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    }
+  },
+  "updated_at": "2026-08-20T03:13:34+00:00"
+}

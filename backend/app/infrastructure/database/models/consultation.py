@@ -2,7 +2,15 @@
 
 from datetime import UTC, datetime
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, Text, UniqueConstraint
+from sqlalchemy import (
+    Column,
+    DateTime,
+    ForeignKey,
+    Integer,
+    Text,
+    UniqueConstraint,
+    text,
+)
 from sqlalchemy.orm import relationship
 
 from app.infrastructure.database.models.base import Base
@@ -25,6 +33,8 @@ class Consultation(Base):
     created_by = Column(Integer, ForeignKey("internal_users.id"), nullable=True)
     updated_at = Column(
         DateTime,
+        nullable=False,
+        server_default=text("CURRENT_TIMESTAMP"),
         default=lambda: datetime.now(UTC),
         onupdate=lambda: datetime.now(UTC),
     )

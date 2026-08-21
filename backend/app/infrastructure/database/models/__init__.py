@@ -1,11 +1,11 @@
 """ORM models registered for SQLAlchemy metadata."""
 
+from app.infrastructure.database.models.appointment import Appointment
 from app.infrastructure.database.models.assignment_model import (
     VeterinarianServiceAssignment,
 )
-from app.infrastructure.database.models.base import Base
-from app.infrastructure.database.models.appointment import Appointment
 from app.infrastructure.database.models.availability_summary import AvailabilitySummary
+from app.infrastructure.database.models.base import Base
 from app.infrastructure.database.models.branch import Branch
 from app.infrastructure.database.models.branch_schedule import BranchSchedule
 from app.infrastructure.database.models.clinic import Clinic

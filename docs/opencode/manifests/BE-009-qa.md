@@ -2,9 +2,9 @@
 manifest_version: 1
 slice: "009"
 layer: qa
-generated_at: 2026-08-19T23:46:58+00:00
+generated_at: 2026-08-21T17:54:21+00:00
 source_plan: docs/opencode/plans/BE-009-plan.md
-source_plan_sha256: c767e142f4beb6c6e703e79223d2709261d2a6c438e28005a57f341b5c39e332
+source_plan_sha256: e2f99a172c4892887dc10f998c345fd25a16a9644b3e3d7e64d335f42344688e
 source_task: docs/opencode/tasks/qa/QA-009.md
 source_task_sha256: ee1c180ea2b2686d0b514e3556503ceaf3b6bea44132ce325218d39995d35cd4
 ---
@@ -36,7 +36,7 @@ source_task_sha256: ee1c180ea2b2686d0b514e3556503ceaf3b6bea44132ce325218d39995d3
 
 ## Tareas
 
-### QA-009-T01 - PENDIENTE
+### QA-009-T01 - COMPLETADA
 - Tipo: qa
 - Criterio: AC-009-01, AC-009-03, AC-009-04
 - Objetivo: Validar el happy path del flujo de consultas.
@@ -48,7 +48,7 @@ source_task_sha256: ee1c180ea2b2686d0b514e3556503ceaf3b6bea44132ce325218d39995d3
 - Validacion: `docker compose run --rm backend pytest app/tests/ -q -k consultation` + ejecucion de UIA-009 C1/C2/C3; salida registrada en results.
 - Resultado: Happy path PASS con evidencia de API y UI.
 
-### QA-009-T02 - PENDIENTE
+### QA-009-T02 - COMPLETADA
 - Tipo: qa
 - Criterio: AC-009-02, AC-009-06, AC-009-10
 - Objetivo: Validar que los negative paths fallan con errores claros sin exponer detalles internos.
@@ -60,7 +60,7 @@ source_task_sha256: ee1c180ea2b2686d0b514e3556503ceaf3b6bea44132ce325218d39995d3
 - Validacion: `docker compose run --rm backend pytest app/tests/ -q -k "consultations"` con los casos negativos; salidas registradas en results.
 - Resultado: Negative paths PASS con errores consistentes y sin filtracion de datos internos.
 
-### QA-009-T03 - PENDIENTE
+### QA-009-T03 - COMPLETADA
 - Tipo: qa
 - Criterio: AC-009-05, AC-009-11, AC-009-12
 - Objetivo: Validar los controles de seguridad ante acceso cruzado a consultas.
@@ -72,7 +72,7 @@ source_task_sha256: ee1c180ea2b2686d0b514e3556503ceaf3b6bea44132ce325218d39995d3
 - Validacion: `docker compose run --rm backend pytest app/tests/ -q -k "consultations_idor or consultations_auth"`; salidas registradas en results.
 - Resultado: Permisos y IDOR/BOLA PASS sin hallazgos OPEN de seguridad.
 
-### QA-009-T04 - PENDIENTE
+### QA-009-T04 - COMPLETADA
 - Tipo: qa
 - Criterio: AC-009-07, AC-009-08, AC-009-09, AC-009-13
 - Objetivo: Validar los estados UI del flujo principal de consultas.
@@ -84,7 +84,7 @@ source_task_sha256: ee1c180ea2b2686d0b514e3556503ceaf3b6bea44132ce325218d39995d3
 - Validacion: `npx playwright test --project=chromium` para UIA-009 + `cd frontend && npm run test && npm run lint && npm run typecheck` sin errores nuevos.
 - Resultado: Estados UI y regresion PASS con evidencia de navegador.
 
-### QA-009-T05 - PENDIENTE
+### QA-009-T05 - COMPLETADA
 - Tipo: reporte
 - Criterio: AC-009-14
 - Objetivo: Validar la migracion Alembic del schema de consultas.

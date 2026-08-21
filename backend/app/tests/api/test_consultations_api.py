@@ -2,6 +2,7 @@
 """Integration tests for consultation API endpoints (BE-009)."""
 
 from unittest.mock import AsyncMock, MagicMock
+
 import httpx
 import pytest
 import pytest_asyncio
@@ -13,7 +14,7 @@ from app.domain.entities.consultation import Consultation
 
 
 @pytest_asyncio.fixture
-async def consultation_app():
+async def consultation_app():  # noqa: C901
     """Create a FastAPI app with consultation routes and dependency overrides."""
     test_app = FastAPI()
     test_app.include_router(router, prefix="/api/v1")
@@ -24,6 +25,9 @@ async def consultation_app():
     mock_appointment_repo = AsyncMock()
     mock_pet_repo = MagicMock()
     mock_owner_repo = MagicMock()
+    # Usuario interno activo no resuelto -> created_by=None (misma semantica previa).
+    mock_internal_user_repo = AsyncMock()
+    mock_internal_user_repo.get_by_user_id = AsyncMock(return_value=None)
 
     def get_mock_consultation_repo():
         return mock_consultation_repo
@@ -37,10 +41,20 @@ async def consultation_app():
     def get_mock_owner_repo():
         return mock_owner_repo
 
+    def get_mock_internal_user_repo():
+        return mock_internal_user_repo
+
     async def get_mock_db():
+        class _Query:
+            def filter(self, *args, **kwargs):
+                return self
+            def first(self):
+                return None
         class FakeSession:
             def close(self):
                 pass
+            def query(self, *args, **kwargs):
+                return _Query()
         yield FakeSession()
 
     async def get_mock_user():
@@ -50,6 +64,9 @@ async def consultation_app():
     test_app.dependency_overrides[consultation_router_mod.get_appointment_repo] = get_mock_appointment_repo
     test_app.dependency_overrides[consultation_router_mod.get_pet_repo] = get_mock_pet_repo
     test_app.dependency_overrides[consultation_router_mod.get_owner_repo] = get_mock_owner_repo
+    test_app.dependency_overrides[
+        consultation_router_mod.get_internal_user_repo
+    ] = get_mock_internal_user_repo
     test_app.dependency_overrides[consultation_router_mod.get_current_db] = get_mock_db
     test_app.dependency_overrides[consultation_router_mod.get_current_access_user] = get_mock_user
 
@@ -59,6 +76,7 @@ async def consultation_app():
         "mock_appointment_repo": mock_appointment_repo,
         "mock_pet_repo": mock_pet_repo,
         "mock_owner_repo": mock_owner_repo,
+        "mock_internal_user_repo": mock_internal_user_repo,
     }
 
     test_app.dependency_overrides.clear()
@@ -73,14 +91,19 @@ class TestCreateConsultationAPI:
         mock_appointment_repo = consultation_app["mock_appointment_repo"]
         mock_pet_repo = consultation_app["mock_pet_repo"]
 
-        from app.domain.entities.appointment import Appointment, AppointmentStatus, AppointmentType
         from datetime import datetime, timedelta
 
+        from app.domain.entities.appointment import (
+            Appointment,
+            AppointmentStatus,
+            AppointmentType,
+        )
+
         appointment = Appointment(
-            id=1, 
+            id=1,
             owner_id=1,
-            pet_id=1, 
-            clinic_id=1, 
+            pet_id=1,
+            clinic_id=1,
             branch_id=1,
             appointment_type=AppointmentType.CONSULTATION,
             scheduled_start=datetime.now(),
@@ -88,7 +111,7 @@ class TestCreateConsultationAPI:
             status=AppointmentStatus.COMPLETED
         )
         mock_appointment_repo.get_by_id.return_value = appointment
-        
+
         mock_pet_repo.get_pet_by_id.return_value = MagicMock(owner_id=1)
 
         consultation_data = {
@@ -100,9 +123,9 @@ class TestCreateConsultationAPI:
             "diagnosis": "test diagnosis",
             "recommendations": "test recommendations",
         }
-        
+
         consultation_result = Consultation(
-            id=1, appointment_id=1, pet_id=1, clinic_id=1, branch_id=1, 
+            id=1, appointment_id=1, pet_id=1, clinic_id=1, branch_id=1,
             history="...", diagnosis="...", recommendations="..."
         )
         mock_consultation_repo.get_by_appointment_id.return_value = None
@@ -124,8 +147,13 @@ class TestCreateConsultationAPI:
         mock_appointment_repo = consultation_app["mock_appointment_repo"]
         mock_pet_repo = consultation_app["mock_pet_repo"]
 
-        from app.domain.entities.appointment import Appointment, AppointmentStatus, AppointmentType
         from datetime import datetime, timedelta
+
+        from app.domain.entities.appointment import (
+            Appointment,
+            AppointmentStatus,
+            AppointmentType,
+        )
 
         appointment = Appointment(
             id=2,

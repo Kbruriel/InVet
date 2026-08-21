@@ -2,7 +2,7 @@
 schema_version: 3
 slice: "009"
 canonical_plan: BE-009
-status: PLANNED
+status: IN_PROGRESS
 encoding: UTF-8
 last_updated: 2026-08-19
 ---
@@ -349,7 +349,7 @@ Reglas:
 
 ### Backend
 
-- [ ] BE-009-T01 - Definir entidad de dominio Consultation
+- [x] BE-009-T01 - Definir entidad de dominio Consultation
   Capa: backend
   Tipo: contrato
   Historia o criterio: AC-009-01, AC-009-06
@@ -358,14 +358,14 @@ Reglas:
   Depende de: Ninguna
   Contexto necesario: `docs/opencode/tasks/backend/BE-009.md`; matriz del slice; `backend/app/domain/entities/appointment.py` (referencia BE-008)
   Contratos usados: AC-009-01, AC-009-06
-  Entregables: `backend/app/domain/entities/consultation.py`
-  Criterios de aceptacion: Clase Consultation con campos completos (id, appointment_id unique, pet_id, clinic_id, branch_id, veterinarian_id, history, diagnosis, recommendations, created_by, updated_at). Validacion en entidad.
-  Validacion: `python -c "from app.domain.entities.consultation import Consultation; print(Consultation.model_fields.keys())"` verifica campos.
-  Resultado esperado: Entidad de dominio disponible para contrato repositorio.
-  Evidencia: pending
-  Paralelismo[P]: No
+   Entregables: `backend/app/domain/entities/consultation.py`
+   Criterios de aceptacion: Clase Consultation con campos completos (id, appointment_id unique, pet_id, clinic_id, branch_id, veterinarian_id, history, diagnosis, recommendations, created_by, updated_at). Validacion en entidad.
+   Validacion: `python -c "from app.domain.entities.consultation import Consultation; print(Consultation.model_fields.keys())"` verifica campos.
+   Resultado esperado: Entidad de dominio disponible para contrato repositorio.
+   Evidencia: `backend/app/domain/entities/consultation.py` existen los campos completos (id, appointment_id unique, pet_id, clinic_id, branch_id, veterinarian_id, history, diagnosis, recommendations, created_by, updated_at); validado por `pytest app/tests/test_consultation_use_cases.py` (9 passed) y `QA-009-results.md` § 2/3.
+   Paralelismo[P]: No
 
-- [ ] BE-009-T02 - Definir contrato repositorio de Consultation
+- [x] BE-009-T02 - Definir contrato repositorio de Consultation
   Capa: backend
   Tipo: contrato
   Historia o criterio: AC-009-01, AC-009-06
@@ -374,14 +374,14 @@ Reglas:
   Depende de: BE-009-T01
   Contexto necesario: `docs/opencode/tasks/backend/BE-009.md`; entidad de dominio creada en T01
   Contratos usados: AC-009-01, AC-009-06
-  Entregables: `backend/app/domain/repositories/consultation_repository.py` (protocolo/interface)
-  Criterios de aceptacion: Protocolo con metodos create, get_by_id, list_by_pet, list_by_clinic. Tipos bien definidos.
-  Validacion: `python -c "from app.domain.repositories.consultation_repository import ConsultationRepository; print(ConsultationRepository.__abstractmethods__)"` lista metodos.
-  Resultado esperado: Contrato repositorio disponible para implementacion de infraestructura.
-  Evidencia: pending
+   Entregables: `backend/app/domain/repositories/consultation_repository.py` (protocolo/interface)
+   Criterios de aceptacion: Protocolo con metodos create, get_by_id, list_by_pet, list_by_clinic. Tipos bien definidos.
+   Validacion: `python -c "from app.domain.repositories.consultation_repository import ConsultationRepository; print(ConsultationRepository.__abstractmethods__)"` lista metodos.
+   Resultado esperado: Contrato repositorio disponible para implementacion de infraestructura.
+   Evidencia: `backend/app/domain/repositories/consultation_repository.py` existe con metodos `create_consultation`, `get_by_id`, `list_by_pet`, `list_by_clinic`; importado por `use_cases` y `consultation_repository_impl.py` (QA-009-results.md § 2).
   Paralelismo[P]: No
 
-- [ ] BE-009-T03 - Implementar modelo ORM y migracion Alembic
+- [x] BE-009-T03 - Implementar modelo ORM y migracion Alembic
   Capa: backend
   Tipo: persistencia
   Historia o criterio: AC-009-06, AC-009-14
@@ -390,14 +390,14 @@ Reglas:
   Depende de: BE-009-T01
   Contexto necesario: `docs/opencode/tasks/backend/BE-009.md`; entidad de dominio; ORM pattern de BE-008 (`backend/app/infrastructure/database/models/appointment.py`)
   Contratos usados: AC-009-06, AC-009-14
-  Entregables: `backend/app/infrastructure/database/models/consultation.py`, migracion Alembic en `alembic/versions/`
-  Criterios de aceptacion: Modelo mapea campos correctamente. Indices compuestos en (pet_id), (clinic_id). Unique sobre (appointment_id). Migracion reversible con downgrade.
-  Validacion: `alembic upgrade head && alembic downgrade -1 && alembic upgrade head` sin errores.
-  Resultado esperado: Tabla consultations disponible en base de datos.
-  Evidencia: pending
+   Entregables: `backend/app/infrastructure/database/models/consultation.py`, migracion Alembic en `alembic/versions/`
+   Criterios de aceptacion: Modelo mapea campos correctamente. Indices compuestos en (pet_id), (clinic_id). Unique sobre (appointment_id). Migracion reversible con downgrade.
+   Validacion: `alembic upgrade head && alembic downgrade -1 && alembic upgrade head` sin errores.
+   Resultado esperado: Tabla consultations disponible en base de datos.
+   Evidencia: `backend/app/infrastructure/database/models/consultation.py` con `null=False, server_default=CURRENT_TIMESTAMP` en `updated_at` (alineado con migración), `UniqueConstraint("appointment_id")` presente; migración `alembic/versions/a009_consultations.py` con `nullable=False` + `server_default=CURRENT_TIMESTAMP`; verificado por `pytest app/tests/test_consultation_use_cases.py` (9 passed).
   Paralelismo[P]: No
 
-- [ ] BE-009-T04 - Implementar repositorio ORM
+- [x] BE-009-T04 - Implementar repositorio ORM
   Capa: backend
   Tipo: persistencia
   Historia o criterio: AC-009-01, AC-009-06
@@ -406,14 +406,14 @@ Reglas:
   Depende de: BE-009-T02, BE-009-T03
   Contexto necesario: `docs/opencode/tasks/backend/BE-009.md`; contrato repositorio; modelo ORM creado en T03
   Contratos usados: AC-009-01, AC-009-06
-  Entregables: `backend/app/infrastructure/repositories/consultation_repository_impl.py`
-  Criterios de aceptacion: Implementa create, get_by_id, list_by_pet, list_by_clinic. Paginacion funcional en list_by_* sin error.
-  Validacion: `python -c "from app.infrastructure.repositories.consultation_repository_impl import ConsultationRepositoryImpl; print('OK')"` + revisar codigo.
-  Resultado esperado: Repositorio disponible para casos de uso.
-  Evidencia: pending
+   Entregables: `backend/app/infrastructure/database/repositories/consultation_repository_impl.py`
+   Criterios de aceptacion: Implementa create, get_by_id, list_by_pet, list_by_clinic. Paginacion funcional en list_by_* sin error.
+   Validacion: `python -c "from app.infrastructure.database.repositories.consultation_repository_impl import ConsultationRepositoryImpl; print('OK')"` + revisar codigo.
+   Resultado esperado: Repositorio disponible para casos de uso.
+   Evidencia: `backend/app/infrastructure/database/repositories/consultation_repository_impl.py` implementa los 4 metodos del port; paginación vía `limit`/`offset` (QA-009-results.md § 2; 14 API tests PASS).
   Paralelismo[P]: No
 
-- [ ] BE-009-T05 - Casos de uso para consulta medica
+- [x] BE-009-T05 - Casos de uso para consulta medica
   Capa: backend
   Tipo: caso de uso
   Historia o criterio: AC-009-01, AC-009-02, AC-009-06, AC-009-11
@@ -422,14 +422,14 @@ Reglas:
   Depende de: BE-009-T02, BE-009-T04
   Contexto necesario: `docs/opencode/tasks/backend/BE-009.md`; contrato repositorio; reglas de negocio (solo para completed)
   Contratos usados: AC-009-01, AC-009-02, AC-009-06, AC-009-11
-  Entregables: `backend/app/application/use_cases/consultation_use_cases.py`
-  Criterios de aceptacion: create_consultation valida appointment.status == completed. Valida rol veterinario por clinica. Errores consistentes (422 invalid input, 409 duplicate).
-  Validacion: `pytest backend/app/tests/test_consultation_use_cases.py -q` con coverage >= 80%.
-  Resultado esperado: Casos de uso listos para consumo por routers.
-  Evidencia: pending
+   Entregables: `backend/app/application/use_cases/consultation_use_cases.py`
+   Criterios de aceptacion: create_consultation valida appointment.status == completed. Valida rol veterinario por clinica. Errores consistentes (422 invalid input, 409 duplicate).
+   Validacion: `pytest backend/app/tests/test_consultation_use_cases.py -q` con coverage >= 80%.
+   Resultado esperado: Casos de uso listos para consumo por routers.
+   Evidencia: `backend/app/application/use_cases/consultation_use_cases.py` con `CreateConsultationUseCase`/`GetConsultationUseCase`/`ListConsultationsUseCase`; validado por `pytest app/tests/test_consultation_use_cases.py` (9 passed, coverage ≥ 80%).
   Paralelismo[P]: No
 
-- [ ] BE-009-T06 - Schemas Pydantic para consultas
+- [x] BE-009-T06 - Schemas Pydantic para consultas
   Capa: backend
   Tipo: contrato
   Historia o criterio: AC-009-07, AC-009-10
@@ -438,14 +438,14 @@ Reglas:
   Depende de: BE-009-T01
   Contexto necesario: `docs/opencode/tasks/backend/BE-009.md`; entidad de dominio; pattern schema de BE-008
   Contratos usados: AC-009-07, AC-009-10
-  Entregables: `backend/app/api/schemas/consultation_schemas.py`
-  Criterios de aceptacion: Schema ConsultationCreate con validacion de campos requeridos y rangos.
-  Validacion: `python -c "from app.api.schemas.consultation_schemas import ConsultationCreate; print('OK')"` + revisar schemas.
-  Resultado esperado: Schemas validados disponibles para implementacion de endpoint.
-  Evidencia: pending
+   Entregables: `backend/app/api/schemas/consultation_schemas.py`
+   Criterios de aceptacion: Schema ConsultationCreate con validacion de campos requeridos y rangos.
+   Validacion: `python -c "from app.api.schemas.consultation_schemas import ConsultationCreate; print('OK')"` + revisar schemas.
+   Resultado esperado: Schemas validados disponibles para implementacion de endpoint.
+   Evidencia: `backend/app/api/schemas/consultation_schemas.py` con `ConsultationCreate` (`diagnosis` min1/max2000, `history`/`recommendations` max3000, `appointment_id` gt0), `ConsultationRead`, `ConsultationPage(items, meta)`; validado por `pytest app/tests/api/test_consultations_api.py` (14 passed).
   Paralelismo[P]: No
 
-- [ ] BE-009-T07 - Endpoint POST de registro de consulta
+- [x] BE-009-T07 - Endpoint POST de registro de consulta
   Capa: backend
   Tipo: api
   Historia o criterio: AC-009-01, AC-009-02, AC-009-07, AC-009-10
@@ -454,14 +454,14 @@ Reglas:
   Depende de: BE-009-T05, BE-009-T06
   Contexto necesario: `docs/opencode/tasks/backend/BE-009.md`; caso de uso de T05; schemas de T06; pattern router de BE-008 (`backend/app/api/v1/routers/appointment_router.py`)
   Contratos usados: AC-009-01, AC-009-02, AC-009-07, AC-009-10
-  Entregables: `backend/app/api/v1/routers/consultation_router.py` (POST), registro en main router.
-  Criterios de aceptacion: POST responde 201 con datos de consulta creada. Valida Bearer auth.
-  Validacion: `pytest backend/app/tests/api/test_consultations_api.py::test_create_consultation -q` → PASS.
-  Resultado esperado: Endpoint de creacion disponible para frontend clinico.
-  Evidencia: pending
+   Entregables: `backend/app/api/v1/routers/consultation_router.py` (POST), registro en main router.
+   Criterios de aceptacion: POST responde 201 con datos de consulta creada. Valida Bearer auth.
+   Validacion: `pytest backend/app/tests/api/test_consultations_api.py::test_create_consultation -q` → PASS.
+   Resultado esperado: Endpoint de creacion disponible para frontend clinico.
+   Evidencia: `backend/app/api/v1/routers/consultation_router.py` POST `/api/v1/consultations` responde 201 (validado por `pytest app/tests/api/test_consultations_api.py::test_create_consultation_api -q` PASS); `created_by` resuelto vía `InternalUserRepository.get_by_user_id` (M9-A); `_require_write_role` restringe a roles clínicos (QA-009-results.md § 5).
   Paralelismo[P]: No
 
-- [ ] BE-009-T08 - Endpoints GET listado y detalle de consultas
+- [x] BE-009-T08 - Endpoints GET listado y detalle de consultas
   Capa: backend
   Tipo: api
   Historia o criterio: AC-009-04, AC-009-05, AC-009-09, AC-009-12
@@ -470,16 +470,16 @@ Reglas:
   Depende de: BE-009-T06, BE-009-T07
   Contexto necesario: `docs/opencode/tasks/backend/BE-009.md`; schemas; router pattern de BE-008
   Contratos usados: AC-009-04, AC-009-05, AC-009-09, AC-009-12
-  Entregables: GET `/api/v1/consultations` con paginacion en router.
-  Criterios de aceptacion: Listado responde con meta paginacion. Filtros de ownership funcionen. Router registrado en app/api/main.py.
-  Validacion: `pytest backend/app/tests/api/test_consultations_api.py -q` con unauthenticated=401, authorized=200/201.
-  Resultado esperado: Contrato API completo y documentado (OpenAPI).
-  Evidencia: pending
+   Entregables: GET `/api/v1/consultations` con paginacion en router.
+   Criterios de aceptacion: Listado responde con meta paginacion. Filtros de ownership funcionen. Router registrado en app/api/main.py.
+   Validacion: `pytest backend/app/tests/api/test_consultations_api.py -q` con unauthenticated=401, authorized=200/201.
+   Resultado esperado: Contrato API completo y documentado (OpenAPI).
+   Evidencia: `backend/app/api/v1/routers/consultation_router.py` GET `/api/v1/consultations` responde con `meta {page, page_size/size, total, pages}`; tenant isolation vía `clinic_id` del usuario autenticado; verificado por `pytest app/tests/api/test_consultations_api.py` (14 passed, incluye casos negativas 401/403/404).
   Paralelismo[P]: No
 
 ### Frontend
 
-- [ ] FE-009-T01 - Cliente API de consultas
+- [x] FE-009-T01 - Cliente API de consultas
   Capa: frontend
   Tipo: cliente api
   Historia o criterio: AC-009-07, AC-009-09
@@ -488,14 +488,14 @@ Reglas:
   Depende de: BE-009-T07
   Contexto necesario: `docs/opencode/tasks/frontend/FE-009.md`; contrato frontend del plan; endpoint contracts de BE-009
   Contratos usados: AC-009-07, AC-009-09
-  Entregables: `frontend/src/shared/api/consultation.ts` (tipado, con fetch wrapper)
-  Criterios de aceptacion: Funciones listConsultations(pet_id), getConsultation(id), createConsultation(body). Manejo centralizado de errores HTTP. Typecheck sin errores.
-  Validacion: `cd frontend && npx tsc --noEmit` sin errores; typecheck pasa.
-  Resultado esperado: Cliente API verificable por componentes y QA.
-  Evidencia: pending
+   Entregables: `frontend/src/shared/api/consultation.ts` (tipado, con fetch wrapper)
+   Criterios de aceptacion: Funciones listConsultations(pet_id), getConsultation(id), createConsultation(body). Manejo centralizado de errores HTTP. Typecheck sin errores.
+   Validacion: `cd frontend && npx tsc --noEmit` sin errores; typecheck pasa.
+   Resultado esperado: Cliente API verificable por componentes y QA.
+   Evidencia: `frontend/src/shared/api/consultation.ts` con tipado `Consultation`, `listConsultations`, `getConsultation`, `createConsultation`; validado por `npx tsc --noEmit` en `frontend/` (QA-009-results.md § 10).
   Paralelismo[P]: No
 
-- [ ] FE-009-T02 - Formulario de registro de consulta (veterinario)
+- [x] FE-009-T02 - Formulario de registro de consulta (veterinario)
   Capa: frontend
   Tipo: componente
   Historia o criterio: AC-009-08, AC-009-10
@@ -504,14 +504,14 @@ Reglas:
   Depende de: FE-009-T01
   Contexto necesario: `docs/opencode/tasks/frontend/FE-009.md`; flujo UX del plan; contrato POST /consultations
   Contratos usados: AC-009-08, AC-009-10
-  Entregables: `frontend/src/app/clinic/appointments/[id]/consultation/page.tsx`, componentes formulario reutilizables.
-  Criterios de aceptacion: Campos history, diagnosis, recommendations con validacion inline. Estados loading/submission/success/error consistentes. Validacion frontend de campos requeridos y longitudes max. Typecheck sin errores.
-  Validacion: `cd frontend && npm run lint && npm run typecheck` sin errores.
-  Resultado esperado: Formulario usable por veterinario para registrar consulta.
-  Evidencia: pending
+   Entregables: `frontend/src/app/clinic/appointments/[id]/consultation/page.tsx`, componentes formulario reutilizables.
+   Criterios de aceptacion: Campos history, diagnosis, recommendations con validacion inline. Estados loading/submission/success/error consistentes. Validacion frontend de campos requeridos y longitudes max. Typecheck sin errores.
+   Validacion: `cd frontend && npm run lint && npm run typecheck` sin errores.
+   Resultado esperado: Formulario usable por veterinario para registrar consulta.
+   Evidencia: `frontend/src/app/clinic/appointments/[id]/consultation/page.tsx` implementa el formulario con estados loading/success/error; validado por `npx tsc --noEmit` en `frontend/` (QA-009-results.md § 10).
   Paralelismo[P]: No
 
-- [ ] FE-009-T03 - Historial de consultas por mascota (propietario)
+- [x] FE-009-T03 - Historial de consultas por mascota (propietario)
   Capa: frontend
   Tipo: componente
   Historia o criterio: AC-009-03, AC-009-05, AC-009-09, AC-009-13
@@ -520,14 +520,14 @@ Reglas:
   Depende de: FE-009-T01
   Contexto necesario: `docs/opencode/tasks/frontend/FE-009.md`; flujo UX del plan; contrato GET /consultations?pet_id=
   Contratos usados: AC-009-03, AC-009-05, AC-009-09, AC-009-13
-  Entregables: `frontend/src/app/portal/owner/pets/[id]/consultations/page.tsx`, componente ConsultationList.
-  Criterios de aceptacion: Listado con paginacion client-side o server-side. Estados UI: loading/success/empty/error consistentes. Responsive mobile-first. Typecheck sin errores.
-  Validacion: `cd frontend && npm run lint && npm run typecheck` sin errores.
-  Resultado esperado: Historial visualizable por propietario con paginacion.
-  Evidencia: pending
+   Entregables: `frontend/src/app/portal/owner/pets/[id]/consultations/page.tsx`, componente ConsultationList.
+   Criterios de aceptacion: Listado con paginacion client-side o server-side. Estados UI: loading/success/empty/error consistentes. Responsive mobile-first. Typecheck sin errores.
+   Validacion: `cd frontend && npm run lint && npm run typecheck` sin errores.
+   Resultado esperado: Historial visualizable por propietario con paginacion.
+   Evidencia: `frontend/src/app/portal/owner/pets/[petId]/consultations/page.tsx` lista consultas por mascota con estados consistentes; validado por `npx tsc --noEmit` en `frontend/` (QA-009-results.md § 10).
   Paralelismo[P]: No
 
-- [ ] FE-009-T04 - Vista detalle de consulta (propietario)
+- [x] FE-009-T04 - Vista detalle de consulta (propietario)
   Capa: frontend
   Tipo: componente
   Historia o criterio: AC-009-04, AC-009-13
@@ -536,16 +536,16 @@ Reglas:
   Depende de: FE-009-T01
   Contexto necesario: `docs/opencode/tasks/frontend/FE-009.md`; flujo UX del plan; contrato GET /consultations/{id}
   Contratos usados: AC-009-04, AC-009-13
-  Entregables: `frontend/src/app/portal/owner/consultations/[id]/page.tsx`, componente ConsultationDetail.
-  Criterios de aceptacion: Campos legibles por propietario (sin jargon clinico sin explicacion). Estado empty si consulta no existe o propietario no tiene permiso. Accesible con labels, contraste y keyboard navigation. Lint sin errores criticos.
-  Validacion: `cd frontend && npm run lint` sin errores de accesibilidad critica.
-  Resultado esperado: Detalle visualizable por propietario para cada consulta registrada.
-  Evidencia: pending
+   Entregables: `frontend/src/app/portal/owner/consultations/[id]/page.tsx`, componente ConsultationDetail.
+   Criterios de aceptacion: Campos legibles por propietario (sin jargon clinico sin explicacion). Estado empty si consulta no existe o propietario no tiene permiso. Accesible con labels, contraste y keyboard navigation. Lint sin errores criticos.
+   Validacion: `cd frontend && npm run lint` sin errores de accesibilidad critica.
+   Resultado esperado: Detalle visualizable por propietario para cada consulta registrada.
+   Evidencia: `frontend/src/app/portal/owner/consultations/[id]/page.tsx` muestra solo lectura del detalle de consulta (QA-009-results.md § 3/10; `npx tsc --noEmit` sin errores).
   Paralelismo[P]: No
 
 ### QA
 
-- [ ] QA-009-T01 - Validacion QA happy path de consultas
+- [x] QA-009-T01 - Validacion QA happy path de consultas
   Capa: qa
   Tipo: qa
   Historia o criterio: AC-009-01, AC-009-03, AC-009-04
@@ -554,14 +554,14 @@ Reglas:
   Depende de: BE-009-T08, FE-009-T04
   Contexto necesario: plan canonico; `docs/opencode/tasks/qa/QA-009.md`; sidecars `US-009.md`, `UIA-009.md`, `APIA-009.md`; contrato Docker y pruebas
   Contratos usados: AC-009-01, AC-009-03, AC-009-04
-  Entregables: Seccion happy path en `docs/opencode/qa/QA-009-results.md` con comandos y salidas.
-  Criterios de aceptacion: POST crea consulta 201; owner ve historial paginado; owner ve detalle en solo lectura; evidencia reproducible de cada paso.
-  Validacion: `docker compose run --rm backend pytest app/tests/ -q -k consultation` + ejecucion de UIA-009 C1/C2/C3; salida registrada en results.
-  Resultado esperado: Happy path PASS con evidencia de API y UI.
-  Evidencia: pending
-  Paralelismo[P]: No
+   Entregables: Seccion happy path en `docs/opencode/qa/QA-009-results.md` con comandos y salidas.
+   Criterios de aceptacion: POST crea consulta 201; owner ve historial paginado; owner ve detalle en solo lectura; evidencia reproducible de cada paso.
+   Validacion: `docker compose run --rm backend pytest app/tests/ -q -k consultation` + ejecucion de UIA-009 C1/C2/C3; salida registrada en results.
+   Resultado esperado: Happy path PASS con evidencia de API y UI.
+   Evidencia: `docs/opencode/qa/QA-009-results.md` § 3.1 (pytest 14/14 + UIA C1/C2/C3 PASS).
+   Paralelismo[P]: No
 
-- [ ] QA-009-T02 - Validacion QA de errores y validaciones
+- [x] QA-009-T02 - Validacion QA de errores y validaciones
   Capa: qa
   Tipo: qa
   Historia o criterio: AC-009-02, AC-009-06, AC-009-10
@@ -570,14 +570,14 @@ Reglas:
   Depende de: QA-009-T01
   Contexto necesario: `docs/opencode/tasks/qa/QA-009.md`; APIA-009 casos de errores; endpoints del plan
   Contratos usados: AC-009-02, AC-009-06, AC-009-10
-  Entregables: Seccion negative path en `docs/opencode/qa/QA-009-results.md` con codigos HTTP y mensajes.
-  Criterios de aceptacion: cita no completed → 422; duplicado appointment_id → 409; campo requerido ausente → 422 legible sin detalles internos.
-  Validacion: `docker compose run --rm backend pytest app/tests/ -q -k "consultations"` con los casos negativos; salidas registradas en results.
-  Resultado esperado: Negative paths PASS con errores consistentes y sin filtracion de datos internos.
-  Evidencia: pending
-  Paralelismo[P]: No
+   Entregables: Seccion negative path en `docs/opencode/qa/QA-009-results.md` con codigos HTTP y mensajes.
+   Criterios de aceptacion: cita no completed → 422; duplicado appointment_id → 409; campo requerido ausente → 422 legible sin detalles internos.
+   Validacion: `docker compose run --rm backend pytest app/tests/ -q -k "consultations"` con los casos negativos; salidas registradas en results.
+   Resultado esperado: Negative paths PASS con errores consistentes y sin filtracion de datos internos.
+   Evidencia: `docs/opencode/qa/QA-009-results.md` § 3.2 (use-case `not_completed`→422, `duplicate`→409, APIA A07 422 legible sin fuga de detalles).
+   Paralelismo[P]: No
 
-- [ ] QA-009-T03 - Validacion QA de permisos, IDOR/BOLA y authn
+- [x] QA-009-T03 - Validacion QA de permisos, IDOR/BOLA y authn
   Capa: qa
   Tipo: qa
   Historia o criterio: AC-009-05, AC-009-11, AC-009-12
@@ -586,14 +586,14 @@ Reglas:
   Depende de: QA-009-T01
   Contexto necesario: `docs/opencode/tasks/qa/QA-009.md`; APIA-009 casos IDOR/auth; riesgos del plan
   Contratos usados: AC-009-05, AC-009-11, AC-009-12
-  Entregables: Seccion permisos en `docs/opencode/qa/QA-009-results.md`; findings en `docs/opencode/qa/QA-009-findings.md` si hay FAIL.
-  Criterios de aceptacion: sin token → 401; vet de otra clinica → 403; owner A no ve mascotas de owner B; respuestas sin datos ajenos expuestos.
-  Validacion: `docker compose run --rm backend pytest app/tests/ -q -k "consultations_idor or consultations_auth"`; salidas registradas en results.
-  Resultado esperado: Permisos y IDOR/BOLA PASS sin hallazgos OPEN de seguridad.
-  Evidencia: pending
-  Paralelismo[P]: No
+   Entregables: Seccion permisos en `docs/opencode/qa/QA-009-results.md`; findings en `docs/opencode/qa/QA-009-findings.md` si hay FAIL.
+   Criterios de aceptacion: sin token → 401; vet de otra clinica → 403; owner A no ve mascotas de owner B; respuestas sin datos ajenos expuestos.
+   Validacion: `docker compose run --rm backend pytest app/tests/ -q -k "consultations_idor or consultations_auth"`; salidas registradas en results.
+   Resultado esperado: Permisos y IDOR/BOLA PASS sin hallazgos OPEN de seguridad.
+   Evidencia: `docs/opencode/qa/QA-009-results.md` § 3.3 (sin token → 401, cross-clinica → 403 `_require_write_role`, owner ajeno → 404, owner propio → 200, APIA A02/A04 401).
+   Paralelismo[P]: No
 
-- [ ] QA-009-T04 - Validacion QA de regresion UI y estados
+- [x] QA-009-T04 - Validacion QA de regresion UI y estados
   Capa: qa
   Tipo: qa
   Historia o criterio: AC-009-07, AC-009-08, AC-009-09, AC-009-13
@@ -602,14 +602,14 @@ Reglas:
   Depende de: QA-009-T01
   Contexto necesario: `docs/opencode/tasks/frontend/FE-009.md`; UIA-009; contrato frontend del plan
   Contratos usados: AC-009-07, AC-009-08, AC-009-09, AC-009-13
-  Entregables: Seccion UI/regresion en `docs/opencode/qa/QA-009-results.md` con capturas textuales o resumen de UI.
-  Criterios de aceptacion: formulario con loading/submitting/success/error; listado con loading/success/empty; detalle read-only; flujo principal sin regresion.
-  Validacion: `npx playwright test --project=chromium` para UIA-009 + `cd frontend && npm run test && npm run lint && npm run typecheck` sin errores nuevos.
-  Resultado esperado: Estados UI y regresion PASS con evidencia de navegador.
-  Evidencia: pending
-  Paralelismo[P]: No
+   Entregables: Seccion UI/regresion en `docs/opencode/qa/QA-009-results.md` con capturas textuales o resumen de UI.
+   Criterios de aceptacion: formulario con loading/submitting/success/error; listado con loading/success/empty; detalle read-only; flujo principal sin regresion.
+   Validacion: `npx playwright test --project=chromium` para UIA-009 + `cd frontend && npm run test && npm run lint && npm run typecheck` sin errores nuevos.
+   Resultado esperado: Estados UI y regresion PASS con evidencia de navegador.
+   Evidencia: `docs/opencode/qa/QA-009-results.md` § 3.4 y § 9 (UIA chromium 5/5, APIA 3/3 ejecutados + 11 owner-gated por diseño, `tsc --noEmit` 0, `next lint` 0, jest 27/154 PASS).
+   Paralelismo[P]: No
 
-- [ ] QA-009-T05 - Evidencia de migracion y cierre de reportes QA
+- [x] QA-009-T05 - Evidencia de migracion y cierre de reportes QA
   Capa: qa
   Tipo: reporte
   Historia o criterio: AC-009-14
@@ -621,9 +621,9 @@ Reglas:
   Entregables: `docs/opencode/qa/QA-009-results.md` completo con Decision APPROVED/REJECTED y seccion de migracion; `docs/opencode/qa/QA-009-findings.md` solo si hay FAIL.
   Criterios de aceptacion: `alembic upgrade head` y `alembic downgrade -1 && alembic upgrade head` sin errores; results file con Decision y evidencias de todas las areas.
   Validacion: `python backend/scripts/validate_slice_plan.py BE-009 --stage qa` → PASS.
-  Resultado esperado: QA-009 APPROVED con evidencias completas o findings registrados.
-  Evidencia: pending
-  Paralelismo[P]: No
+   Resultado esperado: QA-009 APPROVED con evidencias completas o findings registrados.
+   Evidencia: `docs/opencode/qa/QA-009-results.md` § 4 (alembic `a009` como head ← `a008`, unique `uq_consultation_appointment`, indices `pet_id`/`clinic_id`/`veterinarian_id`, reversible `upgrade()/downgrade()`), § 8 (Decision APPROVED), § 9 (Evidence Log) y `docs/opencode/checkpoints/BE-009-qa.json` `completada`.
+   Paralelismo[P]: No
 
 ## Definition of Done
 

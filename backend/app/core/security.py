@@ -1,19 +1,12 @@
 """Funciones de seguridad y manejo de tokens."""
 
-import os
 from datetime import datetime, timedelta
 from typing import Any, cast
-
-# Passlib 1.7.x con bcrypt moderno puede fallar al autodetectar el backend.
-# Activamos el backend puro de Passlib para mantener el hashing estable en tests
-# y en el contenedor de desarrollo sin tocar la semántica funcional de la app.
-os.environ.setdefault("PASSLIB_BUILTIN_BCRYPT", "enabled")
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from jose import JWTError, jwt  # type: ignore[import-untyped]
 from passlib.context import CryptContext  # type: ignore[import-untyped]
-from passlib.hash import bcrypt as bcrypt_hash  # type: ignore[import-untyped]
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -24,7 +17,6 @@ from app.infrastructure.database.models.owner import Owner as OwnerModel
 from app.infrastructure.database.models.user import User as UserModel
 from app.infrastructure.database.session import get_db
 
-bcrypt_hash.set_backend("builtin")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 MIN_SECRET_KEY_LENGTH = 16
@@ -179,6 +171,9 @@ def get_current_access_user(
             )
             if internal_user and internal_user.clinic_id is not None:
                 clinic_id = int(internal_user.clinic_id)
+                if role == "user":
+                    role = "veterinarian"
+                    current_user["role"] = role
 
     if clinic_id is not None:
         current_user["clinic_id"] = clinic_id
