@@ -13,6 +13,12 @@ from app.infrastructure.database.models.consultation import Consultation
 from app.infrastructure.database.models.internal_user_model import InternalUser
 from app.infrastructure.database.models.owner import Owner
 from app.infrastructure.database.models.pet import Pet
+from app.infrastructure.database.models.prescription import (
+    Prescription,
+    PrescriptionItem,
+    PrescriptionReminder,
+    PrescriptionTreatment,
+)
 from app.infrastructure.database.models.rating_summary import RatingSummary
 from app.infrastructure.database.models.service_model import Service
 from app.infrastructure.database.models.session import Session
@@ -30,6 +36,10 @@ __all__ = [
     "InternalUser",
     "Owner",
     "Pet",
+    "Prescription",
+    "PrescriptionItem",
+    "PrescriptionReminder",
+    "PrescriptionTreatment",
     "RatingSummary",
     "Service",
     "Session",

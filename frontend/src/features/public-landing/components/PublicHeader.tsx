@@ -18,7 +18,7 @@ export function PublicHeader() {
               href="/clinicas"
               className="py-2 text-sm font-medium text-gray-600 transition-colors hover:text-teal dark:text-gray-300 dark:hover:text-teal-light"
             >
-              ClÃ­nicas
+              Clínicas
             </a>
             <a
               href="/servicios"
@@ -30,7 +30,7 @@ export function PublicHeader() {
               href="/como-funciona"
               className="py-2 text-sm font-medium text-gray-600 transition-colors hover:text-teal dark:text-gray-300 dark:hover:text-teal-light"
             >
-              CÃ³mo funciona
+              Cómo funciona
             </a>
           </nav>
 

@@ -1,5 +1,80 @@
 # 06 — Changelog by Slice
 
+## BE-010: Recetas, tratamientos y recordatorios — CLOSED (2026-08-22)
+
+### Summary
+
+Este slice implementa el flujo vertical de prescripción veterinaria ligado a la consulta médica: un veterinario registra de forma atómica una receta de su clínica sobre una consulta `completed`, incluyendo medicamentos informativos, tratamientos y recordatorios; un propietario consulta la receta de su mascota en read-only; QA valida happy path, permisos, ownership, IDOR/BOLA, estados UX y regresión. Cubre el mínimo funcional del MVP de recetas (BE-010 + FE-010 + QA-010 + UIA-010). Todos los gates APPROVED.
+
+### Gates Result
+
+| Gate | Decision | Evidencia |
+| --- | --- | --- |
+| Plan slice | APPROVED | `docs/opencode/plans/BE-010-plan.md` (AC-010-01..14) |
+| QA-010 | APPROVED | `docs/opencode/qa/QA-010-results.md` |
+| Functional review | APPROVED | `docs/opencode/reviews/BE-010-review.md` |
+| Clean Architecture | APPROVED | `docs/opencode/reviews/BE-010-clean-architecture-review.md` |
+| Security review | APPROVED | `docs/opencode/reviews/BE-010-security-review.md` (S1–S4 menores, no bloqueantes) |
+| UI checks (UIA-010) | APPROVED | `docs/opencode/checks/BE-010-checks.md` — UIA 18/18 chromium+mobile |
+| Checks (run-checks) | APPROVED | `docs/opencode/checks/BE-010-checks.md` (pytest 25 passed · ruff PASS · black slice PASS · mypy 177 files · jest 157 · build PASS) |
+
+### Backend Implementation
+
+| Componente | Archivo(s) | Estado |
+|-----------|-----------|--------|
+| Domain entity | `backend/app/domain/entities/prescription.py` (Prescription, PrescriptionItem, PrescriptionTreatment, PrescriptionReminder) | ✅ Done |
+| Repository port | `backend/app/domain/repositories/prescription_repository.py` | ✅ Done |
+| Use cases | `backend/app/application/use_cases/prescription_use_cases.py` (create atomico / get_by_id / list_by_pet / exists_by_consultation) | ✅ Done |
+| ORM model + repo impl | `backend/app/infrastructure/database/models/prescription.py` + `repositories/prescription_repository_impl.py` | ✅ Done |
+| Pydantic schemas | `backend/app/api/schemas/prescription_schemas.py` | ✅ Done |
+| Router | `backend/app/api/v1/routers/prescription_router.py` | ✅ Done |
+| Alembic migration | `a010_prescriptions.py` — 4 tablas, unique `consultation_id`, FK a consultation/pet/clinic, índices `pet_id` y `created_at` | ✅ Migrated |
+
+### API Endpoints
+
+| Method | Route | Auth | Descripción |
+|--------|-------|------|-------------|
+| `POST` | `/api/v1/prescriptions` | Bearer — rol clínico (vet/staff/clinic/admin) | Crear receta sobre consulta `completed`; 409 por duplicado (unique `consultation_id`), 403 si no es de la clínica, 401 sin token, 403 propietario, 422 payload/consulta inválida |
+| `GET` | `/api/v1/prescriptions/{id}` | Bearer | Detalle con items, tratamientos y recordatorios; 404 para clínica ajena o owner de otra mascota |
+| `GET` | `/api/v1/prescriptions?pet_id=` | Bearer | Listado paginado (`page`, `page_size`<=100); owner exige `pet_id`; 404 mascota ajena |
+
+### Decisión de diseño relevante
+
+- Creación atómica de receta + items + tratamientos + recordatorios en una sola transacción; `consultation_id` con `UniqueConstraint` impide duplicado (AC-010-07) y responde 409 sin exponer detalles internos.
+- Ownership resuelto desde el token (`clinic_id`/`created_by`); `clinic_id` y `pet_id` nunca se aceptan desde el payload (previene IDOR/BOLA).
+- Propietario solo accede a recetas de sus mascotas: list exige `pet_id` (422 si no) y lectura exige `exists(pet_id=pet_id, owner_id=...)` (404 si no).
+- Detección de duplicado en dos capas: `exists_by_consultation` en use case + `UniqueConstraint` en ORM (`a010`).
+
+### Riesgos y pendientes (no bloqueantes)
+
+| Severidad | Item | Acción |
+|-----------|------|--------|
+| Minor | sin `Idempotency-Key` en `POST /prescriptions` (cubierto por unique + 409) | Documentar en spec; considerar Stage 2 |
+| Minor | sin rate-limiting en `POST /prescriptions` | `fastapi-limiter` en Stage 2 |
+| Minor | `created_by` nulo para propietario (no se aplica a este slice) | Documentado en security review S3 |
+| Info | Disparos automáticos de recordatorios (email/SMS) | Fuera de alcance MVP (BE-013) |
+
+### Findings pre-existentes de run-checks (no bloqueantes)
+
+| Severidad | Item | Acción sugerida |
+|-----------|------|-----------------|
+| Info | Host venv desajustado vs `requirements.txt` (pydantic 2.13.4 vs pin 2.5.0; mypy 1.20.2 vs pin 1.7.1) — mypy host falla, Docker (canonical) pasa | Documentar en BE-012-F2 o slice de infraestructura |
+| Medio | Desajuste de pin `black`: `requirements.txt`=24.3.0 vs `pyproject.toml`=23.12.1; 23 archivos legacy fuera del slice divergen entre las dos versiones | Fijar `pyproject.toml` a `black==24.3.0`; re-baseline opcional |
+
+### Fix aplicado en este gate (slice-scoped)
+
+- **Black-formateo slice-scoped (17 archivos BE-010)** — formato con `black 24.3.0` (active env) sobre todos los archivos Python del slice (domain, application, infrastructure, schemas, router, migration, tests). Whitespace-only, 0 cambios de lógica.
+- **Docker rebuild (condicionado):** `docker compose up -d --build --force-recreate db backend frontend` — necesario por pending backend source files + imagen initial traía black 23.12.1 (drift pre-existing). Tras rebuild, container pasa a black 24.3.0 y pasa `--check` de BE-010 sin violaciones.
+
+### Verificación final
+
+- Backend (Docker): `pytest` slice 25 passed · `ruff` PASS · `black --check` slice PASS (17 unchanged) · `mypy app` Success (177 files).
+- Frontend: `jest` 157 passed · `lint` PASS (1 warning no-img-element pre-existente) · `typecheck` PASS · `build` PASS.
+- Playwright: UIA 18/18 (chromium+mobile) · API project 72 passed · 64 skipped (feature-gated) · 0 failed.
+- Preflight: `validate_slice_plan.py BE-010 --stage docs` PASS · `manage_slice_task.py verify BE-010 --layer all` PASS.
+
+---
+
 ## BE-009: Consulta médica básica — CLOSED (2026-08-21)
 
 ### Summary

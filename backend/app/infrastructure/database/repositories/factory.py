@@ -9,6 +9,7 @@ from sqlalchemy.orm import Session
 from app.domain.repositories.appointment_repository import AppointmentRepository
 from app.domain.repositories.consultation_repository import ConsultationRepository
 from app.domain.repositories.owner_repository import OwnerRepository, PetRepository
+from app.domain.repositories.prescription_repository import PrescriptionRepository
 from app.domain.repositories.slice006_repositories import InternalUserRepository
 from app.infrastructure.database.repositories.appointment_repository_impl import (
     AppointmentRepositoryImpl,
@@ -24,6 +25,9 @@ from app.infrastructure.database.repositories.owner_repository_impl import (
 )
 from app.infrastructure.database.repositories.pet_repository_impl import (
     PetRepositoryImpl,
+)
+from app.infrastructure.database.repositories.prescription_repository_impl import (
+    PrescriptionRepositoryImpl,
 )
 
 
@@ -50,3 +54,8 @@ def get_consultation_repo(db: Session) -> ConsultationRepository:
 def get_internal_user_repo(db: Session) -> InternalUserRepository:
     """Obtener una instancia del repositorio de usuarios internos."""
     return InternalUserRepositoryImpl(db)
+
+
+def get_prescription_repo(db: Session) -> PrescriptionRepository:
+    """Obtener una instancia del repositorio de recetas veterinarias."""
+    return PrescriptionRepositoryImpl(db)

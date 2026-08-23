@@ -450,7 +450,7 @@ def _removed_lines(before: str, after: str) -> list[str]:
     ]
 
 
-def finish_task(
+def finish_task(  # noqa: C901
     repo_root: Path,
     task_id: str,
     evidence: str,
