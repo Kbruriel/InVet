@@ -12,6 +12,7 @@ from app.infrastructure.database.models.clinic import Clinic
 from app.infrastructure.database.models.consultation import Consultation
 from app.infrastructure.database.models.internal_user_model import InternalUser
 from app.infrastructure.database.models.owner import Owner
+from app.infrastructure.database.models.payment import Payment
 from app.infrastructure.database.models.pet import Pet
 from app.infrastructure.database.models.prescription import (
     Prescription,
@@ -35,6 +36,7 @@ __all__ = [
     "Consultation",
     "InternalUser",
     "Owner",
+    "Payment",
     "Pet",
     "Prescription",
     "PrescriptionItem",

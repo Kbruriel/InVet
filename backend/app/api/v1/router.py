@@ -10,6 +10,7 @@ from app.api.v1.routers.clinic_search import router as clinic_search_router
 from app.api.v1.routers.consultation_router import router as consultation_router
 from app.api.v1.routers.internal_users import router as internal_users_router
 from app.api.v1.routers.owners import router as owners_router
+from app.api.v1.routers.payments_router import router as payments_router
 from app.api.v1.routers.pets import owner_pets_router, pet_router
 from app.api.v1.routers.prescription_router import router as prescription_router
 from app.api.v1.routers.public_branches import router as public_branches_router
@@ -27,6 +28,7 @@ router.include_router(clinic_search_router)
 router.include_router(consultation_router)
 router.include_router(internal_users_router)
 router.include_router(owners_router)
+router.include_router(payments_router)
 router.include_router(owner_pets_router)
 router.include_router(pet_router)
 router.include_router(prescription_router)

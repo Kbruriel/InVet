@@ -359,9 +359,35 @@ def _router_invariants(repo_root: Path) -> dict[str, list[str]]:
 
 
 def _matches(path: str, pattern: str) -> bool:
+    if path == pattern:
+        return True
     if pattern.endswith("/**"):
-        return path.startswith(pattern[:-3].rstrip("/"))
-    return PurePosixPath(path).match(pattern) or path == pattern
+        base = pattern[:-3].rstrip("/")
+        return path == base or path.startswith(base + "/")
+    if "**" not in pattern:
+        return PurePosixPath(path).match(pattern)
+    import fnmatch
+
+    pattern_parts = PurePosixPath(pattern).parts
+    path_parts = PurePosixPath(path).parts
+
+    def match_from(pattern_index: int, path_index: int) -> bool:
+        if pattern_index == len(pattern_parts):
+            return path_index == len(path_parts)
+        token = pattern_parts[pattern_index]
+        if token == "**":
+            # ** consumen de cero a todos los segmentos restantes.
+            for next_index in range(path_index, len(path_parts) + 1):
+                if match_from(pattern_index + 1, next_index):
+                    return True
+            return False
+        if path_index >= len(path_parts):
+            return False
+        if not fnmatch.fnmatchcase(path_parts[path_index], token):
+            return False
+        return match_from(pattern_index + 1, path_index + 1)
+
+    return match_from(0, 0)
 
 
 def _read_json(path: Path) -> dict:

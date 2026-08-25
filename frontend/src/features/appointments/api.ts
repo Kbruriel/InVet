@@ -12,7 +12,7 @@ import type {
   StatusTransition,
 } from './types';
 
-const BASE_PATH = '/api/v1/appointments';
+const BASE_PATH = '/appointments';
 
 /**
  * Obtener una cita por ID con tenant isolation.

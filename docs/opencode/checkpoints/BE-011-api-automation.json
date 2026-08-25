@@ -1,0 +1,18 @@
+{
+  "slice": "BE-011",
+  "layer": "api-automation",
+  "tasks": {
+    "APIA-011": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-25T16:28:13+00:00",
+      "finished_at": "2026-08-25T16:28:38+00:00",
+      "evidence": "Suite APIA-011 (tests/api/apia-011-payments.spec.ts, C1..C12): 12/12 passed en 1.7s (project=api, PLAYWRIGHT_START_FRONTEND=false). Cobertura: 401 sin token en POST/GET/detalle/cancel; 403 owner create; 422 servicio inactivo y cambio invalido; 422 cita inexistente sin registro parcial; 201 crear + 200 detalle; 409 cancelacion duplicada; 403 BOLA clinico ajeno; listado paginado meta consistente; listado por periodo. Regresion API completa --project=api: 148 tests, solo 1 fallo preexistente de BE-001 (auth-security-be001, 409 por colision de email bajo 6 workers), 0 regresiones BE-011.",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    }
+  },
+  "updated_at": "2026-08-25T16:28:38+00:00"
+}

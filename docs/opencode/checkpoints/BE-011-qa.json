@@ -1,0 +1,53 @@
+{
+  "slice": "BE-011",
+  "layer": "qa",
+  "tasks": {
+    "QA-011-T01": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-25T01:02:07+00:00",
+      "finished_at": "2026-08-25T01:06:40+00:00",
+      "evidence": "pytest create+read 18/18 pass via docker; C1 201 PaymentRead status=PAID; C8 detail 200; C9/C12 list meta consistent",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "QA-011-T03": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-25T01:09:32+00:00",
+      "finished_at": "2026-08-25T01:09:45+00:00",
+      "evidence": "pytest idor+auth 11/11 pass: 401 sin token en 4 endpoints; 403 owner create/cancel; 404/403 cross-clinic read/cancel; sin filtrado internals",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "QA-011-T02": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-25T01:10:46+00:00",
+      "finished_at": "2026-08-25T01:17:45+00:00",
+      "evidence": "test_payments_negative.py 9/9 pass (docker, rebuilt image): 404 cita inexistente; 422 servicio inexistente/inactivo/con recibido<importe/cash sin recibido/monto no numerico; 409 cancelacion duplicada; 404 pago inexistente; detalles claros del dominio sin interns; regresion suite completa 42/42 pass",
+      "outcome": "pass",
+      "changed_files": [
+        "backend/app/tests/api/test_payments_negative.py"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "QA-011-T04": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-25T01:18:31+00:00",
+      "finished_at": "2026-08-25T01:19:22+00:00",
+      "evidence": "jest payment-ux-states.test.tsx 8/8 pass: PaymentList loading/empty(+CTA Registrar pago)/error banner retry; PaymentDetail loading/error/success Cancelado; PaymentForm submitting deshabilitado/error 422 visible legible; manifest apuntaba a frontend/playwright/tests/test_payments_states.py pero el repo usa jest (sin setup de playwright en frontend), entregable AC-011-08 cubierto por este archivo",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    }
+  },
+  "updated_at": "2026-08-25T01:19:22+00:00"
+}

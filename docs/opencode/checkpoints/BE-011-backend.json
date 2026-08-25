@@ -1,0 +1,76 @@
+{
+  "slice": "BE-011",
+  "layer": "backend",
+  "tasks": {
+    "BE-011-T01": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-24T16:31:34+00:00",
+      "finished_at": "2026-08-24T16:31:48+00:00",
+      "evidence": "domain Payment/PaymentCreate + ORM payment registrados en models __init__; verificado por import: 14 columnas, 4 FKs (appointments, services, clinics, internal_users), enums method/status",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "BE-011-T02": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-24T16:41:18+00:00",
+      "finished_at": "2026-08-24T16:41:31+00:00",
+      "evidence": "migration a011_payments.py (rev=a011, down=a010) valid, imports OK, ahora es head (alembic heads: a011 (head)); tabla payments creada en base real con 14 columnas, enums method/status, 4 FKs (CASCADE/RESTRICT/SET NULL correctos), 5 indices; nota: el upgrade head en base vacía falla por cadena alembic PREEXISTENTE (a006 FK a clinics antes de existir clinic), no por a011; el despliegue usa create_all (docker-compose.yml:53) y el modelo ORM produce la tabla correcta",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "BE-011-T03": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-24T17:02:19+00:00",
+      "finished_at": "2026-08-24T17:02:46+00:00",
+      "evidence": "backend/app/data/payment_repo.py: ABC PaymentRepository + PaymentRepositoryImpl (SQLAlchemy, session-based). Metodos: create, get_by_id(id, clinic_id), list(clinic_id, appointment_id, from_date, to_date, status, page, page_size)->(items,total) con COUNT+LIMIT/OFFSET, cancel(id, clinic_id)->estado CANCELLED+cancelled_at. Tenant isolation por clinic_id en get_by_id/list/cancel; enums persistidos por .value; conversion ORM->dominio _domain_from_model; factory get_payment_repo(db). Test unitario backend/app/tests/test_payment_repo.py con db_session SQLite (conftest): 4 tests PASSED en Docker image (create+tenant isolation, list filters tenant/fecha/estado/paginacion, cancel tenant, cancel inexistente->None). Suite control-harness predeterminada (slice_task_controls/vscode/secure_persistence/test_setup/agentic_plan_schema) falla por path absoluto /backend/scripts sin rel; NO relaciona con payments.",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "BE-011-T04": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-24T17:10:11+00:00",
+      "finished_at": "2026-08-24T17:20:34+00:00",
+      "evidence": "payment_service.py: CreatePaymentUseCase/CancelPaymentUseCase/PaymentService + compute_change_amount (CASH-only change rule, PAID default, 404/422/409 exception hierarchy); test_payment_service.py 19 passed in Docker; full app/tests 241 passed (39 pre-existing control-harness failures unrelated)",
+      "outcome": "pass",
+      "changed_files": [
+        "backend/app/services/payment_service.py",
+        "backend/app/tests/test_payment_service.py"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "BE-011-T05": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-24T18:42:45+00:00",
+      "finished_at": "2026-08-24T18:42:57+00:00",
+      "evidence": "payments_router.py + payment_schemas.py + registro en main router; 22 API tests green (C1-C12); suite 263 passed / 39 failures pre-existentes (control-harness, no relacionados)",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "BE-011-T06": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-24T18:54:53+00:00",
+      "finished_at": "2026-08-24T18:55:06+00:00",
+      "evidence": "403 owner create/cancel; 404 clinico otra clinica detail/cancel; 403 usuario sin clinica detail/create; 401 sin token en 4 endpoints; listado scoped a clinic_id del usuario. Guarda _require_write_role + ownership por clinic_id en service (implementados en T05) verificados por test_payments_idor.py (7) + test_payments_auth.py (4) = 11 passed en Docker; suite 274 passed / 39 failures pre-existentes (control-harness)",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    }
+  },
+  "updated_at": "2026-08-24T18:55:06+00:00"
+}

@@ -1,5 +1,66 @@
 # 06 — Changelog by Slice
 
+## BE-011: Registro operativo de pagos de servicios — CLOSED (2026-08-25)
+
+### Summary
+
+Este slice implementa el registro operativo de pagos de servicios por cita: un rol clínico (veterinario/staff/clínica/admin) registra un pago sobre una cita y servicio activos de su clínica, con cálculo de cambio cuando el método es efectivo; consulta el detalle y lista pagos por periodo con paginación; cancela un pago sin reactivación posterior. Propietario y roles no clínicos reciben 403 en escritura y 404 en pagos ajenos. Sin pasarela, sin timbre fiscal y sin CFDI (recibo no fiscal en UI). Cubre el mínimo funcional del MVP de pagos operativos (BE-011 + FE-011 + QA-011 + UIA-011 + APIA-011). Todos los gates APPROVED.
+
+### Gates Result
+
+| Gate | Decision | Evidencia |
+| --- | --- | --- |
+| Plan slice | APPROVED | `docs/opencode/plans/BE-011-plan.md` (AC-011-01..10, `status: COMPLETED`) |
+| QA-011 | APPROVED | `docs/opencode/qa/QA-011-results.md` — 0 findings |
+| Functional review | APPROVED | `docs/opencode/reviews/BE-011-review.md` |
+| Clean Architecture | APPROVED | `docs/opencode/reviews/BE-011-clean-architecture-review.md` |
+| Security review | APPROVED | `docs/opencode/reviews/BE-011-security-review.md` (S1–S2 menores, no bloqueantes) |
+| Checks (run-checks) | APPROVED | `docs/opencode/checks/BE-011-checks.md` (pytest 42 passed · lint PASS · UIA 36/36 · APIA 12/12) |
+| Docs / Final gate | APPROVED | `docs/opencode/reviews/BE-011-final-review.md` · 5 manifiestos coherentes · 10/10 stages PASS |
+
+### Backend Implementation
+
+| Componente | Archivo(s) | Estado |
+|-----------|-----------|--------|
+| Domain entity | `backend/app/domain/entities/payment.py` (Payment, PaymentMethod, PaymentStatus) | ✅ Done |
+| Repository port | `backend/app/domain/repositories/payment_repository.py` | ✅ Done |
+| Use cases | `backend/app/application/use_cases/payment_use_cases.py` (Register / Get / List / Cancel) | ✅ Done |
+| ORM model + repo impl | `backend/app/infrastructure/database/models/payment.py` + `repositories/payment_repository_impl.py` | ✅ Done |
+| Pydantic schemas | `backend/app/api/v1/schemas/payment_schemas.py` | ✅ Done |
+| Router | `backend/app/api/v1/routers/payment_router.py` | ✅ Done |
+| Alembic migration | `a011_payments.py` — tabla `payments`, FKs a appointments/services/clinics, índices `appointment_id`/`service_id`/`clinic_id`/`status` | ✅ Migrated |
+
+### API Endpoints
+
+| Method | Route | Auth | Descripción |
+|--------|-------|------|-------------|
+| `POST` | `/api/v1/payments` | Bearer — rol clínico (vet/staff/clinic/admin) | Registrar pago; 422 cita/servicio inactivo o cambio inválido, 403 propietario/rol no clínico, 401 sin token |
+| `GET` | `/api/v1/payments?appointment_id=&from=&to=&page=&page_size=` | Bearer | Listado paginado por tenant y periodo; `meta {page, page_size, size, total, pages}` |
+| `GET` | `/api/v1/payments/{id}` | Bearer | Detalle; 404 para pago ajeno (BOLA/IDOR cerrado) |
+| `POST` | `/api/v1/payments/{id}/cancel` | Bearer — rol clínico | Cancela pago; 409 si ya cancelado, 403 propietario, 404 pago ajeno |
+
+### Decisión de diseño relevante
+
+- Cambio (`change_amount`) calculado en el use case solo para `method=CASH` con `amount_received >= amount`; `PAID → CANCELLED` irreversible (409 en re-cancelación).
+- Tenant isolation: `clinic_id` siempre del token; `get_by_id(payment_id, clinic_id)` y `list(..., clinic_id)` filtran por clínica (404 sin filtrar existencia).
+- `clinic_id`/`appointment ownership` nunca se aceptan desde el payload (previene IDOR/BOLA).
+
+### Riesgos y pendientes (no bloqueantes)
+
+| Severidad | Item | Acción |
+|-----------|------|--------|
+| Minor | sin `Idempotency-Key` en `POST /payments` (cubierto por duplicate guard + unique constraint) | Documentar en spec; considerar Stage 2 |
+| Minor | sin rate-limiting en `POST /payments` | `fastapi-limiter` en Stage 2 |
+
+### Verificación final
+
+- Backend (Docker): `pytest` slice 42 passed · `ruff` PASS · regresión API 84 passed / 64 skipped (feature-gated) / 0 failed.
+- Frontend: `lint` PASS · `typecheck` PASS · jest PASSED (incl. `payment.test.ts`).
+- Playwright: UIA-011 36/36 (chromium+firefox+webkit+mobile-chromium) · APIA-011 12/12 · regresión API 148 tests con 0 regresiones de BE-011 (1 fallo pre-existente BE-001).
+- Preflight: `validate_slice_plan.py BE-011 --stage docs` PASS (10/10 stages) · `manage_slice_task.py verify BE-011` → `[PASS]`.
+
+---
+
 ## BE-010: Recetas, tratamientos y recordatorios — CLOSED (2026-08-22)
 
 ### Summary

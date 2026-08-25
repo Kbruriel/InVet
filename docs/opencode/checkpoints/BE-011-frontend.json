@@ -1,0 +1,77 @@
+{
+  "slice": "BE-011",
+  "layer": "frontend",
+  "tasks": {
+    "FE-011-T01": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-24T20:04:02+00:00",
+      "finished_at": "2026-08-24T20:04:28+00:00",
+      "evidence": "frontend/src/shared/api/payment.ts: createPayment/getPayment/listPayments/cancelPayment con tipado (Payment, PaymentCreateData, PaymentListParams, PaymentPageMeta) y query params (page,page_size,appointment_id,from_date,to_date,status); errores HTTP centralizados en apiClient (ApiError status+detail); 5 tests jest PASS en payment.test.ts; npx tsc --noEmit EXIT=0",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "Checkbox FE-011-T01 del plan marcado como completada y manifiesto frontend regenerado por la herramienta (timestamps/sha).",
+      "errors": []
+    },
+    "FE-011-T02": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-24T21:12:23+00:00",
+      "finished_at": "2026-08-25T00:25:53+00:00",
+      "evidence": "lint 0 errors; npx tsc --noEmit exit 0; jest payment.test.ts 5/5 PASS; campos appointment/service/amount/method/amount_received(cash) con validacion inline; calculo de cambio visible; estados submitting/error/success",
+      "outcome": "pass",
+      "changed_files": [
+        "docs/opencode/checkpoints/BE-011-frontend.json",
+        "frontend/src/app/clinic/payments/PaymentForm.tsx",
+        "frontend/src/app/clinic/payments/page.tsx"
+      ],
+      "deletion_justification": "Regeneracion del checkpoint (timestamps/sha) por manage_slice_task en cerradas anteriores",
+      "errors": []
+    },
+    "FE-011-T03": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-25T00:26:08+00:00",
+      "finished_at": "2026-08-25T00:35:22+00:00",
+      "evidence": "PaymentList.tsx con tabla desktop/cards mobile, filtros from_date/to_date, paginacion {page,pages,total}; page.tsx /clinic/payments/history; jest PaymentList.test.tsx 5/5 PASS (loading/empty/error/filas/filtro); tsc --noEmit exit 0; lint 0 errors",
+      "outcome": "pass",
+      "changed_files": [
+        "docs/opencode/checkpoints/BE-011-frontend.json",
+        "frontend/src/app/clinic/payments/history/PaymentList.test.tsx",
+        "frontend/src/app/clinic/payments/history/PaymentList.tsx",
+        "frontend/src/app/clinic/payments/history/page.tsx"
+      ],
+      "deletion_justification": "Regeneracion del checkpoint (timestamps/sha) por manage_slice_task",
+      "errors": []
+    },
+    "FE-011-T04": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-25T00:35:35+00:00",
+      "finished_at": "2026-08-25T00:39:35+00:00",
+      "evidence": "PaymentDetail.tsx + page.tsx en /clinic/payments/[id]; secciones datos/importe/metodo/cambio legibles; boton Cancelar con window.confirm; estado Cancelado visible + fecha cancelacion; 404/403 mapeados; jest PaymentDetail.test.tsx 6/6 PASS; tsc --noEmit exit 0; lint 0 errors",
+      "outcome": "pass",
+      "changed_files": [
+        "frontend/src/app/clinic/payments/[id]/PaymentDetail.test.tsx",
+        "frontend/src/app/clinic/payments/[id]/PaymentDetail.tsx",
+        "frontend/src/app/clinic/payments/[id]/page.tsx"
+      ],
+      "deletion_justification": "Regeneracion del checkpoint (timestamps/sha) por manage_slice_task",
+      "errors": []
+    },
+    "FE-011-T05": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-25T00:39:54+00:00",
+      "finished_at": "2026-08-25T00:48:19+00:00",
+      "evidence": "payment-ux-states.test.tsx cubre AC-011-08: loading (PaymentList+Detail), empty+CTA, error+retry (List+Detail+Form 422), submitting (aria-busy/disabled), success (estado Cancelado tras cancelacion); 8/8 PASS; tsc --noEmit exit 0; lint 0 errors",
+      "outcome": "pass",
+      "changed_files": [
+        "frontend/src/app/clinic/payments/payment-ux-states.test.tsx"
+      ],
+      "deletion_justification": "Regeneracion del checkpoint (timestamps/sha) por manage_slice_task",
+      "errors": []
+    }
+  },
+  "updated_at": "2026-08-25T00:48:19+00:00"
+}
