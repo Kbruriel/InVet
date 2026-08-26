@@ -21,6 +21,7 @@ from app.infrastructure.database.models.prescription import (
     PrescriptionTreatment,
 )
 from app.infrastructure.database.models.rating_summary import RatingSummary
+from app.infrastructure.database.models.review import Review, ReviewResponse
 from app.infrastructure.database.models.service_model import Service
 from app.infrastructure.database.models.session import Session
 from app.infrastructure.database.models.user import User
@@ -43,6 +44,8 @@ __all__ = [
     "PrescriptionReminder",
     "PrescriptionTreatment",
     "RatingSummary",
+    "Review",
+    "ReviewResponse",
     "Service",
     "Session",
     "User",

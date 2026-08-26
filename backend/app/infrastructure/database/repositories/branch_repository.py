@@ -223,6 +223,32 @@ class RatingSummaryRepositoryImpl(RatingSummaryRepository):
             return None
         return RatingSummary.model_validate(db_rating)
 
+    async def upsert_rating_summary(
+        self,
+        branch_id: int,
+        average_rating: float,
+        total_reviews: int,
+        review_distribution: dict[int, int],
+    ) -> RatingSummary:
+        """Insertar o actualizar el resumen de calificaciones (idempotente por sucursal)."""
+        import json
+
+        distribution_payload = json.dumps(review_distribution, ensure_ascii=False)
+        db_summary = (
+            self.db.query(RatingSummaryModel)
+            .filter(RatingSummaryModel.branch_id == branch_id)
+            .first()
+        )
+        if db_summary is None:
+            db_summary = RatingSummaryModel(branch_id=branch_id)
+            self.db.add(db_summary)
+        db_summary.average_rating = average_rating
+        db_summary.total_reviews = total_reviews
+        db_summary.review_distribution = distribution_payload
+        self.db.flush()
+        self.db.refresh(db_summary)
+        return RatingSummary.model_validate(db_summary)
+
 
 class AvailabilitySummaryRepositoryImpl(AvailabilitySummaryRepository):
     """Implementacion del repositorio de resumen de disponibilidad."""

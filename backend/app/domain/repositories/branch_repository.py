@@ -98,6 +98,17 @@ class RatingSummaryRepository(ABC):
         """Obtener resumen de calificaciones por ID de sucursal."""
         pass
 
+    @abstractmethod
+    async def upsert_rating_summary(
+        self,
+        branch_id: int,
+        average_rating: float,
+        total_reviews: int,
+        review_distribution: dict[int, int],
+    ) -> RatingSummary:
+        """Insertar o actualizar el resumen de calificaciones de una sucursal."""
+        pass
+
 
 class AvailabilitySummaryRepository(ABC):
     """Interface para el repositorio de resumen de disponibilidad."""

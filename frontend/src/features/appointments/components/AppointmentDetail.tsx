@@ -10,8 +10,10 @@ import React, { useState, useEffect } from 'react';
 import { getAppointment, transitionStatus } from '../api';
 import type { Appointment, AppointmentStatus } from '../types';
 import { StatusBadge } from './StatusBadge';
+import { RatingForm } from '@/features/reviews/RatingForm';
 import { LoadingSpinner } from '@/shared/ui/components/Loading';
 import { ErrorBanner } from '@/shared/ui/components/ErrorBanner';
+import { getAccessToken } from '@/shared/auth/session';
 
 interface AppointmentDetailProps {
   appointmentId: number;
@@ -25,6 +27,11 @@ export function AppointmentDetail({ appointmentId, onBack }: AppointmentDetailPr
   const [confirmingStatus, setConfirmingStatus] = useState<string | null>(null);
 
   useEffect(() => {
+    if (typeof window !== 'undefined' && getAccessToken() === null) {
+      const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+      window.location.href = `/login?returnUrl=${returnUrl}`;
+      return;
+    }
     let cancelled = false;
 
     async function fetchAppointment() {
@@ -217,6 +224,17 @@ export function AppointmentDetail({ appointmentId, onBack }: AppointmentDetailPr
               )}
             </div>
           </div>
+
+          {/* Calificar cita */}
+          {appointment.status === 'completed' && (
+            <div className="mb-6">
+              <RatingForm
+                appointmentId={appointmentId}
+                existingReview={null}
+                onCreated={() => undefined}
+              />
+            </div>
+          )}
         </>
       )}
 

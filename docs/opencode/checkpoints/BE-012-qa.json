@@ -1,0 +1,53 @@
+{
+  "slice": "BE-012",
+  "layer": "qa",
+  "tasks": {
+    "QA-012-T01": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-25T20:05:00+00:00",
+      "finished_at": "2026-08-25T20:40:00+00:00",
+      "evidence": "pytest test_reviews_api.py + test_review_service.py (create 201 con recalculation de RatingSummary, detalle 200, publico paginado con meta, clinico, respond 200) y verificacion en vivo contra db invet: POST /api/v1/reviews 201 por owner2 (cita 1001 COMPLETED), GET /api/v1/reviews/public/1 200 con items+meta, POST /api/v1/reviews/2/respond 200 por veterinarian, RatingSummary recalculado en la misma transaccion (4.5 avg, total 3)",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "QA-012-T02": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-25T20:41:00+00:00",
+      "finished_at": "2026-08-25T21:10:00+00:00",
+      "evidence": "Verificado en vivo + pytest: rating 0/6 (422 Pydantic ge/le), comment 2049 chars (422 max 2048), cita pendiente 1002 (422 ReviewNotCompletedError), segunda reseña de cita 1001 (409 ReviewDuplicateError), segunda respuesta de reseña 2 (409 ReviewRespondDuplicateError), body vacio (422 min=1), respond inexistente (404); mensajes claros sin internals",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "QA-012-T03": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-25T21:11:00+00:00",
+      "finished_at": "2026-08-25T21:50:00+00:00",
+      "evidence": "Verificado en vivo + test_reviews_auth.py/test_reviews_idor.py: POST/GET/detalle/respond sin token y con token invalido (401 ×5), owner responde (403 'Solo personal clinico de la sucursal...'), owner lista clinico (403 'Requiere rol clinico de clinica'), staff clinica2 responde reseña clinic1 (404 'No puede responder una resena de otra sucursal'), owner1 califica cita de owner2 (403 'No puede calificar una cita que no le pertenece'), GET detalle ajeno (404); listado clinico scoped a clinic_id del token",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "QA-012-T04": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-25T21:51:00+00:00",
+      "finished_at": "2026-08-25T22:20:00+00:00",
+      "evidence": "Jest src/features/reviews + src/shared/api/review.test.ts: 51 passed / 6 suites (RatingForm, ReviewPublicList, ReviewStaffList, ReviewRespondForm, review-ux-states 5 estados × 4 componentes en desktop+mobile); tsc --noEmit exit 0; lint exit 0; build exit 0 (incluye /clinic/reviews y /clinic/reviews/[reviewId]/respond); suite frontend completa 231 passed / 1 fallo preexistente en test/login-page.test.tsx (useSearchParams SSR, ajeno al slice)",
+      "outcome": "pass",
+      "changed_files": [
+        "frontend/src/features/reviews/ReviewRespondForm.test.tsx"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    }
+  },
+  "updated_at": "2026-08-25T22:20:00+00:00"
+}

@@ -71,6 +71,39 @@ def _get_clinic_id_from_user(current_user: dict) -> int:
     return int(clinic_id)
 
 
+def _resolve_owner_id(db: Session, user_id: int) -> int:
+    """Resolver el ID de la fila `owners` asociada al usuario autenticado."""
+    from app.infrastructure.database.models.owner import Owner as OwnerModel
+
+    owner = (
+        db.query(OwnerModel)
+        .filter(OwnerModel.user_id == user_id, OwnerModel.is_active.is_(True))
+        .first()
+    )
+    if owner is None:
+        return int(user_id)
+    return int(owner.id)
+
+
+def _resolve_internal_user_id(db: Session, user_id: int) -> int | None:
+    """Resolver el ID de la fila `internal_users` del usuario (si existe)."""
+    from app.infrastructure.database.models.internal_user_model import (
+        InternalUser as InternalUserModel,
+    )
+
+    internal_user = (
+        db.query(InternalUserModel)
+        .filter(
+            InternalUserModel.user_id == user_id,
+            InternalUserModel.is_active.is_(True),
+        )
+        .first()
+    )
+    if internal_user is None:
+        return None
+    return int(internal_user.id)
+
+
 # ---------------------------------------------------------------------------
 # GET /appointments/availability
 # IMPORTANTE: debe declararse ANTES que GET /{appointment_id} para que
@@ -172,6 +205,7 @@ async def create_appointment(
     body: AppointmentCreateSchema,
     current_user: dict = Depends(get_current_access_user),
     repo: AppointmentRepository = Depends(get_appointment_repo),
+    db: Session = Depends(get_current_db),
 ) -> AppointmentReadSchema:
     """Crear una nueva cita pendiente.
 
@@ -186,9 +220,8 @@ async def create_appointment(
         # Build the AppointmentCreate data object from the request body
         from datetime import datetime as dt
 
-        owner_id_val = (
-            body.owner_id if hasattr(body, "owner_id") and body.owner_id else _user_id
-        )
+        owner_id_val = _resolve_owner_id(db, _user_id)
+        created_by_val = _resolve_internal_user_id(db, _user_id)
 
         scheduled_start = body.scheduled_start
         if isinstance(scheduled_start, str):
@@ -212,7 +245,7 @@ async def create_appointment(
         appointment = await use_case.execute(
             data=data,
             owner_id=owner_id_val,
-            created_by=_user_id,
+            created_by=created_by_val,
         )
         return AppointmentReadSchema.model_validate(appointment)
     except ValueError as exc:

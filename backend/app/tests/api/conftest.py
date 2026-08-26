@@ -1,8 +1,9 @@
-"""Fixture compartida para tests de API de pagos operativos (BE-011-T05).
+"""Fixture compartida para tests de API de pagos operativos (BE-011-T05)
+y de resenas (BE-012-T06).
 
-Crea una aplicacion FastAPI con el router de pagos y las dependencias de
-repositorio sobrescritas con ``AsyncMock``. Permite sobreescribir el
-usuario autenticado (``get_current_access_user``) por prueba.
+Crea una aplicacion FastAPI con el router y las dependencias de
+repositorio/servicio sobrescritas con ``AsyncMock``. Permite sobreescribir
+el usuario autenticado (``get_current_access_user``) por prueba.
 """
 
 from __future__ import annotations
@@ -119,6 +120,93 @@ def payment_app() -> Iterator[dict[str, Any]]:
         "mock_appointment_repo": mock_appointment_repo,
         "mock_service_repo": mock_service_repo,
         "mock_internal_user_repo": mock_internal_user_repo,
+    }
+
+    app.dependency_overrides.clear()
+
+
+# ---------------------------------------------------------------------------
+# Resenas (BE-012)
+# ---------------------------------------------------------------------------
+def _review_entity(overrides=None):
+    from app.domain.entities.review import Review
+
+    data = dict(
+        id=1,
+        appointment_id=1,
+        branch_id=1,
+        clinic_id=1,
+        user_id=50,
+        rating=5,
+        comment="Muy buena atención",
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
+    )
+    if overrides:
+        data.update(overrides)
+    return Review(**data)
+
+
+def _response_entity(overrides=None):
+    from app.domain.entities.review import ReviewResponse
+
+    data = dict(
+        id=100,
+        review_id=1,
+        branch_id=1,
+        user_id=10,
+        body="Gracias por su feedback",
+        created_at=datetime.now(UTC),
+        updated_at=datetime.now(UTC),
+    )
+    if overrides:
+        data.update(overrides)
+    return ReviewResponse(**data)
+
+
+@pytest.fixture
+def review_app() -> Iterator[dict[str, Any]]:
+    """App FastAPI de resenas con mocks de servicio y usuario (owner) por defecto."""
+    import app.api.v1.routers.review_router as review_router_mod
+    from app.api.v1.routers.review_router import router as review_router
+
+    app = FastAPI()
+    app.include_router(review_router, prefix="/api/v1")
+
+    async def mocked_user() -> dict[str, Any]:
+        return {"id": 100, "user_id": 100, "clinic_id": 1, "role": "owner"}
+
+    app.dependency_overrides[
+        review_router_mod.get_current_access_user
+    ] = mocked_user
+
+    mock_service = AsyncMock()
+    mock_service.create = AsyncMock(return_value=_review_entity())
+    mock_service.respond = AsyncMock(
+        return_value=_review_entity(overrides={"response": _response_entity()})
+    )
+    mock_service.get = AsyncMock(return_value=_review_entity())
+    mock_service.list_public = AsyncMock(
+        return_value=([_review_entity(), _review_entity(overrides={"id": 2})], 2)
+    )
+    mock_service.list_clinical = AsyncMock(return_value=([_review_entity()], 1))
+
+    mock_branch_repo = AsyncMock()
+    mock_branch_repo.get_branch_by_id = AsyncMock(return_value=AsyncMock(id=1))
+
+    app.dependency_overrides[review_router_mod.get_review_service] = lambda: mock_service
+    app.dependency_overrides[review_router_mod.get_branch_repo] = (
+        lambda: mock_branch_repo
+    )
+
+    yield {
+        "app": app,
+        "client_factory": lambda: httpx.AsyncClient(
+            transport=httpx.ASGITransport(app=app),
+            base_url="http://test",
+        ),
+        "mock_service": mock_service,
+        "mock_branch_repo": mock_branch_repo,
     }
 
     app.dependency_overrides.clear()

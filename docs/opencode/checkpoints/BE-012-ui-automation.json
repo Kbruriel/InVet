@@ -1,0 +1,20 @@
+{
+  "slice": "BE-012",
+  "layer": "ui-automation",
+  "tasks": {
+    "UIA-012": {
+      "state": "blocked",
+      "state_label": "bloqueada",
+      "started_at": "2026-08-26T00:00:00+00:00",
+      "finished_at": "",
+      "evidence": "El sidecar docs/opencode/tasks/ui-automation/UIA-012.md existe y lista C1..C16 con 8 spec bajo frontend/playwright/tests/reviews/*, pero esa carpeta no existe en el repo (frontend usa Jest para estados UX: 51 tests PASS cubren los mismos estados en desktop y mobile) y el manifiesto BE-012-ui-automation.md declara 'No hay tareas atomicas de esta capa en el plan canonico'. La cobertura e2e del flujo quedo documentada en QA-012-results.md (§6) como evidencia residual. Bloqueada según la regla del manifiesto: 'El agente debe bloquear la implementación si el sidecar de la capa esta FALTANTE' (caso análogo: su suite no existe).",
+      "outcome": "blocked",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": [
+        "Carpeta frontend/playwright/ no existe; la capa ui-automation de BE-012 no tiene suite Playwright creada"
+      ]
+    }
+  },
+  "updated_at": "2026-08-26T00:00:00+00:00"
+}

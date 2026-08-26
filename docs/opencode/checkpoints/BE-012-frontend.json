@@ -1,0 +1,79 @@
+{
+  "slice": "BE-012",
+  "layer": "frontend",
+  "tasks": {
+    "FE-012-T01": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-25T17:02:00+00:00",
+      "finished_at": "2026-08-25T17:24:00+00:00",
+      "evidence": "frontend/src/shared/api/review.ts: createReview, getReview, listPublicReviews, listClinicReviews, respondReview con tipado (Review, ReviewResponse, ReviewListMeta, ReviewCreateData) y page/page_size; errores HTTP centralizados en apiClient (ApiError status+detail); review.test.ts PASS; npx tsc --noEmit exit 0",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "FE-012-T02": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-25T17:25:00+00:00",
+      "finished_at": "2026-08-25T17:55:00+00:00",
+      "evidence": "RatingForm.tsx: estrellas 1..5 con fieldset/legend, comment max 2048 con contador, botón Calificar cita; estados submitting (disabled aria-busy), error 422/409/404 inline legibles, success toast; sección deshabilitada 'ya calificó esta cita' tras crear; integrada en AppointmentDetail.tsx (Completadas); RatingForm.test.tsx PASS; tsc/lint/build exit 0",
+      "outcome": "pass",
+      "changed_files": [
+        "frontend/src/features/reviews/RatingForm.tsx",
+        "frontend/src/features/reviews/RatingForm.test.tsx",
+        "frontend/src/features/appointments/components/AppointmentDetail.tsx"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "FE-012-T03": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-25T17:56:00+00:00",
+      "finished_at": "2026-08-25T18:30:00+00:00",
+      "evidence": "ReviewPublicList.tsx: tarjeta promedio, distribución 5-1, listado paginado con meta {page,page_size,total,pages}, respuesta clínica visible si existe; estados loading/empty(+CTA)/error/success; integrada en BranchProfile.tsx; ReviewPublicList.test.tsx PASS; tsc --noEmit exit 0; build incluye /clinic/[branchId]",
+      "outcome": "pass",
+      "changed_files": [
+        "frontend/src/features/reviews/ReviewPublicList.tsx",
+        "frontend/src/features/reviews/ReviewPublicList.test.tsx",
+        "frontend/src/features/public-clinic-profile/BranchProfile.tsx"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "FE-012-T04": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-25T18:31:00+00:00",
+      "finished_at": "2026-08-25T19:10:00+00:00",
+      "evidence": "ReviewStaffList.tsx (listado sucursal con estado respondida) + ReviewRespondForm.tsx (body max 2048, 403/404 banners legibles, 409 'ya respondida', toast success); rutas /clinic/reviews y /clinic/reviews/[reviewId]/respond; ReviewRespondForm.test.tsx corregido (maxlength 1024 -> 2048 según schema) y PASS; tsc/lint/build exit 0",
+      "outcome": "pass",
+      "changed_files": [
+        "frontend/src/features/reviews/ReviewStaffList.tsx",
+        "frontend/src/features/reviews/ReviewStaffList.test.tsx",
+        "frontend/src/features/reviews/ReviewRespondForm.tsx",
+        "frontend/src/features/reviews/ReviewRespondForm.test.tsx",
+        "frontend/src/app/clinic/reviews/page.tsx",
+        "frontend/src/app/clinic/reviews/[reviewId]/respond/page.tsx"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "FE-012-T05": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-25T19:11:00+00:00",
+      "finished_at": "2026-08-25T19:45:00+00:00",
+      "evidence": "review-ux-states.test.tsx: 5 estados (loading, submitting, empty, success, error) × 4 componentes (RatingForm, ReviewPublicList, ReviewStaffList, ReviewRespondForm) en breakpoints desktop/mobile; Jest src/features/reviews 51 passed / 6 suites; tsc exit 0; lint exit 0; npm run build exit 0",
+      "outcome": "pass",
+      "changed_files": [
+        "frontend/src/features/reviews/review-ux-states.test.tsx"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    }
+  },
+  "updated_at": "2026-08-25T19:45:00+00:00"
+}

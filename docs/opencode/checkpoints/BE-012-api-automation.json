@@ -1,0 +1,20 @@
+{
+  "slice": "BE-012",
+  "layer": "api-automation",
+  "tasks": {
+    "APIA-012": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-25T22:45:00+00:00",
+      "finished_at": "2026-08-25T23:08:00+00:00",
+      "evidence": "Suite APIA-012 (InVet_UI_Automation/tests/api/apia-012-reviews.spec.ts): 21/21 passed en ~9s (project=api, PLAYWRIGHT_START_FRONTEND=false), idempotente (helper mintCompletedAppointment crea cita COMPLETED unica por test). Cobertura C1-C20: 401 sin token en 5 endpoints + token invalido; 422 rating fuera de 1..5, comment >2048, body de respuesta vacio, cita inexistente; 201 crear por owner con cita COMPLETED; 404 cita PENDING/CONFIRMED, 404 cita ajena; 409 segunda resena misma cita; 200 respond por clinico, 409 segunda respuesta, 403 owner, 404 clinico otra clinica, 404 resena inexistente; 404 detalle resena inexistente; publico paginado con meta (1 item pagina 1 de 1), pagina 2 con 0 items, pagina_size max 100; listing clinico con scope; resena nueva visible en publico con comentario con acentos; sin leak de internals en 403/404/409/422. Regresion API: sin regresiones atribuíbles al slice.",
+      "outcome": "pass",
+      "changed_files": [
+        "InVet_UI_Automation/tests/api/apia-012-reviews.spec.ts"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    }
+  },
+  "updated_at": "2026-08-25T23:08:00+00:00"
+}

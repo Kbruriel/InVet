@@ -14,6 +14,7 @@ from app.api.v1.routers.payments_router import router as payments_router
 from app.api.v1.routers.pets import owner_pets_router, pet_router
 from app.api.v1.routers.prescription_router import router as prescription_router
 from app.api.v1.routers.public_branches import router as public_branches_router
+from app.api.v1.routers.review_router import router as review_router
 from app.api.v1.routers.public_clinics import router as public_clinics_router
 from app.api.v1.routers.public_services import router as public_services_router
 from app.api.v1.routers.services import router as services_router
@@ -33,6 +34,7 @@ router.include_router(owner_pets_router)
 router.include_router(pet_router)
 router.include_router(prescription_router)
 router.include_router(public_branches_router)
+router.include_router(review_router)
 router.include_router(public_clinics_router)
 router.include_router(public_services_router)
 router.include_router(services_router)

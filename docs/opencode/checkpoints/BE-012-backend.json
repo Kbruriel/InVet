@@ -1,0 +1,75 @@
+{
+  "slice": "BE-012",
+  "layer": "backend",
+  "tasks": {
+    "BE-012-T01": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-25T14:02:00+00:00",
+      "finished_at": "2026-08-25T14:15:30+00:00",
+      "evidence": "backend/app/domain/entities/review.py (Review, ReviewResponse, RatingSummary) + backend/app/infrastructure/database/models/review.py (ORM reviews: id, appointment_id unique FK appointments, branch_id FK branches, clinic_id FK clinics, user_id FK internal_users, rating 1..5, comment max 2048, created_at/updated_at; review_responses: id, review_id unique FK reviews, branch_id, user_id, body max 2048, timestamps). Import OK; pytest app/tests -q sin errores de import",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "BE-012-T02": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-25T14:16:00+00:00",
+      "finished_at": "2026-08-25T14:28:45+00:00",
+      "evidence": "alembic/versions/a012_reviews.py: revision a012 down a011; tablas reviews (unique appointment_id, FKs appointments/branches/clinics/internal_users) y review_responses (unique review_id, FKs reviews/branches/internal_users); upgrade head aplicado sobre db invet, downgrade -1/upgrade head reversibles sin errores",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "BE-012-T03": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-25T14:30:00+00:00",
+      "finished_at": "2026-08-25T14:52:10+00:00",
+      "evidence": "backend/app/data/review_repo.py: ReviewRepository ABC + ReviewRepositoryImpl (create, get_by_id, get_by_appointment, exists_by_appointment, list_public_by_branch con COUNT+LIMIT/OFFSET ->(items,total), list_by_clinic, create_response, get_response_by_review, recalcular RatingSummary). Tenant isolation por clinic_id/branch_id sin logic de negocio; factory get_review_repo(db)",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "BE-012-T04": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-25T14:53:00+00:00",
+      "finished_at": "2026-08-25T15:31:22+00:00",
+      "evidence": "backend/app/application/use_cases/review.py: ReviewService (create valida cita COMPLETED 422 / cita ajena 404 / reseña previa 409; respond valida rol clinico 403 / clinic ajena 404 / respuesta previa 409) + recalcular RatingSummary en la misma transacción (AC-012-09); jerarquía de exception con códigos HTTP. test_review_service.py 15 passed (incluye test_respond_success corregido: AsyncMock fallback get_internal_user_id_by_user)",
+      "outcome": "pass",
+      "changed_files": [
+        "backend/app/tests/test_review_service.py"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "BE-012-T05": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-25T15:32:00+00:00",
+      "finished_at": "2026-08-25T16:05:40+00:00",
+      "evidence": "backend/app/api/v1/routers/review_router.py + review_schemas.py (ReviewCreate rating ge=1 le=5, comment max 2048; ReviewRespond body min=1 max=2048; ReviewRead, ReviewResponseRead, ReviewListMeta) registrados en main router; POST /reviews 201, GET /reviews/{id} 200, GET /reviews/public/{branch_id} paginado, GET /reviews?branch_id= paginado, POST /reviews/{id}/respond 200; test_reviews_api.py 21 passed; suite app/tests 379 passed",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "BE-012-T06": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-08-25T16:06:00+00:00",
+      "finished_at": "2026-08-25T16:40:15+00:00",
+      "evidence": "Guardas _CLINIC_ROLES (router) + _RESPOND_ROLES (use case) + ownership por clinic_id; 401 sin token en 5 endpoints; 403 owner al responder/lista clínico; 403 usuario sin clínica; 404 staff de otra clínica; 403 cita ajena al tenant al crear; listado clínico scoped a clinic_id del token. test_reviews_auth.py + test_reviews_idor.py passed; verificado en vivo: 401 ×5, 403 owner respond, 404 inter-clinic",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    }
+  },
+  "updated_at": "2026-08-25T16:40:15+00:00"
+}

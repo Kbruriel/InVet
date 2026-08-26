@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { Card, Button, ErrorBanner, EmptyState, LoadingSpinner } from '@/shared/ui/components';
 import { fetchBranchPublic, BranchProfilePublic, AvailabilitySummary } from '@/shared/api/branch-client';
+import { ReviewPublicList } from '@/features/reviews/ReviewPublicList';
 
 type UiState = 'loading' | 'success' | 'error' | 'empty';
 
@@ -261,6 +262,13 @@ export function BranchProfile({ branchId }: BranchProfileProps) {
 
         {/* Rating */}
         <RatingSection rating={branch.rating} />
+
+        {/* Reseñas */}
+        <div className="mt-6 border-t border-sandy-300 pt-6">
+          <h2 className="mb-4 text-lg font-semibold text-slate-900">Reseñas</h2>
+          <ReviewPublicList branchId={branchId} />
+        </div>
+
 
         {/* CTA */}
         <div className="mt-6 flex flex-wrap gap-4 border-t border-sandy-300 pt-6">

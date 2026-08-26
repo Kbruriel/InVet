@@ -1,15 +1,29 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { Suspense, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { authLogin } from '@/shared/api/auth';
 
-export default function LoginPage() {
+function LoginInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const returnUrl = searchParams.get('returnUrl');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+
+  const resolveReturnUrl = () => {
+    if (
+      returnUrl &&
+      returnUrl.startsWith('/') &&
+      !returnUrl.startsWith('//') &&
+      !returnUrl.startsWith('/login')
+    ) {
+      return returnUrl;
+    }
+    return '/';
+  };
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -20,7 +34,7 @@ export default function LoginPage() {
       const result = await authLogin({ email, password });
       localStorage.setItem('access_token', result.access_token);
       localStorage.setItem('refresh_token', result.refresh_token);
-      router.push('/');
+      router.push(resolveReturnUrl());
       router.refresh();
     } catch (err) {
       const authErr = err as { detail?: string };
@@ -103,5 +117,13 @@ export default function LoginPage() {
         </p>
       </div>
     </section>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginInner />
+    </Suspense>
   );
 }
