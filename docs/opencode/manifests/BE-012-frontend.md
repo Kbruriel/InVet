@@ -2,11 +2,11 @@
 manifest_version: 1
 slice: "012"
 layer: frontend
-generated_at: 2026-08-25T22:05:16+00:00
+generated_at: 2026-08-26T22:28:54+00:00
 source_plan: docs/opencode/plans/BE-012-plan.md
-source_plan_sha256: 21c5a19467d164db2591bc62b3be7a6829e0501a1f84b7742a3a3e6d8fac58da
+source_plan_sha256: 65260d71a32cd8c0276f060281ad2f3b6915736c0db0a2921ef8786ad41c26da
 source_task: docs/opencode/tasks/frontend/FE-012.md
-source_task_sha256: de3b4a26d13cf4c5084368b41d64fbab26b9af0d1c921cdd6947926a0e697ee4
+source_task_sha256: f219468744f20f8fd249e87b400a17a995ce824bf9901df0231b8c18e06ece02
 ---
 
 # BE-012 - manifiesto compacto frontend
@@ -43,7 +43,7 @@ source_task_sha256: de3b4a26d13cf4c5084368b41d64fbab26b9af0d1c921cdd6947926a0e69
 
 ## Tareas
 
-### FE-012-T01 - PENDIENTE
+### FE-012-T01 - COMPLETADA
 - Tipo: cliente api
 - Criterio: AC-012-07, AC-012-13
 - Objetivo: Implementar cliente API tipado para operaciones de reseñas.
@@ -55,7 +55,7 @@ source_task_sha256: de3b4a26d13cf4c5084368b41d64fbab26b9af0d1c921cdd6947926a0e69
 - Validacion: `cd frontend && npx tsc --noEmit && npx jest src/shared/api/review.test.ts`.
 - Resultado: Cliente API disponible para componentes.
 
-### FE-012-T02 - PENDIENTE
+### FE-012-T02 - COMPLETADA
 - Tipo: componente
 - Criterio: AC-012-01, AC-012-11
 - Objetivo: Implementar la sección Calificar cita en el detalle de cita.
@@ -67,7 +67,7 @@ source_task_sha256: de3b4a26d13cf4c5084368b41d64fbab26b9af0d1c921cdd6947926a0e69
 - Validacion: `cd frontend && npx tsc --noEmit && npx jest src/features/reviews/RatingForm.test.tsx`.
 - Resultado: Formulario calificación usable por el propietario.
 
-### FE-012-T03 - PENDIENTE
+### FE-012-T03 - COMPLETADA
 - Tipo: componente
 - Criterio: AC-012-07, AC-012-08
 - Objetivo: Mostrar el listado paginado de reseñas en el perfil publico.
@@ -79,7 +79,7 @@ source_task_sha256: de3b4a26d13cf4c5084368b41d64fbab26b9af0d1c921cdd6947926a0e69
 - Validacion: `cd frontend && npx tsc --noEmit && npx jest src/features/reviews/ReviewPublicList.test.tsx`.
 - Resultado: Sección Reseñas visible al anónimo en el perfil publico.
 
-### FE-012-T04 - PENDIENTE
+### FE-012-T04 - COMPLETADA
 - Tipo: componente
 - Criterio: AC-012-05, AC-012-06
 - Objetivo: Implementar el formulario de respuesta clinica a reseñas.
@@ -91,7 +91,7 @@ source_task_sha256: de3b4a26d13cf4c5084368b41d64fbab26b9af0d1c921cdd6947926a0e69
 - Validacion: `cd frontend && npx tsc --noEmit && npx jest src/features/reviews/ReviewRespondForm.test.tsx`.
 - Resultado: Flujo clinico de respuesta completo.
 
-### FE-012-T05 - PENDIENTE
+### FE-012-T05 - COMPLETADA
 - Tipo: estado ux
 - Criterio: AC-012-10
 - Objetivo: Implementar los cinco estados en los cuatro componentes del slice.

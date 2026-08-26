@@ -13,7 +13,7 @@
 | 009 | US-009 | BE-009 | FE-009 | QA-009 | UIA-009 | APIA-009 | Consulta medica basica | APPROVED |
 | 010 | US-010 | BE-010 | FE-010 | QA-010 | UIA-010 | APIA-010 | Recetas, tratamientos y recordatorios |
 | 011 | US-011 | BE-011 | FE-011 | QA-011 | UIA-011 | APIA-011 | Registro operativo de pagos de servicios | APPROVED |
-| 012 | US-012 | BE-012 | FE-012 | QA-012 | UIA-012 | APIA-012 | Calificaciones y comentarios |
+| 012 | US-012 | BE-012 | FE-012 | QA-012 | UIA-012 | APIA-012 | Calificaciones y comentarios | APPROVED |
 | 013 | US-013 | BE-013 | FE-013 | QA-013 | UIA-013 | APIA-013 | Notificaciones internas y correo |
 | 014 | US-014 | BE-014 | FE-014 | QA-014 | UIA-014 | APIA-014 | Soporte basico |
 | 015 | US-015 | BE-015 | FE-015 | QA-015 | UIA-015 | APIA-015 | Reportes operativos basicos |

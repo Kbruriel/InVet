@@ -2,11 +2,11 @@
 manifest_version: 1
 slice: "012"
 layer: backend
-generated_at: 2026-08-25T22:05:16+00:00
+generated_at: 2026-08-26T22:28:54+00:00
 source_plan: docs/opencode/plans/BE-012-plan.md
-source_plan_sha256: 21c5a19467d164db2591bc62b3be7a6829e0501a1f84b7742a3a3e6d8fac58da
+source_plan_sha256: 65260d71a32cd8c0276f060281ad2f3b6915736c0db0a2921ef8786ad41c26da
 source_task: docs/opencode/tasks/backend/BE-012.md
-source_task_sha256: d1d8f4ec482a36d2a86001895824ccdb5f8a12397dc49c84986e61e39a629665
+source_task_sha256: c9a9c2d9fb428410a4ea109c94e5a35ca6bbb344ba6d7d3409795a647a9ab45f
 ---
 
 # BE-012 - manifiesto compacto backend
@@ -42,7 +42,7 @@ source_task_sha256: d1d8f4ec482a36d2a86001895824ccdb5f8a12397dc49c84986e61e39a62
 
 ## Tareas
 
-### BE-012-T01 - PENDIENTE
+### BE-012-T01 - COMPLETADA
 - Tipo: persistencia
 - Criterio: AC-012-01, AC-012-14, AC-012-15
 - Objetivo: Definir la entidad de dominio Review.
@@ -54,7 +54,7 @@ source_task_sha256: d1d8f4ec482a36d2a86001895824ccdb5f8a12397dc49c84986e61e39a62
 - Validacion: `python -c "from app.domain.entities import review"` y `pytest backend/app/tests -q` sin errores de import.
 - Resultado: Entidades Review y ReviewResponse modeladas y tipadas.
 
-### BE-012-T02 - PENDIENTE
+### BE-012-T02 - COMPLETADA
 - Tipo: persistencia
 - Criterio: AC-012-14
 - Objetivo: Crear la tabla reviews con su constraint unico.
@@ -66,7 +66,7 @@ source_task_sha256: d1d8f4ec482a36d2a86001895824ccdb5f8a12397dc49c84986e61e39a62
 - Validacion: `alembic upgrade head`, `alembic downgrade -1 && alembic upgrade head` sin errores.
 - Resultado: Tablas creadas con constraints y reversible.
 
-### BE-012-T03 - PENDIENTE
+### BE-012-T03 - COMPLETADA
 - Tipo: persistencia
 - Criterio: AC-012-04, AC-012-07
 - Objetivo: Implementar el repositorio de reseñas por sucursal.
@@ -78,7 +78,7 @@ source_task_sha256: d1d8f4ec482a36d2a86001895824ccdb5f8a12397dc49c84986e61e39a62
 - Validacion: `pytest backend/app/tests/data/test_review_repo.py -q`.
 - Resultado: Acceso a datos tipado y testeado.
 
-### BE-012-T04 - PENDIENTE
+### BE-012-T04 - COMPLETADA
 - Tipo: caso de uso
 - Criterio: AC-012-02, AC-012-05, AC-012-09
 - Objetivo: Implementar el use case de crear reseña.
@@ -90,7 +90,7 @@ source_task_sha256: d1d8f4ec482a36d2a86001895824ccdb5f8a12397dc49c84986e61e39a62
 - Validacion: `pytest backend/app/tests/application/test_review_service.py -q`.
 - Resultado: Reglas de negocio centralizadas en use cases.
 
-### BE-012-T05 - PENDIENTE
+### BE-012-T05 - COMPLETADA
 - Tipo: api
 - Criterio: AC-012-01, AC-012-07, AC-012-08
 - Objetivo: Exponer endpoints de crear, lectura, publico, respuesta de reseñas.
@@ -102,7 +102,7 @@ source_task_sha256: d1d8f4ec482a36d2a86001895824ccdb5f8a12397dc49c84986e61e39a62
 - Validacion: `pytest backend/app/tests/api/test_reviews_*.py -q`.
 - Resultado: Contrato API completo y documentado (OpenAPI).
 
-### BE-012-T06 - PENDIENTE
+### BE-012-T06 - COMPLETADA
 - Tipo: seguridad
 - Criterio: AC-012-04, AC-012-06, AC-012-12, AC-012-13
 - Objetivo: Aplicar la guardia de rol para responder reseñas.

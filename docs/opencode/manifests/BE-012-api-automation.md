@@ -2,9 +2,9 @@
 manifest_version: 1
 slice: "012"
 layer: api-automation
-generated_at: 2026-08-25T22:05:16+00:00
+generated_at: 2026-08-26T22:28:54+00:00
 source_plan: docs/opencode/plans/BE-012-plan.md
-source_plan_sha256: 21c5a19467d164db2591bc62b3be7a6829e0501a1f84b7742a3a3e6d8fac58da
+source_plan_sha256: 65260d71a32cd8c0276f060281ad2f3b6915736c0db0a2921ef8786ad41c26da
 source_task: docs/opencode/tasks/api-automation/APIA-012.md
 source_task_sha256: 8458ef29a32304bbc50825e2696d1096f115ba695af65be5492c97440f0c5b6e
 ---

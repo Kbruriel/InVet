@@ -1,5 +1,70 @@
 # 06 — Changelog by Slice
 
+## BE-012: Calificaciones y comentarios — CLOSED (2026-08-26)
+
+### Summary
+
+Este slice implementa calificaciones y comentarios de citas completadas: el propietario califica una cita `COMPLETED` con 1-5 estrellas y comentario (única por cita); el personal clínico responde con un único mensaje una reseña de su sucursal; y el perfil público de sucursal expone promedio, distribución por estrellas y listado paginado con la respuesta clínica visible. La reseña recalcula `RatingSummary` (promedio, total, distribución) en la misma transacción. Permisos por rol: el propietario califica; veterinarian/staff/clinic responde; IDOR/BOLA acotado por `clinic_id` del token. Cubre el mínimo funcional del MVP de reseñas (BE-012 + FE-012 + QA-012 + APIA-012). Todos los gates APPROVED; UIA-012 documentada como no-aplicable (sin suite Playwright del slice; cobertura UX vía Jest 51 tests).
+
+### Gates Result
+
+| Gate | Decision | Evidencia |
+| --- | --- | --- |
+| Plan slice | APPROVED | `docs/opencode/plans/BE-012-plan.md` (`status: COMPLETED`) |
+| QA-012 | APPROVED | `docs/opencode/qa/QA-012-results.md` — 0 findings |
+| Functional review | APPROVED | `docs/opencode/reviews/BE-012-review.md` |
+| Clean Architecture | APPROVED | `docs/opencode/reviews/BE-012-clean-architecture-review.md` (0 findings) |
+| Security review | APPROVED | `docs/opencode/reviews/BE-012-security-review.md` (S1–S2 menores, no bloqueantes) |
+| Checks (run-checks) | APPROVED | `docs/opencode/checks/BE-012-checks.md` (pytest 47 passed · suite 379 passed · jest 51 · lint/tsc/build PASS · APIA 21/21) |
+| Docs / Final gate | APPROVED | `docs/opencode/carryovers/BE-012-carryovers.md` (0 abiertos) · `update-docs` completado · `validate_slice_plan.py BE-012` 10/10 stages PASS |
+
+### Backend Implementation
+
+| Componente | Archivo(s) | Estado |
+|-----------|-----------|--------|
+| Domain entity | `backend/app/domain/entities/review.py` (Review, ReviewResponse, RatingSummary) | ✅ Done |
+| Repository port | `backend/app/data/review_repo.py` (ABC + `ReviewRepositoryImpl`) | ✅ Done |
+| Use case | `backend/app/application/use_cases/review.py` (`ReviewService`: create / get / list public / list clinic / respond) | ✅ Done |
+| ORM model | `backend/app/infrastructure/database/models/review.py` (reviews + review_responses) | ✅ Done |
+| Pydantic schemas | `backend/app/api/schemas/review_schemas.py` | ✅ Done |
+| Router | `backend/app/api/v1/routers/review_router.py` | ✅ Done |
+| Alembic migration | `a012_reviews.py` — unique `appointment_id`, unique `review_id` (respuesta), FKs a appointments/branches/clinics/internal_users | ✅ Migrated |
+
+### API Endpoints
+
+| Method | Route | Auth | Descripción |
+|--------|-------|------|-------------|
+| `POST` | `/api/v1/reviews` | Bearer — owner | Calificar cita `COMPLETED`; 422 cita incompleta, 403 cita ajena, 409 reseña previa, 401 sin token |
+| `GET` | `/api/v1/reviews/{id}` | Bearer | Detalle con respuesta clínica; 404 ajeno/IDOR |
+| `GET` | `/api/v1/reviews/public/{branch_id}?page=&page_size=` | público | Listado paginado + promedio/distribución; `meta {page,page_size,total,pages}` |
+| `GET` | `/api/v1/reviews?branch_id=` | Bearer — rol clínico | Listado propio tenant, paginado |
+| `POST` | `/api/v1/reviews/{id}/respond` | Bearer — veterinarian/staff/clinic | Responder; 403 no rol clínico, 404 ajena, 409 respuesta previa, 422 body vacío |
+
+### Decisión de diseño relevante
+
+- Única reseña por cita `COMPLETED` (`UniqueConstraint appointment_id`) y única respuesta por reseña (`UniqueConstraint review_id`); duplicados → 409 sin exponer internos.
+- `RatingSummary` (promedio, total, distribución 5-1) recalculado en la **misma transacción** al crear la reseña (AC-012-09).
+- `_RESPOND_ROLES = {veterinarian, clinic, staff, admin, internal}` (`review.py`) + `_CLINIC_ROLES` (`review_router.py`); `clinic_id` siempre del token (404 sin filtrar existencia) — previene IDOR/BOLA.
+- `comment`/`body` con `max=2048`; `rating` `ge=1 le=5`; mensajes de error en español, sin internals.
+
+### Riesgos y pendientes (no bloqueantes)
+
+| Severidad | Item | Acción |
+|-----------|------|--------|
+| Minor | sin `Idempotency-Key` en `POST /reviews` (cubierto por duplicate guard + unique constraint) | Patrones previos BE-009/010/011; documentar en spec |
+| Minor | sin rate-limiting en `POST /reviews` | `fastapi-limiter` en Stage 2 |
+| Minor | UIA-012 Playwright e2e inexistente (suite no creada) | Cobertura UX asegurada vía Jest (51 tests, 5 estados × 4 componentes, desktop+mobile); riesgo residual documentado en `QA-012-results.md` §6 |
+| Out-of-scope | BE-008 bug: `GET /appointments?status=COMPLETED` (mayúsculo) → 500 | `appointment_repository_impl.py:191` enum case mismatch; corregir en el slice que owns appointments |
+
+### Verificación final
+
+- Backend (Docker): `pytest` reviews 47 passed · suite completa 379 passed / 0 failed.
+- Frontend: `lint` PASS · `tsc --noEmit` PASS · `npm run build` PASS · jest reviews 51 passed (suite 231 passed / 1 fallo preexistente `login-page.test.tsx`).
+- Playwright API: APIA-012 21/21 (project=api, ~9s).
+- Preflight: `validate_slice_plan.py BE-012` → 10/10 stages PASS (previous, plan, backend, frontend, secure-persistence, qa, findings, review, checks, docs).
+
+---
+
 ## BE-011: Registro operativo de pagos de servicios — CLOSED (2026-08-25)
 
 ### Summary

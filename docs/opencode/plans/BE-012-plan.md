@@ -233,19 +233,19 @@ Pruebas backend:
 
 ## Checklist tecnico
 
-- [ ] Modelos SQLAlchemy `Review`, `ReviewResponse` + alembic `a012_reviews.py` aplicados.
-- [ ] Repositorio ABC + implementacion SQLAlchemy (`backend/app/data/review_repo.py`).
-- [ ] Use cases en `backend/app/application/use_cases/review.py` (crear, responder, lectura, recalcular resumen).
-- [ ] Schemas Pydantic `backend/app/api/schemas/review_schemas.py` (ReviewCreate, ReviewRead, ReviewRespond, ReviewResponseRead, ReviewListMeta).
-- [ ] Routers `backend/app/api/v1/routers/review_router.py` (POST/GET publico, GET tenant, POST respond); registro en main router.
-- [ ] Permisos por rol + ownership por `clinic_id`/`branch_id` validados (guardas `_require_*_role` + ownership por tenant).
-- [ ] Pytest happy + negative + auth (401) + idor (403/404) + transaccional (rating + resumen).
-- [ ] Cliente API `frontend/src/shared/api/review.ts` + tests Jest.
-- [ ] Rutas `frontend/src/features/reviews/*` + secciones en `AppointmentDetail` (Calificar) y `BranchProfile` (Reseñas).
-- [ ] Estados UX (loading, submitting, empty, success, error) reutilizando `src/shared/ui`.
-- [ ] `npx tsc --noEmit`, `npm run lint`, `npm run build` sin errores (frontend).
-- [ ] `python backend/scripts/validate_slice_plan.py BE-012 --stage plan` PASS.
-- [ ] `python backend/scripts/manage_slice_task.py manifest BE-012 --layer all` genera manifest.
+- [x] Modelos SQLAlchemy `Review`, `ReviewResponse` + alembic `a012_reviews.py` aplicados.
+- [x] Repositorio ABC + implementacion SQLAlchemy (`backend/app/data/review_repo.py`).
+- [x] Use cases en `backend/app/application/use_cases/review.py` (crear, responder, lectura, recalcular resumen).
+- [x] Schemas Pydantic `backend/app/api/schemas/review_schemas.py` (ReviewCreate, ReviewRead, ReviewRespond, ReviewResponseRead, ReviewListMeta).
+- [x] Routers `backend/app/api/v1/routers/review_router.py` (POST/GET publico, GET tenant, POST respond); registro en main router.
+- [x] Permisos por rol + ownership por `clinic_id`/`branch_id` validados (guardas `_require_*_role` + ownership por tenant).
+- [x] Pytest happy + negative + auth (401) + idor (403/404) + transaccional (rating + resumen).
+- [x] Cliente API `frontend/src/shared/api/review.ts` + tests Jest.
+- [x] Rutas `frontend/src/features/reviews/*` + secciones en `AppointmentDetail` (Calificar) y `BranchProfile` (Reseñas).
+- [x] Estados UX (loading, submitting, empty, success, error) reutilizando `src/shared/ui`.
+- [x] `npx tsc --noEmit`, `npm run lint`, `npm run build` sin errores (frontend).
+- [x] `python backend/scripts/validate_slice_plan.py BE-012 --stage plan` PASS.
+- [x] `python backend/scripts/manage_slice_task.py manifest BE-012 --layer all` genera manifest.
 
 ## Definition of done
 

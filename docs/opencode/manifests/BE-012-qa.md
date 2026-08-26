@@ -2,11 +2,11 @@
 manifest_version: 1
 slice: "012"
 layer: qa
-generated_at: 2026-08-25T22:05:16+00:00
+generated_at: 2026-08-26T22:28:54+00:00
 source_plan: docs/opencode/plans/BE-012-plan.md
-source_plan_sha256: 21c5a19467d164db2591bc62b3be7a6829e0501a1f84b7742a3a3e6d8fac58da
+source_plan_sha256: 65260d71a32cd8c0276f060281ad2f3b6915736c0db0a2921ef8786ad41c26da
 source_task: docs/opencode/tasks/qa/QA-012.md
-source_task_sha256: ae1dacd14d306197709fa194b60b5a0afc5b2c3cd386da2fab31222b0ba9ed69
+source_task_sha256: fc27c34479c5e11e1f73c2bd617e37ed8fe01dbcfe1fc19f04857c47e49040cb
 ---
 
 # BE-012 - manifiesto compacto qa
@@ -41,7 +41,7 @@ source_task_sha256: ae1dacd14d306197709fa194b60b5a0afc5b2c3cd386da2fab31222b0ba9
 
 ## Tareas
 
-### QA-012-T01 - PENDIENTE
+### QA-012-T01 - COMPLETADA
 - Tipo: prueba
 - Criterio: AC-012-01, AC-012-07, AC-012-09
 - Objetivo: Validar el happy path de calificar una cita.
@@ -53,7 +53,7 @@ source_task_sha256: ae1dacd14d306197709fa194b60b5a0afc5b2c3cd386da2fab31222b0ba9
 - Validacion: `docker compose run --rm backend pytest app/tests/api/test_reviews_create.py app/tests/api/test_reviews_public.py app/tests/api/test_reviews_respond.py -q`.
 - Resultado: Flujo de reseñas funcional end-to-end.
 
-### QA-012-T02 - PENDIENTE
+### QA-012-T02 - COMPLETADA
 - Tipo: prueba
 - Criterio: AC-012-02, AC-012-03, AC-012-05, AC-012-15
 - Objetivo: Validar rechazos de reseñas invalidas con errores claros.
@@ -65,7 +65,7 @@ source_task_sha256: ae1dacd14d306197709fa194b60b5a0afc5b2c3cd386da2fab31222b0ba9
 - Validacion: `docker compose run --rm backend pytest app/tests/api/test_reviews_negative.py -q`.
 - Resultado: Validaciones de negocio y consistencia de errores cubiertas.
 
-### QA-012-T03 - PENDIENTE
+### QA-012-T03 - COMPLETADA
 - Tipo: prueba
 - Criterio: AC-012-04, AC-012-06, AC-012-12, AC-012-13
 - Objetivo: Validar controles de seguridad ante acceso cruzado a reseñas.
@@ -77,7 +77,7 @@ source_task_sha256: ae1dacd14d306197709fa194b60b5a0afc5b2c3cd386da2fab31222b0ba9
 - Validacion: `docker compose run --rm backend pytest app/tests/api/test_reviews_idor.py app/tests/api/test_reviews_auth.py -q`.
 - Resultado: Sin hallazgos de seguridad IDOR/BOLA/rol en reseñas.
 
-### QA-012-T04 - PENDIENTE
+### QA-012-T04 - COMPLETADA
 - Tipo: prueba
 - Criterio: AC-012-10, AC-012-11
 - Objetivo: Validar los estados UI del flujo de reseñas.
