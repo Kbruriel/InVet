@@ -228,6 +228,34 @@ async def create_consultation(
             status_code=status.HTTP_403_FORBIDDEN, detail=exc.message
         ) from None
 
+    # BE-013-T06: emit notificacion al owner tras consulta completada
+    from app.api.v1.routers._notify import emit_notify
+    try:
+        pet = pet_repo.get_pet_by_id(payload.pet_id)
+        pet_display = getattr(pet, "name", str(payload.pet_id)) if pet else str(payload.pet_id)
+        owner_id_for_pet = None
+        owner_email = None
+        if pet:
+            from app.infrastructure.database.models.owner import Owner as OwnerModel
+            owner = db.query(OwnerModel).filter(OwnerModel.id == pet.owner_id).first()
+            if owner:
+                owner_id_for_pet = int(owner.user_id)
+                owner_email = owner.email
+        if owner_id_for_pet:
+            await emit_notify(
+                db=db,
+                recipient_user_id=owner_id_for_pet,
+                recipient_email=owner_email,
+                clinic_id=clinic_id,
+                event_type="consultation_completed",
+                ref_entity="consultation",
+                ref_id=result.id if result else 0,
+                body_extra=f"Clinica: {payload.diagnosis[:80] if payload.diagnosis else 'Sin diagnostico'} | Mascota: {pet_display}",
+            )
+    except Exception:
+        # BE-013: un fallo de notificacion no debe romper la consulta.
+        pass
+
     return ConsultationRead.model_validate(result)
 
 

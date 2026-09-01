@@ -223,6 +223,40 @@ async def create_prescription(
             status_code=status.HTTP_403_FORBIDDEN, detail=exc.message
         ) from None
 
+    # BE-013-T06: emit notificacion al owner tras receta creada
+    from app.api.v1.routers._notify import emit_notify
+    try:
+        pet = getattr(result, "pet", None)
+        pet_obj = (
+            db.query(PetModel)
+            .filter(PetModel.id == pet.id if pet else 0)
+            .first()
+            if pet
+            else None
+        )
+        pet_display = getattr(pet_obj, "name", str(payload.pet_id)) if pet_obj else "mascota"
+        owner_user_id = None
+        owner_email = None
+        if pet_obj:
+            owner = db.query(OwnerModel).filter(OwnerModel.id == pet_obj.owner_id).first()
+            if owner:
+                owner_user_id = int(owner.user_id)
+                owner_email = owner.email
+        if owner_user_id:
+            await emit_notify(
+                db=db,
+                recipient_user_id=owner_user_id,
+                recipient_email=owner_email,
+                clinic_id=clinic_id,
+                event_type="prescription_created",
+                ref_entity="prescription",
+                ref_id=result.id,
+                body_extra=f"Receta veterinaria registrada | Mascota: {pet_display}",
+            )
+    except Exception:
+        # BE-013: un fallo de notificacion no debe romper la creacion de la receta.
+        pass
+
     return PrescriptionRead.model_validate(result)
 
 

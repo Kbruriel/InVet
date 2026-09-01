@@ -39,7 +39,7 @@ function actorCreds(actor: Actor): { email: string; password: string } {
     case "owner":
       return { email: env.ownerEmail, password: env.ownerPassword };
     case "owner-clinic2":
-      return { email: "owner-clinic2@invet.com", password: env.foreignOwnerPassword };
+      return { email: env.foreignOwnerEmail, password: env.foreignOwnerPassword };
   }
 }
 
@@ -440,7 +440,7 @@ test.describe("pagos operativos UI - UIA-011 (C1..C9)", () => {
       });
 
       const foreignId = await seedPayment(page);
-      await authenticateAs(page, "owner-clinic2@invet.com", env.foreignOwnerPassword);
+      await authenticateAs(page, env.foreignOwnerEmail, env.foreignOwnerPassword);
       await page.goto(`/clinic/payments/${foreignId}`);
 
       // La respuesta 404 superficieada como estado legible.

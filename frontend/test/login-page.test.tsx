@@ -1,6 +1,11 @@
 // Mock Next.js App Router hooks before any imports
+const mockPush = jest.fn();
 jest.mock("next/navigation", () => ({
-  useRouter: () => ({ push: jest.fn(), refresh: jest.fn() }),
+  ...jest.requireActual("next/navigation"),
+  useRouter: () => ({ push: mockPush, refresh: jest.fn() }),
+  useSearchParams: () => ({ get: (key: string) => key === "next" ? "/dashboard" : null }),
+  useParams: () => ({}),
+  usePathname: () => "/login",
 }));
 
 import { render, screen } from "@testing-library/react";

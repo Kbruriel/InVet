@@ -15,8 +15,8 @@ test('TC-005-01: Login como clinic_admin redirige al panel', async ({ page }) =>
   await expect(page).toHaveURL(/.*\/login/);
 
   // Cuando ingreso credenciales
-  await page.fill('input[name="email"]', 'qa@example.com');
-  await page.fill('input[name="password"]', 'secret123');
+  await page.fill('input[name="email"]', 'qa@test.com');
+  await page.fill('input[name="password"]', 'Pruebas');
   await page.click('button[type="submit"]');
 
   // Entonces navego al panel de administracion (o a la ruta por defecto)

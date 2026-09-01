@@ -175,7 +175,7 @@ test.describe("consultation UI - UIA-009", () => {
         feature: "Historial de consultas del propietario",
         scenario: "El propietario ve las consultas de su mascota en solo lectura",
         given: [
-          "un propietario autenticado (owner1@invet.com) que posee la mascota 1000",
+          "un propietario autenticado (owner1@test.com) que posee la mascota 1000",
           "la consultation 1000 existe en el historial de esa mascota",
         ],
         when: ["navego a /portal/owner/pets/1000/consultations"],
@@ -223,7 +223,7 @@ test.describe("consultation UI - UIA-009", () => {
         feature: "Detalle de consulta del propietario",
         scenario: "El propietario visualiza el detalle clinico sin controles de edicion",
         given: [
-          "un propietario autenticado (owner1@invet.com) que posee la consulta 1000",
+          "un propietario autenticado (owner1@test.com) que posee la consulta 1000",
         ],
         when: ["navego a /portal/owner/consultations/1000"],
         then: [
@@ -274,7 +274,7 @@ test.describe("consultation UI - UIA-009", () => {
         feature: "Aislamiento de datos del propietario",
         scenario: "El propietario nunca ve consultas de mascotas de otros propietarios",
         given: [
-          "un propietario autenticado (owner2@invet.com) que posee la mascota 1001",
+          "un propietario autenticado (owner2@test.com) que posee la mascota 1001",
           "owner2 NO posee la mascota 1000 (pertenece a owner1)",
         ],
         when: ["navego a /portal/owner/pets/1000/consultations (mascota ajena)"],

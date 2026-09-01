@@ -79,12 +79,8 @@ type AppointmentListResponse = {
 // ===========================================================================
 
 async function loginAsOwner(request: APIRequestContext): Promise<string> {
-  test.skip(
-    env.loginEmail === "qa@example.com",
-    "Provide LOGIN_EMAIL and LOGIN_PASSWORD of a registered owner account to run owner tests.",
-  );
   const response = await request.post("/api/v1/auth/login", {
-    data: { email: env.loginEmail, password: env.loginPassword },
+    data: { email: env.clinicEmail, password: env.clinicPassword },
   });
   expect(response.status()).toBe(200);
   const payload = (await response.json()) as AuthPayload;
@@ -106,7 +102,7 @@ async function loginAsClinic(request: APIRequestContext): Promise<string> {
 
 async function loginAsVet(request: APIRequestContext): Promise<string> {
   test.skip(
-    env.vetEmail === "vet@example.com",
+    env.vetEmail === "vet@invet.local",
     "Provide VET_EMAIL and VET_PASSWORD to run vet tests.",
   );
   const response = await request.post("/api/v1/auth/login", {
@@ -567,7 +563,7 @@ test.describe("Appointment creation — APIA-008", () => {
 
       // Intentar con un token diferente (simulado) — si no hay clinica_B seeded, skip
       test.skip(
-        env.clinicEmail === "clinic@example.com",
+        env.clinicEmail === "clinic@test.com",
         "Requires a second clinic account for cross-branch IDOR testing.",
       );
 
@@ -1061,7 +1057,7 @@ test.describe("Appointment creation — APIA-008", () => {
 
       // Si solo tenemos un vet seeded, skip esta prueba de IDOR entre vets
       test.skip(
-        env.vetEmail === "vet@example.com",
+        env.vetEmail === "vet@test.com",
         "Requires a second vet account for cross-vet permission testing.",
       );
 

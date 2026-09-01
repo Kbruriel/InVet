@@ -93,12 +93,8 @@ async function loginAsClinic(request: APIRequestContext): Promise<string> {
 }
 
 async function loginAsOwner(request: APIRequestContext): Promise<string> {
-  test.skip(
-    env.loginEmail === "qa@example.com",
-    "Provide LOGIN_EMAIL of a registered owner account to run owner-specific tests.",
-  );
   const response = await request.post("/api/v1/auth/login", {
-    data: { email: env.loginEmail, password: env.loginPassword },
+    data: { email: env.ownerEmail, password: env.ownerPassword },
   });
   expect(response.status()).toBe(200);
   const payload = (await response.json()) as AuthPayload;

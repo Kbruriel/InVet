@@ -131,6 +131,7 @@ async def create_payment(
     current_user: dict = Depends(get_current_access_user),
     service: PaymentService = Depends(get_payment_service),
     internal_user_repo: InternalUserRepository = Depends(get_internal_user_repo),
+    db: Session = Depends(get_current_db),
 ) -> PaymentRead:
     """Registrar un pago operativo sobre una cita y un servicio activos.
 
@@ -153,6 +154,52 @@ async def create_payment(
         PaymentError,
     ) as exc:  # AppointmentNotFoundError / ServiceNotFoundError / ServiceInactiveError / InvalidCashPaymentError
         raise HTTPException(status_code=exc.status_code, detail=exc.message) from None
+
+    # BE-013-T06: emit notificacion al owner del pet asociado a la cita pagada
+    from app.api.v1.routers._notify import emit_notify
+
+    event_type = None
+    if result and result.status:
+        status_val = result.status.value if hasattr(result.status, "value") else str(result.status)
+        if status_val == "paid":
+            event_type = "payment_completed"
+        elif status_val == "cancelled":
+            event_type = "payment_cancelled"
+    appointment_id = getattr(result, "appointment_id", None) if result else None
+    if event_type and appointment_id:
+        try:
+            from app.infrastructure.database.models.appointment import (
+                Appointment as AppointmentModel,
+            )
+
+            appt = (
+                db.query(AppointmentModel)
+                .filter(AppointmentModel.id == appointment_id)
+                .first()
+            )
+            pet_obj = getattr(appt, "pet", None) if appt else None
+            pet_display = str(appt.pet_id) if appt else "servicio"
+            owner_user_id = None
+            owner_email = None
+            if pet_obj:
+                owner = db.query(OwnerModel).filter(OwnerModel.id == pet_obj.owner_id).first()
+                if owner:
+                    owner_user_id = int(owner.user_id)
+                    owner_email = owner.email
+            if owner_user_id:
+                await emit_notify(
+                    db=db,
+                    recipient_user_id=owner_user_id,
+                    recipient_email=owner_email,
+                    clinic_id=clinic_id,
+                    event_type=event_type,
+                    ref_entity="payment",
+                    ref_id=result.id,
+                    body_extra=f"Pago procesado: {status_val} | Monto: {result.amount if hasattr(result, 'amount') else ''}",
+                )
+        except Exception:
+            # BE-013: un fallo de notificacion no debe romper la creacion del pago.
+            pass
 
     return PaymentRead.model_validate(result)
 

@@ -247,6 +247,47 @@ async def create_appointment(
             owner_id=owner_id_val,
             created_by=created_by_val,
         )
+        
+        # BE-013-T06: emit notificacion al owner de la mascota
+        from app.api.v1.routers._notify import emit_notify
+        
+        pet_name = getattr(appointment, "pet", None)
+        if hasattr(pet_name, "name"):
+            pet_display = pet_name.name
+        else:
+            pet_display = str(body.pet_id)
+        
+        # appointment.owner_id es owners.id; el receptor de la notificacion
+        # debe ser el usuario del owner (notifications.user_id, tabla users).
+        from app.infrastructure.database.models.owner import Owner as OwnerModel
+        _owner_row = (
+            db.query(OwnerModel)
+            .filter(OwnerModel.id == appointment.owner_id)
+            .first()
+            if getattr(appointment, "owner_id", None) is not None
+            else None
+        )
+        
+        _recipient = (
+            int(_owner_row.user_id)
+            if (_owner_row is not None and getattr(_owner_row, "user_id", None) is not None)
+            else _user_id
+        )
+        if _recipient is None:
+            return AppointmentReadSchema.model_validate(appointment)
+            
+        _recipient_email = getattr(_owner_row, "email", None) if _owner_row is not None else None
+        await emit_notify(
+            db=db,
+            recipient_user_id=_recipient,
+            recipient_email=_recipient_email,
+            clinic_id=_clinic_id,
+            event_type="appointment_created",
+            ref_entity="appointment",
+            ref_id=int(appointment.id),
+            body_extra=f"Cita agendada para {pet_display}",
+        )
+        
         return AppointmentReadSchema.model_validate(appointment)
     except ValueError as exc:
         raise HTTPException(
@@ -354,6 +395,7 @@ async def transition_appointment_status(
     body: StatusTransitionSchema,
     current_user: dict = Depends(get_current_access_user),
     repo: AppointmentRepository = Depends(get_appointment_repo),
+    db: Session = Depends(get_current_db),
 ) -> AppointmentReadSchema:
     """Transicionar el estado de una cita.
 
@@ -374,6 +416,52 @@ async def transition_appointment_status(
             scheduled_start=body.scheduled_start,
             duration_minutes=body.duration_minutes,
         )
+        
+        # BE-013-T06: emit notificacion al owner segun transicion
+        if appointment and getattr(appointment, "owner_id", None) is not None:
+            from app.api.v1.routers._notify import emit_notify
+            event_map = {
+                "confirmed": "appointment_confirmed",
+                "cancelled": "appointment_cancelled",
+                "completed": "appointment_completed",
+                "no_show": "appointment_no_show",
+                "approved": "appointment_approved",
+            }
+            notif_event = event_map.get(body.status.value)
+            if notif_event:
+                try:
+                    pet_display = "cita"
+                    pet_obj = getattr(appointment, "pet", None)
+                    if pet_obj is not None and getattr(pet_obj, "name", None):
+                        pet_display = pet_obj.name
+                    # appointment.owner_id es owners.id; resuelve el usuario receptor.
+                    from app.infrastructure.database.models.owner import Owner as OwnerModel
+                    _owner_row = (
+                        db.query(OwnerModel)
+                        .filter(OwnerModel.id == appointment.owner_id)
+                        .first()
+                    )
+                    _recipient = (
+                        int(_owner_row.user_id)
+                        if _owner_row is not None and _owner_row.user_id is not None
+                        else None
+                    )
+                    _recipient_email = getattr(_owner_row, "email", None) if _owner_row is not None else None
+                    if _recipient:
+                        await emit_notify(
+                            db=db,
+                            recipient_user_id=_recipient,
+                            recipient_email=_recipient_email,
+                            clinic_id=clinic_id,
+                            event_type=notif_event,
+                            ref_entity="appointment",
+                            ref_id=int(appointment.id),
+                            body_extra=f"Estado de {pet_display}: {body.status.value}",
+                        )
+                except Exception:
+                    # BE-013: un fallo de notificacion no debe romper la transicion.
+                    pass
+        
         if not appointment:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,

@@ -12,6 +12,7 @@ from app.api.v1.routers.internal_users import router as internal_users_router
 from app.api.v1.routers.owners import router as owners_router
 from app.api.v1.routers.payments_router import router as payments_router
 from app.api.v1.routers.pets import owner_pets_router, pet_router
+from app.api.v1.routers.notification_router import router as notification_router
 from app.api.v1.routers.prescription_router import router as prescription_router
 from app.api.v1.routers.public_branches import router as public_branches_router
 from app.api.v1.routers.review_router import router as review_router
@@ -30,6 +31,7 @@ router.include_router(consultation_router)
 router.include_router(internal_users_router)
 router.include_router(owners_router)
 router.include_router(payments_router)
+router.include_router(notification_router)
 router.include_router(owner_pets_router)
 router.include_router(pet_router)
 router.include_router(prescription_router)

@@ -11,14 +11,8 @@ const env = readAutomationEnv();
 // ---------------------------------------------------------------------------
 
 async function loginAsAdmin(request: APIRequestContext): Promise<string> {
-  // Skip if no seeded QA user is configured.
-  test.skip(
-    env.loginEmail === "qa@example.com",
-    "Provide LOGIN_EMAIL and LOGIN_PASSWORD of a real registered admin account to run this test.",
-  );
-
   const response = await request.post("/api/v1/auth/login", {
-    data: { email: env.loginEmail, password: env.loginPassword },
+    data: { email: env.adminEmail, password: env.adminPassword },
   });
   expect(response.status()).toBe(200);
   const payload = (await response.json()) as Record<string, unknown>;

@@ -71,12 +71,6 @@ test.describe("BE-001 login API - positive & negative", () => {
   test(
     "APIA-002-05 US-001 AC-001-03 POST /api/v1/auth/login with valid credentials returns access_token, refresh_token and bearer",
     async ({ request }, testInfo) => {
-      // Skip if no seeded QA user is configured.
-      test.skip(
-        env.loginEmail === "qa@example.com",
-        "Provide LOGIN_EMAIL and LOGIN_PASSWORD of a real registered account to run this test.",
-      );
-
       annotateTraceability(testInfo, {
         slice: "001",
         userStory: "US-001",

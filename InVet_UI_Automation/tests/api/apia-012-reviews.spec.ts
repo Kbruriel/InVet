@@ -52,8 +52,8 @@ const SEED_REVIEW_ID = 2;
 // Cita 1001: COMPLETED, titular owner2 → usada para BOLA/duplicate/validación.
 const SEED_COMPLETED_APPOINTMENT_ID = 1001;
 
-const FOREIGN_OWNER_EMAIL = "owner-clinic2@invet.com";
-const FOREIGN_OWNER_PASSWORD = "secret123";
+const FOREIGN_OWNER_EMAIL = env.foreignOwnerEmail;
+const FOREIGN_OWNER_PASSWORD = env.foreignOwnerPassword;
 const FOREIGN_PET_ID = 1000;
 
 const CLINIC_ID = 1;

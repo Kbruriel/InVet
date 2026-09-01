@@ -52,8 +52,8 @@ def _ensure_consultation_seed(connection: Connection) -> None:
             bind=connection, tables=[Appointment.__table__, Pet.__table__]
         )
 
-    # Seed pet 1 -> CLIINIC owner (owner of user 'clinic@example.com'). The
-    # Playwright owner tests skip the literal 'qa@example.com' account, so bind
+    # Seed pet 1 -> clinic owner (owner of user 'clinic@test.com'). The
+    # Playwright owner tests use the seeded clinic account, so bind
     # pet 1 to the clinic owner account instead of the lowest-id owner. Fall back
     # to the lowest owner row if the clinic account is absent.
     connection.execute(
@@ -71,12 +71,12 @@ def _ensure_consultation_seed(connection: Connection) -> None:
                 o.id = (
                     SELECT o2.id FROM owners o2
                     JOIN users u2 ON u2.id = o2.user_id
-                    WHERE u2.email = 'clinic@example.com'
+                    WHERE u2.email = 'clinic@test.com'
                     LIMIT 1
                 )
                 OR NOT EXISTS (
                     SELECT 1 FROM owners o2 JOIN users u2 ON u2.id = o2.user_id
-                    WHERE u2.email = 'clinic@example.com'
+                    WHERE u2.email = 'clinic@test.com'
                 )
               )
             ORDER BY o.id
@@ -92,17 +92,17 @@ def _ensure_consultation_seed(connection: Connection) -> None:
             UPDATE pets SET owner_id = (
                 SELECT o.id FROM owners o
                 JOIN users u ON u.id = o.user_id
-                WHERE u.email = 'clinic@example.com' LIMIT 1
+                WHERE u.email = 'clinic@test.com' LIMIT 1
             )
             WHERE id = 1
             AND EXISTS (
                 SELECT 1 FROM owners o JOIN users u ON u.id = o.user_id
-                WHERE u.email = 'clinic@example.com'
+                WHERE u.email = 'clinic@test.com'
             )
             AND owner_id <> (
                 SELECT o.id FROM owners o
                 JOIN users u ON u.id = o.user_id
-                WHERE u.email = 'clinic@example.com' LIMIT 1
+                WHERE u.email = 'clinic@test.com' LIMIT 1
             )
             """
         )
@@ -159,7 +159,7 @@ def _ensure_owner_consultation_fixtures(connection: Connection) -> None:
     the BE-009 owner UIA tests (UIA-009 TC-03/04/05).
 
     Existing seed data binds pet 1 to the *clinic* owner, so the generic
-    ``qa@example.com`` login (an owner with no pets) hits the BOLA guard and can
+    ``qa@test.com`` login (an owner with no pets) hits the BOLA guard and can
     never exercise the owner happy-path. These fixtures give the specs a real
     owner who owns a pet with a completed appointment and a registered
     consultation, plus a second owner whose pet is used to assert cross-owner
@@ -168,7 +168,7 @@ def _ensure_owner_consultation_fixtures(connection: Connection) -> None:
     if not inspect(connection).has_table("consultations"):
         return
 
-    password_hash = get_password_hash("secret123")
+    password_hash = get_password_hash("Pruebas")
 
     connection.execute(
         text(
@@ -178,9 +178,9 @@ def _ensure_owner_consultation_fixtures(connection: Connection) -> None:
                 is_active, is_admin, created_at, updated_at
             )
             VALUES
-                ('owner1@invet.com', 'owner1@invet.com', :password_hash,
+                ('owner1@test.com', 'owner1@test.com', :password_hash,
                  'Due', 'Uno', true, false, NOW(), NOW()),
-                ('owner2@invet.com', 'owner2@invet.com', :password_hash,
+                ('owner2@test.com', 'owner2@test.com', :password_hash,
                  'Due', 'Dos', true, false, NOW(), NOW())
             ON CONFLICT (email) DO UPDATE SET
                 username = EXCLUDED.username,
@@ -194,7 +194,7 @@ def _ensure_owner_consultation_fixtures(connection: Connection) -> None:
         {"password_hash": password_hash},
     )
 
-    for email in ("owner1@invet.com", "owner2@invet.com"):
+    for email in ("owner1@test.com", "owner2@test.com"):
         connection.execute(
             text(
                 """
@@ -222,8 +222,8 @@ def _ensure_owner_consultation_fixtures(connection: Connection) -> None:
 
     fixtures = (
         # (pet_id, owner_email, appt_id, consultation_id, day_offset)
-        (1000, "owner1@invet.com", 1000, 1000, 1),
-        (1001, "owner2@invet.com", 1001, 1001, 2),
+        (1000, "owner1@test.com", 1000, 1000, 1),
+        (1001, "owner2@test.com", 1001, 1001, 2),
     )
 
     for pet_id, owner_email, appt_id, consultation_id, day_offset in fixtures:
@@ -354,7 +354,7 @@ def _seed_default_clinic_branch(connection: Connection) -> None:
 
 def _seed_default_auth_accounts(connection: Connection) -> None:
     """Ensure the default QA/admin accounts exist for browser and API checks."""
-    password_hash = get_password_hash("secret123")
+    password_hash = get_password_hash("Pruebas")
 
     connection.execute(
         text(
@@ -364,10 +364,10 @@ def _seed_default_auth_accounts(connection: Connection) -> None:
                 created_at, updated_at
             )
             VALUES
-                ('qa@example.com', 'qa@example.com', :password_hash, 'QA', 'Admin', true, true, NOW(), NOW()),
-                ('admin@example.com', 'admin@example.com', :password_hash, 'Admin', 'InVet', true, true, NOW(), NOW()),
-                ('clinic@example.com', 'clinic@example.com', :password_hash, 'Clinic', 'Viewer', true, false, NOW(), NOW()),
-                ('vet@example.com', 'vet@example.com', :password_hash, 'Vet', 'Viewer', true, false, NOW(), NOW())
+                ('qa@test.com', 'qa@test.com', :password_hash, 'QA', 'Admin', true, true, NOW(), NOW()),
+                ('admin@test.com', 'admin@test.com', :password_hash, 'Admin', 'InVet', true, true, NOW(), NOW()),
+                ('clinic@test.com', 'clinic@test.com', :password_hash, 'Clinic', 'Viewer', true, false, NOW(), NOW()),
+                ('vet@test.com', 'vet@test.com', :password_hash, 'Vet', 'Viewer', true, false, NOW(), NOW())
             ON CONFLICT (email) DO UPDATE SET
                 username = EXCLUDED.username,
                 hashed_password = EXCLUDED.hashed_password,
@@ -392,7 +392,7 @@ def _seed_default_auth_accounts(connection: Connection) -> None:
             SELECT u.id, 'QA', 'Admin', u.email, '555-0101', 'Calle QA 1',
                    'Ciudad de pruebas', 'Estado de pruebas', 'MX', '00000', true, 1
             FROM users u
-            WHERE u.email = 'qa@example.com'
+            WHERE u.email = 'qa@test.com'
               AND NOT EXISTS (
                   SELECT 1 FROM owners o WHERE o.user_id = u.id
               )
@@ -410,7 +410,7 @@ def _seed_default_auth_accounts(connection: Connection) -> None:
             SELECT u.id, 'Admin', 'InVet', u.email, '555-0102', 'Calle Admin 1',
                    'Ciudad de pruebas', 'Estado de pruebas', 'MX', '00000', true, 1
             FROM users u
-            WHERE u.email = 'admin@example.com'
+            WHERE u.email = 'admin@test.com'
               AND NOT EXISTS (
                   SELECT 1 FROM owners o WHERE o.user_id = u.id
               )
@@ -428,7 +428,7 @@ def _seed_default_auth_accounts(connection: Connection) -> None:
             SELECT u.id, 'Clinic', 'Viewer', u.email, '555-0103', 'Calle Clinic 1',
                    'Ciudad de pruebas', 'Estado de pruebas', 'MX', '00000', true, 1
             FROM users u
-            WHERE u.email = 'clinic@example.com'
+            WHERE u.email = 'clinic@test.com'
               AND NOT EXISTS (
                   SELECT 1 FROM owners o WHERE o.user_id = u.id
               )
@@ -457,7 +457,7 @@ def _seed_default_auth_accounts(connection: Connection) -> None:
                 '[]',
                 true
             FROM users u
-            WHERE u.email = 'vet@example.com'
+            WHERE u.email = 'vet@test.com'
               AND NOT EXISTS (
                   SELECT 1 FROM internal_users i WHERE i.user_id = u.id
               )

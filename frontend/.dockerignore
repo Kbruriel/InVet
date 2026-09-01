@@ -3,4 +3,12 @@ node_modules
 coverage
 playwright-report
 test-results
+test/
+playwright/
+**/*.test.ts
+**/*.test.tsx
+**/*.spec.ts
+**/*.spec.tsx
+playwright.config.ts
+test.js
 *.log

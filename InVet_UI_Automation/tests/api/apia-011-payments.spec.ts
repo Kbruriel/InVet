@@ -248,7 +248,7 @@ test.describe("Pagos API contractual — APIA-011", () => {
       expect(created.status()).toBe(201);
       const paymentId = ((await created.json()) as { id: number }).id;
 
-      const secondClinicToken = await loginAs(request, "owner-clinic2@invet.com", env.foreignOwnerPassword);
+      const secondClinicToken = await loginAs(request, env.foreignOwnerEmail, env.foreignOwnerPassword);
       const res = await request.get(`/api/v1/payments/${paymentId}`, {
         headers: authHeader(secondClinicToken),
       });

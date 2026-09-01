@@ -11,6 +11,7 @@ from app.infrastructure.database.models.branch_schedule import BranchSchedule
 from app.infrastructure.database.models.clinic import Clinic
 from app.infrastructure.database.models.consultation import Consultation
 from app.infrastructure.database.models.internal_user_model import InternalUser
+from app.infrastructure.database.models.notification import Notification
 from app.infrastructure.database.models.owner import Owner
 from app.infrastructure.database.models.payment import Payment
 from app.infrastructure.database.models.pet import Pet
@@ -36,6 +37,7 @@ __all__ = [
     "Clinic",
     "Consultation",
     "InternalUser",
+    "Notification",
     "Owner",
     "Payment",
     "Pet",

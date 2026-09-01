@@ -10,6 +10,10 @@ const customJestConfig = {
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
+  testPathIgnorePatterns: [
+    "<rootDir>/playwright/",
+    "<rootDir>/test.js",
+  ],
 };
 
 module.exports = createJestConfig(customJestConfig);

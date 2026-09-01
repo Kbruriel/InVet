@@ -41,21 +41,21 @@ export function readAutomationEnv(): AutomationEnv {
     loginApiEnabled: readBoolean(process.env.LOGIN_API_ENABLED, true),
     loginPath: process.env.LOGIN_PATH || "/login",
     loginApiPath: process.env.LOGIN_API_PATH || "/api/v1/auth/login",
-    loginEmail: process.env.LOGIN_EMAIL || "qa@example.com",
-    loginPassword: process.env.LOGIN_PASSWORD || "secret123",
-    clinicEmail: process.env.CLINIC_EMAIL || "clinic@example.com",
-    clinicPassword: process.env.CLINIC_PASSWORD || "secret123",
-    vetEmail: process.env.VET_EMAIL || "vet@example.com",
-    vetPassword: process.env.VET_PASSWORD || "secret123",
-    adminEmail: process.env.ADMIN_EMAIL || "admin@example.com",
-    adminPassword: process.env.ADMIN_PASSWORD || "secret123",
+    loginEmail: process.env.LOGIN_EMAIL || "qa@test.com",
+    loginPassword: process.env.LOGIN_PASSWORD || "Pruebas",
+    clinicEmail: process.env.CLINIC_EMAIL || "clinic@test.com",
+    clinicPassword: process.env.CLINIC_PASSWORD || "Pruebas",
+    vetEmail: process.env.VET_EMAIL || "vet@test.com",
+    vetPassword: process.env.VET_PASSWORD || "Pruebas",
+    adminEmail: process.env.ADMIN_EMAIL || "admin@test.com",
+    adminPassword: process.env.ADMIN_PASSWORD || "Pruebas",
     // BE-009 owner happy-path fixtures (see _ensure_owner_consultation_fixtures
     // in backend bootstrap). ownerEmail owns pet 1000 + consultation 1000;
     // foreignOwnerEmail owns pet 1001 + consultation 1001 (used to assert the
     // BOLA isolation check on the owner UI).
-    ownerEmail: process.env.OWNER_EMAIL || "owner1@invet.com",
-    ownerPassword: process.env.OWNER_PASSWORD || "secret123",
-    foreignOwnerEmail: process.env.FOREIGN_OWNER_EMAIL || "owner2@invet.com",
-    foreignOwnerPassword: process.env.FOREIGN_OWNER_PASSWORD || "secret123",
+    ownerEmail: process.env.OWNER_EMAIL || "owner1@test.com",
+    ownerPassword: process.env.OWNER_PASSWORD || "Pruebas",
+    foreignOwnerEmail: process.env.FOREIGN_OWNER_EMAIL || "owner2@test.com",
+    foreignOwnerPassword: process.env.FOREIGN_OWNER_PASSWORD || "Pruebas",
   };
 }

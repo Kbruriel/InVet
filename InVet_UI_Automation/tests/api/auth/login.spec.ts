@@ -30,11 +30,6 @@ test.describe("login api", () => {
   test(
     "@regression US-002-01 CA-02 valid credentials return tokens",
     async ({ request }, testInfo) => {
-      test.skip(
-        env.loginEmail === "qa@example.com",
-        "Configure LOGIN_EMAIL and LOGIN_PASSWORD with a seeded QA account.",
-      );
-
       annotateTraceability(testInfo, {
         slice: "002",
         userStory: "US-002-01",
@@ -59,4 +54,3 @@ test.describe("login api", () => {
     },
   );
 });
-
