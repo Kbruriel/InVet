@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { supportApi, SupportCategory } from '@/shared/api/support';
 import { TicketForm } from '@/features/support/ui/ticket-form';
-import { TicketList } from '@/features/support/ui/ticket-list';
+import { TicketListFiltered } from '@/features/support/ui/ticket-list-filtered';
 import { Button } from '@/shared/ui/button';
 
 export default function SupportPage() {
@@ -91,7 +91,7 @@ export default function SupportPage() {
       <div>
         <h2 className="text-xl font-semibold text-gray-800 mb-4">Mis tickets</h2>
         <div className="border border-gray-200 rounded-lg p-6 shadow-sm">
-          <TicketList onTicketClick={(ticketId) => window.location.href = `/support/${ticketId}`} />
+          <TicketListFiltered onTicketClick={(ticketId) => window.location.href = `/support/${ticketId}`} />
         </div>
       </div>
     </div>
