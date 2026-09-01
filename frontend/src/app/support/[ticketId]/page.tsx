@@ -5,6 +5,7 @@ import { supportApi, SupportTicket } from '@/shared/api/support';
 import { Button } from '@/shared/ui/button';
 import { useRouter } from 'next/navigation';
 import { TicketStatusBadge } from './ticket-status-badge';
+import { TicketStatusUpdater } from './ticket-status-updater';
 
 interface PageProps {
   params: {
@@ -136,6 +137,9 @@ export default function TicketDetailPage({ params }: PageProps) {
           </dl>
         </div>
       </div>
+
+      {/* Add Status Updater Component */}
+      <TicketStatusUpdater ticket={ticket} onStatusChange={() => window.location.reload()} />
 
       <div className="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
         <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
