@@ -30,6 +30,7 @@ from app.infrastructure.database.session import get_db
 
 def _import_router():
     import app.api.v1.routers.notification_router as notif_router_mod
+
     return notif_router_mod, notif_router_mod.router
 
 
@@ -187,8 +188,8 @@ def _seed():
 def test_list_notifications_success(app_client):
     """C3: Listado paginado con metadata correcta."""
     _seed()
-    response = app_client.get(f"/api/v1/notifications?page=1&page_size=5")
-    
+    response = app_client.get("/api/v1/notifications?page=1&page_size=5")
+
     assert response.status_code == 200
     data = response.json()
     assert "items" in data
@@ -201,8 +202,8 @@ def test_list_notifications_success(app_client):
 def test_list_notifications_empty(app_client):
     """C11: Listado vacío cuando no existen datos."""
     # Usar una base de datos completamente nueva sin datos
-    response = app_client.get(f"/api/v1/notifications?page=1&page_size=20")
-    
+    response = app_client.get("/api/v1/notifications?page=1&page_size=20")
+
     assert response.status_code == 200
     data = response.json()
     assert len(data["items"]) == 0
@@ -213,11 +214,11 @@ def test_list_notifications_empty(app_client):
 
 def test_list_notifications_unauthorized(app_client):
     """C9: Sin token se devuelve 401."""
-    # Desactivar autenticación  
+    # Desactivar autenticación
     app_client.app.dependency_overrides[auth_dep] = _override_auth(None, None)
-    
-    response = app_client.get(f"/api/v1/notifications")
-    
+
+    response = app_client.get("/api/v1/notifications")
+
     assert response.status_code == 401
     assert "detail" in response.json()
 
@@ -226,14 +227,14 @@ def test_list_notifications_with_owner(app_client):
     """C1: Creación de notificación al crear una reseña o evento."""
     # Simular creación de notificación (esto se haría en otro endpoint)
     u1, u2, c1, c2, n1_id, n2_id, n3_id = _seed()
-    
-    response = app_client.get(f"/api/v1/notifications?page=1&page_size=10")
+
+    response = app_client.get("/api/v1/notifications?page=1&page_size=10")
     assert response.status_code == 200
-    
+
     data = response.json()
     # Debe mostrar notificaciones propias (usuario 1)
     # No debe mostrar notificaciones del otro usuario
-    assert len(data["items"]) >= 1 
+    assert len(data["items"]) >= 1
     assert any(item["id"] == n1_id for item in data["items"])
     assert any(item["id"] == n2_id for item in data["items"])
     assert not any(item["id"] == n3_id for item in data["items"])

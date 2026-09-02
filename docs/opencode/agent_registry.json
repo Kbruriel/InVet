@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "execution_policy": {
+    "delegation": false,
+    "complete_flow_agent": "invet-orchestrator",
+    "manual_command_profile": true,
+    "opencode_mode": "primary",
+    "command_subtask": false,
+    "github_permission_parity": "semantic"
+  },
+  "agents": [
+    {
+      "id": "invet-orchestrator",
+      "github_name": "InVet Orchestrator",
+      "commands": ["execute-slice"]
+    },
+    {
+      "id": "invet-product-planner",
+      "github_name": "InVet Product Planner",
+      "commands": ["plan-task"]
+    },
+    {
+      "id": "invet-backend-implementer",
+      "github_name": "InVet Backend Implementer",
+      "commands": ["implement-backend-task"]
+    },
+    {
+      "id": "invet-frontend-implementer",
+      "github_name": "InVet Frontend Implementer",
+      "commands": ["implement-frontend-task"]
+    },
+    {
+      "id": "invet-ui-automation-implementer",
+      "github_name": "InVet UI Automation Implementer",
+      "commands": ["implement-ui-automation-task"]
+    },
+    {
+      "id": "invet-api-automation-implementer",
+      "github_name": "InVet API Automation Implementer",
+      "commands": ["implement-api-automation-task"]
+    },
+    {
+      "id": "invet-qa-validator",
+      "github_name": "InVet QA Validator",
+      "commands": ["qa-task"]
+    },
+    {
+      "id": "invet-slice-reviewer",
+      "github_name": "InVet Slice Reviewer",
+      "commands": ["review-slice"]
+    },
+    {
+      "id": "invet-clean-architecture-reviewer",
+      "github_name": "InVet Clean Architecture Reviewer",
+      "commands": ["clean-architecture-review"]
+    },
+    {
+      "id": "invet-security-reviewer",
+      "github_name": "InVet Security Reviewer",
+      "commands": ["security-review"]
+    },
+    {
+      "id": "invet-findings-implementer",
+      "github_name": "InVet Findings Implementer",
+      "commands": ["implement-findings"]
+    },
+    {
+      "id": "invet-check-runner",
+      "github_name": "InVet Check Runner",
+      "commands": ["run-ui-checks", "run-checks"]
+    },
+    {
+      "id": "invet-docs-updater",
+      "github_name": "InVet Docs Updater",
+      "commands": ["update-docs"]
+    },
+    {
+      "id": "invet-final-reviewer",
+      "github_name": "InVet Final Reviewer",
+      "commands": ["final-gate"]
+    }
+  ]
+}

@@ -1,46 +1,74 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+
+import { supportApi, type SupportTicket } from '@/shared/api/support';
+
 import { TicketStatusUpdater } from './ticket-status-updater';
 
-const mockTicket = {
-  id: '1',
-  clinic_id: 'clinic-1',
-  owner_id: 'owner-1',
-  title: 'Test Ticket',
-  description: 'Test description',
-  category_id: 'category-1',
-  status: 'initiated',
-  created_at: '2023-01-01T00:00:00Z'
+jest.mock('@/shared/api/support', () => ({
+  ...jest.requireActual('@/shared/api/support'),
+  supportApi: {
+    createTicket: jest.fn(),
+    listTickets: jest.fn(),
+    getTicket: jest.fn(),
+    updateTicketStatus: jest.fn(),
+    getCategories: jest.fn(),
+  },
+}));
+
+const mockedSupportApi = supportApi as jest.Mocked<typeof supportApi>;
+const ticket: SupportTicket = {
+  id: 21,
+  clinic_id: 4,
+  owner_id: 8,
+  title: 'Error al facturar',
+  description: 'Detalle',
+  category_id: 2,
+  status: 'iniciado',
+  created_at: '2026-08-30T12:00:00Z',
+  updated_at: '2026-08-30T12:00:00Z',
 };
 
 describe('TicketStatusUpdater', () => {
-  const onStatusChange = jest.fn();
+  const onStatusUpdated = jest.fn();
 
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('renders component with available transitions', () => {
-    render(<TicketStatusUpdater ticket={mockTicket} onStatusChange={onStatusChange} />);
-    
-    // Should show the title and buttons for available transitions
-    expect(screen.getByText(/cambiar estado/i)).toBeInTheDocument();
+  it('muestra sólo las transiciones permitidas', () => {
+    render(<TicketStatusUpdater ticket={ticket} onStatusUpdated={onStatusUpdated} />);
+
+    expect(screen.getByRole('button', { name: 'Pendiente' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'En proceso' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Cerrado' })).not.toBeInTheDocument();
   });
 
-  it('shows correct transitions based on current status', () => {
-    // Test initiated status
-    const initiatedTicket = { ...mockTicket, status: 'initiated' };
-    render(<TicketStatusUpdater ticket={initiatedTicket} onStatusChange={onStatusChange} />);
-    
-    expect(screen.getByRole('button', { name: /pending/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /process/i })).toBeInTheDocument();
+  it('envía new_status y actualiza el detalle', async () => {
+    mockedSupportApi.updateTicketStatus.mockResolvedValue({
+      ticket_id: 21,
+      old_status: 'iniciado',
+      new_status: 'pendiente',
+    });
+    render(<TicketStatusUpdater ticket={ticket} onStatusUpdated={onStatusUpdated} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Pendiente' }));
+
+    await waitFor(() => {
+      expect(mockedSupportApi.updateTicketStatus).toHaveBeenCalledWith(21, {
+        new_status: 'pendiente',
+      });
+    });
+    expect(onStatusUpdated).toHaveBeenCalledTimes(1);
   });
 
-  it('does not render when no transitions available', () => {
-    // Test closed status - should have no transitions
-    const closedTicket = { ...mockTicket, status: 'closed' };
-    render(<TicketStatusUpdater ticket={closedTicket} onStatusChange={onStatusChange} />);
-    
-    // Component should not be rendered (but we test this in a different way)
-    expect(true).toBe(true); // Placeholder - actual behavior would be to not show anything
+  it('no renderiza acciones para un ticket cerrado', () => {
+    const { container } = render(
+      <TicketStatusUpdater
+        ticket={{ ...ticket, status: 'cerrado' }}
+        onStatusUpdated={onStatusUpdated}
+      />,
+    );
+
+    expect(container).toBeEmptyDOMElement();
   });
 });

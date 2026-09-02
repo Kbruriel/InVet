@@ -1,6 +1,6 @@
 ---
 description: Implementa tareas backend InVet con FastAPI, SQLAlchemy 2.0, Alembic, Pytest y Clean Architecture.
-mode: all
+mode: primary
 permission:
   edit: allow
   bash:

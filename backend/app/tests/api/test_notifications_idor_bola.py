@@ -28,6 +28,7 @@ from app.infrastructure.database.session import get_db
 
 def _import_router():
     import app.api.v1.routers.notification_router as notif_router_mod
+
     return notif_router_mod, notif_router_mod.router
 
 
@@ -43,7 +44,6 @@ session_module.SessionLocal = sessionmaker(
 )
 TestingSessionLocal = session_module.SessionLocal
 Base.metadata.create_all(bind=test_engine)
-
 
 
 def _override_get_db():
@@ -125,7 +125,7 @@ def _seed():
         db.add_all([u1, u2])
         db.flush()
 
-                # Owner 1
+        # Owner 1
         o1 = OwnerModel(
             user_id=u1.id,
             first_name="Juan",
@@ -170,7 +170,7 @@ def _seed():
         n3 = NotificationModel(
             user_id=u2.id,
             clinic_id=c2.id,
-            event_type="CONVERSATION_STARTED", 
+            event_type="CONVERSATION_STARTED",
             subject="Nueva conversación",
             body="Tienes una nueva conversación",
             ref_type="conversation",
@@ -187,18 +187,20 @@ def _seed():
 def test_idor_bola_prevention_on_list(app_client):
     """C13: Listado por clinica A no fuga datos de clinica B."""
     u1, u2, c1, c2, n1_id, n2_id, n3_id = _seed()
-    
+
     # Simular que usuario 2 (de clinica 2) intenta acceder a notificaciones de clinica 1
-    app_client.app.dependency_overrides[auth_dep] = _override_auth(2, 2)  # Usuario 2 de clinica 2
-    
-    response = app_client.get(f"/api/v1/notifications?page=1&page_size=10")
-    
+    app_client.app.dependency_overrides[auth_dep] = _override_auth(
+        2, 2
+    )  # Usuario 2 de clinica 2
+
+    response = app_client.get("/api/v1/notifications?page=1&page_size=10")
+
     assert response.status_code == 200
     data = response.json()
-    
+
     # No debería ver notificaciones de otra clínica
     assert len(data["items"]) >= 0  # Puede ser 0 si no hay notificaciones propias
-    
+
     # Verificar que ninguna de las notificaciones sea de la otra clinica
     for item in data["items"]:
         if "user_id" in item:
@@ -209,15 +211,15 @@ def test_idor_bola_prevention_on_list(app_client):
 def test_idor_bola_prevention_on_mark_read(app_client):
     """C4: Marcación incorrecta por token (ID ajeno) devuelve 404 sin revelar existencia."""
     u1, u2, c1, c2, n1_id, n2_id, n3_id = _seed()
-    
+
     # Simular que usuario 2 intenta marcar la notificación del usuario 1
     app_client.app.dependency_overrides[auth_dep] = _override_auth(2, 2)  # Usuario 2
-    
+
     response = app_client.post(f"/api/v1/notifications/{n1_id}/read")
-    
+
     assert response.status_code == 404
     data = response.json()
-    
+
     # No debe revelar información sensibles de la notificación
     assert "id" not in str(data).lower()
     assert "detail" in data
@@ -226,30 +228,31 @@ def test_idor_bola_prevention_on_mark_read(app_client):
 def test_bola_prevention_on_unread_count(app_client):
     """Verifica protección BOLA en conteo de no leídas."""
     u1, u2, c1, c2, n1_id, n2_id, n3_id = _seed()
-    
+
     # Usuario 2 accede a su propio conteo (debe ser 1)
     app_client.app.dependency_overrides[auth_dep] = _override_auth(2, 2)  # Usuario 2
-    
-    response = app_client.get(f"/api/v1/notifications/count/unread")
-    
+
+    response = app_client.get("/api/v1/notifications/count/unread")
+
     assert response.status_code == 200
     data = response.json()
-    
+
     # Solo debe contar notificaciones propias (en este caso, la de usuario 2)
     # Si hay una no leída para el usuario 2, el conteo debe ser al menos 1
+
 
 def test_invalid_access_to_nonexistent_notification(app_client):
     """Verifica que acceso a notificación inexistente devuelva 404."""
     u1, u2, c1, c2, n1_id, n2_id, n3_id = _seed()
-    
+
     # Usuario 2 intenta acceder a notificación inexistente
     app_client.app.dependency_overrides[auth_dep] = _override_auth(2, 2)  # Usuario 2
-    
-    response = app_client.post(f"/api/v1/notifications/99999/read")
-    
+
+    response = app_client.post("/api/v1/notifications/99999/read")
+
     assert response.status_code == 404
     data = response.json()
-    
+
     # No debe revelar información sobre la existencia de esa notificación
     assert "detail" in data
 
@@ -257,16 +260,16 @@ def test_invalid_access_to_nonexistent_notification(app_client):
 def test_list_notifications_authorized_only_your_clinic(app_client):
     """Verifica que se liste solo notificaciones de la misma clínica."""
     _seed()
-    
+
     # Usuario 1 de clinica 1 listando (se debe devolver sus notificaciones)
     app_client.app.dependency_overrides[auth_dep] = _override_auth(1, 1)  # Usuario 1
-    
-    response = app_client.get(f"/api/v1/notifications?page=1&page_size=10")
-    
+
+    response = app_client.get("/api/v1/notifications?page=1&page_size=10")
+
     assert response.status_code == 200
     data = response.json()
-    
-    # Verificar que las notificaciones son de la clínica del usuario actual  
+
+    # Verificar que las notificaciones son de la clínica del usuario actual
     for item in data["items"]:
         if "clinic_id" in item:
             # Verificar que todas pertenecen a la clínica 1 (usuario 1)

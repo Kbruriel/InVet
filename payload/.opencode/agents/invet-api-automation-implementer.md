@@ -1,6 +1,6 @@
 ---
 description: Implementa automatizacion API con Playwright APIRequestContext para slices de InVet.
-mode: subagent
+mode: primary
 permission:
   edit: allow
   bash:

@@ -1,6 +1,7 @@
 ---
 description: Implementa hallazgos de revision y documenta el cierre de correcciones.
 agent: invet-findings-implementer
+subtask: false
 ---
 
 Implementa los hallazgos indicados por `$ARGUMENTS`.

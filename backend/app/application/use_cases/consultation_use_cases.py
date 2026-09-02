@@ -111,7 +111,9 @@ class CreateConsultationUseCase:
                 "Ya existe una consulta registrada para esta cita."
             )
 
-        resolved_branch_id = data.branch_id if data.branch_id is not None else appointment.branch_id
+        resolved_branch_id = (
+            data.branch_id if data.branch_id is not None else appointment.branch_id
+        )
         resolved_veterinarian_id = (
             data.veterinarian_id
             if data.veterinarian_id is not None

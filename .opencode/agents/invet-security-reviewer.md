@@ -1,6 +1,6 @@
 ---
 description: Revisa seguridad del slice identificado sin modificar producto.
-mode: subagent
+mode: primary
 permission:
   edit: allow
   bash:

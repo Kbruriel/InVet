@@ -1,6 +1,7 @@
 ---
 description: Ejecuta el gate final de release con el modelo seleccionado.
 agent: invet-final-reviewer
+subtask: false
 ---
 
 Ejecuta el gate final del slice indicado por `$ARGUMENTS`.

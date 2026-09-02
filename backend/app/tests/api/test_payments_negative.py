@@ -17,7 +17,6 @@ Los detalles HTTP deben coincidir con los mensajes publicos del dominio
 from __future__ import annotations
 
 from datetime import UTC, datetime
-
 from unittest.mock import AsyncMock
 
 import pytest
@@ -52,7 +51,9 @@ class TestCreatePaymentNegative:
     async def test_missing_service_returns_422_clear_message(
         self, payment_app: dict
     ) -> None:
-        payment_app["mock_service_repo"].get_service_by_id = AsyncMock(return_value=None)
+        payment_app["mock_service_repo"].get_service_by_id = AsyncMock(
+            return_value=None
+        )
         client = payment_app["client_factory"]()
         async with client:
             resp = await client.post("/api/v1/payments", json=PAYLOAD_OK)
@@ -81,7 +82,10 @@ class TestCreatePaymentNegative:
         async with client:
             resp = await client.post("/api/v1/payments", json=PAYLOAD_OK)
         assert resp.status_code == 422
-        assert resp.json()["detail"] == "Solo se puede registrar un pago con un servicio activo."
+        assert (
+            resp.json()["detail"]
+            == "Solo se puede registrar un pago con un servicio activo."
+        )
 
     @pytest.mark.asyncio
     async def test_cash_received_below_amount_returns_422_clear_message(

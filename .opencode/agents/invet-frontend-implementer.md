@@ -1,12 +1,14 @@
 ---
 description: Implementa tareas frontend InVet desde un contrato vertical validado.
-mode: all
+mode: primary
 permission:
   edit: allow
   bash:
     "*": ask
     "docker compose ps*": allow
     "docker compose logs*": allow
+    "docker compose build*": allow
+    "docker compose up*": allow
     "python backend/scripts/validate_slice_plan.py*": allow
     "python backend/scripts/manage_slice_task.py*": allow
     "npm run lint*": allow
@@ -42,6 +44,7 @@ Arquitectura:
 - `src/shared/layout`: shells publico y privado.
 - `src/shared/config`: environment y constantes.
 - Leer `docs/opencode/references/carryovers_governance.md` cuando la tarea venga de otro slice o haya sido postergada.
+- Leer `docs/opencode/references/docker_frontend_build_troubleshooting.md` ante cualquier fallo de lint, tipos o build Docker.
 
 Reglas:
 - Avanza de forma autonoma cuando plan, tareas y codigo den contexto suficiente.
@@ -66,6 +69,8 @@ Reglas:
 - Escribe comentarios, evidencias y outcomes en UTF-8; corrige mojibake como `Ã`, `Â` o `â` antes de cerrar.
 - Ejecuta comandos, pruebas y lectura de logs directamente; no inicies subagentes ni delegues a otro LLM.
 - Trabaja una tarea atomica a la vez desde el manifiesto compacto y guarda su checkpoint antes de continuar.
+- No declares un error preexistente o ajeno al slice sin una linea base o historial reproducible. Si el build limpio reporta un error en un entregable de la tarea, la tarea sigue incompleta.
+- Separa errores bloqueantes, advertencias no bloqueantes y caches generadas; conserva el comando, codigo de salida y ruta de cada hallazgo.
 
 Alineacion visual:
 - Aplica `docs/opencode/references/frontend_visual_alignment.md`.
@@ -90,6 +95,8 @@ Al implementar `FE-00X`:
 
 Contexto Docker:
 - El repo incluye `docker-compose.yml` con `db`, `backend` y `frontend`.
+- Antes de cerrar trabajo frontend, ejecuta `docker compose build --no-cache frontend`; una corrida local no reemplaza esta construccion limpia.
 - Si el slice necesita validar el runtime o build en contenedor, usa el servicio `frontend`.
 - Si la tarea frontend depende de la API y la persistencia, levanta `db` y `backend` y documenta el comando exacto usado.
 - No consideres equivalente una corrida local si el criterio o el plan piden validacion con Docker.
+- Si el typecheck local falla solo dentro de `.next` pero el builder limpio pasa, clasificalo como cache local, aplica la limpieza segura de la guia y reporta la distincion.

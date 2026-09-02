@@ -18,6 +18,7 @@ from app.infrastructure.database.models.payment import Payment as PaymentModel
 
 def _domain_from_model(model: PaymentModel) -> Payment:
     """Convierte un modelo ORM a entidad de dominio."""
+
     def _v(val: object) -> str:
         return getattr(val, "value", val)
 
@@ -48,9 +49,7 @@ class PaymentRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_by_id(
-        self, payment_id: int, clinic_id: int
-    ) -> Payment | None:
+    async def get_by_id(self, payment_id: int, clinic_id: int) -> Payment | None:
         """Obtener pago por ID con aislamiento de tenant (clinic_id)."""
         pass
 
@@ -100,9 +99,7 @@ class PaymentRepositoryImpl(PaymentRepository):
         self.db.refresh(model)
         return _domain_from_model(model)
 
-    async def get_by_id(
-        self, payment_id: int, clinic_id: int
-    ) -> Payment | None:
+    async def get_by_id(self, payment_id: int, clinic_id: int) -> Payment | None:
         """Obtener pago por ID y clinic_id (tenant isolation)."""
         stmt = (
             select(PaymentModel)
@@ -125,13 +122,9 @@ class PaymentRepositoryImpl(PaymentRepository):
         page_size: int = 20,
     ) -> tuple[list[Payment], int]:
         """Listar pagos por tenant con filtros opcionales y paginacion."""
-        base_stmt = select(PaymentModel).where(
-            PaymentModel.clinic_id == clinic_id
-        )
+        base_stmt = select(PaymentModel).where(PaymentModel.clinic_id == clinic_id)
         if appointment_id is not None:
-            base_stmt = base_stmt.where(
-                PaymentModel.appointment_id == appointment_id
-            )
+            base_stmt = base_stmt.where(PaymentModel.appointment_id == appointment_id)
         if from_date is not None:
             base_stmt = base_stmt.where(PaymentModel.paid_at >= from_date)
         if to_date is not None:
@@ -140,9 +133,7 @@ class PaymentRepositoryImpl(PaymentRepository):
             base_stmt = base_stmt.where(PaymentModel.status == status.value)
         base_stmt = base_stmt.order_by(PaymentModel.id.desc())
 
-        count_stmt = select(func.count()).select_from(
-            base_stmt.subquery()
-        )
+        count_stmt = select(func.count()).select_from(base_stmt.subquery())
         total = self.db.execute(count_stmt).scalar() or 0
 
         offset = (page - 1) * page_size

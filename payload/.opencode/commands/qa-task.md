@@ -1,6 +1,7 @@
 ---
 description: Ejecuta QA funcional y tecnico para una tarea QA InVet con evidencia reproducible y gates objetivos.
 agent: invet-qa-validator
+subtask: false
 ---
 
 Valida la tarea QA indicada por `$ARGUMENTS`.

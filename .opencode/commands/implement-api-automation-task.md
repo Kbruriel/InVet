@@ -1,6 +1,7 @@
 ---
 description: Implementa automatizacion API para un slice InVet.
 agent: invet-api-automation-implementer
+subtask: false
 ---
 
 Implementa la automatizacion API del slice indicado por `$ARGUMENTS`.

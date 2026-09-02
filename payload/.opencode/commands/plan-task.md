@@ -1,6 +1,7 @@
 ---
 description: Planifica un slice vertical InVet desde un ID BE, FE o QA.
 agent: invet-product-planner
+subtask: false
 ---
 
 Planifica el slice indicado por `$ARGUMENTS`.

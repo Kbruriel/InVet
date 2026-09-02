@@ -141,11 +141,7 @@ def _manifest_lines(
     source = _source_for_layer(repo_root, ids.index, layer)
     plan = repo_root / "docs/opencode/plans" / f"{ids.backend}-plan.md"
     allowlist = sorted(
-        {
-            path
-            for task in tasks
-            for path in _paths_from_deliverables(repo_root, task)
-        }
+        {path for task in tasks for path in _paths_from_deliverables(repo_root, task)}
         | set(_operational_paths(ids.backend, layer))
     )
     docker_controls: list[str] = []
@@ -168,7 +164,7 @@ def _manifest_lines(
     lines = [
         "---",
         "manifest_version: 1",
-        f"slice: \"{ids.index}\"",
+        f'slice: "{ids.index}"',
         f"layer: {layer}",
         f"generated_at: {_now()}",
         f"source_plan: docs/opencode/plans/{ids.backend}-plan.md",
@@ -499,7 +495,10 @@ def finish_task(  # noqa: C901
             errors.append(f"Archivo fuera de Entregables/allowlist: {path}")
     deleted_files = sorted(path for path in baseline if path not in current)
     if deleted_files and not deletion_justification:
-        errors.append("Archivos existentes eliminados sin justificacion: " + ", ".join(deleted_files))
+        errors.append(
+            "Archivos existentes eliminados sin justificacion: "
+            + ", ".join(deleted_files)
+        )
     removed: dict[str, list[str]] = {}
     for path, before in runtime.get("baseline_contents", {}).items():
         current_path = repo_root / path
@@ -528,14 +527,16 @@ def finish_task(  # noqa: C901
     elif outcome == "blocked":
         errors.append("La tarea quedo bloqueada por entorno, dependencia o permiso.")
 
-    checkpoint_path = _checkpoint_path(
-        repo_root, runtime["slice"], runtime["layer"]
+    checkpoint_path = _checkpoint_path(repo_root, runtime["slice"], runtime["layer"])
+    checkpoint = (
+        _read_json(checkpoint_path)
+        if checkpoint_path.exists()
+        else {
+            "slice": runtime["slice"],
+            "layer": runtime["layer"],
+            "tasks": {},
+        }
     )
-    checkpoint = _read_json(checkpoint_path) if checkpoint_path.exists() else {
-        "slice": runtime["slice"],
-        "layer": runtime["layer"],
-        "tasks": {},
-    }
     if not errors:
         final_state = "completed"
     elif outcome == "blocked":
@@ -566,7 +567,9 @@ def finish_task(  # noqa: C901
 
 def main() -> int:  # noqa: C901
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--repo-root", type=Path, default=Path(__file__).resolve().parents[2])
+    parser.add_argument(
+        "--repo-root", type=Path, default=Path(__file__).resolve().parents[2]
+    )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     manifest = subparsers.add_parser("manifest")
@@ -601,14 +604,18 @@ def main() -> int:  # noqa: C901
             paths = generate_manifests(repo_root, args.slice_id, args.layer)
             for path in paths:
                 line_count = len(path.read_text(encoding="utf-8").splitlines())
-                print(f"[MANIFIESTO] {path.relative_to(repo_root)} ({line_count} lineas)")
+                print(
+                    f"[MANIFIESTO] {path.relative_to(repo_root)} ({line_count} lineas)"
+                )
         elif args.command == "verify":
             errors = verify_manifests(repo_root, args.slice_id, args.layer)
             if errors:
                 for error in errors:
                     print(f"[ERROR] {error}")
                 return 1
-            print(f"[PASS] manifiestos coherentes para {normalize_slice_id(args.slice_id).backend}")
+            print(
+                f"[PASS] manifiestos coherentes para {normalize_slice_id(args.slice_id).backend}"
+            )
         elif args.command == "start":
             runtime = start_task(repo_root, args.slice_id, args.task)
             print(f"[ESTADO] {runtime['state_label']} | {runtime['task']}")

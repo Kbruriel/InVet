@@ -1,5 +1,6 @@
 """Verify migration coherence against ORM model and chain."""
-import ast, re, sys
+import ast
+import re
 
 # 1. Syntax check
 code = open(r'backend/alembic/versions/a013_notifications.py', encoding='utf-8').read()

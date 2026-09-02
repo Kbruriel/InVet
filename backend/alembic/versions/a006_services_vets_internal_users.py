@@ -4,6 +4,7 @@ Revision ID: a006_services_vets_internal_users
 Revises:
 Create Date: 2026-08-08
 """
+
 import sqlalchemy as sa
 
 from alembic import op

@@ -28,6 +28,7 @@ from app.infrastructure.database.session import get_db
 
 def _import_router():
     import app.api.v1.routers.notification_router as notif_router_mod
+
     return notif_router_mod, notif_router_mod.router
 
 
@@ -43,7 +44,6 @@ session_module.SessionLocal = sessionmaker(
 )
 TestingSessionLocal = session_module.SessionLocal
 Base.metadata.create_all(bind=test_engine)
-
 
 
 def _override_get_db():
@@ -125,7 +125,7 @@ def _seed():
         db.add_all([u1, u2])
         db.flush()
 
-                # Owner 1
+        # Owner 1
         o1 = OwnerModel(
             user_id=u1.id,
             first_name="Juan",
@@ -170,7 +170,7 @@ def _seed():
         n3 = NotificationModel(
             user_id=u2.id,
             clinic_id=c2.id,
-            event_type="CONVERSATION_STARTED", 
+            event_type="CONVERSATION_STARTED",
             subject="Nueva conversación",
             body="Tienes una nueva conversación",
             ref_type="conversation",
@@ -187,9 +187,9 @@ def _seed():
 def test_mark_all_notifications_as_read_success(app_client):
     """C6: Marcación masiva devuelve 200 con count actualizado."""
     u1, u2, c1, c2, n1_id, n2_id, n3_id = _seed()
-    
-    response = app_client.post(f"/api/v1/notifications/read-all")
-    
+
+    response = app_client.post("/api/v1/notifications/read-all")
+
     assert response.status_code == 200
     data = response.json()
     assert "read" in data
@@ -199,12 +199,12 @@ def test_mark_all_notifications_as_read_success(app_client):
 def test_mark_all_notifications_as_read_unauthorized(app_client):
     """C9: Sin token se devuelve 401."""
     u1, u2, c1, c2, n1_id, n2_id, n3_id = _seed()
-    
+
     # Desactivar autenticación
     app_client.app.dependency_overrides[auth_dep] = _override_auth(None, None)
-    
-    response = app_client.post(f"/api/v1/notifications/read-all")
-    
+
+    response = app_client.post("/api/v1/notifications/read-all")
+
     assert response.status_code == 401
     assert "detail" in response.json()
 
@@ -212,8 +212,8 @@ def test_mark_all_notifications_as_read_unauthorized(app_client):
 def test_mark_all_notifications_as_read_empty(app_client):
     """C6: Marcación masiva cuando no hay notificaciones."""
     # Usar una base de datos completamente nueva sin datos
-    response = app_client.post(f"/api/v1/notifications/read-all")
-    
+    response = app_client.post("/api/v1/notifications/read-all")
+
     assert response.status_code == 200
     data = response.json()
     assert data["read"] == 0
@@ -222,13 +222,13 @@ def test_mark_all_notifications_as_read_empty(app_client):
 def test_mark_all_notifications_as_read_counts_correctly(app_client):
     """Verifica que el count actualizado es correcto."""
     u1, u2, c1, c2, n1_id, n2_id, n3_id = _seed()
-    
+
     # Primero verificamos que hay notificaciones leídas y no leídas
-    list_response = app_client.get(f"/api/v1/notifications?page=1&page_size=10")
+    list_response = app_client.get("/api/v1/notifications?page=1&page_size=10")
     data = list_response.json()
     assert len(data["items"]) >= 1
-    
+
     # Marcar todas como leídas
-    mark_all_response = app_client.post(f"/api/v1/notifications/read-all")
-    
+    mark_all_response = app_client.post("/api/v1/notifications/read-all")
+
     assert mark_all_response.status_code == 200

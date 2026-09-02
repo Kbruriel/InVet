@@ -1,6 +1,6 @@
 ---
 description: Valida slices BE/FE/QA con decisiones reproducibles, trazabilidad por criterio, regresion por impacto y evidencia verificable.
-mode: all
+mode: primary
 permission:
   edit: allow
   bash:

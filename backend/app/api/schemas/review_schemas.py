@@ -18,7 +18,9 @@ class ReviewCreate(BaseModel):
     appointment_id: int = Field(..., gt=0, description="ID de la cita calificada")
     rating: int = Field(..., ge=1, le=5, description="Puntuación de 1 a 5 estrellas")
     comment: str | None = Field(
-        None, max_length=2048, description="Comentario opcional (máximo 2048 caracteres)"
+        None,
+        max_length=2048,
+        description="Comentario opcional (máximo 2048 caracteres)",
     )
 
 
@@ -56,7 +58,9 @@ class ReviewRead(BaseModel):
 class ReviewRespond(BaseModel):
     """Schema para responder una reseña (respuesta única por reseña)."""
 
-    body: str = Field(..., min_length=1, max_length=2048, description="Cuerpo de la respuesta")
+    body: str = Field(
+        ..., min_length=1, max_length=2048, description="Cuerpo de la respuesta"
+    )
 
 
 class ReviewListMeta(BaseModel):

@@ -4,7 +4,10 @@ Use these compact rules whenever GitHub Copilot works in this repository.
 
 ## Runtime model
 
+- `docs/opencode/agent_registry.json` is the canonical inventory and command-to-profile map for OpenCode and GitHub Copilot.
 - The model selected by the user performs every phase. Do not call `runSubagent`, delegate to another agent, or invoke another LLM.
+- In a complete slice run, `InVet Orchestrator` stays active for every phase and applies the corresponding phase contract directly. In a manual phase run, the matching prompt selects its specialized profile.
+- OpenCode permission parity is semantic in GitHub Copilot: the GitHub profiles expose only `read`, `search`, `edit`, and `execute`, omit any agent/delegation tool, and enforce command restrictions through their written contracts.
 - Execute commands, tests, validators, status, diff, and log reads directly with the current model.
 - Safe read-only checks, tests, lint, and validators may run without confirmation. Require confirmation for applied migrations, commits, pushes, destructive operations, or external side effects.
 - Show state changes as `leyendo`, `editando`, `ejecutando pruebas`, `esperando permiso`, or `generacion cancelada`.

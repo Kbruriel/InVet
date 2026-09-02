@@ -65,6 +65,12 @@ La secuencia manual equivalente es:
 
 ## Reglas
 
+0. En Windows PowerShell 5.1 no encadenes comandos con `&&`: configura el
+   directorio de trabajo `C:\InVet` directamente en la herramienta y ejecuta
+   cada comando por separado. Para fail-fast usa
+   `if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }`. Esta regla aplica a todos
+   los agentes y especialmente a los gates de review.
+
 1. `plan-task` acepta `BE-00X`, `FE-00X` o `QA-00X`, informa la normalizacion y conserva el mismo indice vertical.
 2. `plan-task` genera un unico `docs/opencode/plans/BE-00X-plan.md` schema v3 con contrato frontend, trazabilidad, Docker, UTF-8 y tareas atomicas.
    Nunca implementa codigo de backend ni frontend.

@@ -1,6 +1,6 @@
 ---
 description: Revisa el plan y la implementacion de un slice BE/FE/QA.
-mode: all
+mode: primary
 permission:
   edit: allow
   bash:

@@ -18,15 +18,20 @@ from app.core.security import get_current_access_user
 from app.data.payment_repo import PaymentRepository
 from app.domain.entities.payment import PaymentStatus
 from app.domain.repositories.appointment_repository import AppointmentRepository
-from app.domain.repositories.slice006_repositories import InternalUserRepository, ServiceRepository
+from app.domain.repositories.slice006_repositories import (
+    InternalUserRepository,
+    ServiceRepository,
+)
 from app.infrastructure.database.repositories.appointment_repository_impl import (
     AppointmentRepositoryImpl,
 )
-from app.infrastructure.database.repositories.factory import get_internal_user_repo as _factory_internal_user
+from app.infrastructure.database.repositories.factory import (
+    get_internal_user_repo as _factory_internal_user,
+)
 from app.infrastructure.database.repositories.service_repository_impl import (
     ServiceRepositoryImpl,
 )
-from app.services.payment_service import PaymentService, PaymentError
+from app.services.payment_service import PaymentError, PaymentService
 
 router = APIRouter(prefix="/payments", tags=["payments"])
 
@@ -51,7 +56,9 @@ def get_payment_repo(db: Session = Depends(get_current_db)) -> PaymentRepository
     return PaymentRepositoryImpl(db)
 
 
-def get_appointment_repo(db: Session = Depends(get_current_db)) -> AppointmentRepository:
+def get_appointment_repo(
+    db: Session = Depends(get_current_db),
+) -> AppointmentRepository:
     """Repositorio de citas (para validacion en el use case de creacion)."""
     return AppointmentRepositoryImpl(db)
 
@@ -151,7 +158,7 @@ async def create_payment(
     try:
         result = await use_case.execute(clinic_id=clinic_id, data=domain_data)
     except (
-        PaymentError,
+        PaymentError
     ) as exc:  # AppointmentNotFoundError / ServiceNotFoundError / ServiceInactiveError / InvalidCashPaymentError
         raise HTTPException(status_code=exc.status_code, detail=exc.message) from None
 
@@ -160,7 +167,11 @@ async def create_payment(
 
     event_type = None
     if result and result.status:
-        status_val = result.status.value if hasattr(result.status, "value") else str(result.status)
+        status_val = (
+            result.status.value
+            if hasattr(result.status, "value")
+            else str(result.status)
+        )
         if status_val == "paid":
             event_type = "payment_completed"
         elif status_val == "cancelled":
@@ -171,6 +182,7 @@ async def create_payment(
             from app.infrastructure.database.models.appointment import (
                 Appointment as AppointmentModel,
             )
+            from app.infrastructure.database.models.owner import Owner
 
             appt = (
                 db.query(AppointmentModel)
@@ -182,7 +194,7 @@ async def create_payment(
             owner_user_id = None
             owner_email = None
             if pet_obj:
-                owner = db.query(OwnerModel).filter(OwnerModel.id == pet_obj.owner_id).first()
+                owner = db.query(Owner).filter(Owner.id == pet_obj.owner_id).first()
                 if owner:
                     owner_user_id = int(owner.user_id)
                     owner_email = owner.email
@@ -241,9 +253,7 @@ async def get_payment(
 )
 async def list_payments(
     page: int = Query(1, ge=1, description="Número de página"),
-    page_size: int = Query(
-        20, ge=1, le=100, description="Tamaño de página"
-    ),
+    page_size: int = Query(20, ge=1, le=100, description="Tamaño de página"),
     appointment_id: int | None = Query(
         None, gt=0, description="Filtrar por cita (opcional)"
     ),

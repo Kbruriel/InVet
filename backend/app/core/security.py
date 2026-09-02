@@ -136,9 +136,7 @@ def get_current_access_user(
                 headers={"WWW-Authenticate": "Bearer"},
             )
 
-    role = payload.get("role") or (
-        "admin" if db_user and db_user.is_admin else "user"
-    )
+    role = payload.get("role") or ("admin" if db_user and db_user.is_admin else "user")
     current_user: dict[str, Any] = {
         "id": user_id,
         "user_id": user_id,

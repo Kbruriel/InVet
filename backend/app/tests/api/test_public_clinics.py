@@ -59,9 +59,9 @@ async def async_app(mock_use_case):
     def mock_get_use_case():
         return mock_use_case
 
-    app.dependency_overrides[
-        pub_clinics_mod.get_public_clinic_list_use_case
-    ] = mock_get_use_case
+    app.dependency_overrides[pub_clinics_mod.get_public_clinic_list_use_case] = (
+        mock_get_use_case
+    )
 
     yield app
 
@@ -147,9 +147,9 @@ class TestGetClinica:
         def mock_get_use_case():
             return mock_use_case
 
-        app.dependency_overrides[
-            pub_clinics_mod.get_public_clinic_list_use_case
-        ] = mock_get_use_case
+        app.dependency_overrides[pub_clinics_mod.get_public_clinic_list_use_case] = (
+            mock_get_use_case
+        )
 
         async with httpx.AsyncClient(
             transport=httpx.ASGITransport(app=app), base_url="http://test"

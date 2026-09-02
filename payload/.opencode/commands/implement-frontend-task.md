@@ -1,6 +1,7 @@
 ---
 description: Implementa la responsabilidad frontend de un slice InVet.
 agent: invet-frontend-implementer
+subtask: false
 ---
 
 Implementa la tarea frontend indicada por `$ARGUMENTS`.
@@ -34,13 +35,18 @@ Instrucciones:
 16. Agrega pruebas unitarias o de componente para todo archivo productivo nuevo o modificado y pruebas de integracion cuando el flujo lo requiera.
 17. No delegues a QA las pruebas unitarias frontend.
 18. No agregues checkout, productos, marketplace, inventario ni facturacion.
-19. Marca `- [x]` solo tras ejecutar `Validacion`; reemplaza `Evidencia: pending` con archivos, comandos y resultado.
-20. Si una tarea no se completa, conserva `- [ ]`, `Evidencia: pending` y documenta el bloqueo.
-21. Resume tareas completadas, rutas, componentes, contratos y pruebas ejecutadas.
-22. Escribe comentarios, evidencias y outcomes en UTF-8. Corrige mojibake como `Ã`, `Â` o `â` antes de cerrar.
+19. Ante un fallo de lint, tipos o Docker, aplica `docs/opencode/references/docker_frontend_build_troubleshooting.md`.
+   - Reproduce con `docker compose build --no-cache frontend` y conserva el primer error bloqueante.
+   - No declares un error preexistente o ajeno sin linea base o historial reproducible. Un error del build limpio en un entregable del slice mantiene la tarea incompleta.
+   - Reporta por separado errores, advertencias y cache generada; no elimines funcionalidad requerida ni conviertas pruebas en placeholders para obtener un build verde.
+20. Marca `- [x]` solo tras ejecutar `Validacion`; reemplaza `Evidencia: pending` con archivos, comandos y resultado.
+21. Si una tarea no se completa, conserva `- [ ]`, `Evidencia: pending` y documenta el bloqueo.
+22. Resume tareas completadas, rutas, componentes, contratos y pruebas ejecutadas.
+23. Escribe comentarios, evidencias y outcomes en UTF-8. Corrige mojibake como `Ã`, `Â` o `â` antes de cerrar.
 
 Hook de cierre:
-- Si Docker Compose esta disponible y el usuario no pidió omitirlo, ejecutar `docker compose up -d --build --force-recreate db backend frontend`.
+- Si Docker Compose esta disponible y el usuario no pidió omitirlo, ejecutar primero `docker compose build --no-cache frontend`.
+- Solo tras un build limpio exitoso, ejecutar `docker compose up -d --build --force-recreate db backend frontend` cuando el slice requiera integración en ejecución.
 - Si Docker Compose no esta disponible, registrar el skip con la causa exacta.
 Cierre obligatorio:
 - Al cerrar, reporta siempre Siguiente paso recomendado con el comando exacto segun el estado final del gate.

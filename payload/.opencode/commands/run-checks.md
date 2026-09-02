@@ -1,6 +1,7 @@
 ---
 description: Ejecuta checks backend/frontend disponibles, corrige fallos si se solicita y resume resultados.
 agent: invet-check-runner
+subtask: false
 ---
 
 Ejecuta los checks tecnicos disponibles del repositorio y reporta pass/fail/skipped.

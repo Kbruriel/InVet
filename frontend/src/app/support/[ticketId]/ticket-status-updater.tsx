@@ -1,91 +1,87 @@
 'use client';
 
 import { useState } from 'react';
-import { supportApi, SupportTicket } from '@/shared/api/support';
-import { Button } from '@/shared/ui/button';
+
+import { Button } from '@/shared/ui/components/Button';
+import {
+  supportApi,
+  type SupportTicket,
+  type TicketStatus,
+} from '@/shared/api/support';
+
+const STATUS_TRANSITIONS: Record<TicketStatus, readonly TicketStatus[]> = {
+  iniciado: ['pendiente', 'proceso'],
+  pendiente: ['proceso'],
+  proceso: ['completado', 'cerrado'],
+  completado: [],
+  cerrado: [],
+};
+
+const STATUS_LABELS: Record<TicketStatus, string> = {
+  iniciado: 'Iniciado',
+  pendiente: 'Pendiente',
+  proceso: 'En proceso',
+  completado: 'Completado',
+  cerrado: 'Cerrado',
+};
 
 interface TicketStatusUpdaterProps {
   ticket: SupportTicket;
-  onStatusChange?: () => void;
+  onStatusUpdated: () => void | Promise<void>;
 }
 
-export function TicketStatusUpdater({ ticket, onStatusChange }: TicketStatusUpdaterProps) {
-  const [isSubmitting, setIsSubmitting] = useState(false);
+export function TicketStatusUpdater({
+  ticket,
+  onStatusUpdated,
+}: TicketStatusUpdaterProps) {
+  const [isUpdating, setIsUpdating] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const availableStatuses = STATUS_TRANSITIONS[ticket.status];
 
-  // Define allowed transitions for each status
-  const getAvailableTransitions = () => {
-    switch (ticket.status) {
-      case 'initiated':
-        return ['pending', 'process'];
-      case 'pending':
-        return ['process', 'completed', 'closed'];
-      case 'process':
-        return ['completed', 'closed'];
-      case 'completed':
-        return ['closed'];
-      case 'closed':
-        return [];
-      default:
-        return [];
-    }
-  };
-
-  const availableTransitions = getAvailableTransitions();
-  
-  const handleStatusChange = async (newStatus: string) => {
-    if (!availableTransitions.includes(newStatus)) {
+  async function updateStatus(newStatus: TicketStatus) {
+    if (!availableStatuses.includes(newStatus)) {
       return;
     }
 
-    setIsSubmitting(true);
+    setIsUpdating(true);
     setError(null);
 
     try {
-      await supportApi.updateTicketStatus(ticket.id, { status: newStatus as any });
-      onStatusChange?.();
-    } catch (err) {
-      setError('Error al actualizar el estado del ticket. Por favor, inténtelo de nuevo.');
-      console.error(err);
+      await supportApi.updateTicketStatus(ticket.id, { new_status: newStatus });
+      await onStatusUpdated();
+    } catch {
+      setError('No fue posible actualizar el estado del ticket.');
     } finally {
-      setIsSubmitting(false);
+      setIsUpdating(false);
     }
-  };
+  }
 
-  if (availableTransitions.length === 0) {
+  if (availableStatuses.length === 0) {
     return null;
   }
 
   return (
-    <div className="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden mt-6">
-      <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-        <h2 className="text-lg font-medium text-gray-900">Cambiar estado</h2>
+    <section aria-labelledby="ticket-status-actions">
+      <h2 id="ticket-status-actions" className="text-lg font-semibold">
+        Cambiar estado
+      </h2>
+      <div className="mt-3 flex flex-wrap gap-2">
+        {availableStatuses.map((status) => (
+          <Button
+            key={status}
+            type="button"
+            disabled={isUpdating}
+            onClick={() => void updateStatus(status)}
+          >
+            {STATUS_LABELS[status]}
+          </Button>
+        ))}
       </div>
-      <div className="p-6">
-        <p className="text-sm text-gray-600 mb-4">
-          Seleccione una transición válida para actualizar el estado del ticket.
+      {error ? (
+        <p className="mt-3 text-sm text-red-600" role="alert">
+          {error}
         </p>
-        
-        {error && (
-          <div className="rounded-md bg-red-50 p-4 mb-4">
-            <p className="text-sm text-red-700">{error}</p>
-          </div>
-        )}
-
-        <div className="flex flex-wrap gap-2">
-          {availableTransitions.map((transition) => (
-            <Button
-              key={transition}
-              onClick={() => handleStatusChange(transition)}
-              disabled={isSubmitting}
-              variant="outline"
-              size="sm"
-            >
-              {transition}
-            </Button>
-          ))}
-        </div>
-      </div>
-    </div>
+      ) : null}
+    </section>
   );
 }

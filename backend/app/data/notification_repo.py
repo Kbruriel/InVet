@@ -13,7 +13,9 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.domain.entities.notification import Notification
-from app.infrastructure.database.models.notification import Notification as NotificationModel
+from app.infrastructure.database.models.notification import (
+    Notification as NotificationModel,
+)
 
 
 def _domain_from_model(model: NotificationModel) -> Notification:
@@ -73,14 +75,14 @@ class NotificationRepository(ABC):
         ...
 
     @abstractmethod
-    async def mark_read(self, notification_id: int, user_id: int) -> Notification | None:
+    async def mark_read(
+        self, notification_id: int, user_id: int
+    ) -> Notification | None:
         """Marcar una notificacion como leida si el usuario es el receptor."""
         ...
 
     @abstractmethod
-    async def mark_all_read(
-        self, user_id: int, clinic_id: int
-    ) -> int:
+    async def mark_all_read(self, user_id: int, clinic_id: int) -> int:
         """Marcar todas las no leidas de un usuario como leidas. Devuelve count actualizado."""
         ...
 
@@ -116,7 +118,9 @@ class NotificationRepositoryImpl(NotificationRepository):
         # Verificacion previa por clave de dedup para devolver None sin ejecutar
         # rollback sobre la transaccion del llamador: un integridad error aqui
         # abortaria el unit of work completo (p. ej. alta de cita + notificacion).
-        existing = await self.get_notification_for_user_key(user_id, event_type, ref_type, ref_id)
+        existing = await self.get_notification_for_user_key(
+            user_id, event_type, ref_type, ref_id
+        )
         if existing is not None:
             return None
         model = NotificationModel(
@@ -156,7 +160,9 @@ class NotificationRepositoryImpl(NotificationRepository):
         )
 
         if unread_only:
-            base_stmt = base_stmt.where(NotificationModel.is_read == False)  # noqa: E712
+            base_stmt = base_stmt.where(
+                NotificationModel.is_read == False
+            )  # noqa: E712
 
         total_stmt = select(func.count()).select_from(base_stmt.subquery())
         total = self.db.execute(total_stmt).scalar() or 0
@@ -182,7 +188,9 @@ class NotificationRepositoryImpl(NotificationRepository):
             return None
         return _domain_from_model(result)
 
-    async def mark_read(self, notification_id: int, user_id: int) -> Notification | None:
+    async def mark_read(
+        self, notification_id: int, user_id: int
+    ) -> Notification | None:
         """Marcar una notificacion como leida si el usuario es el receptor."""
         stmt = (
             select(NotificationModel)
@@ -198,9 +206,7 @@ class NotificationRepositoryImpl(NotificationRepository):
         self.db.refresh(model)
         return _domain_from_model(model)
 
-    async def mark_all_read(
-        self, user_id: int, clinic_id: int
-    ) -> int:
+    async def mark_all_read(self, user_id: int, clinic_id: int) -> int:
         """Marcar todas las no leidas de un usuario como leidas. Retorna count actualizado."""
         stmt = select(NotificationModel).where(
             NotificationModel.user_id == user_id,

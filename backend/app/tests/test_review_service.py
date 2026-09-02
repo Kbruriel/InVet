@@ -11,6 +11,9 @@ from unittest.mock import AsyncMock
 import pytest
 
 from app.application.use_cases.review import (
+    ReviewDuplicateError as ReviewCreateDuplicateError,
+)
+from app.application.use_cases.review import (
     ReviewError,
     ReviewNotAuthorizedError,
     ReviewNotCompletedError,
@@ -18,7 +21,6 @@ from app.application.use_cases.review import (
     ReviewRespondDuplicateError,
     ReviewRespondForbiddenError,
     ReviewRespondNotFoundError,
-    ReviewDuplicateError as ReviewCreateDuplicateError,
     ReviewService,
 )
 from app.domain.entities.appointment import (
@@ -148,7 +150,9 @@ async def test_create_appointment_not_completed_raises_422(
     )
 
     with pytest.raises(ReviewNotCompletedError) as exc:
-        await service.create(ReviewCreate(appointment_id=1, rating=5, comment=None), _owner_user())
+        await service.create(
+            ReviewCreate(appointment_id=1, rating=5, comment=None), _owner_user()
+        )
 
     assert exc.value.status_code == 422
     appointment_repo.get_by_id.assert_awaited_once()
@@ -159,39 +163,53 @@ async def test_create_appointment_missing_raises_422(appointment_repo, service) 
     appointment_repo.get_by_id = AsyncMock(return_value=None)
 
     with pytest.raises(ReviewNotCompletedError) as excinfo:
-        await service.create(ReviewCreate(appointment_id=1, rating=5, comment=None), _owner_user())
+        await service.create(
+            ReviewCreate(appointment_id=1, rating=5, comment=None), _owner_user()
+        )
 
     assert excinfo.value.status_code == 422
 
 
 @pytest.mark.asyncio
-async def test_create_not_owner_raises_403(review_repo, appointment_repo, service) -> None:
+async def test_create_not_owner_raises_403(
+    review_repo, appointment_repo, service
+) -> None:
     appointment_repo.get_by_id = AsyncMock(return_value=_appointment())
     review_repo.get_owner_id_by_user = AsyncMock(return_value=999)
 
     with pytest.raises(ReviewNotAuthorizedError) as exc:
-        await service.create(ReviewCreate(appointment_id=1, rating=5, comment=None), _owner_user())
+        await service.create(
+            ReviewCreate(appointment_id=1, rating=5, comment=None), _owner_user()
+        )
 
     assert exc.value.status_code == 403
 
 
 @pytest.mark.asyncio
-async def test_create_ownerless_user_raises_403(review_repo, appointment_repo, service) -> None:
+async def test_create_ownerless_user_raises_403(
+    review_repo, appointment_repo, service
+) -> None:
     appointment_repo.get_by_id = AsyncMock(return_value=_appointment())
     review_repo.get_owner_id_by_user = AsyncMock(return_value=None)
 
     with pytest.raises(ReviewNotAuthorizedError):
-        await service.create(ReviewCreate(appointment_id=1, rating=5, comment=None), _owner_user())
+        await service.create(
+            ReviewCreate(appointment_id=1, rating=5, comment=None), _owner_user()
+        )
 
 
 @pytest.mark.asyncio
-async def test_create_duplicate_raises_409(review_repo, appointment_repo, service) -> None:
+async def test_create_duplicate_raises_409(
+    review_repo, appointment_repo, service
+) -> None:
     appointment_repo.get_by_id = AsyncMock(return_value=_appointment())
     review_repo.get_owner_id_by_user = AsyncMock(return_value=OWNER)
     review_repo.exists_by_appointment = AsyncMock(return_value=True)
 
     with pytest.raises(ReviewCreateDuplicateError) as exc:
-        await service.create(ReviewCreate(appointment_id=1, rating=5, comment=None), _owner_user())
+        await service.create(
+            ReviewCreate(appointment_id=1, rating=5, comment=None), _owner_user()
+        )
 
     assert exc.value.status_code == 409
     review_repo.create.assert_not_awaited()
@@ -244,9 +262,7 @@ async def test_respond_missing_review_404(review_repo, service) -> None:
     review_repo.get_by_id = AsyncMock(return_value=None)
 
     with pytest.raises(ReviewRespondNotFoundError) as exc:
-        await service.respond(
-            10, ReviewRespond(body="Respuesta"), _owner_user("staff")
-        )
+        await service.respond(10, ReviewRespond(body="Respuesta"), _owner_user("staff"))
 
     assert exc.value.status_code == 404
     review_repo.create_response.assert_not_awaited()
@@ -259,9 +275,7 @@ async def test_respond_duplicate_409(review_repo, service) -> None:
     )
 
     with pytest.raises(ReviewRespondDuplicateError) as exc:
-        await service.respond(
-            10, ReviewRespond(body="Respuesta"), _owner_user("admin")
-        )
+        await service.respond(10, ReviewRespond(body="Respuesta"), _owner_user("admin"))
 
     assert exc.value.status_code == 409
     review_repo.create_response.assert_not_awaited()
@@ -299,7 +313,9 @@ async def test_list_public_delegates(review_repo, service) -> None:
 
     assert total == 2
     assert [i.id for i in items] == [10, 11]
-    review_repo.list_by_branch.assert_awaited_once_with(branch_id=1, page=2, page_size=10)
+    review_repo.list_by_branch.assert_awaited_once_with(
+        branch_id=1, page=2, page_size=10
+    )
 
 
 @pytest.mark.asyncio
@@ -313,4 +329,3 @@ async def test_list_clinical_delegates(review_repo, service) -> None:
     review_repo.list_by_clinic.assert_awaited_once_with(
         clinic_id=CLINIC, branch_id=2, page=1, page_size=5
     )
-

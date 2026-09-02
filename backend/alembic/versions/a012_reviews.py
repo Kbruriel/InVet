@@ -73,9 +73,7 @@ def upgrade() -> None:
     )
     op.create_index("ix_reviews_branch_id", "reviews", ["branch_id"])
     op.create_index("ix_reviews_clinic_id", "reviews", ["clinic_id"])
-    op.create_index(
-        "ix_reviews_created_at", "reviews", ["created_at"]
-    )
+    op.create_index("ix_reviews_created_at", "reviews", ["created_at"])
 
     op.create_table(
         "review_responses",

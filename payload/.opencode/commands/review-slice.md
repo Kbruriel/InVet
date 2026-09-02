@@ -1,6 +1,7 @@
 ---
 description: Revisa el plan y la implementacion de un slice BE/FE/QA.
 agent: invet-slice-reviewer
+subtask: false
 ---
 
 Revisa el slice indicado por `$ARGUMENTS`.

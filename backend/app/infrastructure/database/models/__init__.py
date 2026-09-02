@@ -25,6 +25,11 @@ from app.infrastructure.database.models.rating_summary import RatingSummary
 from app.infrastructure.database.models.review import Review, ReviewResponse
 from app.infrastructure.database.models.service_model import Service
 from app.infrastructure.database.models.session import Session
+from app.infrastructure.database.models.support_ticket_model import (
+    SupportTicket,
+    TicketCategory,
+    TicketStatus,
+)
 from app.infrastructure.database.models.user import User
 from app.infrastructure.database.models.veterinarian_model import Veterinarian
 
@@ -50,6 +55,9 @@ __all__ = [
     "ReviewResponse",
     "Service",
     "Session",
+    "SupportTicket",
+    "TicketCategory",
+    "TicketStatus",
     "User",
     "Veterinarian",
     "VeterinarianServiceAssignment",

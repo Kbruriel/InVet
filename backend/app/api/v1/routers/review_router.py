@@ -15,8 +15,8 @@ from app.api.schemas.review_schemas import (
     ReviewList,
     ReviewListMeta,
     ReviewRead,
-    ReviewResponseRead,
     ReviewRespond,
+    ReviewResponseRead,
 )
 from app.application.use_cases.review import (
     ReviewError,
@@ -25,7 +25,10 @@ from app.application.use_cases.review import (
 from app.core.security import get_current_access_user
 from app.data.review_repo import ReviewRepository
 from app.domain.repositories.appointment_repository import AppointmentRepository
-from app.domain.repositories.branch_repository import BranchRepository, RatingSummaryRepository
+from app.domain.repositories.branch_repository import (
+    BranchRepository,
+    RatingSummaryRepository,
+)
 from app.infrastructure.database.repositories.appointment_repository_impl import (
     AppointmentRepositoryImpl,
 )
@@ -167,9 +170,7 @@ async def list_public_reviews(
     pages = (total + page_size - 1) // page_size if page_size > 0 else 0
     return ReviewList(
         items=[ReviewRead.model_validate(i) for i in items],
-        meta=ReviewListMeta(
-            page=page, page_size=page_size, total=total, pages=pages
-        ),
+        meta=ReviewListMeta(page=page, page_size=page_size, total=total, pages=pages),
     )
 
 
@@ -200,9 +201,7 @@ async def list_clinic_reviews(
     pages = (total + page_size - 1) // page_size if page_size > 0 else 0
     return ReviewList(
         items=[ReviewRead.model_validate(i) for i in items],
-        meta=ReviewListMeta(
-            page=page, page_size=page_size, total=total, pages=pages
-        ),
+        meta=ReviewListMeta(page=page, page_size=page_size, total=total, pages=pages),
     )
 
 

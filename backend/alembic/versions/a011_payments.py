@@ -59,9 +59,7 @@ def upgrade() -> None:
         sa.Column("method", payment_method_enum, nullable=False, default="cash"),
         sa.Column("amount_received", sa.Integer(), nullable=True),
         sa.Column("change_amount", sa.Integer(), nullable=True),
-        sa.Column(
-            "status", payment_status_enum, nullable=False, default="paid"
-        ),
+        sa.Column("status", payment_status_enum, nullable=False, default="paid"),
         sa.Column(
             "paid_at",
             sa.DateTime(),

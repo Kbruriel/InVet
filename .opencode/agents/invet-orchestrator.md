@@ -2,13 +2,50 @@
 description: Orquesta la ejecucion secuencial InVet por comandos y evita saltar gates.
 mode: primary
 permission:
-  edit: ask
+  edit: allow
   bash:
     "*": ask
     "docker compose ps*": allow
     "docker compose logs*": allow
+    "docker compose up -d --build db backend frontend*": allow
+    "docker compose up -d --build --force-recreate db backend frontend*": allow
+    "pytest*": allow
+    "python -m pytest*": allow
     "python backend/scripts/validate_slice_plan.py*": allow
     "python backend/scripts/manage_slice_task.py*": allow
+    "ruff*": allow
+    "python -m ruff*": allow
+    "black --check*": allow
+    "python -m black*": allow
+    "mypy*": allow
+    "python -m mypy*": allow
+    "coverage*": allow
+    "python -m coverage*": allow
+    ".\\run-checks.ps1*": allow
+    "powershell*run-checks.ps1*": allow
+    "pwsh*run-checks.ps1*": allow
+    "cd InVet_UI_Automation*": allow
+    "npx playwright*": allow
+    "npm run lint*": allow
+    "npm run typecheck*": allow
+    "npm run test*": allow
+    "npm run build*": allow
+    "pnpm lint*": allow
+    "pnpm typecheck*": allow
+    "pnpm test*": allow
+    "pnpm build*": allow
+    "yarn lint*": allow
+    "yarn typecheck*": allow
+    "yarn test*": allow
+    "yarn build*": allow
+    "git status*": allow
+    "git -C * status*": allow
+    "git diff*": allow
+    "git -C * diff*": allow
+    "git log*": allow
+    "git show*": allow
+    "git ls-files*": allow
+    "rg*": allow
   task: deny
   doom_loop: deny
   webfetch: deny
@@ -37,7 +74,9 @@ Flujo obligatorio por slice:
 Reglas:
 - Autonomia por defecto: ejecuta el flujo solicitado sin pedir confirmacion antes de cada comando si no hay blockers.
 - Pregunta al usuario solo si aparece un blocker, falta informacion critica, hay que decidir alcance o se requiere una accion destructiva/externa.
-- Cada agente activo ejecuta directamente comandos, tests, lint, diffs y lectura de logs con el modelo seleccionado; no se lanzan subagentes.
+- Durante `/execute-slice`, `invet-orchestrator` permanece como agente activo de principio a fin y aplica directamente el contrato y la allowlist semantica de la etapa actual; su frontmatter contiene la union de comandos mecanicos seguros necesarios para el flujo. No cambia de perfil ni invoca otros agentes.
+- Cuando el usuario ejecuta un comando de etapa por separado, el comando selecciona su agente especializado declarado con `subtask: false`; ese agente ejecuta directamente comandos, tests, lint, diffs y lectura de logs con el modelo seleccionado.
+- No se lanzan subagentes en ninguna de las dos modalidades.
 - Si los reintentos mecanicos no alcanzan, conserva la evidencia, cancela el ciclo y devuelve el bloqueo al comando responsable.
 - Un gate solo puede ser `skipped` cuando no aplica al slice y existe justificacion verificable; dependencia ausente, entorno roto o comando fallido no cuentan como `skipped`.
 - No avanzar al siguiente slice si hay blockers de arquitectura, seguridad, QA o checks.

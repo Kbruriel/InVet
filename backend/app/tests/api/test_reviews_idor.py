@@ -36,7 +36,8 @@ def _as_user(review_app: dict, role: str, clinic_id: int | None) -> None:
 
 
 def _scoped_get(review_app: dict, review, tenant_id: int) -> None:
-    """ Servicio que solo expone la reseña a su tenant (BOLA simulada). """
+    """Servicio que solo expone la reseña a su tenant (BOLA simulada)."""
+
     async def get(review_id: int, clinic_id: int):
         if clinic_id != tenant_id:
             raise ReviewNotFoundError()
@@ -54,14 +55,14 @@ class TestReviewsIDOR:
         """El propietario no puede responder una reseña (rol bloqueado)."""
         client = review_app["client_factory"]()
         async with client:
-            resp = await client.post(
-                "/api/v1/reviews/1/respond", json={"body": "Hola"}
-            )
+            resp = await client.post("/api/v1/reviews/1/respond", json={"body": "Hola"})
         assert resp.status_code == 403
         review_app["mock_service"].respond.assert_not_awaited()
 
     @pytest.mark.asyncio
-    async def test_owner_cannot_list_clinical_returns_403(self, review_app: dict) -> None:
+    async def test_owner_cannot_list_clinical_returns_403(
+        self, review_app: dict
+    ) -> None:
         """El propietario no puede listar el listado clínico (rol bloqueado)."""
         client = review_app["client_factory"]()
         async with client:
@@ -92,7 +93,9 @@ class TestReviewsIDOR:
         assert resp.status_code == 403
 
     @pytest.mark.asyncio
-    async def test_user_without_clinic_list_clinical_403(self, review_app: dict) -> None:
+    async def test_user_without_clinic_list_clinical_403(
+        self, review_app: dict
+    ) -> None:
         """Un usuario sin clínica no puede listar el listado clínico (BOLA)."""
         _as_user(review_app, "veterinarian", None)
         client = review_app["client_factory"]()

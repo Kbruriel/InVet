@@ -1,6 +1,6 @@
 ---
 description: Implementa automatizacion UI/E2E con Playwright para slices de InVet.
-mode: subagent
+mode: primary
 permission:
   edit: allow
   bash:

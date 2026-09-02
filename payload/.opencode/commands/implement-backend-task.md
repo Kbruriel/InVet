@@ -1,6 +1,7 @@
 ---
 description: Implementa una tarea backend InVet, por ejemplo BE-001.
 agent: invet-backend-implementer
+subtask: false
 ---
 
 Implementa la tarea backend indicada por `$ARGUMENTS`.

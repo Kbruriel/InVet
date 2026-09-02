@@ -90,6 +90,9 @@ export const apiClient = {
   put<T>(path: string, body?: RequestBody, extraHeaders?: HeadersInit): Promise<T> {
     return request<T>('PUT', path, body, extraHeaders);
   },
+  patch<T>(path: string, body?: RequestBody, extraHeaders?: HeadersInit): Promise<T> {
+    return request<T>('PATCH', path, body, extraHeaders);
+  },
   delete<T>(path: string, extraHeaders?: HeadersInit): Promise<T> {
     return request<T>('DELETE', path, undefined, extraHeaders);
   },

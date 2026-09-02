@@ -35,9 +35,10 @@ opencode.json
 docs/opencode/**/*.md
 backend/scripts/validate_slice_plan.py
 backend/scripts/manage_slice_task.py
+backend/scripts/validate_agent_catalog.py
 ```
 
-El paquete instala el contrato de planes schema v3, incluyendo `docs/opencode/references/spec_kit_reference_improvements.md`, politica UTF-8 y validacion de tareas con responsabilidad unica.
+El paquete instala el contrato de planes schema v3, incluyendo `docs/opencode/references/spec_kit_reference_improvements.md`, politica UTF-8 y validacion de tareas con responsabilidad unica. `docs/opencode/agent_registry.json` es el inventario canonico compartido por OpenCode y GitHub Copilot.
 
 ## Comandos instalados
 
@@ -53,6 +54,7 @@ El paquete instala el contrato de planes schema v3, incluyendo `docs/opencode/re
 /implement-findings
 /clean-architecture-review
 /security-review
+/run-ui-checks
 /run-checks
 /update-docs
 /final-gate
@@ -65,6 +67,8 @@ invet-orchestrator
 invet-product-planner
 invet-backend-implementer
 invet-frontend-implementer
+invet-ui-automation-implementer
+invet-api-automation-implementer
 invet-qa-validator
 invet-slice-reviewer
 invet-findings-implementer
@@ -72,6 +76,7 @@ invet-clean-architecture-reviewer
 invet-security-reviewer
 invet-check-runner
 invet-docs-updater
+invet-final-reviewer
 ```
 
 ## Principio de ejecucion
@@ -83,3 +88,11 @@ BE-00X + FE-00X + QA-00X = un resultado funcional verificable
 ```
 
 No se debe avanzar al siguiente indice hasta cerrar arquitectura, seguridad, checks y documentacion.
+
+Los 14 perfiles OpenCode usan `mode: primary`, niegan `task` y los 15 comandos declaran `subtask: false`. Por tanto, tanto el flujo completo como cada fase manual se ejecutan directamente con el modelo seleccionado, sin crear subagentes.
+
+Valida el inventario, los mapeos OpenCode/GitHub y el espejo `payload` con:
+
+```text
+python backend/scripts/validate_agent_catalog.py
+```

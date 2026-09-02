@@ -1,6 +1,7 @@
 ---
 description: Actualiza documentacion Markdown despues de cerrar los gates del slice.
 agent: invet-docs-updater
+subtask: false
 ---
 
 Actualiza la documentacion del slice indicado por `$ARGUMENTS`.

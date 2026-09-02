@@ -15,14 +15,14 @@ import pytest
 
 from app.application.notification_use_cases import NotificationService
 from app.data.notification_repo import get_notification_repo
-from app.infrastructure.database.models.owner import Owner
 from app.infrastructure.database.models.clinic import Clinic
+from app.infrastructure.database.models.owner import Owner
 from app.infrastructure.database.models.user import User
-
 
 # --------------------------------------------------------------------------- #
 #  Helpers                                                                   #
 # --------------------------------------------------------------------------- #
+
 
 async def _create_base(db_session):
     """Seed mínimo de clinica / usuario para que el repo y servicio funcionen."""
@@ -71,6 +71,7 @@ async def _make_service(db_session):
 # --------------------------------------------------------------------------- #
 #  C8 tests                                                                  #
 # --------------------------------------------------------------------------- #
+
 
 @pytest.mark.asyncio
 async def test_emit_service_dedup_at_service_layer(db_session):

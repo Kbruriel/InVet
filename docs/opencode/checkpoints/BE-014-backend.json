@@ -1,0 +1,67 @@
+{
+  "slice": "BE-014",
+  "layer": "backend",
+  "tasks": {
+    "BE-014-T01": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-01T16:41:08+00:00",
+      "finished_at": "2026-09-01T16:42:03+00:00",
+      "evidence": "17/17 pasadas: 4 pruebas de migracion (apply, seed minimo, idempotencia, unicidad y downgrade) y 13 pruebas API de regresion; Base.metadata crea tablas importando app.infrastructure.database.models; el seed ya propaga errores.",
+      "outcome": "pass",
+      "changed_files": [
+        "backend/alembic/versions/a014_support.py",
+        "backend/app/infraestructure/database/models/support_ticket_model.py",
+        "backend/app/infrastructure/database/models/__init__.py",
+        "backend/app/tests/api/test_support_ticket_api.py"
+      ],
+      "deletion_justification": "Se elimino el modelo duplicado bajo la ruta mal escrita app/infraestructure y se retiro el bloque except Exception: pass para que los fallos del seed sean visibles.",
+      "errors": []
+    },
+    "BE-014-T02": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-01T14:23:57+00:00",
+      "finished_at": "2026-09-01T16:20:48+00:00",
+      "evidence": "16/16 pasadas (get_by_id propia/ajena/interna, list_by_owner propia/ajena/interna/status, update_status propia/ajena/interna/estado-preserved, list_active_categories propia/ajena/only-active, list_by_clinic interna) + 13/13 regresion API verde",
+      "outcome": "pass",
+      "changed_files": [
+        "backend/app/tests/data/test_support_ticket_repo.py"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "BE-014-T03": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-01T16:42:17+00:00",
+      "finished_at": "2026-09-01T16:46:00+00:00",
+      "evidence": "37 pruebas de reglas y repositorio aprobadas: deduplicacion normalizada en ventana de 24 h, aislamiento owner/clinic y transiciones validadas antes de persistir.",
+      "outcome": "pass",
+      "changed_files": [
+        "backend/app/application/support_ticket_use_cases.py",
+        "backend/app/data/support_ticket_repo.py",
+        "backend/app/tests/data/test_support_ticket_repo.py",
+        "backend/app/tests/usecases/test_support_ticket_rules.py",
+        "docs/opencode/checkpoints/BE-014-backend.json"
+      ],
+      "deletion_justification": "Se reemplazo la validacion posterior a la escritura por validacion previa, se normalizaron claves de estados y se retiro la nota obsoleta que declaraba la deduplicacion fuera de alcance; no se elimino funcionalidad valida.",
+      "errors": []
+    },
+    "BE-014-T04": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-01T16:47:02+00:00",
+      "finished_at": "2026-09-01T16:48:04+00:00",
+      "evidence": "API automation: 14 passed en app/tests/api/test_support_ticket_api.py; duplicado 24h devuelve 409; transicion invalida conserva estado; ruta categories unica.",
+      "outcome": "pass",
+      "changed_files": [
+        "backend/app/api/v1/routers/support_ticket_router.py",
+        "backend/app/tests/api/test_support_ticket_api.py"
+      ],
+      "deletion_justification": "Se elimino la segunda declaracion duplicada de GET /tickets/categories en support_ticket_router.py.",
+      "errors": []
+    }
+  },
+  "updated_at": "2026-09-01T16:48:04+00:00"
+}

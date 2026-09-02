@@ -11,11 +11,11 @@ from __future__ import annotations
 from collections.abc import Iterator
 from datetime import UTC, datetime, timedelta
 from typing import Any
+from unittest.mock import AsyncMock
 
 import httpx
 import pytest
 from fastapi import FastAPI
-from unittest.mock import AsyncMock
 
 import app.api.v1.routers.payments_router as payments_router_mod
 from app.api.v1.routers.payments_router import router
@@ -106,10 +106,18 @@ def payment_app() -> Iterator[dict[str, Any]]:
     mock_internal_user_repo = AsyncMock()
     mock_internal_user_repo.get_by_user_id = AsyncMock(return_value=None)
 
-    app.dependency_overrides[payments_router_mod.get_payment_repo] = lambda: mock_payment_repo
-    app.dependency_overrides[payments_router_mod.get_appointment_repo] = lambda: mock_appointment_repo
-    app.dependency_overrides[payments_router_mod.get_service_repo] = lambda: mock_service_repo
-    app.dependency_overrides[payments_router_mod.get_internal_user_repo] = lambda: mock_internal_user_repo
+    app.dependency_overrides[payments_router_mod.get_payment_repo] = (
+        lambda: mock_payment_repo
+    )
+    app.dependency_overrides[payments_router_mod.get_appointment_repo] = (
+        lambda: mock_appointment_repo
+    )
+    app.dependency_overrides[payments_router_mod.get_service_repo] = (
+        lambda: mock_service_repo
+    )
+    app.dependency_overrides[payments_router_mod.get_internal_user_repo] = (
+        lambda: mock_internal_user_repo
+    )
 
     yield {
         "app": app,
@@ -176,9 +184,7 @@ def review_app() -> Iterator[dict[str, Any]]:
     async def mocked_user() -> dict[str, Any]:
         return {"id": 100, "user_id": 100, "clinic_id": 1, "role": "owner"}
 
-    app.dependency_overrides[
-        review_router_mod.get_current_access_user
-    ] = mocked_user
+    app.dependency_overrides[review_router_mod.get_current_access_user] = mocked_user
 
     mock_service = AsyncMock()
     mock_service.create = AsyncMock(return_value=_review_entity())
@@ -194,7 +200,9 @@ def review_app() -> Iterator[dict[str, Any]]:
     mock_branch_repo = AsyncMock()
     mock_branch_repo.get_branch_by_id = AsyncMock(return_value=AsyncMock(id=1))
 
-    app.dependency_overrides[review_router_mod.get_review_service] = lambda: mock_service
+    app.dependency_overrides[review_router_mod.get_review_service] = (
+        lambda: mock_service
+    )
     app.dependency_overrides[review_router_mod.get_branch_repo] = (
         lambda: mock_branch_repo
     )

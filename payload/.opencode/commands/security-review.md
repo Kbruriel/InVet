@@ -1,6 +1,7 @@
 ---
 description: Revisa seguridad de un slice identificado y escribe evidencia.
 agent: invet-security-reviewer
+subtask: false
 ---
 
 Revisa la seguridad del slice indicado por `$ARGUMENTS`.

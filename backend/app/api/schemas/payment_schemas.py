@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -21,7 +20,11 @@ class PaymentCreate(BaseModel):
 
     appointment_id: int = Field(..., gt=0, description="ID de la cita asociada")
     service_id: int = Field(..., gt=0, description="ID del servicio cobrado")
-    amount: int = Field(..., ge=0, description="Importe del pago (menor unidad de moneda, ej. centavos de peso)")
+    amount: int = Field(
+        ...,
+        ge=0,
+        description="Importe del pago (menor unidad de moneda, ej. centavos de peso)",
+    )
     method: PaymentMethod = Field(
         ...,
         description="Metodo de pago (cash, transfer, card, other)",

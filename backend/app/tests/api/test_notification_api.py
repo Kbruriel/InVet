@@ -210,9 +210,7 @@ class TestNotificationsAPI:
     def test_list_unread_only_filters(self, app_client: TestClient) -> None:
         u1, _u2, c1, _c2, _n1, _n2, _n3 = _seed()
         _as_user(app_client, u1, c1)
-        resp = app_client.get(
-            "/api/v1/notifications", params={"unread_only": True}
-        )
+        resp = app_client.get("/api/v1/notifications", params={"unread_only": True})
         assert resp.status_code == 200, resp.text
         body = resp.json()
         assert body["meta"]["total"] == 1
@@ -242,23 +240,17 @@ class TestNotificationsAPI:
         )
         # page_size por debajo del minimo (1)
         assert (
-            app_client.get(
-                "/api/v1/notifications", params={"page_size": 0}
-            ).status_code
+            app_client.get("/api/v1/notifications", params={"page_size": 0}).status_code
             == 422
         )
         # page por debajo del minimo (1)
         assert (
-            app_client.get(
-                "/api/v1/notifications", params={"page": 0}
-            ).status_code
+            app_client.get("/api/v1/notifications", params={"page": 0}).status_code
             == 422
         )
         # tipo invalido
         assert (
-            app_client.get(
-                "/api/v1/notifications", params={"page": "abc"}
-            ).status_code
+            app_client.get("/api/v1/notifications", params={"page": "abc"}).status_code
             == 422
         )
 
@@ -317,9 +309,7 @@ class TestNotificationsAPI:
         assert n1 in ids_seen
         assert n2 in ids_seen
 
-    def test_read_all_marks_only_unread_own(
-        self, app_client: TestClient
-    ) -> None:
+    def test_read_all_marks_only_unread_own(self, app_client: TestClient) -> None:
         u1, _u2, c1, _c2, _n1, _n2, n3 = _seed()
         _as_user(app_client, u1, c1)
         resp = app_client.post("/api/v1/notifications/read-all")

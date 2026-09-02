@@ -1,6 +1,6 @@
 ---
 description: Implementa hallazgos de revision y documenta checklist y correcciones en Markdown.
-mode: all
+mode: primary
 permission:
   edit: allow
   bash:

@@ -230,13 +230,17 @@ async def create_consultation(
 
     # BE-013-T06: emit notificacion al owner tras consulta completada
     from app.api.v1.routers._notify import emit_notify
+
     try:
         pet = pet_repo.get_pet_by_id(payload.pet_id)
-        pet_display = getattr(pet, "name", str(payload.pet_id)) if pet else str(payload.pet_id)
+        pet_display = (
+            getattr(pet, "name", str(payload.pet_id)) if pet else str(payload.pet_id)
+        )
         owner_id_for_pet = None
         owner_email = None
         if pet:
             from app.infrastructure.database.models.owner import Owner as OwnerModel
+
             owner = db.query(OwnerModel).filter(OwnerModel.id == pet.owner_id).first()
             if owner:
                 owner_id_for_pet = int(owner.user_id)
@@ -314,7 +318,9 @@ async def list_consultations(
     page_size: int = Query(
         20, ge=1, le=100, alias="page_size", description="Tamaño de página"
     ),
-    pet_id: int | None = Query(None, gt=0, description="Filtrar por mascota (opcional)"),
+    pet_id: int | None = Query(
+        None, gt=0, description="Filtrar por mascota (opcional)"
+    ),
     current_user: dict = Depends(get_current_access_user),
     consultation_repo: ConsultationRepository = Depends(get_consultation_repo),
     pet_repo: PetRepository = Depends(get_pet_repo),

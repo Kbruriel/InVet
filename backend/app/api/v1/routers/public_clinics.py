@@ -34,10 +34,12 @@ async def list_clinicas(
     request: Request,
     page: int = Query(1, ge=1, description="Número de página (comienza en 1)"),
     size: int = Query(20, ge=1, le=100, description="Tamaño de página (máximo 100)"),
-    limit: int
-    | None = Query(None, ge=1, le=100, description="Alias de tamaño de página"),
-    page_size: int
-    | None = Query(None, ge=1, le=100, description="Alias de tamaño de página"),
+    limit: int | None = Query(
+        None, ge=1, le=100, description="Alias de tamaño de página"
+    ),
+    page_size: int | None = Query(
+        None, ge=1, le=100, description="Alias de tamaño de página"
+    ),
     search: str | None = Query(None, description="Filtro por nombre o ciudad"),
     service_type: str | None = Query(None, description="Filtro por tipo de servicio"),
     use_case: ListPublicClinicsUseCase = Depends(get_public_clinic_list_use_case),

@@ -1,0 +1,58 @@
+{
+  "slice": "BE-014",
+  "layer": "frontend",
+  "tasks": {
+    "FE-014-T01": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-01T22:43:18+00:00",
+      "finished_at": "2026-09-01T23:05:00+00:00",
+      "evidence": "5/5 pruebas de support.test.ts pasadas; client.ts y support.ts tipan POST/GET/PATCH/categorías y conservan errores HTTP.",
+      "outcome": "pass",
+      "changed_files": [
+        "frontend/src/shared/api/client.ts",
+        "frontend/src/shared/api/support.ts",
+        "frontend/src/shared/api/support.test.ts"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "FE-014-T02": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-01T22:43:18+00:00",
+      "finished_at": "2026-09-01T23:05:00+00:00",
+      "evidence": "12/12 pruebas de SupportPage, TicketForm, TicketList y filtro pasadas; se cubren validación, loading, empty, error, success y submitting.",
+      "outcome": "pass",
+      "changed_files": [
+        "frontend/src/app/support/page.tsx",
+        "frontend/src/app/support/page.test.tsx",
+        "frontend/src/features/support/ui/ticket-form.tsx",
+        "frontend/src/features/support/ui/ticket-form.test.tsx",
+        "frontend/src/features/support/ui/ticket-list.tsx",
+        "frontend/src/features/support/ui/ticket-list.test.tsx",
+        "frontend/src/features/support/ui/ticket-list-filtered.tsx",
+        "frontend/src/features/support/ui/ticket-list-filtered.test.tsx"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "FE-014-T03": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-01T22:43:18+00:00",
+      "finished_at": "2026-09-01T23:05:00+00:00",
+      "evidence": "6/6 pruebas de la ruta /support/[ticketId] y TicketStatusUpdater pasadas; cubren 200, 404, ID inválido, error y transiciones de estado.",
+      "outcome": "pass",
+      "changed_files": [
+        "frontend/src/app/support/[ticketId]/page.tsx",
+        "frontend/src/app/support/[ticketId]/page.test.tsx",
+        "frontend/src/app/support/[ticketId]/ticket-status-updater.tsx",
+        "frontend/src/app/support/[ticketId]/ticket-status-updater.test.tsx"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    }
+  },
+  "updated_at": "2026-09-01T23:05:00+00:00"
+}

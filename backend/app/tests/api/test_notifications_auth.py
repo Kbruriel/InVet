@@ -28,6 +28,7 @@ from app.infrastructure.database.session import get_db
 
 def _import_router():
     import app.api.v1.routers.notification_router as notif_router_mod
+
     return notif_router_mod, notif_router_mod.router
 
 
@@ -43,7 +44,6 @@ session_module.SessionLocal = sessionmaker(
 )
 TestingSessionLocal = session_module.SessionLocal
 Base.metadata.create_all(bind=test_engine)
-
 
 
 def _override_get_db():
@@ -125,7 +125,7 @@ def _seed():
         db.add_all([u1, u2])
         db.flush()
 
-                # Owner 1
+        # Owner 1
         o1 = OwnerModel(
             user_id=u1.id,
             first_name="Juan",
@@ -170,7 +170,7 @@ def _seed():
         n3 = NotificationModel(
             user_id=u2.id,
             clinic_id=c2.id,
-            event_type="CONVERSATION_STARTED", 
+            event_type="CONVERSATION_STARTED",
             subject="Nueva conversación",
             body="Tienes una nueva conversación",
             ref_type="conversation",
@@ -187,10 +187,10 @@ def _seed():
 def test_all_endpoints_require_authentication(app_client):
     """C9: Sin token se devuelve 401 en todos los endpoints."""
     _seed()
-    
+
     # Desactivar autenticación para todas las pruebas
     app_client.app.dependency_overrides[auth_dep] = _override_auth(None, None)
-    
+
     # Probar todo endpoint que requiere autenticación
     endpoints = [
         ("/api/v1/notifications", "GET"),
@@ -198,7 +198,7 @@ def test_all_endpoints_require_authentication(app_client):
         ("/api/v1/notifications/read-all", "POST"),
         ("/api/v1/notifications/123", "PATCH"),
     ]
-    
+
     for endpoint, method in endpoints:
         if method == "GET":
             response = app_client.get(endpoint)
@@ -206,20 +206,22 @@ def test_all_endpoints_require_authentication(app_client):
             response = app_client.patch(endpoint)
         else:  # POST
             response = app_client.post(endpoint)
-        
-        assert response.status_code == 401, f"Endpoint {endpoint} should return 401 without authentication"
+
+        assert (
+            response.status_code == 401
+        ), f"Endpoint {endpoint} should return 401 without authentication"
 
 
 def test_notifications_created_by_emission_endpoint(app_client):
     """C2: Creación de notificación al crear una reseña."""
     # Esta prueba se centra en verificar que los endpoints funcionan correctamente,
     # ya que la creación real ocurre en otros endpoints (no expuestos directamente aquí)
-    
+
     # Simular emisión de notificación
     response = app_client.get("/api/v1/notifications?page=1&page_size=5")
     assert response.status_code == 200
-    
-    # Aunque el endpoint POST /notifications/emit no está implementado 
+
+    # Aunque el endpoint POST /notifications/emit no está implementado
     # (porque está en el dominio y se llama desde otros routers)
     # lo importante es que se validan las operaciones existentes
     data = response.json()
@@ -229,13 +231,15 @@ def test_notifications_created_by_emission_endpoint(app_client):
 def test_unauthorized_access_to_notification_details(app_client):
     """Verifica que no se pueda acceder a detalles de notificaciones sin autenticación."""
     u1, u2, c1, c2, n1_id, n2_id, n3_id = _seed()
-    
+
     # Cambiar la autenticación para que no coincida
-    app_client.app.dependency_overrides[auth_dep] = _override_auth(999, 999)  # Usuario inexistente
-    
+    app_client.app.dependency_overrides[auth_dep] = _override_auth(
+        999, 999
+    )  # Usuario inexistente
+
     # Probar acceso a una notificación
     response = app_client.get(f"/api/v1/notifications/{n1_id}")
-    
+
     # Puede ser que devuelva 404 o 403 dependiendo de la implementación,
     # pero no debe devolver información sensible
     assert response.status_code in [404, 403]  # No debería revelar existencia

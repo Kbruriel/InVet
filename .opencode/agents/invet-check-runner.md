@@ -1,6 +1,6 @@
 ---
 description: Ejecuta checks tecnicos backend/frontend, corrige fallos cuando el usuario lo pide y resume resultados accionables.
-mode: all
+mode: primary
 permission:
   edit: ask
   bash:

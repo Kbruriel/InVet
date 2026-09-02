@@ -68,7 +68,9 @@ def _write_all_sources(root: Path) -> None:
         path.write_text(content, encoding="utf-8")
 
 
-def test_manifest_is_compact_and_allowlist_comes_from_deliverables(tmp_path: Path) -> None:
+def test_manifest_is_compact_and_allowlist_comes_from_deliverables(
+    tmp_path: Path,
+) -> None:
     controls = _load_controls()
     _write_plan(tmp_path)
 
@@ -81,7 +83,9 @@ def test_manifest_is_compact_and_allowlist_comes_from_deliverables(tmp_path: Pat
     assert "iniciar subagentes" in text
 
 
-def test_manifest_verification_detects_missing_and_stale_sources(tmp_path: Path) -> None:
+def test_manifest_verification_detects_missing_and_stale_sources(
+    tmp_path: Path,
+) -> None:
     controls = _load_controls()
     _write_plan(tmp_path)
     _write_all_sources(tmp_path)
@@ -95,17 +99,19 @@ def test_manifest_verification_detects_missing_and_stale_sources(tmp_path: Path)
     assert any("stale/invalido" in error for error in errors)
 
 
-def test_automation_manifests_require_docker_without_host_fallback(tmp_path: Path) -> None:
+def test_automation_manifests_require_docker_without_host_fallback(
+    tmp_path: Path,
+) -> None:
     controls = _load_controls()
     _write_plan(tmp_path)
     _write_all_sources(tmp_path)
 
-    ui_manifest = controls.generate_manifests(
-        tmp_path, "BE-001", "ui-automation"
-    )[0].read_text(encoding="utf-8")
-    api_manifest = controls.generate_manifests(
-        tmp_path, "BE-001", "api-automation"
-    )[0].read_text(encoding="utf-8")
+    ui_manifest = controls.generate_manifests(tmp_path, "BE-001", "ui-automation")[
+        0
+    ].read_text(encoding="utf-8")
+    api_manifest = controls.generate_manifests(tmp_path, "BE-001", "api-automation")[
+        0
+    ].read_text(encoding="utf-8")
 
     for manifest in (ui_manifest, api_manifest):
         assert "Entorno Docker obligatorio" in manifest
@@ -114,7 +120,9 @@ def test_automation_manifests_require_docker_without_host_fallback(tmp_path: Pat
     assert "backend publicado por Docker" in api_manifest
 
 
-def test_automation_phase_uses_its_sidecar_allowlist_and_checkpoint(tmp_path: Path) -> None:
+def test_automation_phase_uses_its_sidecar_allowlist_and_checkpoint(
+    tmp_path: Path,
+) -> None:
     controls = _load_controls()
     _write_plan(tmp_path)
     _write_all_sources(tmp_path)
@@ -138,9 +146,7 @@ def test_finish_blocks_out_of_scope_changes_and_router_removal(tmp_path: Path) -
     _write_plan(tmp_path)
     router = tmp_path / "backend/app/api/v1/router.py"
     router.parent.mkdir(parents=True)
-    router.write_text(
-        "router.include_router(existing_router)\n", encoding="utf-8"
-    )
+    router.write_text("router.include_router(existing_router)\n", encoding="utf-8")
     unrelated = tmp_path / "backend/app/core/config.py"
     unrelated.parent.mkdir(parents=True)
     unrelated.write_text("VALUE = 1\n", encoding="utf-8")
@@ -148,9 +154,7 @@ def test_finish_blocks_out_of_scope_changes_and_router_removal(tmp_path: Path) -
 
     router.write_text("router.include_router(new_router)\n", encoding="utf-8")
     unrelated.write_text("VALUE = 2\n", encoding="utf-8")
-    _, errors = controls.finish_task(
-        tmp_path, "BE-001-T01", "pytest: pass", ""
-    )
+    _, errors = controls.finish_task(tmp_path, "BE-001-T01", "pytest: pass", "")
 
     assert any("fuera de Entregables" in error for error in errors)
     assert any("Invariantes de router" in error for error in errors)
@@ -165,9 +169,7 @@ def test_finish_requires_justification_for_removed_lines(tmp_path: Path) -> None
     controls.start_task(tmp_path, "BE-001", "BE-001-T01")
     target.write_text("KEEP = 1\n", encoding="utf-8")
 
-    _, errors = controls.finish_task(
-        tmp_path, "BE-001-T01", "pytest: pass", ""
-    )
+    _, errors = controls.finish_task(tmp_path, "BE-001-T01", "pytest: pass", "")
     assert any("Lineas existentes eliminadas" in error for error in errors)
 
     controls.start_task(tmp_path, "BE-001", "BE-001-T01")

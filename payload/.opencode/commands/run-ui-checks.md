@@ -1,6 +1,7 @@
 ---
 description: Ejecuta checks de UI automation y regresion para un slice InVet.
 agent: invet-check-runner
+subtask: false
 ---
 
 Ejecuta los checks de UI automation del slice indicado por `$ARGUMENTS`.

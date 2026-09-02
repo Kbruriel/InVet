@@ -11,7 +11,6 @@ Cubre:
 from __future__ import annotations
 
 from datetime import UTC, datetime
-
 from unittest.mock import AsyncMock
 
 import pytest
@@ -53,9 +52,7 @@ class TestGetPaymentAPI:
         async def fake_get(payment_id, clinic_id):
             return None if clinic_id != 1 else _default_payment_stub()
 
-        payment_app["mock_payment_repo"].get_by_id = AsyncMock(
-            side_effect=fake_get
-        )
+        payment_app["mock_payment_repo"].get_by_id = AsyncMock(side_effect=fake_get)
 
         client = payment_app["client_factory"]()
         async with client:
@@ -90,7 +87,9 @@ class TestListPaymentsAPI:
         )
         client = payment_app["client_factory"]()
         async with client:
-            resp = await client.get("/api/v1/payments", params={"page": 1, "page_size": 10})
+            resp = await client.get(
+                "/api/v1/payments", params={"page": 1, "page_size": 10}
+            )
         assert resp.status_code == 200, resp.text
         body = resp.json()
         assert isinstance(body["items"], list)

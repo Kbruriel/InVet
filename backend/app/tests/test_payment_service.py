@@ -7,8 +7,17 @@ from unittest.mock import AsyncMock
 
 import pytest
 
-from app.domain.entities.appointment import Appointment, AppointmentStatus, AppointmentType
-from app.domain.entities.payment import Payment, PaymentCreate, PaymentMethod, PaymentStatus
+from app.domain.entities.appointment import (
+    Appointment,
+    AppointmentStatus,
+    AppointmentType,
+)
+from app.domain.entities.payment import (
+    Payment,
+    PaymentCreate,
+    PaymentMethod,
+    PaymentStatus,
+)
 from app.domain.entities.service import Service
 from app.services.payment_service import (
     AlreadyCancelledError,
@@ -22,7 +31,6 @@ from app.services.payment_service import (
     ServiceNotFoundError,
     compute_change_amount,
 )
-
 
 CLINIC = 1
 
@@ -168,7 +176,9 @@ def test_compute_change_error_has_422_status():
 
 
 @pytest.mark.asyncio
-async def test_create_payment_success_cash(payment_repo, appointment_repo, service_repo, create_uc):
+async def test_create_payment_success_cash(
+    payment_repo, appointment_repo, service_repo, create_uc
+):
     appointment_repo.get_by_id.return_value = _appointment()
     service_repo.get_service_by_id.return_value = _service()
     payment_repo.create.return_value = _payment()
@@ -188,11 +198,17 @@ async def test_create_payment_success_cash(payment_repo, appointment_repo, servi
 
 
 @pytest.mark.asyncio
-async def test_create_payment_non_cash_no_change(payment_repo, appointment_repo, service_repo, create_uc):
+async def test_create_payment_non_cash_no_change(
+    payment_repo, appointment_repo, service_repo, create_uc
+):
     appointment_repo.get_by_id.return_value = _appointment()
     service_repo.get_service_by_id.return_value = _service()
     payment_repo.create.return_value = _payment(
-        overrides={"method": PaymentMethod.CARD, "amount_received": None, "change_amount": None},
+        overrides={
+            "method": PaymentMethod.CARD,
+            "amount_received": None,
+            "change_amount": None,
+        },
     )
 
     await create_uc.execute(
@@ -207,7 +223,9 @@ async def test_create_payment_non_cash_no_change(payment_repo, appointment_repo,
 
 
 @pytest.mark.asyncio
-async def test_create_payment_appointment_missing(payment_repo, appointment_repo, create_uc):
+async def test_create_payment_appointment_missing(
+    payment_repo, appointment_repo, create_uc
+):
     appointment_repo.get_by_id.return_value = None
 
     with pytest.raises(AppointmentNotFoundError) as exc:
@@ -218,7 +236,9 @@ async def test_create_payment_appointment_missing(payment_repo, appointment_repo
 
 
 @pytest.mark.asyncio
-async def test_create_payment_service_missing(payment_repo, appointment_repo, service_repo, create_uc):
+async def test_create_payment_service_missing(
+    payment_repo, appointment_repo, service_repo, create_uc
+):
     appointment_repo.get_by_id.return_value = _appointment()
     service_repo.get_service_by_id.return_value = None
 
@@ -230,9 +250,13 @@ async def test_create_payment_service_missing(payment_repo, appointment_repo, se
 
 
 @pytest.mark.asyncio
-async def test_create_payment_service_inactive(payment_repo, appointment_repo, service_repo, create_uc):
+async def test_create_payment_service_inactive(
+    payment_repo, appointment_repo, service_repo, create_uc
+):
     appointment_repo.get_by_id.return_value = _appointment()
-    service_repo.get_service_by_id.return_value = _service(overrides={"is_active": False})
+    service_repo.get_service_by_id.return_value = _service(
+        overrides={"is_active": False}
+    )
 
     with pytest.raises(ServiceInactiveError):
         await create_uc.execute(CLINIC, _create_data())
@@ -241,7 +265,9 @@ async def test_create_payment_service_inactive(payment_repo, appointment_repo, s
 
 
 @pytest.mark.asyncio
-async def test_create_payment_cash_shortfall(payment_repo, appointment_repo, service_repo, create_uc):
+async def test_create_payment_cash_shortfall(
+    payment_repo, appointment_repo, service_repo, create_uc
+):
     appointment_repo.get_by_id.return_value = _appointment()
     service_repo.get_service_by_id.return_value = _service()
 
@@ -261,7 +287,9 @@ async def test_create_payment_cash_shortfall(payment_repo, appointment_repo, ser
 
 
 @pytest.mark.asyncio
-async def test_create_payment_cash_without_received(payment_repo, appointment_repo, service_repo, create_uc):
+async def test_create_payment_cash_without_received(
+    payment_repo, appointment_repo, service_repo, create_uc
+):
     appointment_repo.get_by_id.return_value = _appointment()
     service_repo.get_service_by_id.return_value = _service()
 
@@ -306,7 +334,10 @@ async def test_create_payment_tenant_isolation_passed_to_repos(
 async def test_cancel_payment_success(payment_repo, cancel_uc):
     payment_repo.get_by_id.return_value = _payment()
     cancelled = _payment(
-        overrides={"status": PaymentStatus.CANCELLED, "cancelled_at": datetime.now(UTC)},
+        overrides={
+            "status": PaymentStatus.CANCELLED,
+            "cancelled_at": datetime.now(UTC),
+        },
     )
     payment_repo.cancel.return_value = cancelled
 
@@ -331,7 +362,10 @@ async def test_cancel_payment_not_found(payment_repo, cancel_uc):
 @pytest.mark.asyncio
 async def test_cancel_already_cancelled_raises_409(payment_repo, cancel_uc):
     payment_repo.get_by_id.return_value = _payment(
-        overrides={"status": PaymentStatus.CANCELLED, "cancelled_at": datetime.now(UTC)},
+        overrides={
+            "status": PaymentStatus.CANCELLED,
+            "cancelled_at": datetime.now(UTC),
+        },
     )
 
     with pytest.raises(AlreadyCancelledError) as exc:

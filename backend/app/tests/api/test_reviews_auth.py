@@ -12,14 +12,13 @@ por diseño y queda fuera de este modulo (cubierto en ``test_reviews_api.py``).
 from __future__ import annotations
 
 from collections.abc import Iterator
+from unittest.mock import AsyncMock
 
 import httpx
 import pytest
 from fastapi import FastAPI
-from unittest.mock import AsyncMock
 
 import app.api.v1.routers.review_router as review_router_mod
-
 
 PAYLOAD_CREATE = {"appointment_id": 1, "rating": 5, "comment": "Ok"}
 PAYLOAD_RESPOND = {"body": "Gracias por su feedback"}
@@ -65,7 +64,10 @@ class TestReviewsAuth:
         async with client:
             resp = await client.post("/api/v1/reviews", json=PAYLOAD_CREATE)
         assert resp.status_code == 401
-        assert resp.json()["detail"] in {"Not authenticated", "Could not validate credentials"}
+        assert resp.json()["detail"] in {
+            "Not authenticated",
+            "Could not validate credentials",
+        }
 
     @pytest.mark.asyncio
     async def test_create_with_invalid_token_returns_401(

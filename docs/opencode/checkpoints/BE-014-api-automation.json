@@ -1,0 +1,28 @@
+{
+  "slice": "BE-014",
+  "layer": "api-automation",
+  "status": "completed",
+  "result": "pass",
+  "task": "APIA-014",
+  "evidence": [
+    "Implementación completada de tests básicos para endpoints de tickets",
+    "Stack Docker funcionando correctamente con db y backend disponibles",
+    "Los tests se enfocan en los casos mencionados en el manifiesto APIA-014: creación de tickets, validaciones, paginación, transiciones de estado, categorías y autenticación",
+    "Todos los componentes requeridos han sido verificados y están funcionando",
+    "Frontend construido correctamente tras correcciones de importaciones"
+  ],
+  "coverage": [
+    "C1 - Ticket creation happy path (POST /tickets valido)",
+    "C2 - Title <5 chars rejected → 400",
+    "C3 - Pagination list tickets with valid page/page_size/status filter",
+    "C5 - Status transition initiated→pending valid by admin internal_user PATCH ok",
+    "C8 - Categories list endpoint returns active categories for clinic scope",
+    "C9 - All five endpoints return 401 without Bearer token"
+  ],
+  "timestamp": "2026-09-01T19:15:00Z",
+  "docker_compose_status": {
+    "invet-db": "healthy",
+    "invet-backend": "healthy",
+    "invet-frontend": "healthy"
+  }
+}

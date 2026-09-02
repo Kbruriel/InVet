@@ -1,56 +1,64 @@
-import { render, screen, waitFor } from '@testing-library/react';
-import TicketDetailPage from './page';
+import { render, screen } from '@testing-library/react';
 
-// Mock required modules
+import { supportApi, type SupportTicket } from '@/shared/api/support';
+
+import SupportTicketPage from './page';
+
 jest.mock('@/shared/api/support', () => ({
   ...jest.requireActual('@/shared/api/support'),
   supportApi: {
-    getTicket: jest.fn()
-  }
+    createTicket: jest.fn(),
+    listTickets: jest.fn(),
+    getTicket: jest.fn(),
+    updateTicketStatus: jest.fn(),
+    getCategories: jest.fn(),
+  },
 }));
 
-const mockTicket = {
-  id: '1',
-  clinic_id: 'clinic-1',
-  owner_id: 'owner-1',
-  title: 'Test Ticket',
-  description: 'Test description',
-  category_id: 'category-1',
-  status: 'initiated',
-  created_at: '2023-01-01T00:00:00Z'
+jest.mock('./ticket-status-updater', () => ({
+  TicketStatusUpdater: () => <div data-testid="status-updater" />,
+}));
+
+const mockedSupportApi = supportApi as jest.Mocked<typeof supportApi>;
+const ticket: SupportTicket = {
+  id: 21,
+  clinic_id: 4,
+  owner_id: 8,
+  title: 'Error al facturar',
+  description: 'La pantalla muestra un error.',
+  category_id: 2,
+  category: { id: 2, name: 'Facturación' },
+  status: 'iniciado',
+  created_at: '2026-08-30T12:00:00Z',
+  updated_at: '2026-08-30T12:00:00Z',
 };
 
-describe('TicketDetailPage', () => {
+describe('SupportTicketPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  it('renders loading state initially', async () => {
-    render(<TicketDetailPage params={{ ticketId: '1' }} />);
-    
-    expect(screen.getByRole('button', { name: /volver a la lista/i })).toBeInTheDocument();
+  it('muestra el detalle obtenido por ID numérico', async () => {
+    mockedSupportApi.getTicket.mockResolvedValue(ticket);
+    render(<SupportTicketPage params={{ ticketId: '21' }} />);
+
+    expect(await screen.findByRole('heading', { name: 'Error al facturar' })).toBeInTheDocument();
+    expect(screen.getByText('Facturación')).toBeInTheDocument();
+    expect(screen.getByTestId('status-updater')).toBeInTheDocument();
+    expect(mockedSupportApi.getTicket).toHaveBeenCalledWith(21);
   });
 
-  it('displays ticket details correctly', async () => {
-    // Mock the API call to return successful data
-    const getTicketMock = jest.fn().mockResolvedValue(mockTicket);
-    
-    // This would require more complex mocking of the module
-    expect(true).toBe(true); // Placeholder test - actual implementation would include proper mocks
-    
+  it('distingue una respuesta 404', async () => {
+    mockedSupportApi.getTicket.mockRejectedValue({ status: 404, detail: 'not found' });
+    render(<SupportTicketPage params={{ ticketId: '21' }} />);
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(/no existe/i);
   });
 
-  it('handles 404 error correctly', async () => {
-    // Mock an API call that returns 404 error
-    const getTicketMock = jest.fn().mockRejectedValue({ status: 404 });
-    
-    expect(true).toBe(true); // Placeholder test - actual implementation would include proper mocks
-  });
+  it('rechaza un ID inválido sin consultar la API', async () => {
+    render(<SupportTicketPage params={{ ticketId: 'abc' }} />);
 
-  it('handles general error correctly', async () => {
-    // Mock an API call that returns general error 
-    const getTicketMock = jest.fn().mockRejectedValue({ status: 500 });
-    
-    expect(true).toBe(true); // Placeholder test - actual implementation would include proper mocks
+    expect(await screen.findByRole('alert')).toHaveTextContent(/no es válido/i);
+    expect(mockedSupportApi.getTicket).not.toHaveBeenCalled();
   });
 });

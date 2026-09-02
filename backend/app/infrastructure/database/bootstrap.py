@@ -24,7 +24,9 @@ def _ensure_consultation_seed(connection: Connection) -> None:
     pet_columns = {column["name"] for column in inspector.get_columns("pets")}
     if "has_medical_history" not in pet_columns:
         connection.execute(
-            text("ALTER TABLE pets ADD COLUMN IF NOT EXISTS has_medical_history BOOLEAN")
+            text(
+                "ALTER TABLE pets ADD COLUMN IF NOT EXISTS has_medical_history BOOLEAN"
+            )
         )
 
     needs_recreate = False
@@ -37,9 +39,7 @@ def _ensure_consultation_seed(connection: Connection) -> None:
         needs_recreate = True
 
     if needs_recreate:
-        connection.execute(
-            text("DROP TABLE IF EXISTS appointments CASCADE")
-        )
+        connection.execute(text("DROP TABLE IF EXISTS appointments CASCADE"))
         # Import the appointment model here so its table is registered in the
         # current process metadata before asking SQLAlchemy to create it.
         from app.infrastructure.database.models.appointment import (
@@ -216,9 +216,7 @@ def _ensure_owner_consultation_fixtures(connection: Connection) -> None:
             {"email": email},
         )
 
-    connection.execute(
-        text("UPDATE owners SET clinic_id = 1 WHERE clinic_id IS NULL")
-    )
+    connection.execute(text("UPDATE owners SET clinic_id = 1 WHERE clinic_id IS NULL"))
 
     fixtures = (
         # (pet_id, owner_email, appt_id, consultation_id, day_offset)

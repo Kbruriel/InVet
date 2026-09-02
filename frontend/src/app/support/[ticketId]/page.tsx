@@ -1,154 +1,95 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { supportApi, SupportTicket } from '@/shared/api/support';
-import { Button } from '@/shared/ui/button';
-import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useState } from 'react';
+
+import { supportApi, type SupportTicket } from '@/shared/api/support';
+import type { ApiError } from '@/shared/api/client';
+
 import { TicketStatusBadge } from './ticket-status-badge';
 import { TicketStatusUpdater } from './ticket-status-updater';
 
-interface PageProps {
-  params: {
-    ticketId: string;
-  };
+interface SupportTicketPageProps {
+  params: { ticketId: string };
 }
 
-export default function TicketDetailPage({ params }: PageProps) {
+export default function SupportTicketPage({ params }: SupportTicketPageProps) {
   const [ticket, setTicket] = useState<SupportTicket | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
+  const ticketId = Number(params.ticketId);
+
+  const loadTicket = useCallback(async () => {
+    if (!Number.isInteger(ticketId) || ticketId <= 0) {
+      setError('El identificador del ticket no es válido.');
+      setIsLoading(false);
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      setTicket(await supportApi.getTicket(ticketId));
+    } catch (requestError) {
+      const apiError = requestError as Partial<ApiError>;
+      if (apiError.status === 404) {
+        setError('El ticket solicitado no existe.');
+      } else {
+        setError('No fue posible cargar el ticket.');
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  }, [ticketId]);
 
   useEffect(() => {
-    const fetchTicket = async () => {
-      if (!params.ticketId) {
-        setError('ID de ticket inválido');
-        setLoading(false);
-        return;
-      }
+    void loadTicket();
+  }, [loadTicket]);
 
-      setLoading(true);
-      setError(null);
-      
-      try {
-        const response = await supportApi.getTicket(params.ticketId);
-        setTicket(response);
-      } catch (err: any) {
-        if (err.status === 404) {
-          // No se revela información al usuario sobre el ticket
-          setError('Ticket no encontrado');
-        } else {
-          setError('Error al cargar el ticket. Por favor, inténtelo de nuevo.');
-          console.error(err);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchTicket();
-  }, [params.ticketId]);
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center py-12">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-600"></div>
-      </div>
-    );
+  if (isLoading) {
+    return <p className="p-6">Cargando ticket…</p>;
   }
 
-  if (error) {
+  if (error || !ticket) {
     return (
-      <div className="max-w-4xl mx-auto py-8 px-4">
-        <div className="rounded-md bg-red-50 p-4 mb-6">
-          <p className="text-sm text-red-700">{error}</p>
-          <Button 
-            onClick={() => router.push('/support')} 
-            variant="outline" 
-            className="mt-2"
-          >
-            Volver a la lista de tickets
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  if (!ticket) {
-    return (
-      <div className="max-w-4xl mx-auto py-8 px-4">
-        <div className="rounded-md bg-red-50 p-4 mb-6">
-          <p className="text-sm text-red-700">No se pudo cargar el ticket.</p>
-          <Button 
-            onClick={() => router.push('/support')} 
-            variant="outline" 
-            className="mt-2"
-          >
-            Volver a la lista de tickets
-          </Button>
-        </div>
-      </div>
+      <main className="p-6">
+        <p role="alert" className="text-red-600">
+          {error ?? 'No fue posible cargar el ticket.'}
+        </p>
+      </main>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4">
-      <div className="mb-6">
-        <Button 
-          onClick={() => router.push('/support')} 
-          variant="outline" 
-          size="sm"
-          className="mb-4"
-        >
-          ← Volver a la lista
-        </Button>
-          <div className="flex justify-between items-start">
+    <main className="mx-auto max-w-3xl space-y-6 p-6">
+      <header className="space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-sm text-slate-500">Ticket #{ticket.id}</p>
+          <TicketStatusBadge status={ticket.status} />
+        </div>
+        <h1 className="text-3xl font-bold">{ticket.title}</h1>
+      </header>
+
+      <section className="rounded-lg border border-slate-200 bg-white p-5">
+        <dl className="grid gap-4 sm:grid-cols-2">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">{ticket.title}</h1>
-            <div className="flex items-center space-x-2">
-              <TicketStatusBadge status={ticket.status} />
-            </div>
+            <dt className="text-sm font-medium text-slate-500">Categoría</dt>
+            <dd>{ticket.category?.name ?? 'Sin categoría'}</dd>
           </div>
+          <div>
+            <dt className="text-sm font-medium text-slate-500">Creado</dt>
+            <dd>{new Date(ticket.created_at).toLocaleString('es-MX')}</dd>
+          </div>
+        </dl>
+        <div className="mt-5">
+          <h2 className="text-sm font-medium text-slate-500">Descripción</h2>
+          <p className="mt-1 whitespace-pre-wrap">
+            {ticket.description ?? 'Sin descripción'}
+          </p>
         </div>
-      </div>
+      </section>
 
-      <div className="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden mb-8">
-        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-          <h2 className="text-lg font-medium text-gray-900">Detalles del ticket</h2>
-        </div>
-        <div className="p-6">
-          <dl className="space-y-4">
-            <div className="flex">
-              <dt className="text-sm font-medium text-gray-500 w-32">Fecha de creación:</dt>
-              <dd className="text-sm text-gray-900">{new Date(ticket.created_at).toLocaleString()}</dd>
-            </div>
-            {ticket.category_id && (
-              <div className="flex">
-                <dt className="text-sm font-medium text-gray-500 w-32">Categoría:</dt>
-                <dd className="text-sm text-gray-900">{ticket.category_id}</dd>
-              </div>
-            )}
-            {ticket.description && (
-              <div className="flex">
-                <dt className="text-sm font-medium text-gray-500 w-32">Descripción:</dt>
-                <dd className="text-sm text-gray-900">{ticket.description}</dd>
-              </div>
-            )}
-          </dl>
-        </div>
-      </div>
-
-      {/* Add Status Updater Component */}
-      <TicketStatusUpdater ticket={ticket} onStatusChange={() => window.location.reload()} />
-
-      <div className="bg-white shadow-sm rounded-lg border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-          <h2 className="text-lg font-medium text-gray-900">Historial de estado</h2>
-        </div>
-        <div className="p-6">
-          <p className="text-sm text-gray-600">Para historial completo del cambio de estado, consulte con soporte.</p>
-        </div>
-      </div>
-    </div>
+      <TicketStatusUpdater ticket={ticket} onStatusUpdated={loadTicket} />
+    </main>
   );
 }

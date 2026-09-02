@@ -45,9 +45,9 @@ async def async_app(mock_use_case):
     def mock_get_use_case():
         return mock_use_case
 
-    app.dependency_overrides[
-        pub_branches_mod.get_public_branch_list_use_case
-    ] = mock_get_use_case
+    app.dependency_overrides[pub_branches_mod.get_public_branch_list_use_case] = (
+        mock_get_use_case
+    )
 
     yield app
 

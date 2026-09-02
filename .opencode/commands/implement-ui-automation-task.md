@@ -1,6 +1,7 @@
 ---
 description: Implementa automatizacion UI/E2E para un slice InVet.
 agent: invet-ui-automation-implementer
+subtask: false
 ---
 
 Implementa la automatizacion UI del slice indicado por `$ARGUMENTS`.

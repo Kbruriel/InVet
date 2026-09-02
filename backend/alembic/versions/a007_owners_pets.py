@@ -4,6 +4,7 @@ Revision ID: a007_owners_pets
 Revises: a006_services_vets_internal_users
 Create Date: 2026-08-09
 """
+
 import sqlalchemy as sa
 
 from alembic import op

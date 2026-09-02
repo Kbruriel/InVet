@@ -17,13 +17,15 @@ Las fuentes normativas complementarias son:
 
 - `.opencode/agents/invet-orchestrator.md`
 - `.opencode/commands/execute-slice.md`
+- `docs/opencode/agent_registry.json`
+- `backend/scripts/validate_agent_catalog.py`
 - `backend/scripts/validate_slice_plan.py`
 - `docs/opencode/04_agent_contracts.md`
 - `docs/opencode/05_done_gates_by_command.md`
 - `docs/opencode/templates/slice_plan_template.md`
 - `docs/opencode/references/spec_kit_reference_improvements.md`
 
-En caso de discrepancia, prevalecen el validador determinista y el contrato del comando que se esta ejecutando.
+En caso de discrepancia de inventario o mapeo prevalece `agent_registry.json` y debe corregirse la configuracion hasta que `validate_agent_catalog.py` apruebe. Para el comportamiento de una fase prevalecen el validador determinista y el contrato del comando que se esta ejecutando.
 
 ## Inventario recuperado
 
@@ -402,7 +404,7 @@ Durante este flujo, el agente activo ejecuta directamente los lotes mecanicos, l
 
 | Agente | Comando principal | Responsabilidad | Puede modificar codigo | Evidencia o gate |
 |---|---|---|---|---|
-| InVet Orchestrator | `/execute-slice` | Normalizar el ID, coordinar agentes y detenerse ante gates fallidos | Solo por delegacion | Flujo completo del slice |
+| InVet Orchestrator | `/execute-slice` | Normalizar el ID, ejecutar directamente el contrato de cada etapa y detenerse ante gates fallidos | Si, dentro de la allowlist de la etapa activa | Flujo completo del slice |
 | Product Planner | `/plan-task` | Crear el plan canonico schema v3 con tareas BE, FE y QA trazables, mas `US/UIA/APIA` | No | `BE-00X-plan.md` valido |
 | Backend Implementer | `/implement-backend-task` | Implementar backend y sus pruebas unitarias | Si, backend y pruebas relacionadas | Tareas BE y validaciones satisfechas |
 | Frontend Implementer | `/implement-frontend-task` | Implementar UI, integracion y pruebas unitarias de frontend | Si, frontend y pruebas relacionadas | Tareas FE y validaciones satisfechas |
@@ -731,8 +733,19 @@ El gate final es obligatorio, usa el modelo seleccionado y valida que los artefa
 
 La ruta canónica para completar un slice vertical `BE-00X / FE-00X / QA-00X` es esta. El flujo separa con claridad la implementacion de producto, la automatizacion y la validacion final, para evitar bucles como "QA llama a review y review vuelve a QA" sin correccion real.
 
+### Paso 0: iniciar el slice completo
+
+El prerrequisito operativo es identificar el indice compartido del slice y confirmar que existe contexto suficiente en backlog, especificaciones o artefactos previos para planificarlo. Para ejecutar todas las fases de `00X` en orden canonico, inicia:
+
+```text
+/execute-slice BE-00X
+```
+
+Tambien se acepta `FE-00X` o `QA-00X`: el comando normaliza los tres prefijos al mismo indice. `invet-orchestrator` permanece como agente activo durante todo el flujo, aplica directamente el contrato de cada etapa y se detiene ante el primer gate no aprobado. Si solo se quiere ejecutar o reanudar una fase, se usa su comando especializado de la tabla y el agente manual correspondiente.
+
 | Fase | Comando | Prompt recomendado | Resultado esperado |
 |---|---|---|---|
+| 0. Iniciar slice | `/execute-slice BE-00X` | "Ejecuta el slice vertical 00X completo. Normaliza BE/FE/QA al mismo indice, recorre las fases en orden, respeta el contrato y allowlist de cada etapa, conserva evidencia y detente ante el primer `REJECTED`, `BLOCKED`, finding bloqueante o artefacto stale." | `invet-orchestrator` inicia o reanuda el flujo desde la primera fase pendiente |
 | 1. Plan | `/plan-task BE-00X` | "Lee el contexto del slice 00X, genera o actualiza `docs/opencode/plans/BE-00X-plan.md` con schema v3, crea o actualiza `US-00X`, `UIA-00X` y `APIA-00X`, valida con `backend/scripts/validate_slice_plan.py --stage plan` y al cerrar reporta `Estado de ejecucion` y `Siguiente paso recomendado`." | Plan canonico v3 listo, trazabilidad completa y tareas atomicas definidas |
 | 2. Backend | `/implement-backend-task BE-00X` | "Implementa solo las tareas `Capa: backend` pendientes del plan, agrega pruebas unitarias para todo cambio productivo, valida `secure-persistence` cuando aplique y no toques frontend ni automatizacion." | Backend funcional y con evidencia de pruebas |
 | 3. Frontend | `/implement-frontend-task BE-00X` | "Implementa solo las tareas `Capa: frontend` pendientes, conserva el sistema visual del proyecto, agrega pruebas de componente o unidad y reporta los archivos tocados con evidencia." | Frontend funcional y verificable |
@@ -746,6 +759,190 @@ La ruta canónica para completar un slice vertical `BE-00X / FE-00X / QA-00X` es
 | 11. Checks tecnicos | `/run-checks BE-00X` | "Ejecuta backend/frontend y reejecuta API automation contra el backend Docker; distingue pass/fail/blocked con evidencia." | `APPROVED` recomienda `/update-docs BE-00X`; fallo vuelve al propietario |
 | 12. Documentacion | `/update-docs BE-00X` | "Actualiza contratos, riesgos, decisiones y changelog solo despues de QA, reviews y checks aprobados." | Documentacion final cerrada |
 | 13. Release obligatorio | `/final-gate BE-00X` | "Verifica el cierre global, valida evidencia mecanica adicional si hace falta y aprueba solo si ya no quedan bloqueos." | Decision final de release |
+
+### Agente responsable por cada paso
+
+Existen dos rutas validas y ambas conservan un solo modelo sin subagentes:
+
+- Flujo completo: `/execute-slice BE-00X` mantiene `invet-orchestrator` como agente activo. El orquestador ejecuta directamente cada contrato de etapa, respeta su allowlist semantica, sus reglas de escritura y su gate, y dispone de la union de comandos mecanicos seguros del flujo; no invoca ni cambia a otro agente.
+- Fase manual: el usuario inicia el comando especializado y OpenCode selecciona directamente el perfil declarado en `agent:`. Todos los comandos declaran `subtask: false` y todos los perfiles usan `mode: primary` con permiso `task: deny`.
+
+Por ejemplo, `/implement-backend-task BE-014` debe ejecutarse directamente con `invet-backend-implementer`. Si se llega a Backend desde `/execute-slice BE-014`, el agente activo sigue siendo `invet-orchestrator`, pero aplica el mismo contrato, manifiesto y allowlist de backend.
+
+#### Diagrama de ejecución del slice completo
+
+```mermaid
+flowchart TD
+    A{"Modo de ejecución"}
+    A -->|"/execute-slice"| O["Agente activo: invet-orchestrator<br/>ejecución directa en todas las etapas"]
+    A -->|"comandos manuales"| M["El comando selecciona su perfil<br/>agent + subtask false"]
+    O --> P1
+    M --> P1
+    P1["1. Plan<br/>completo: orchestrator<br/>manual: product-planner"] --> P2["2. Backend<br/>completo: orchestrator<br/>manual: backend-implementer"]
+    P2 --> P3["3. Frontend<br/>completo: orchestrator<br/>manual: frontend-implementer"]
+    P3 --> P4["4. UI automation<br/>completo: orchestrator<br/>manual: ui-automation-implementer"]
+    P4 --> P5["5. API automation<br/>completo: orchestrator<br/>manual: api-automation-implementer"]
+    P5 --> P6["6. QA<br/>completo: orchestrator<br/>manual: qa-validator"]
+    P6 --> P7["7. Review funcional<br/>completo: orchestrator<br/>manual: slice-reviewer"]
+    P7 --> P8["8. Clean architecture<br/>completo: orchestrator<br/>manual: clean-architecture-reviewer"]
+    P8 --> P9["9. Seguridad<br/>completo: orchestrator<br/>manual: security-reviewer"]
+    P9 --> P10["10. UI checks<br/>completo: orchestrator<br/>manual: check-runner"]
+    P10 --> H{"¿Hay hallazgos bloqueantes?"}
+    H -->|Sí| F["Corregir hallazgos<br/>completo: orchestrator<br/>manual: findings-implementer"]
+    F --> P6
+    H -->|No| P11["11. Checks técnicos<br/>completo: orchestrator<br/>manual: check-runner"]
+    P11 --> P12["12. Documentación<br/>completo: orchestrator<br/>manual: docs-updater"]
+    P12 --> P13["13. Gate final<br/>completo: orchestrator<br/>manual: final-reviewer"]
+    P13 --> Z["Slice cerrado"]
+```
+
+El bucle de hallazgos regresa a QA y vuelve a recorrer las revisiones y checks necesarios antes de actualizar la documentacion y solicitar el gate final. En la ruta completa no ocurre un cambio de agente: `invet-orchestrator` ejecuta tambien el contrato de correccion y la revalidacion.
+
+| Fase | Comando | Agente activo en `/execute-slice` | Agente en ejecucion manual |
+|---|---|---|---|
+| 0. Iniciar o reanudar el slice completo | `/execute-slice BE-00X` | `invet-orchestrator` | `invet-orchestrator` |
+| 1. Plan | `/plan-task BE-00X` | `invet-orchestrator` | `invet-product-planner` |
+| 2. Backend | `/implement-backend-task BE-00X` | `invet-orchestrator` | `invet-backend-implementer` |
+| 3. Frontend | `/implement-frontend-task BE-00X` | `invet-orchestrator` | `invet-frontend-implementer` |
+| 4. Automatizacion UI | `/implement-ui-automation-task BE-00X` | `invet-orchestrator` | `invet-ui-automation-implementer` |
+| 5. Automatizacion API | `/implement-api-automation-task BE-00X` | `invet-orchestrator` | `invet-api-automation-implementer` |
+| 6. QA | `/qa-task QA-00X` | `invet-orchestrator` | `invet-qa-validator` |
+| 7. Revision del slice | `/review-slice BE-00X` | `invet-orchestrator` | `invet-slice-reviewer` |
+| 8. Arquitectura limpia | `/clean-architecture-review BE-00X` | `invet-orchestrator` | `invet-clean-architecture-reviewer` |
+| 9. Seguridad | `/security-review BE-00X` | `invet-orchestrator` | `invet-security-reviewer` |
+| 10. Checks de UI | `/run-ui-checks BE-00X` | `invet-orchestrator` | `invet-check-runner` |
+| Correccion cuando hay hallazgos | `/implement-findings BE-00X` | `invet-orchestrator` | `invet-findings-implementer` |
+| 11. Checks de repositorio | `/run-checks BE-00X` | `invet-orchestrator` | `invet-check-runner` |
+| 12. Documentacion | `/update-docs BE-00X` | `invet-orchestrator` | `invet-docs-updater` |
+| 13. Release obligatorio | `/final-gate BE-00X` | `invet-orchestrator` | `invet-final-reviewer` |
+
+Los IDs `BE`, `FE` y `QA` se normalizan al mismo indice. La tabla usa el alias recomendado de cada etapa para que el comando de reanudacion sea inequívoco.
+
+### Prompts recomendados por etapa
+
+Estos prompts son plantillas de invocacion para el usuario. Sustituye `00X` por el indice real del slice y conserva el prefijo `BE` o `QA` mostrado. La primera linea activa el comando y selecciona el agente manual indicado en la tabla anterior; el texto restante precisa alcance y evidencia, pero no reemplaza el contrato del agente. En `/execute-slice`, `invet-orchestrator` permanece activo durante todas las etapas.
+
+Todas las plantillas comparten este requisito de cierre: informar `Estado de ejecucion`, evidencia verificable, archivos modificados y `Siguiente paso recomendado`; nunca declarar `COMPLETED` o `APPROVED` si existe un bloqueo o una validacion pendiente.
+
+#### 0. Slice completo — `invet-orchestrator`
+
+```text
+/execute-slice BE-00X
+
+Ejecuta el slice vertical completo en el orden canonico. Normaliza BE/FE/QA al mismo indice, respeta el manifiesto y el allowlist de cada etapa, registra evidencia mecanica y detente ante el primer REJECTED, BLOCKED, finding bloqueante o artefacto stale. Si aparecen findings, aplica el bucle correccion -> QA -> reviews afectados -> UI checks -> checks antes de documentar y solicitar el gate final.
+```
+
+#### 1. Plan — `invet-product-planner`
+
+```text
+/plan-task BE-00X
+
+Regenera o actualiza el plan canonico schema v3 del slice. Incluye secciones normativas, tareas atomicas con formato canonico, subsecciones FE, capa QA, US, UIA, APIA, cinco manifiestos y carryovers trazables. Ejecuta validate_slice_plan.py para stage plan y no habilites implementacion mientras exista un gap.
+```
+
+#### 2. Backend — `invet-backend-implementer`
+
+```text
+/implement-backend-task BE-00X
+
+Implementa unicamente las tareas backend pendientes del plan y manifiesto vigentes. Conserva Clean Architecture, aislamiento por clinica, permisos e invariantes de seguridad; agrega migraciones y pruebas unitarias o HTTPX cuando apliquen. Ejecuta las validaciones backend, incluida secure-persistence cuando corresponda, y registra evidencia por tarea sin tocar frontend ni automatizacion.
+```
+
+#### 3. Frontend — `invet-frontend-implementer`
+
+```text
+/implement-frontend-task BE-00X
+
+Implementa unicamente las tareas frontend pendientes y sus criterios de aceptacion. Conserva el sistema visual, rutas, estados de carga/vacio/error, accesibilidad y contratos del backend. Agrega pruebas de componente o unidad, valida build y typecheck, y no modifiques backend ni automatizacion salvo que el plan lo autorice expresamente.
+```
+
+#### 4. Automatizacion UI — `invet-ui-automation-implementer`
+
+```text
+/implement-ui-automation-task BE-00X
+
+Implementa o corrige los escenarios Playwright UI trazados a US y criterios de aceptacion. Prepara db/backend/frontend con Docker, usa PLAYWRIGHT_START_FRONTEND=false y ejecuta contra los puertos publicados sin fallback al host. Reporta escenarios, resultados y evidencia; si el producto falla, abre o actualiza el finding y no ocultes el fallo ajustando expectativas.
+```
+
+#### 5. Automatizacion API — `invet-api-automation-implementer`
+
+```text
+/implement-api-automation-task BE-00X
+
+Implementa o corrige los escenarios Playwright API trazados al contrato HTTP, incluyendo autenticacion, autorizacion, payloads y casos negativos. Ejecuta contra el backend publicado por Docker sin fallback al host. Distingue defectos de producto, automatizacion y entorno, y registra evidencia reproducible.
+```
+
+#### 6. QA — `invet-qa-validator`
+
+```text
+/qa-task QA-00X
+
+Valida el slice completo contra plan, manifiestos, US y matriz de trazabilidad. Recupera dependencias o entorno cuando sea seguro, ejecuta las suites reales y actualiza QA-00X-results.md y QA-00X-findings.md. No repares producto desde QA y emite APPROVED, REJECTED o BLOCKED exclusivamente con evidencia.
+```
+
+#### 7. Revision funcional — `invet-slice-reviewer`
+
+```text
+/review-slice BE-00X
+
+Revisa el diff y la evidencia del slice vertical contra el plan y los criterios de aceptacion. Confirma que QA este aprobada, detecta regresiones, omisiones y cambios fuera de alcance, y documenta hallazgos accionables sin modificar producto. Si falta evidencia QA, devuelve el flujo a /qa-task QA-00X.
+```
+
+#### 8. Arquitectura limpia — `invet-clean-architecture-reviewer`
+
+```text
+/clean-architecture-review BE-00X
+
+Revisa limites de capas, direccion de dependencias, responsabilidades, contratos y persistencia del slice. Usa el diff y la evidencia existente, clasifica hallazgos por impacto y no modifiques codigo. Aprueba solo cuando no queden violaciones bloqueantes de arquitectura.
+```
+
+#### 9. Seguridad — `invet-security-reviewer`
+
+```text
+/security-review BE-00X
+
+Revisa autenticacion, autorizacion, aislamiento por clinica, exposicion de datos, validacion de entrada, secretos e IDOR/BOLA. Verifica casos positivos y negativos con evidencia, registra hallazgos concretos y no modifiques producto. No apruebes mientras exista un riesgo bloqueante sin resolver.
+```
+
+#### 10. Checks UI — `invet-check-runner`
+
+```text
+/run-ui-checks BE-00X
+
+Reejecuta los checks UI y de regresion contra db/backend/frontend de Docker con PLAYWRIGHT_START_FRONTEND=false y sin fallback al host. Comprueba salud del entorno, conserva logs utiles y clasifica el resultado como APPROVED, REJECTED o BLOCKED indicando el propietario de cualquier fallo.
+```
+
+#### Correccion condicional de hallazgos — `invet-findings-implementer`
+
+```text
+/implement-findings BE-00X
+
+Corrige exclusivamente los findings OPEN o IN_PROGRESS del slice, respetando su capa propietaria y el alcance autorizado. Agrega o actualiza pruebas de regresion, registra evidencia por finding y cambia a READY_FOR_REVALIDATION, nunca a cerrado. Al terminar, recomienda /qa-task QA-00X y los reviews o checks afectados.
+```
+
+#### 11. Checks tecnicos — `invet-check-runner`
+
+```text
+/run-checks BE-00X
+
+Ejecuta los checks formales aplicables de backend y frontend y reejecuta la automatizacion API contra el backend Docker. Incluye lint, formato, tipos, build y pruebas segun el repositorio; no omitas fallos ni uses resultados previos como sustituto. Reporta pass, fail o blocked con comando y evidencia.
+```
+
+#### 12. Documentacion — `invet-docs-updater`
+
+```text
+/update-docs BE-00X
+
+Actualiza contratos, decisiones, riesgos, trazabilidad y changelog usando unicamente el estado verificado del slice. Confirma primero que QA, reviews y checks esten aprobados; no encubras pendientes ni alteres codigo productivo. Deja documentados los comandos y resultados que sustentan el cierre.
+```
+
+#### 13. Gate final — `invet-final-reviewer`
+
+```text
+/final-gate BE-00X
+
+Verifica de forma independiente el cierre global del slice: plan y manifiestos vigentes, tareas y carryovers cerrados, QA y reviews aprobados, checks verdes, documentacion sincronizada y ausencia de findings bloqueantes. Ejecuta evidencia mecanica adicional si es necesaria y emite la decision final sin modificar producto.
+```
 
 ### Mapa operativo por capa
 
@@ -813,9 +1010,12 @@ El directorio de payload es el espejo distribuible del sistema agentico. Los cam
 
 Las pruebas de contrato deben verificar como minimo:
 
-- Registro y despliegue de `/execute-slice`.
-- Sincronizacion de agentes y comandos.
+- Registro y despliegue de los 14 agentes y 15 comandos declarados en `agent_registry.json`.
+- Mapeo exacto comando-agente entre OpenCode y GitHub Copilot.
+- `mode: primary`, `subtask: false` y denegacion del permiso `task` en OpenCode.
+- Sincronizacion byte a byte de agentes, comandos, contratos y validadores incluidos en `payload`.
 - Despliegue de `backend/scripts/validate_slice_plan.py`.
+- Despliegue y ejecucion de `backend/scripts/validate_agent_catalog.py`.
 - Compatibilidad de plantillas con schema v3.
 - Presencia de los campos y decisiones requeridos en artefactos.
 - Rechazo de planes legacy y de gates incompletos.

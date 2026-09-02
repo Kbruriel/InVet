@@ -1,28 +1,34 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+
+import { supportApi, type TicketListResponse } from '@/shared/api/support';
+
 import { TicketList } from './ticket-list';
 
-const mockTickets = [
-  {
-    id: '1',
-    clinic_id: 'clinic-1',
-    owner_id: 'owner-1',
-    title: 'Test Ticket 1',
-    description: 'Description 1',
-    category_id: '1',
-    status: 'initiated',
-    created_at: '2023-01-01T00:00:00Z'
+jest.mock('@/shared/api/support', () => ({
+  ...jest.requireActual('@/shared/api/support'),
+  supportApi: {
+    createTicket: jest.fn(),
+    listTickets: jest.fn(),
+    getTicket: jest.fn(),
+    updateTicketStatus: jest.fn(),
+    getCategories: jest.fn(),
   },
-  {
-    id: '2',
-    clinic_id: 'clinic-1',
-    owner_id: 'owner-1',
-    title: 'Test Ticket 2',
-    description: 'Description 2',
-    category_id: '2',
-    status: 'pending',
-    created_at: '2023-01-02T00:00:00Z'
-  }
-];
+}));
+
+const mockedSupportApi = supportApi as jest.Mocked<typeof supportApi>;
+const response: TicketListResponse = {
+  items: [
+    {
+      id: 21,
+      title: 'Error al facturar',
+      status: 'iniciado',
+      category_name: 'Facturación',
+      owner_name: 'Ada Lovelace',
+      created_at: '2026-08-30T12:00:00Z',
+    },
+  ],
+  meta: { total: 1, page: 1, page_size: 10, pages: 1 },
+};
 
 describe('TicketList', () => {
   const onTicketClick = jest.fn();
@@ -31,24 +37,42 @@ describe('TicketList', () => {
     jest.clearAllMocks();
   });
 
-  it('renders loading state initially', () => {
-    // This test would require more complex setup to mock API call
-    // For now, we are mainly validating structure
-    expect(true).toBe(true); // Placeholder test
-  });
-
-  it('renders tickets correctly', async () => {
-    // Render the component with mocked data  
-    // In a more complete implementation, this would require mocking the API service
-    
-    // Just check that the component renders without throwing errors
-    expect(true).toBe(true);
-  });
-
-  it('shows empty state when no tickets', () => {
+  it('carga y muestra los tickets', async () => {
+    mockedSupportApi.listTickets.mockResolvedValue(response);
     render(<TicketList onTicketClick={onTicketClick} />);
-    
-    // Check for empty state - will need to be implemented for more precise testing
-    expect(true).toBe(true); // Placeholder test
+
+    expect(await screen.findByText('Error al facturar')).toBeInTheDocument();
+    expect(mockedSupportApi.listTickets).toHaveBeenCalledWith({ page: 1, page_size: 10 });
+  });
+
+  it('notifica el ID al seleccionar una fila', async () => {
+    mockedSupportApi.listTickets.mockResolvedValue(response);
+    render(<TicketList onTicketClick={onTicketClick} />);
+
+    const title = await screen.findByText('Error al facturar');
+    fireEvent.click(title.closest('tr') as HTMLTableRowElement);
+    expect(onTicketClick).toHaveBeenCalledWith(21);
+  });
+
+  it('muestra el estado vacío', async () => {
+    mockedSupportApi.listTickets.mockResolvedValue({
+      items: [],
+      meta: { total: 0, page: 1, page_size: 10, pages: 0 },
+    });
+    render(<TicketList onTicketClick={onTicketClick} />);
+
+    expect(await screen.findByText(/no hay tickets para mostrar/i)).toBeInTheDocument();
+  });
+
+  it('permite reintentar después de un error', async () => {
+    const consoleError = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+    mockedSupportApi.listTickets
+      .mockRejectedValueOnce(new Error('network'))
+      .mockResolvedValueOnce(response);
+    render(<TicketList onTicketClick={onTicketClick} />);
+
+    fireEvent.click(await screen.findByRole('button', { name: /reintentar/i }));
+    await waitFor(() => expect(screen.getByText('Error al facturar')).toBeInTheDocument());
+    consoleError.mockRestore();
   });
 });

@@ -12,6 +12,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from app.data.review_repo import ReviewRepository
 from app.domain.entities.appointment import AppointmentStatus
 from app.domain.entities.review import (
     Review,
@@ -21,7 +22,6 @@ from app.domain.entities.review import (
 )
 from app.domain.repositories.appointment_repository import AppointmentRepository
 from app.domain.repositories.branch_repository import RatingSummaryRepository
-from app.data.review_repo import ReviewRepository
 
 
 class ReviewError(Exception):
@@ -111,7 +111,9 @@ class ReviewService:
         )
         # Aislamiento de tenant propietario: solo el owner de la cita puede calificar.
         owner_id = await self.review_repo.get_owner_id_by_user(user_id)
-        if owner_id is None or int(getattr(appointment, "owner_id", 0)) != int(owner_id):
+        if owner_id is None or int(getattr(appointment, "owner_id", 0)) != int(
+            owner_id
+        ):
             raise ReviewNotAuthorizedError()
 
         if await self.review_repo.exists_by_appointment(payload.appointment_id):
@@ -127,13 +129,11 @@ class ReviewService:
         )
         created = await self.review_repo.create(review)
 
-        total, distribution = await self.review_repo.get_review_stats(
-            created.branch_id
-        )
+        total, distribution = await self.review_repo.get_review_stats(created.branch_id)
         if total > 0:
-            average = sum(
-                rating * count for rating, count in distribution.items()
-            ) / total
+            average = (
+                sum(rating * count for rating, count in distribution.items()) / total
+            )
             await self.rating_repo.upsert_rating_summary(
                 branch_id=created.branch_id,
                 average_rating=round(average, 2),
@@ -212,9 +212,7 @@ class ReviewService:
     async def _get_completed_appointment(
         self, appointment_id: int, clinic_id: int
     ) -> Any:
-        appointment = await self.appointment_repo.get_by_id(
-            appointment_id, clinic_id
-        )
+        appointment = await self.appointment_repo.get_by_id(appointment_id, clinic_id)
         if appointment is None:
             raise ReviewNotCompletedError()
         if appointment.status != AppointmentStatus.COMPLETED:

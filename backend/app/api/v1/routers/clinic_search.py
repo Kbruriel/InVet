@@ -24,8 +24,9 @@ def get_clinic_search_use_case(
 @router.get("/buscar", response_model=ClinicSearchResponse)
 async def search_clinicas(
     location: str | None = Query(None, description="Ubicación para filtrar clínicas"),
-    service_type: str
-    | None = Query(None, description="Tipo de servicio para filtrar clínicas"),
+    service_type: str | None = Query(
+        None, description="Tipo de servicio para filtrar clínicas"
+    ),
     page: int = Query(1, ge=1, description="Número de página (comienza en 1)"),
     size: int = Query(10, ge=1, le=100, description="Tamaño de página (máximo 100)"),
     use_case: SearchClinicsUseCase = Depends(get_clinic_search_use_case),

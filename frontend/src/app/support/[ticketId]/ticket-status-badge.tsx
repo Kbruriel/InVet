@@ -1,23 +1,27 @@
-'use client';
+import type { TicketStatus } from '@/shared/api/support';
 
-import { SupportTicket } from '@/shared/api/support';
+const STATUS_STYLES: Record<TicketStatus, string> = {
+  iniciado: 'bg-blue-100 text-blue-800',
+  pendiente: 'bg-amber-100 text-amber-800',
+  proceso: 'bg-violet-100 text-violet-800',
+  completado: 'bg-emerald-100 text-emerald-800',
+  cerrado: 'bg-slate-200 text-slate-700',
+};
 
-interface TicketStatusBadgeProps {
-  status: SupportTicket['status'];
-}
+const STATUS_LABELS: Record<TicketStatus, string> = {
+  iniciado: 'Iniciado',
+  pendiente: 'Pendiente',
+  proceso: 'En proceso',
+  completado: 'Completado',
+  cerrado: 'Cerrado',
+};
 
-export function TicketStatusBadge({ status }: TicketStatusBadgeProps) {
-  const statusClasses = {
-    initiated: 'bg-blue-100 text-blue-800',
-    pending: 'bg-yellow-100 text-yellow-800',
-    process: 'bg-purple-100 text-purple-800',
-    completed: 'bg-green-100 text-green-800',
-    closed: 'bg-gray-100 text-gray-800'
-  };
-
+export function TicketStatusBadge({ status }: { status: TicketStatus }) {
   return (
-    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${statusClasses[status] || 'bg-gray-100 text-gray-800'}`}>
-      {status}
+    <span
+      className={`inline-flex rounded-full px-3 py-1 text-sm font-medium ${STATUS_STYLES[status]}`}
+    >
+      {STATUS_LABELS[status]}
     </span>
   );
 }

@@ -4,6 +4,8 @@ Esta carpeta contiene la documentacion operativa para ejecutar InVet por slices 
 
 Consulta `15_operational_manifests_flow.md` para la propiedad, verificacion y cadena completa de manifiestos operativos.
 
+El inventario canonico de perfiles y comandos vive en `agent_registry.json`. Verifica su paridad entre OpenCode, GitHub Copilot y `payload` con `python backend/scripts/validate_agent_catalog.py`.
+
 ## Skills vs agentes OpenCode
 
 Los `invet-*` son agentes OpenCode, no skills Codex. Se ejecutan mediante comandos slash.
@@ -84,6 +86,7 @@ Los archivos de hallazgos esperados son:
 - `12_troubleshooting_skills_vs_agents.md`: solucion al error de confundir skills Codex con agentes OpenCode.
 - `13_agents_architecture_and_gate_flow.md`: arquitectura agentica y continuidad de gates.
 - `14_github_copilot_agentic_flow.md`: version del flujo compatible con GitHub Copilot.
+- `agent_registry.json`: fuente canonica de agentes, nombres GitHub, comandos y politica sin delegacion.
 - `templates`: plantillas Markdown para resultados, hallazgos y correcciones.
 - `templates/slice_plan_template.md`: contrato obligatorio de planes schema v3.
 - `templates/carryovers_registry_template.md`: plantilla para registrar tareas postergadas o transferidas.
@@ -92,6 +95,7 @@ Los archivos de hallazgos esperados son:
 - `references/carryovers_governance.md`: reglas para tareas postergadas y cierres cruzados entre slices.
 - `references/slice_task_context.md`: brief por slice con titulo, descripcion, entregables BE/FE y foco de aceptacion QA.
 - `references/missing_artifact_generation.md`: procedimiento para migrar backups legacy de `payload/` a artefactos canonicos validos.
+- `references/docker_frontend_build_troubleshooting.md`: diagnostico reproducible de lint, tipos y builds Docker frontend, con reglas para distinguir errores del slice, deuda heredada, advertencias y cache local.
 - `tasks/backend`: tareas backend.
 - `tasks/frontend`: tareas frontend.
 - `tasks/qa`: tareas QA.

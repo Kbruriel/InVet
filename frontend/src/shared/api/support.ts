@@ -1,107 +1,103 @@
 import { apiClient } from './client';
 
-// Tipos de datos para soporte
+export const TICKET_STATUSES = [
+  'iniciado',
+  'pendiente',
+  'proceso',
+  'completado',
+  'cerrado',
+] as const;
+
+export type TicketStatus = (typeof TICKET_STATUSES)[number];
 
 export interface SupportCategory {
-  id: string;
-  clinic_id: string;
+  id: number;
   name: string;
-  active: boolean;
 }
-
-export interface SupportTicketStatus {
-  initiated: 'initiated';
-  pending: 'pending';
-  process: 'process';
-  completed: 'completed';
-  closed: 'closed';
-}
-
-export type TicketStatus = keyof SupportTicketStatus;
 
 export interface SupportTicket {
-  id: string;
-  clinic_id: string;
-  owner_id: string;
+  id: number;
+  clinic_id: number;
+  owner_id: number;
   title: string;
-  description?: string;
-  category_id?: string;
+  description: string | null;
+  category_id: number | null;
+  category?: SupportCategory | null;
   status: TicketStatus;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SupportTicketListItem {
+  id: number;
+  title: string;
+  status: TicketStatus;
+  category_name: string | null;
+  owner_name: string;
   created_at: string;
 }
 
 export interface CreateSupportTicketRequest {
   title: string;
   description?: string;
-  category_id?: string;
+  category_id?: number;
 }
 
 export interface UpdateTicketStatusRequest {
-  status: TicketStatus;
+  new_status: TicketStatus;
+}
+
+export interface TicketStatusChangeResponse {
+  ticket_id: number;
+  old_status: TicketStatus;
+  new_status: TicketStatus;
 }
 
 export interface ListTicketsFilters {
   page?: number;
   page_size?: number;
-  status?: TicketStatus; 
+  status?: TicketStatus;
 }
 
-// Client
-export const supportApi = {
-  // Crear un ticket de soporte
-  createTicket: async (data: CreateSupportTicketRequest): Promise<SupportTicket> => {
-    const response = await apiClient.post<SupportTicket>('/tickets', {
-      body: JSON.stringify(data),
-    });
-    return response.json();
-  },
-
-  // Listar tickets
-  listTickets: async (filters?: ListTicketsFilters): Promise<{
-    items: SupportTicket[];
+export interface TicketListResponse {
+  items: SupportTicketListItem[];
+  meta: {
+    total: number;
     page: number;
     page_size: number;
-    total: number;
-  }> => {
+    pages?: number;
+  };
+}
+
+export const supportApi = {
+  createTicket(data: CreateSupportTicketRequest): Promise<SupportTicket> {
+    return apiClient.post<SupportTicket>('/tickets', data);
+  },
+
+  listTickets(filters?: ListTicketsFilters): Promise<TicketListResponse> {
     const params = new URLSearchParams();
-    
-    if (filters?.page !== undefined) params.append('page', filters.page.toString());
-    if (filters?.page_size !== undefined) params.append('page_size', filters.page_size.toString());
-    if (filters?.status !== undefined) params.append('status', filters.status);
-    
-    const response = await apiClient.get<{
-      items: SupportTicket[];
-      page: number;
-      page_size: number;
-      total: number;
-    }>(`/tickets?${params.toString()}`);
-    
-    return response.json();
+
+    if (filters?.page !== undefined) params.set('page', filters.page.toString());
+    if (filters?.page_size !== undefined) params.set('page_size', filters.page_size.toString());
+    if (filters?.status !== undefined) params.set('status', filters.status);
+
+    const query = params.toString();
+    return apiClient.get<TicketListResponse>(query ? `/tickets?${query}` : '/tickets');
   },
 
-  // Obtener detalle de un ticket
-  getTicket: async (ticketId: string): Promise<SupportTicket> => {
-    const response = await apiClient.get<SupportTicket>(`/tickets/${ticketId}`);
-    return response.json();
+  getTicket(ticketId: number | string): Promise<SupportTicket> {
+    return apiClient.get<SupportTicket>(`/tickets/${ticketId}`);
   },
 
-  // Actualizar el estado de un ticket
-  updateTicketStatus: async (
-    ticketId: string, 
-    data: UpdateTicketStatusRequest
-  ): Promise<SupportTicket> => {
-    const response = await apiClient.patch<SupportTicket>(
-      `/tickets/${ticketId}/status`,
-      {
-        body: JSON.stringify(data),
-      }
-    );
-    return response.json();
+  updateTicketStatus(
+    ticketId: number | string,
+    data: UpdateTicketStatusRequest,
+  ): Promise<TicketStatusChangeResponse> {
+    return apiClient.patch<TicketStatusChangeResponse>(`/tickets/${ticketId}/status`, data);
   },
 
-  // Obtener categorías activas
-  getCategories: async (): Promise<SupportCategory[]> => {
-    const response = await apiClient.get<SupportCategory[]>('/tickets/categories');
-    return response.json();
+  async getCategories(): Promise<SupportCategory[]> {
+    const response = await apiClient.get<{ items: SupportCategory[] }>('/tickets/categories');
+    return response.items;
   },
 };

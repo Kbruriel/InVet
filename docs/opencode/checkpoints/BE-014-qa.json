@@ -1,0 +1,65 @@
+{
+  "slice": "BE-014",
+  "layer": "qa",
+  "tasks": {
+    "QA-014-T01": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-01T23:05:00+00:00",
+      "finished_at": "2026-09-01T23:15:00+00:00",
+      "evidence": "Suite backend dirigida: 55 passed. Cubre límites, deduplicación normalizada de 24 h con 409, categorías y transiciones válidas e inválidas.",
+      "outcome": "pass",
+      "changed_files": [
+        "backend/app/tests/api/test_support_ticket_api.py",
+        "backend/app/tests/data/test_support_ticket_repo.py",
+        "backend/app/tests/usecases/test_support_ticket_rules.py"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "QA-014-T02": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-01T23:05:00+00:00",
+      "finished_at": "2026-09-01T23:15:00+00:00",
+      "evidence": "Los 4 casos de migración pasaron dentro de 55 passed: apply, seed mínimo/idempotente, restricciones y downgrade reversible.",
+      "outcome": "pass",
+      "changed_files": [
+        "backend/tests/api/test_support_ticket_migration.py",
+        "backend/alembic/versions/a014_support.py"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "QA-014-T03": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-01T23:05:00+00:00",
+      "finished_at": "2026-09-01T23:15:00+00:00",
+      "evidence": "La matriz de autorización pasó dentro de 55 passed: aislamiento por clínica/propietario, 404 para ticket ajeno, 403 para cambio no permitido y 401 sin sesión.",
+      "outcome": "pass",
+      "changed_files": [
+        "backend/app/tests/api/test_support_ticket_api.py",
+        "backend/app/tests/data/test_support_ticket_repo.py"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "QA-014-T04": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-01T23:05:00+00:00",
+      "finished_at": "2026-09-01T23:15:00+00:00",
+      "evidence": "7 suites y 23 pruebas frontend pasadas; cubren loading, empty, error, success, submitting, validación y 404. Build Docker y stack DB/backend/frontend saludables.",
+      "outcome": "pass",
+      "changed_files": [
+        "frontend/src/app/support",
+        "frontend/src/features/support/ui",
+        "docs/opencode/qa/QA-014-results.md"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    }
+  },
+  "updated_at": "2026-09-01T23:15:00+00:00"
+}

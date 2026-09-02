@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import Column, DateTime, ForeignKey, Integer, Text
 from sqlalchemy.orm import relationship
 
 from app.infrastructure.database.models.base import Base
@@ -20,8 +20,12 @@ class Review(Base):
         nullable=False,
         unique=True,
     )
-    branch_id = Column(Integer, ForeignKey("branches.id", ondelete="CASCADE"), nullable=False)
-    clinic_id = Column(Integer, ForeignKey("clinics.id", ondelete="CASCADE"), nullable=False)
+    branch_id = Column(
+        Integer, ForeignKey("branches.id", ondelete="CASCADE"), nullable=False
+    )
+    clinic_id = Column(
+        Integer, ForeignKey("clinics.id", ondelete="CASCADE"), nullable=False
+    )
     user_id = Column(
         Integer,
         ForeignKey("owners.id", ondelete="SET NULL"),
@@ -30,7 +34,9 @@ class Review(Base):
     rating = Column(Integer, nullable=False)
     comment = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    updated_at = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+    )
 
     response = relationship(
         "ReviewResponse",
@@ -52,7 +58,9 @@ class ReviewResponse(Base):
         nullable=False,
         unique=True,
     )
-    branch_id = Column(Integer, ForeignKey("branches.id", ondelete="CASCADE"), nullable=False)
+    branch_id = Column(
+        Integer, ForeignKey("branches.id", ondelete="CASCADE"), nullable=False
+    )
     user_id = Column(
         Integer,
         ForeignKey("internal_users.id", ondelete="SET NULL"),
@@ -60,6 +68,8 @@ class ReviewResponse(Base):
     )
     body = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    updated_at = Column(
+        DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False
+    )
 
     review = relationship("Review", back_populates="response")

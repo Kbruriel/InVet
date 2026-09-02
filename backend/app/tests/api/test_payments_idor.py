@@ -83,7 +83,9 @@ class TestPaymentsIDOR:
         payment_app["mock_payment_repo"].cancel.assert_not_awaited()
 
     @pytest.mark.asyncio
-    async def test_user_without_clinic_detail_returns_403(self, payment_app: dict) -> None:
+    async def test_user_without_clinic_detail_returns_403(
+        self, payment_app: dict
+    ) -> None:
         _as_user(payment_app, "staff", None)
         client = payment_app["client_factory"]()
         async with client:
@@ -91,7 +93,9 @@ class TestPaymentsIDOR:
         assert resp.status_code == 403
 
     @pytest.mark.asyncio
-    async def test_user_without_clinic_create_returns_403(self, payment_app: dict) -> None:
+    async def test_user_without_clinic_create_returns_403(
+        self, payment_app: dict
+    ) -> None:
         _as_user(payment_app, "staff", None)
         client = payment_app["client_factory"]()
         async with client:
@@ -101,8 +105,9 @@ class TestPaymentsIDOR:
 
     @pytest.mark.asyncio
     async def test_list_scoped_to_authenticated_clinic(self, payment_app: dict) -> None:
-        from app.domain.entities.payment import Payment, PaymentMethod, PaymentStatus
         from datetime import UTC, datetime
+
+        from app.domain.entities.payment import Payment, PaymentMethod, PaymentStatus
 
         def _pay(clinic: int) -> Payment:
             return Payment(
@@ -119,7 +124,13 @@ class TestPaymentsIDOR:
             )
 
         async def list_scoped(
-            clinic_id, appointment_id=None, from_date=None, to_date=None, status=None, page=1, page_size=20
+            clinic_id,
+            appointment_id=None,
+            from_date=None,
+            to_date=None,
+            status=None,
+            page=1,
+            page_size=20,
         ):
             items = [_pay(clinic_id)] if clinic_id == 99 else []
             return items, len(items)

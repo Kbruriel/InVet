@@ -18,16 +18,15 @@ import pytest
 
 import app.api.v1.routers.review_router as review_router_mod
 from app.application.use_cases.review import (
+    ReviewDuplicateError,
     ReviewError,
     ReviewNotCompletedError,
     ReviewNotFoundError,
     ReviewRespondDuplicateError,
     ReviewRespondNotFoundError,
-    ReviewDuplicateError,
 )
 from app.domain.entities.review import (
     Review,
-    ReviewCreate,
     ReviewResponse,
 )
 
@@ -68,9 +67,6 @@ def _response(overrides=None) -> ReviewResponse:
     if overrides:
         data.update(overrides)
     return ReviewResponse(**data)
-
-
-
 
 
 # ---------------------------------------------------------------------------
@@ -159,9 +155,7 @@ class TestGetReviewAPI:
 
     @pytest.mark.asyncio
     async def test_get_not_found_404(self, review_app):
-        review_app["mock_service"].get = AsyncMock(
-            side_effect=ReviewNotFoundError()
-        )
+        review_app["mock_service"].get = AsyncMock(side_effect=ReviewNotFoundError())
         client = review_app["client_factory"]()
         async with client:
             resp = await client.get("/api/v1/reviews/999")
@@ -170,6 +164,7 @@ class TestGetReviewAPI:
     @pytest.mark.asyncio
     async def test_get_user_without_clinic_403(self, review_app):
         """Usuario sin clínica asociada → 403 en el router."""
+
         async def user_without_clinic() -> dict[str, Any]:
             return {"id": 100, "user_id": 100, "role": "owner"}
 
@@ -204,9 +199,7 @@ class TestListPublicAPI:
 
     @pytest.mark.asyncio
     async def test_list_public_branch_not_found_404(self, review_app):
-        review_app["mock_branch_repo"].get_branch_by_id = AsyncMock(
-            return_value=None
-        )
+        review_app["mock_branch_repo"].get_branch_by_id = AsyncMock(return_value=None)
         client = review_app["client_factory"]()
         async with client:
             resp = await client.get("/api/v1/reviews/public/999")
@@ -263,7 +256,12 @@ class TestListClinicAPI:
     @pytest.mark.asyncio
     async def test_list_clinical_with_branch_filter(self, review_app):
         async def vet_user() -> dict[str, Any]:
-            return {"id": 10, "user_id": 10, "clinic_id": CLINIC, "role": "veterinarian"}
+            return {
+                "id": 10,
+                "user_id": 10,
+                "clinic_id": CLINIC,
+                "role": "veterinarian",
+            }
 
         review_app["app"].dependency_overrides[
             review_router_mod.get_current_access_user
@@ -310,9 +308,7 @@ class TestRespondReviewAPI:
         """Rol owner no puede responder."""
         client = review_app["client_factory"]()
         async with client:
-            resp = await client.post(
-                "/api/v1/reviews/1/respond", json={"body": "Hola"}
-            )
+            resp = await client.post("/api/v1/reviews/1/respond", json={"body": "Hola"})
         assert resp.status_code == 403
         review_app["mock_service"].respond.assert_not_awaited()
 
@@ -345,20 +341,14 @@ class TestRespondReviewAPI:
         )
         client = review_app["client_factory"]()
         async with client:
-            resp = await client.post(
-                "/api/v1/reviews/1/respond", json={"body": "Hola"}
-            )
+            resp = await client.post("/api/v1/reviews/1/respond", json={"body": "Hola"})
         assert resp.status_code == 409
 
     @pytest.mark.asyncio
     async def test_respond_service_error_propagated(self, review_app):
         self._clinical_user(review_app, role="staff")
-        review_app["mock_service"].respond = AsyncMock(
-            side_effect=ReviewError()
-        )
+        review_app["mock_service"].respond = AsyncMock(side_effect=ReviewError())
         client = review_app["client_factory"]()
         async with client:
-            resp = await client.post(
-                "/api/v1/reviews/1/respond", json={"body": "Hola"}
-            )
+            resp = await client.post("/api/v1/reviews/1/respond", json={"body": "Hola"})
         assert resp.status_code == 400

@@ -1,164 +1,117 @@
-import { supportApi } from './support';
 import { apiClient } from './client';
+import {
+  supportApi,
+  type SupportCategory,
+  type SupportTicket,
+  type TicketListResponse,
+  type TicketStatusChangeResponse,
+} from './support';
 
-// Mockear apiClient
-jest.mock('./client');
+jest.mock('./client', () => ({
+  apiClient: {
+    get: jest.fn(),
+    post: jest.fn(),
+    put: jest.fn(),
+    patch: jest.fn(),
+    delete: jest.fn(),
+  },
+}));
+
+const mockedApiClient = apiClient as jest.Mocked<typeof apiClient>;
+
+const ticket: SupportTicket = {
+  id: 21,
+  clinic_id: 4,
+  owner_id: 8,
+  title: 'No puedo emitir una factura',
+  description: 'La pantalla muestra un error.',
+  category_id: 2,
+  category: { id: 2, name: 'Facturación' },
+  status: 'iniciado',
+  created_at: '2026-08-30T12:00:00Z',
+  updated_at: '2026-08-30T12:00:00Z',
+};
 
 describe('supportApi', () => {
-  const mockFetch = apiClient as jest.Mocked<typeof apiClient>;
-  
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  describe('createTicket', () => {
-    it('should create a ticket successfully', async () => {
-      const mockTicket = {
-        id: 'ticket-1',
-        clinic_id: 'clinic-1',
-        owner_id: 'owner-1',
-        title: 'Test Ticket',
-        description: 'Ticket description',
-        category_id: 'category-1',
-        status: 'initiated',
-        created_at: '2023-01-01T00:00:00Z'
-      };
+  it('crea un ticket con el cuerpo esperado', async () => {
+    mockedApiClient.post.mockResolvedValue(ticket);
 
-      mockFetch.post.mockResolvedValue({
-        json: jest.fn().mockResolvedValue(mockTicket),
-      } as any);
+    await expect(
+      supportApi.createTicket({
+        title: ticket.title,
+        description: ticket.description ?? undefined,
+        category_id: 2,
+      }),
+    ).resolves.toEqual(ticket);
 
-      const result = await supportApi.createTicket({
-        title: 'Test Ticket',
-        description: 'Ticket description',
-        category_id: 'category-1'
-      });
-
-      expect(result).toEqual(mockTicket);
-      expect(mockFetch.post).toHaveBeenCalledWith('/tickets', {
-        body: JSON.stringify({
-          title: 'Test Ticket',
-          description: 'Ticket description',
-          category_id: 'category-1'
-        }),
-      });
+    expect(mockedApiClient.post).toHaveBeenCalledWith('/tickets', {
+      title: ticket.title,
+      description: ticket.description,
+      category_id: 2,
     });
   });
 
-  describe('listTickets', () => {
-    it('should list tickets successfully', async () => {
-      const mockResponse = {
-        items: [
-          {
-            id: 'ticket-1',
-            clinic_id: 'clinic-1',
-            owner_id: 'owner-1',
-            title: 'Test Ticket',
-            description: 'Ticket description',
-            category_id: 'category-1',
-            status: 'initiated',
-            created_at: '2023-01-01T00:00:00Z'
-          }
-        ],
-        page: 1,
-        page_size: 10,
-        total: 1
-      };
-
-      mockFetch.get.mockResolvedValue({
-        json: jest.fn().mockResolvedValue(mockResponse),
-      } as any);
-
-      const result = await supportApi.listTickets({
-        page: 1,
-        page_size: 10,
-        status: 'initiated'
-      });
-
-      expect(result).toEqual(mockResponse);
-      expect(mockFetch.get).toHaveBeenCalledWith('/tickets?page=1&page_size=10&status=initiated');
-    });
-  });
-
-  describe('getTicket', () => {
-    it('should get ticket details successfully', async () => {
-      const mockTicket = {
-        id: 'ticket-1',
-        clinic_id: 'clinic-1',
-        owner_id: 'owner-1',
-        title: 'Test Ticket',
-        description: 'Ticket description',
-        category_id: 'category-1',
-        status: 'initiated',
-        created_at: '2023-01-01T00:00:00Z'
-      };
-
-      mockFetch.get.mockResolvedValue({
-        json: jest.fn().mockResolvedValue(mockTicket),
-      } as any);
-
-      const result = await supportApi.getTicket('ticket-1');
-
-      expect(result).toEqual(mockTicket);
-      expect(mockFetch.get).toHaveBeenCalledWith('/tickets/ticket-1');
-    });
-  });
-
-  describe('updateTicketStatus', () => {
-    it('should update ticket status successfully', async () => {
-      const mockTicket = {
-        id: 'ticket-1',
-        clinic_id: 'clinic-1',
-        owner_id: 'owner-1',
-        title: 'Test Ticket',
-        description: 'Ticket description',
-        category_id: 'category-1',
-        status: 'pending',
-        created_at: '2023-01-01T00:00:00Z'
-      };
-
-      mockFetch.patch.mockResolvedValue({
-        json: jest.fn().mockResolvedValue(mockTicket),
-      } as any);
-
-      const result = await supportApi.updateTicketStatus('ticket-1', {
-        status: 'pending'
-      });
-
-      expect(result).toEqual(mockTicket);
-      expect(mockFetch.patch).toHaveBeenCalledWith('/tickets/ticket-1/status', {
-        body: JSON.stringify({
-          status: 'pending'
-        }),
-      });
-    });
-  });
-
-  describe('getCategories', () => {
-    it('should get active categories successfully', async () => {
-      const mockCategories = [
+  it('serializa paginación y estado al listar tickets', async () => {
+    const response: TicketListResponse = {
+      items: [
         {
-          id: 'category-1',
-          clinic_id: 'clinic-1',
-          name: 'Technical Support',
-          active: true
+          id: ticket.id,
+          title: ticket.title,
+          status: ticket.status,
+          category_name: ticket.category?.name ?? null,
+          owner_name: 'Ada Lovelace',
+          created_at: ticket.created_at,
         },
-        {
-          id: 'category-2',
-          clinic_id: 'clinic-1',
-          name: 'Billing',
-          active: true
-        }
-      ];
+      ],
+      meta: { total: 1, page: 2, page_size: 10, pages: 1 },
+    };
+    mockedApiClient.get.mockResolvedValue(response);
 
-      mockFetch.get.mockResolvedValue({
-        json: jest.fn().mockResolvedValue(mockCategories),
-      } as any);
+    await expect(
+      supportApi.listTickets({ page: 2, page_size: 10, status: 'pendiente' }),
+    ).resolves.toEqual(response);
 
-      const result = await supportApi.getCategories();
+    expect(mockedApiClient.get).toHaveBeenCalledWith(
+      '/tickets?page=2&page_size=10&status=pendiente',
+    );
+  });
 
-      expect(result).toEqual(mockCategories);
-      expect(mockFetch.get).toHaveBeenCalledWith('/tickets/categories');
+  it('obtiene el detalle por ID numérico', async () => {
+    mockedApiClient.get.mockResolvedValue(ticket);
+
+    await expect(supportApi.getTicket(21)).resolves.toEqual(ticket);
+    expect(mockedApiClient.get).toHaveBeenCalledWith('/tickets/21');
+  });
+
+  it('actualiza el estado mediante PATCH y new_status', async () => {
+    const response: TicketStatusChangeResponse = {
+      ticket_id: 21,
+      old_status: 'iniciado',
+      new_status: 'pendiente',
+    };
+    mockedApiClient.patch.mockResolvedValue(response);
+
+    await expect(
+      supportApi.updateTicketStatus(21, { new_status: 'pendiente' }),
+    ).resolves.toEqual(response);
+
+    expect(mockedApiClient.patch).toHaveBeenCalledWith('/tickets/21/status', {
+      new_status: 'pendiente',
     });
+  });
+
+  it('extrae las categorías de la envoltura items', async () => {
+    const categories: SupportCategory[] = [
+      { id: 1, name: 'Técnico' },
+      { id: 2, name: 'Facturación' },
+    ];
+    mockedApiClient.get.mockResolvedValue({ items: categories });
+
+    await expect(supportApi.getCategories()).resolves.toEqual(categories);
+    expect(mockedApiClient.get).toHaveBeenCalledWith('/tickets/categories');
   });
 });

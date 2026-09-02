@@ -1,6 +1,6 @@
 ---
 description: Actualiza documentacion InVet solo despues de aprobar los gates.
-mode: all
+mode: primary
 permission:
   edit: allow
   bash:

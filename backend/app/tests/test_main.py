@@ -51,9 +51,9 @@ def test_public_clinics_route_is_mounted_through_main_app():
         )
     )
 
-    app.dependency_overrides[
-        pub_clinics_mod.get_public_clinic_list_use_case
-    ] = lambda: mock_use_case
+    app.dependency_overrides[pub_clinics_mod.get_public_clinic_list_use_case] = (
+        lambda: mock_use_case
+    )
     try:
         response = client.get("/api/v1/clinicas?page=1&limit=12&size=12")
     finally:

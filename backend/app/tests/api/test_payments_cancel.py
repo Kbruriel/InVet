@@ -8,7 +8,6 @@ Cubre:
 from __future__ import annotations
 
 from datetime import UTC, datetime
-
 from unittest.mock import AsyncMock
 
 import pytest
@@ -34,7 +33,9 @@ def _payment(status: PaymentStatus, cancelled_at: datetime | None = None) -> Pay
 
 class TestCancelPaymentAPI:
     @pytest.mark.asyncio
-    async def test_c10_cancel_paid_returns_200_cancelled(self, payment_app: dict) -> None:
+    async def test_c10_cancel_paid_returns_200_cancelled(
+        self, payment_app: dict
+    ) -> None:
         now = datetime.now(UTC)
         cancelled = _payment(PaymentStatus.CANCELLED, cancelled_at=now)
         payment_app["mock_payment_repo"].cancel = AsyncMock(return_value=cancelled)
@@ -72,7 +73,9 @@ class TestCancelPaymentAPI:
         assert resp.status_code == 404
 
     @pytest.mark.asyncio
-    async def test_c10_cancel_by_owner_role_returns_403(self, payment_app: dict) -> None:
+    async def test_c10_cancel_by_owner_role_returns_403(
+        self, payment_app: dict
+    ) -> None:
         import app.api.v1.routers.payments_router as payments_router_mod
 
         async def owner_user() -> dict:

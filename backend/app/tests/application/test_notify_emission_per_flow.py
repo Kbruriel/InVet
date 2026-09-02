@@ -80,7 +80,9 @@ async def _emit(
     )
 
 
-def _rows_for(db_session: Any, *, user_id: int, event_type: str, ref_type: str, ref_id: int) -> list[NotificationModel]:
+def _rows_for(
+    db_session: Any, *, user_id: int, event_type: str, ref_type: str, ref_id: int
+) -> list[NotificationModel]:
     stmt = select(NotificationModel).where(
         NotificationModel.user_id == user_id,
         NotificationModel.event_type == event_type,
@@ -93,36 +95,72 @@ def _rows_for(db_session: Any, *, user_id: int, event_type: str, ref_type: str, 
 @pytest.mark.asyncio
 async def test_flujo_cita_creada_crear_fila_email_1(db_session):
     provider = SpyEmailProvider()
-    r1 = await _emit(db_session, event_type="appointment_created", ref_type="appointment", ref_id=1, provider=provider)
+    r1 = await _emit(
+        db_session,
+        event_type="appointment_created",
+        ref_type="appointment",
+        ref_id=1,
+        provider=provider,
+    )
     assert r1["created"] is True
     assert r1["email_sent"] is True
     assert len(provider.sent) == 1
     assert provider.sent[0][0] == EMAIL
 
-    rows = _rows_for(db_session, user_id=USER, event_type="appointment_created", ref_type="appointment", ref_id=1)
+    rows = _rows_for(
+        db_session,
+        user_id=USER,
+        event_type="appointment_created",
+        ref_type="appointment",
+        ref_id=1,
+    )
     assert len(rows) == 1
 
     # Doble emision con la misma clave: NO debe insertar segunda fila, NO debe reenviar email
     provider2 = SpyEmailProvider()
-    r2 = await _emit(db_session, event_type="appointment_created", ref_type="appointment", ref_id=1, provider=provider2)
+    r2 = await _emit(
+        db_session,
+        event_type="appointment_created",
+        ref_type="appointment",
+        ref_id=1,
+        provider=provider2,
+    )
     assert r2["created"] is False
     assert r2["email_sent"] is False
     assert r2.get("reason") == "already_exists"
     assert provider2.sent == []
 
-    rows2 = _rows_for(db_session, user_id=USER, event_type="appointment_created", ref_type="appointment", ref_id=1)
+    rows2 = _rows_for(
+        db_session,
+        user_id=USER,
+        event_type="appointment_created",
+        ref_type="appointment",
+        ref_id=1,
+    )
     assert len(rows2) == 1
 
 
 @pytest.mark.asyncio
 async def test_flujo_cita_status_confirmada(db_session):
     provider = SpyEmailProvider()
-    r1 = await _emit(db_session, event_type="appointment_confirmed", ref_type="appointment", ref_id=21, provider=provider)
+    r1 = await _emit(
+        db_session,
+        event_type="appointment_confirmed",
+        ref_type="appointment",
+        ref_id=21,
+        provider=provider,
+    )
     assert r1["created"] is True
     assert r1["email_sent"] is True
 
     provider2 = SpyEmailProvider()
-    r2 = await _emit(db_session, event_type="appointment_confirmed", ref_type="appointment", ref_id=21, provider=provider2)
+    r2 = await _emit(
+        db_session,
+        event_type="appointment_confirmed",
+        ref_type="appointment",
+        ref_id=21,
+        provider=provider2,
+    )
     assert r2["created"] is False
     assert provider2.sent == []
 
@@ -130,13 +168,25 @@ async def test_flujo_cita_status_confirmada(db_session):
 @pytest.mark.asyncio
 async def test_flujo_pago_paid(db_session):
     provider = SpyEmailProvider()
-    r1 = await _emit(db_session, event_type="payment_completed", ref_type="payment", ref_id=42, provider=provider)
+    r1 = await _emit(
+        db_session,
+        event_type="payment_completed",
+        ref_type="payment",
+        ref_id=42,
+        provider=provider,
+    )
     assert r1["created"] is True
     assert r1["email_sent"] is True
 
     # dedup sobre la segunda emision con la misma clave
     provider2 = SpyEmailProvider()
-    r2 = await _emit(db_session, event_type="payment_completed", ref_type="payment", ref_id=42, provider=provider2)
+    r2 = await _emit(
+        db_session,
+        event_type="payment_completed",
+        ref_type="payment",
+        ref_id=42,
+        provider=provider2,
+    )
     assert r2["created"] is False
     assert provider2.sent == []
 
@@ -307,10 +357,42 @@ async def test_multi_flujo_1_usuario_4_notificaciones_unicas(db_session):
     ref_id, porque event_type+ref_type son distintos.
     """
     u = 90_000
-    p1 = SpyEmailProvider(); await _emit(db_session, event_type="appointment_created", ref_type="appointment", ref_id=7, provider=p1, user_id=u)
-    p2 = SpyEmailProvider(); await _emit(db_session, event_type="appointment_confirmed", ref_type="appointment", ref_id=7, provider=p2, user_id=u)
-    p3 = SpyEmailProvider(); await _emit(db_session, event_type="consultation_completed", ref_type="consultation", ref_id=7, provider=p3, user_id=u)
-    p4 = SpyEmailProvider(); await _emit(db_session, event_type="prescription_created", ref_type="prescription", ref_id=7, provider=p4, user_id=u)
+    p1 = SpyEmailProvider()
+    await _emit(
+        db_session,
+        event_type="appointment_created",
+        ref_type="appointment",
+        ref_id=7,
+        provider=p1,
+        user_id=u,
+    )
+    p2 = SpyEmailProvider()
+    await _emit(
+        db_session,
+        event_type="appointment_confirmed",
+        ref_type="appointment",
+        ref_id=7,
+        provider=p2,
+        user_id=u,
+    )
+    p3 = SpyEmailProvider()
+    await _emit(
+        db_session,
+        event_type="consultation_completed",
+        ref_type="consultation",
+        ref_id=7,
+        provider=p3,
+        user_id=u,
+    )
+    p4 = SpyEmailProvider()
+    await _emit(
+        db_session,
+        event_type="prescription_created",
+        ref_type="prescription",
+        ref_id=7,
+        provider=p4,
+        user_id=u,
+    )
 
     for p in (p1, p2, p3, p4):
         assert len(p.sent) == 1

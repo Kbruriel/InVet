@@ -29,6 +29,7 @@ from app.infrastructure.database.session import get_db
 
 def _import_router():
     import app.api.v1.routers.notification_router as notif_router_mod
+
     return notif_router_mod, notif_router_mod.router
 
 
@@ -44,7 +45,6 @@ session_module.SessionLocal = sessionmaker(
 )
 TestingSessionLocal = session_module.SessionLocal
 Base.metadata.create_all(bind=test_engine)
-
 
 
 def _override_get_db():
@@ -126,7 +126,7 @@ def _seed():
         db.add_all([u1, u2])
         db.flush()
 
-                # Owner 1
+        # Owner 1
         o1 = OwnerModel(
             user_id=u1.id,
             first_name="Juan",
@@ -171,7 +171,7 @@ def _seed():
         n3 = NotificationModel(
             user_id=u2.id,
             clinic_id=c2.id,
-            event_type="CONVERSATION_STARTED", 
+            event_type="CONVERSATION_STARTED",
             subject="Nueva conversación",
             body="Tienes una nueva conversación",
             ref_type="conversation",
@@ -188,24 +188,25 @@ def _seed():
 def test_mark_notification_as_read_success(app_client):
     """C5: Marcación correcta devuelve 200 con estado actualizado."""
     u1, u2, c1, c2, n1_id, n2_id, n3_id = _seed()
-    
+
     response = app_client.patch(f"/api/v1/notifications/{n1_id}")
-    
+
     assert response.status_code == 200
     data = response.json()
     assert data["is_read"] is True
 
 
-
 def test_mark_notification_as_read_forbidden(app_client):
     """C4: Marcación incorrecta por token (ID ajeno) devuelve 404 sin revelar existencia."""
     u1, u2, c1, c2, n1_id, n2_id, n3_id = _seed()
-    
+
     # Intentamos marcar como leída una notificación que no nos pertenece
-    app_client.app.dependency_overrides[auth_dep] = _override_auth(2, 2)  # Usuario 2 intenta marcar la notificacion de usuario 1
-    
+    app_client.app.dependency_overrides[auth_dep] = _override_auth(
+        2, 2
+    )  # Usuario 2 intenta marcar la notificacion de usuario 1
+
     response = app_client.patch(f"/api/v1/notifications/{n1_id}")
-    
+
     assert response.status_code == 404
     # No debe revelar información sensibles sobre la notificación o usuario
     data = response.json()
@@ -217,12 +218,12 @@ def test_mark_notification_as_read_forbidden(app_client):
 def test_mark_notification_as_read_unauthorized(app_client):
     """C9: Sin token se devuelve 401."""
     u1, u2, c1, c2, n1_id, n2_id, n3_id = _seed()
-    
+
     # Desactivar autenticación para esta prueba
     app_client.app.dependency_overrides[auth_dep] = _override_auth(None, None)
-    
+
     response = app_client.patch(f"/api/v1/notifications/{n1_id}")
-    
+
     assert response.status_code == 401
     assert "detail" in response.json()
 
@@ -230,8 +231,8 @@ def test_mark_notification_as_read_unauthorized(app_client):
 def test_mark_notification_as_read_not_found(app_client):
     """C4: Intentar marcar notificación inexistente también devuelve 404."""
     _seed()
-    
+
     # Intentamos marcar como leída una notificación que no existe
-    response = app_client.patch(f"/api/v1/notifications/999999")
-    
+    response = app_client.patch("/api/v1/notifications/999999")
+
     assert response.status_code == 404

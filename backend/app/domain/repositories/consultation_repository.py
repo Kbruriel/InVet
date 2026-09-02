@@ -11,9 +11,7 @@ class ConsultationRepository(ABC):
     """Interface para el repositorio de consultas medicas."""
 
     @abstractmethod
-    async def create_consultation(
-        self, consultation: Consultation
-    ) -> Consultation:
+    async def create_consultation(self, consultation: Consultation) -> Consultation:
         """Crear una nueva consulta. Retorna la entidad con ID asignado."""
         pass
 

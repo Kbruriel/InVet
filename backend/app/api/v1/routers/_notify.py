@@ -13,6 +13,7 @@ Uso:
                      event_type="appointment_created", body_extra=f"Mascota: {pet_name}")
     )
 """
+
 from __future__ import annotations
 
 from typing import Any

@@ -21,6 +21,8 @@ El limite de salida definido en OpenCode no gobierna necesariamente el proveedor
 
 Los agentes especializados de `.github/agents/` son perfiles seleccionables, no una autorizacion para delegar. Ninguno declara la herramienta `agent`, listas `agents` ni handoffs.
 
+El catalogo canonico es `docs/opencode/agent_registry.json`. Cada `.github/prompts/*.prompt.md` declara el perfil visible que corresponde al mismo comando OpenCode. La equivalencia de permisos es semantica: GitHub expone `read/search/edit/execute`, mientras las instrucciones del perfil, el manifiesto de capa y los gates restringen que puede editar; OpenCode expresa parte de esas restricciones directamente en su frontmatter.
+
 | Perfil | Responsabilidad |
 |---|---|
 | InVet Orchestrator | Ejecutar el flujo completo en el modelo actual |
@@ -80,6 +82,14 @@ final-gate.prompt.md BE-00X
 ```
 
 El comando backend ejecuta internamente sus validadores, incluida la persistencia segura cuando aplica; el usuario no tiene que invocar el script. El final gate es obligatorio. El flujo se detiene ante el primer `REJECTED`, `BLOCKED`, finding bloqueante, manifiesto stale, archivo fuera de allowlist o invariante de router perdida.
+
+En el flujo completo el perfil activo es siempre `InVet Orchestrator`, que ejecuta directamente cada contrato sin handoff. En una ejecucion manual se selecciona el perfil indicado por el prompt: por ejemplo, `implement-backend-task.prompt.md BE-014` se ejecuta con `InVet Backend Implementer`. La tabla, el diagrama y las plantillas de prompt copiables para cada etapa de ambas rutas viven en `13_agents_architecture_and_gate_flow.md`, bajo `Prompts recomendados por etapa`.
+
+Verifica que los 14 perfiles, 15 prompts, mapeos y copias distribuibles sigan alineados con:
+
+```text
+python backend/scripts/validate_agent_catalog.py
+```
 
 ## Checkpoint por tarea
 

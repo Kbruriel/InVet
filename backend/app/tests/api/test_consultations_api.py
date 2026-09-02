@@ -1,4 +1,3 @@
-
 """Integration tests for consultation API endpoints (BE-009)."""
 
 from unittest.mock import AsyncMock, MagicMock
@@ -48,27 +47,41 @@ async def consultation_app():  # noqa: C901
         class _Query:
             def filter(self, *args, **kwargs):
                 return self
+
             def first(self):
                 return None
+
         class FakeSession:
             def close(self):
                 pass
+
             def query(self, *args, **kwargs):
                 return _Query()
+
         yield FakeSession()
 
     async def get_mock_user():
         return {"user_id": 1, "clinic_id": 1, "role": "veterinarian"}
 
-    test_app.dependency_overrides[consultation_router_mod.get_consultation_repo] = get_mock_consultation_repo
-    test_app.dependency_overrides[consultation_router_mod.get_appointment_repo] = get_mock_appointment_repo
-    test_app.dependency_overrides[consultation_router_mod.get_pet_repo] = get_mock_pet_repo
-    test_app.dependency_overrides[consultation_router_mod.get_owner_repo] = get_mock_owner_repo
-    test_app.dependency_overrides[
-        consultation_router_mod.get_internal_user_repo
-    ] = get_mock_internal_user_repo
+    test_app.dependency_overrides[consultation_router_mod.get_consultation_repo] = (
+        get_mock_consultation_repo
+    )
+    test_app.dependency_overrides[consultation_router_mod.get_appointment_repo] = (
+        get_mock_appointment_repo
+    )
+    test_app.dependency_overrides[consultation_router_mod.get_pet_repo] = (
+        get_mock_pet_repo
+    )
+    test_app.dependency_overrides[consultation_router_mod.get_owner_repo] = (
+        get_mock_owner_repo
+    )
+    test_app.dependency_overrides[consultation_router_mod.get_internal_user_repo] = (
+        get_mock_internal_user_repo
+    )
     test_app.dependency_overrides[consultation_router_mod.get_current_db] = get_mock_db
-    test_app.dependency_overrides[consultation_router_mod.get_current_access_user] = get_mock_user
+    test_app.dependency_overrides[consultation_router_mod.get_current_access_user] = (
+        get_mock_user
+    )
 
     yield {
         "app": test_app,
@@ -108,7 +121,7 @@ class TestCreateConsultationAPI:
             appointment_type=AppointmentType.CONSULTATION,
             scheduled_start=datetime.now(),
             scheduled_end=datetime.now() + timedelta(minutes=30),
-            status=AppointmentStatus.COMPLETED
+            status=AppointmentStatus.COMPLETED,
         )
         mock_appointment_repo.get_by_id.return_value = appointment
 
@@ -125,8 +138,14 @@ class TestCreateConsultationAPI:
         }
 
         consultation_result = Consultation(
-            id=1, appointment_id=1, pet_id=1, clinic_id=1, branch_id=1,
-            history="...", diagnosis="...", recommendations="..."
+            id=1,
+            appointment_id=1,
+            pet_id=1,
+            clinic_id=1,
+            branch_id=1,
+            history="...",
+            diagnosis="...",
+            recommendations="...",
         )
         mock_consultation_repo.get_by_appointment_id.return_value = None
         mock_consultation_repo.create_consultation.return_value = consultation_result
@@ -141,7 +160,9 @@ class TestCreateConsultationAPI:
         assert response.status_code == 201
 
     @pytest.mark.asyncio
-    async def test_create_consultation_api_derives_optional_fields(self, consultation_app):
+    async def test_create_consultation_api_derives_optional_fields(
+        self, consultation_app
+    ):
         test_app = consultation_app["app"]
         mock_consultation_repo = consultation_app["mock_consultation_repo"]
         mock_appointment_repo = consultation_app["mock_appointment_repo"]
@@ -208,7 +229,9 @@ class TestConsultationReadAndListAccess:
         async def get_owner_user():
             return {"user_id": 10, "clinic_id": 1, "role": "user"}
 
-        test_app.dependency_overrides[consultation_router_mod.get_current_access_user] = get_owner_user
+        test_app.dependency_overrides[
+            consultation_router_mod.get_current_access_user
+        ] = get_owner_user
         mock_owner_repo.get_owner_by_user_id.return_value = MagicMock(id=55)
         mock_pet_repo.get_pet_by_id.return_value = MagicMock(owner_id=55)
         mock_consultation_repo.get_by_id.return_value = Consultation(
@@ -240,7 +263,9 @@ class TestConsultationReadAndListAccess:
         async def get_owner_user():
             return {"user_id": 10, "clinic_id": 1, "role": "user"}
 
-        test_app.dependency_overrides[consultation_router_mod.get_current_access_user] = get_owner_user
+        test_app.dependency_overrides[
+            consultation_router_mod.get_current_access_user
+        ] = get_owner_user
         mock_owner_repo.get_owner_by_user_id.return_value = MagicMock(id=55)
         mock_pet_repo.get_pet_by_id.return_value = MagicMock(owner_id=999)
         mock_consultation_repo.get_by_id.return_value = Consultation(
@@ -271,7 +296,9 @@ class TestConsultationReadAndListAccess:
         async def get_owner_user():
             return {"user_id": 10, "clinic_id": 1, "role": "user"}
 
-        test_app.dependency_overrides[consultation_router_mod.get_current_access_user] = get_owner_user
+        test_app.dependency_overrides[
+            consultation_router_mod.get_current_access_user
+        ] = get_owner_user
         mock_owner_repo.get_owner_by_user_id.return_value = MagicMock(id=55)
         mock_pet_repo.get_pet_by_id.return_value = MagicMock(owner_id=55)
         mock_consultation_repo.list_by_pet.return_value = (

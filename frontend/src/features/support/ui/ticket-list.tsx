@@ -1,69 +1,58 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { supportApi, SupportTicket, ListTicketsFilters } from '@/shared/api/support';
-import { Button } from '@/shared/ui/button';
+import { useCallback, useEffect, useState } from 'react';
+import { supportApi, SupportTicketListItem } from '@/shared/api/support';
+import { Button } from '@/shared/ui/components/Button';
 
 interface TicketListProps {
-  onTicketClick: (ticketId: string) => void;
+  onTicketClick: (ticketId: number) => void;
 }
 
+const PAGE_SIZE = 10;
+
 export function TicketList({ onTicketClick }: TicketListProps) {
-  const [tickets, setTickets] = useState<SupportTicket[]>([]);
+  const [tickets, setTickets] = useState<SupportTicketListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
   const [total, setTotal] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
 
-  useEffect(() => {
-    loadTickets();
-  }, [page]);
-
-  const loadTickets = async () => {
+  const loadTickets = useCallback(async () => {
     setLoading(true);
     setError(null);
-    
-    try {
-      const filters: ListTicketsFilters = {
-        page,
-        page_size: pageSize
-      };
 
-      const response = await supportApi.listTickets(filters);
+    try {
+      const response = await supportApi.listTickets({ page, page_size: PAGE_SIZE });
       setTickets(response.items);
-      setTotal(response.total);
+      setTotal(response.meta.total);
     } catch (err) {
       setError('Error al cargar los tickets. Por favor, inténtelo de nuevo.');
       console.error(err);
     } finally {
       setLoading(false);
     }
-  };
+  }, [page]);
+
+  useEffect(() => {
+    void loadTickets();
+  }, [loadTickets]);
 
   const handlePageChange = (newPage: number) => {
-    if (newPage >= 1 && newPage <= Math.ceil(total / pageSize)) {
+    const lastPage = Math.max(1, Math.ceil(total / PAGE_SIZE));
+    if (newPage >= 1 && newPage <= lastPage) {
       setPage(newPage);
     }
   };
 
   if (loading && tickets.length === 0) {
-    return (
-      <div className="flex justify-center items-center py-8">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-teal-600"></div>
-      </div>
-    );
+    return <div role="status" aria-label="Cargando tickets" className="py-8" />;
   }
 
   if (error) {
     return (
-      <div className="rounded-md bg-red-50 p-4 mb-4">
+      <div className="rounded-md bg-red-50 p-4 mb-4" role="alert">
         <p className="text-sm text-red-700">{error}</p>
-        <Button 
-          onClick={loadTickets} 
-          variant="outline" 
-          className="mt-2"
-        >
+        <Button onClick={() => void loadTickets()} variant="outline" className="mt-2">
           Reintentar
         </Button>
       </div>
@@ -71,11 +60,7 @@ export function TicketList({ onTicketClick }: TicketListProps) {
   }
 
   if (tickets.length === 0) {
-    return (
-      <div className="text-center py-8">
-        <p className="text-gray-500">No hay tickets para mostrar</p>
-      </div>
-    );
+    return <p className="text-center py-8 text-gray-500">No hay tickets para mostrar</p>;
   }
 
   return (
@@ -84,42 +69,31 @@ export function TicketList({ onTicketClick }: TicketListProps) {
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                 Título
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                 Estado
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
                 Fecha
               </th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
             {tickets.map((ticket) => (
-              <tr 
-                key={ticket.id} 
+              <tr
+                key={ticket.id}
                 className="hover:bg-gray-50 cursor-pointer"
                 onClick={() => onTicketClick(ticket.id)}
               >
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div className="text-sm font-medium text-gray-900">{ticket.title}</div>
-                  {ticket.description && (
-                    <p className="text-sm text-gray-500 line-clamp-1">{ticket.description}</p>
-                  )}
+                  {ticket.category_name && <p className="text-sm text-gray-500">{ticket.category_name}</p>}
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
-                    ${ticket.status === 'initiated' ? 'bg-blue-100 text-blue-800' : ''}
-                    ${ticket.status === 'pending' ? 'bg-yellow-100 text-yellow-800' : ''}
-                    ${ticket.status === 'process' ? 'bg-purple-100 text-purple-800' : ''}
-                    ${ticket.status === 'completed' ? 'bg-green-100 text-green-800' : ''}
-                    ${ticket.status === 'closed' ? 'bg-gray-100 text-gray-800' : ''}`}>
-                    {ticket.status}
-                  </span>
-                </td>
+                <td className="px-6 py-4 whitespace-nowrap">{ticket.status}</td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {new Date(ticket.created_at).toLocaleDateString()}
+                  {new Date(ticket.created_at).toLocaleDateString('es-MX')}
                 </td>
               </tr>
             ))}
@@ -127,30 +101,19 @@ export function TicketList({ onTicketClick }: TicketListProps) {
         </table>
       </div>
 
-      {/* Pagination */}
-      {total > pageSize && (
-        <div className="flex justify-between items-center mt-4">
-          <p className="text-sm text-gray-700">
-            Mostrando {Math.min(pageSize, total)} de {total} tickets
-          </p>
-          <div className="flex space-x-2">
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => handlePageChange(page - 1)}
-              disabled={page === 1}
-            >
-              Anterior
-            </Button>
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => handlePageChange(page + 1)}
-              disabled={page * pageSize >= total}
-            >
-              Siguiente
-            </Button>
-          </div>
+      {total > PAGE_SIZE && (
+        <div className="flex justify-end space-x-2">
+          <Button variant="outline" size="sm" onClick={() => handlePageChange(page - 1)} disabled={page === 1}>
+            Anterior
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => handlePageChange(page + 1)}
+            disabled={page * PAGE_SIZE >= total}
+          >
+            Siguiente
+          </Button>
         </div>
       )}
     </div>

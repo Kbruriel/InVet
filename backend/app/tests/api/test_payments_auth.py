@@ -45,9 +45,13 @@ def _unauthenticated_app() -> FastAPI:
 
     app.dependency_overrides[payments_router_mod.get_current_db] = fake_db
     app.dependency_overrides[payments_router_mod.get_payment_repo] = lambda: object()
-    app.dependency_overrides[payments_router_mod.get_appointment_repo] = lambda: object()
+    app.dependency_overrides[payments_router_mod.get_appointment_repo] = (
+        lambda: object()
+    )
     app.dependency_overrides[payments_router_mod.get_service_repo] = lambda: object()
-    app.dependency_overrides[payments_router_mod.get_internal_user_repo] = lambda: object()
+    app.dependency_overrides[payments_router_mod.get_internal_user_repo] = (
+        lambda: object()
+    )
     return app
 
 

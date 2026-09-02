@@ -20,16 +20,20 @@ def consultation_repo():
     repo = AsyncMock()
     return repo
 
+
 @pytest.fixture
 def appointment_repo():
     repo = AsyncMock()
     return repo
 
+
 @pytest.fixture
 def pet_owner_resolver():
     async def resolver(pet_id, clinic_id):
         return 1  # Always return owner_id 1
+
     return resolver
+
 
 @pytest.fixture
 def create_consultation_uc(consultation_repo, appointment_repo, pet_owner_resolver):
@@ -39,8 +43,11 @@ def create_consultation_uc(consultation_repo, appointment_repo, pet_owner_resolv
         pet_owner_resolver=pet_owner_resolver,
     )
 
+
 @pytest.mark.asyncio
-async def test_create_consultation_success(create_consultation_uc, consultation_repo, appointment_repo):
+async def test_create_consultation_success(
+    create_consultation_uc, consultation_repo, appointment_repo
+):
     # Arrange
     from datetime import datetime, timedelta
 
@@ -56,7 +63,7 @@ async def test_create_consultation_success(create_consultation_uc, consultation_
         appointment_type=AppointmentType.CONSULTATION,
         scheduled_start=datetime.now(),
         scheduled_end=datetime.now() + timedelta(minutes=30),
-        status=AppointmentStatus.COMPLETED
+        status=AppointmentStatus.COMPLETED,
     )
     appointment_repo.get_by_id.return_value = appointment
 
@@ -71,20 +78,28 @@ async def test_create_consultation_success(create_consultation_uc, consultation_
         recommendations="test recommendations",
     )
 
-    consultation_result = Consultation(id=1, appointment_id=1, pet_id=1, clinic_id=1, branch_id=1, history="...", diagnosis="...", recommendations="...")
+    consultation_result = Consultation(
+        id=1,
+        appointment_id=1,
+        pet_id=1,
+        clinic_id=1,
+        branch_id=1,
+        history="...",
+        diagnosis="...",
+        recommendations="...",
+    )
     consultation_repo.get_by_appointment_id.return_value = None
     consultation_repo.create_consultation.return_value = consultation_result
 
     # Act
     result = await create_consultation_uc.execute(
-        data=consultation_data,
-        owner_id=1,
-        created_by=1
+        data=consultation_data, owner_id=1, created_by=1
     )
 
     # Assert
     assert result.id == 1
     consultation_repo.create_consultation.assert_called_once()
+
 
 @pytest.mark.asyncio
 async def test_create_consultation_derives_branch_and_optional_text(
@@ -150,12 +165,16 @@ async def test_create_consultation_derives_branch_and_optional_text(
     assert created.recommendations == ""
     assert result.id == 2
 
+
 @pytest.mark.asyncio
-async def test_create_consultation_appointment_not_completed(create_consultation_uc, appointment_repo):
+async def test_create_consultation_appointment_not_completed(
+    create_consultation_uc, appointment_repo
+):
     # Arrange
     from datetime import datetime, timedelta
 
     from app.domain.entities.appointment import Appointment, AppointmentType
+
     appointment = Appointment(
         id=1,
         owner_id=1,
@@ -165,39 +184,62 @@ async def test_create_consultation_appointment_not_completed(create_consultation
         appointment_type=AppointmentType.CONSULTATION,
         scheduled_start=datetime.now(),
         scheduled_end=datetime.now() + timedelta(minutes=30),
-        status=AppointmentStatus.PENDING
+        status=AppointmentStatus.PENDING,
     )
     appointment_repo.get_by_id.return_value = appointment
 
     consultation_data = ConsultationCreate(
-        appointment_id=1, pet_id=1, clinic_id=1, branch_id=1,
-        veterinarian_id=1, history="...", diagnosis="...", recommendations="..."
+        appointment_id=1,
+        pet_id=1,
+        clinic_id=1,
+        branch_id=1,
+        veterinarian_id=1,
+        history="...",
+        diagnosis="...",
+        recommendations="...",
     )
 
     # Act & Assert
     with pytest.raises(AppointmentNotCompletedError):
-        await create_consultation_uc.execute(data=consultation_data, owner_id=1, created_by=1)
+        await create_consultation_uc.execute(
+            data=consultation_data, owner_id=1, created_by=1
+        )
+
 
 @pytest.mark.asyncio
-async def test_create_consultation_appointment_not_found(create_consultation_uc, appointment_repo):
+async def test_create_consultation_appointment_not_found(
+    create_consultation_uc, appointment_repo
+):
     # Arrange
     appointment_repo.get_by_id.return_value = None
 
     consultation_data = ConsultationCreate(
-        appointment_id=1, pet_id=1, clinic_id=1, branch_id=1,
-        veterinarian_id=1, history="...", diagnosis="...", recommendations="..."
+        appointment_id=1,
+        pet_id=1,
+        clinic_id=1,
+        branch_id=1,
+        veterinarian_id=1,
+        history="...",
+        diagnosis="...",
+        recommendations="...",
     )
 
     # Act & Assert
     with pytest.raises(OwnershipError):
-        await create_consultation_uc.execute(data=consultation_data, owner_id=1, created_by=1)
+        await create_consultation_uc.execute(
+            data=consultation_data, owner_id=1, created_by=1
+        )
+
 
 @pytest.mark.asyncio
-async def test_create_consultation_pet_mismatch(create_consultation_uc, appointment_repo):
+async def test_create_consultation_pet_mismatch(
+    create_consultation_uc, appointment_repo
+):
     # Arrange
     from datetime import datetime, timedelta
 
     from app.domain.entities.appointment import Appointment, AppointmentType
+
     appointment = Appointment(
         id=1,
         owner_id=1,
@@ -207,25 +249,37 @@ async def test_create_consultation_pet_mismatch(create_consultation_uc, appointm
         appointment_type=AppointmentType.CONSULTATION,
         scheduled_start=datetime.now(),
         scheduled_end=datetime.now() + timedelta(minutes=30),
-        status=AppointmentStatus.COMPLETED
+        status=AppointmentStatus.COMPLETED,
     )
     appointment_repo.get_by_id.return_value = appointment
 
     consultation_data = ConsultationCreate(
-        appointment_id=1, pet_id=2, clinic_id=1, branch_id=1,
-        veterinarian_id=1, history="...", diagnosis="...", recommendations="..."
+        appointment_id=1,
+        pet_id=2,
+        clinic_id=1,
+        branch_id=1,
+        veterinarian_id=1,
+        history="...",
+        diagnosis="...",
+        recommendations="...",
     )
 
     # Act & Assert
     with pytest.raises(OwnershipError):
-        await create_consultation_uc.execute(data=consultation_data, owner_id=1, created_by=1)
+        await create_consultation_uc.execute(
+            data=consultation_data, owner_id=1, created_by=1
+        )
+
 
 @pytest.mark.asyncio
-async def test_create_consultation_owner_mismatch(create_consultation_uc, appointment_repo, pet_owner_resolver):
+async def test_create_consultation_owner_mismatch(
+    create_consultation_uc, appointment_repo, pet_owner_resolver
+):
     # Arrange
     from datetime import datetime, timedelta
 
     from app.domain.entities.appointment import Appointment, AppointmentType
+
     appointment = Appointment(
         id=1,
         owner_id=1,
@@ -235,7 +289,7 @@ async def test_create_consultation_owner_mismatch(create_consultation_uc, appoin
         appointment_type=AppointmentType.CONSULTATION,
         scheduled_start=datetime.now(),
         scheduled_end=datetime.now() + timedelta(minutes=30),
-        status=AppointmentStatus.COMPLETED
+        status=AppointmentStatus.COMPLETED,
     )
     appointment_repo.get_by_id.return_value = appointment
 
@@ -246,6 +300,7 @@ async def test_create_consultation_owner_mismatch(create_consultation_uc, appoin
     # We need to re-inject the UC with the wrong resolver or just mock the resolver in the
     # test. Since the fixture provides it, we can't easily change it without recreating the UC.
     from unittest.mock import AsyncMock
+
     uc = CreateConsultationUseCase(
         consultation_repository=AsyncMock(),
         appointment_repository=appointment_repo,
@@ -253,13 +308,20 @@ async def test_create_consultation_owner_mismatch(create_consultation_uc, appoin
     )
 
     consultation_data = ConsultationCreate(
-        appointment_id=1, pet_id=1, clinic_id=1, branch_id=1,
-        veterinarian_id=1, history="...", diagnosis="...", recommendations="..."
+        appointment_id=1,
+        pet_id=1,
+        clinic_id=1,
+        branch_id=1,
+        veterinarian_id=1,
+        history="...",
+        diagnosis="...",
+        recommendations="...",
     )
 
     # Act & Assert
     with pytest.raises(OwnershipError):
         await uc.execute(data=consultation_data, owner_id=1, created_by=1)
+
 
 @pytest.mark.asyncio
 async def test_create_consultation_duplicate(create_consultation_uc, appointment_repo):
@@ -267,6 +329,7 @@ async def test_create_consultation_duplicate(create_consultation_uc, appointment
     from datetime import datetime, timedelta
 
     from app.domain.entities.appointment import Appointment, AppointmentType
+
     appointment = Appointment(
         id=1,
         owner_id=1,
@@ -276,23 +339,44 @@ async def test_create_consultation_duplicate(create_consultation_uc, appointment
         appointment_type=AppointmentType.CONSULTATION,
         scheduled_start=datetime.now(),
         scheduled_end=datetime.now() + timedelta(minutes=30),
-        status=AppointmentStatus.COMPLETED
+        status=AppointmentStatus.COMPLETED,
     )
     appointment_repo.get_by_id.return_value = appointment
 
     consultation_data = ConsultationCreate(
-        appointment_id=1, pet_id=1, clinic_id=1, branch_id=1,
-        veterinarian_id=1, history="...", diagnosis="...", recommendations="..."
+        appointment_id=1,
+        pet_id=1,
+        clinic_id=1,
+        branch_id=1,
+        veterinarian_id=1,
+        history="...",
+        diagnosis="...",
+        recommendations="...",
     )
 
     # Mock existing consultation
     from app.domain.entities.consultation import Consultation
-    existing_consultation = Consultation(id=100, appointment_id=1, pet_id=1, clinic_id=1, branch_id=1, history="...", diagnosis="...", recommendations="...")
-    create_consultation_uc.consultation_repository.get_by_appointment_id.return_value = existing_consultation
+
+    existing_consultation = Consultation(
+        id=100,
+        appointment_id=1,
+        pet_id=1,
+        clinic_id=1,
+        branch_id=1,
+        history="...",
+        diagnosis="...",
+        recommendations="...",
+    )
+    create_consultation_uc.consultation_repository.get_by_appointment_id.return_value = (
+        existing_consultation
+    )
 
     # Act & Assert
     with pytest.raises(DuplicateConsultationError):
-        await create_consultation_uc.execute(data=consultation_data, owner_id=1, created_by=1)
+        await create_consultation_uc.execute(
+            data=consultation_data, owner_id=1, created_by=1
+        )
+
 
 @pytest.mark.asyncio
 async def test_get_consultation_not_found(consultation_repo):
@@ -304,13 +388,23 @@ async def test_get_consultation_not_found(consultation_repo):
     with pytest.raises(ConsultationNotFoundError):
         await use_case.execute(consultation_id=999, clinic_id=1)
 
+
 @pytest.mark.asyncio
 async def test_list_consultations(consultation_repo):
     # Arrange
     use_case = ListConsultationsUseCase(consultation_repo)
     from app.domain.entities.consultation import Consultation
 
-    consultation = Consultation(id=1, appointment_id=1, pet_id=1, clinic_id=1, branch_id=1, history="...", diagnosis="...", recommendations="...")
+    consultation = Consultation(
+        id=1,
+        appointment_id=1,
+        pet_id=1,
+        clinic_id=1,
+        branch_id=1,
+        history="...",
+        diagnosis="...",
+        recommendations="...",
+    )
     consultation_repo.list_by_clinic.return_value = ([consultation], 1)
 
     # Act

@@ -1,6 +1,6 @@
 ---
 description: Revisa el gate final del slice sin modificar producto.
-mode: subagent
+mode: primary
 permission:
   edit: allow
   bash:

@@ -46,7 +46,9 @@ class TestCreatePaymentAPI:
         assert "paid_at" in body
 
     @pytest.mark.asyncio
-    async def test_c1_success_non_cash_no_change_amount(self, payment_app: dict) -> None:
+    async def test_c1_success_non_cash_no_change_amount(
+        self, payment_app: dict
+    ) -> None:
         from datetime import UTC, datetime
 
         from app.domain.entities.payment import Payment, PaymentMethod, PaymentStatus
@@ -98,7 +100,9 @@ class TestCreatePaymentAPI:
 
     @pytest.mark.asyncio
     async def test_c3_missing_service_returns_422(self, payment_app: dict) -> None:
-        payment_app["mock_service_repo"].get_service_by_id = AsyncMock(return_value=None)
+        payment_app["mock_service_repo"].get_service_by_id = AsyncMock(
+            return_value=None
+        )
         client = payment_app["client_factory"]()
         async with client:
             resp = await client.post("/api/v1/payments", json=PAYLOAD_OK)
@@ -106,8 +110,9 @@ class TestCreatePaymentAPI:
 
     @pytest.mark.asyncio
     async def test_c3_inactive_service_returns_422(self, payment_app: dict) -> None:
-        from app.domain.entities.service import Service
         from datetime import UTC, datetime
+
+        from app.domain.entities.service import Service
 
         now = datetime.now(UTC)
         payment_app["mock_service_repo"].get_service_by_id = AsyncMock(
@@ -139,7 +144,9 @@ class TestCreatePaymentAPI:
         assert resp.status_code == 422
 
     @pytest.mark.asyncio
-    async def test_c4_cash_missing_received_returns_422(self, payment_app: dict) -> None:
+    async def test_c4_cash_missing_received_returns_422(
+        self, payment_app: dict
+    ) -> None:
         payload = {**PAYLOAD_OK, "amount_received": None}
         client = payment_app["client_factory"]()
         async with client:
@@ -174,10 +181,18 @@ class TestCreatePaymentAPI:
             yield _S()
 
         app.dependency_overrides[payments_router_mod.get_current_db] = fake_db
-        app.dependency_overrides[payments_router_mod.get_payment_repo] = lambda: object()
-        app.dependency_overrides[payments_router_mod.get_appointment_repo] = lambda: object()
-        app.dependency_overrides[payments_router_mod.get_service_repo] = lambda: object()
-        app.dependency_overrides[payments_router_mod.get_internal_user_repo] = lambda: object()
+        app.dependency_overrides[payments_router_mod.get_payment_repo] = (
+            lambda: object()
+        )
+        app.dependency_overrides[payments_router_mod.get_appointment_repo] = (
+            lambda: object()
+        )
+        app.dependency_overrides[payments_router_mod.get_service_repo] = (
+            lambda: object()
+        )
+        app.dependency_overrides[payments_router_mod.get_internal_user_repo] = (
+            lambda: object()
+        )
 
         async with httpx.AsyncClient(
             transport=httpx.ASGITransport(app=app), base_url="http://t"

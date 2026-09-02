@@ -9,6 +9,7 @@
 - Los planes nuevos usan `schema_version: 3` y declaran `encoding: UTF-8`.
 - Todas las redacciones, comentarios, evidencias y outcomes operativos se escriben en UTF-8.
 - Cada agente ejecuta directamente comandos, pruebas y logs con el modelo seleccionado en la sesion; los subagentes estan deshabilitados.
+- Todos los perfiles OpenCode invocables usan `mode: primary`, todos los comandos declaran `subtask: false` y todos los perfiles niegan el permiso `task`.
 - Una tarea completada requiere criterios verificados y `Evidencia` reproducible.
 - Un gate fallido detiene el flujo; no se convierte en `skipped`.
 - Cada tarea debe tener responsabilidad unica, tipo declarado, contexto necesario, contratos usados y resultado esperado.
@@ -131,8 +132,10 @@ OPEN
 
 ## Fuente de verdad y distribucion
 
+- `docs/opencode/agent_registry.json` es la fuente canonica para los 14 IDs de agente, sus nombres visibles en GitHub y los 15 comandos que poseen.
 - `.opencode`, `docs/opencode` y `backend/scripts` son los archivos operativos del repositorio.
 - `payload` es el espejo distribuible usado por `install-invet-opencode-agents.ps1`.
-- Las pruebas contractuales deben impedir divergencias en agentes, comandos, templates y validadores.
+- `python backend/scripts/validate_agent_catalog.py` impide divergencias de inventario, mapeo comando-agente, politica de ejecucion directa y hashes del espejo `payload`.
+- La paridad de permisos entre OpenCode y GitHub es semantica, no sintactica: OpenCode aplica allowlists de herramienta en frontmatter; GitHub expone `read/search/edit/execute` y cada perfil limita su alcance mediante instrucciones, manifiestos y gates.
 - Ningun agente fija, cambia o selecciona un modelo alternativo. Toda la ejecucion usa el modelo seleccionado en la sesion.
 - `invet-final-reviewer` es el gate obligatorio de release despues de QA, reviews, checks y docs y conserva el modelo seleccionado en la sesion.

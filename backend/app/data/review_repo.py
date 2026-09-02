@@ -15,6 +15,8 @@ from app.domain.entities.review import Review, ReviewResponse
 from app.infrastructure.database.models.owner import Owner as OwnerModel
 from app.infrastructure.database.models.review import (
     Review as ReviewModel,
+)
+from app.infrastructure.database.models.review import (
     ReviewResponse as ReviewResponseModel,
 )
 
@@ -61,23 +63,17 @@ class ReviewRepository(ABC):
         pass
 
     @abstractmethod
-    async def exists_by_appointment(
-        self, appointment_id: int
-    ) -> bool:
+    async def exists_by_appointment(self, appointment_id: int) -> bool:
         """Verificar si la cita ya tiene una reseña."""
         pass
 
     @abstractmethod
-    async def get_by_id(
-        self, review_id: int, clinic_id: int
-    ) -> Review | None:
+    async def get_by_id(self, review_id: int, clinic_id: int) -> Review | None:
         """Obtener reseña por ID con aislamiento de tenant (clinic_id)."""
         pass
 
     @abstractmethod
-    async def exists_by_id(
-        self, review_id: int, clinic_id: int
-    ) -> bool:
+    async def exists_by_id(self, review_id: int, clinic_id: int) -> bool:
         """Verificar si la reseña existe en el tenant."""
         pass
 
@@ -108,30 +104,22 @@ class ReviewRepository(ABC):
         pass
 
     @abstractmethod
-    async def get_response_by_review(
-        self, review_id: int
-    ) -> ReviewResponse | None:
+    async def get_response_by_review(self, review_id: int) -> ReviewResponse | None:
         """Obtener la respuesta clínica de una reseña (unica)."""
         pass
 
     @abstractmethod
-    async def get_review_stats(
-        self, branch_id: int
-    ) -> tuple[int, dict[int, int]]:
+    async def get_review_stats(self, branch_id: int) -> tuple[int, dict[int, int]]:
         """Obtener total de reseñas y distribucion por calificacion de una sucursal."""
         pass
 
     @abstractmethod
-    async def get_owner_id_by_user(
-        self, user_id: int
-    ) -> int | None:
+    async def get_owner_id_by_user(self, user_id: int) -> int | None:
         """Devolver el ID del propietario asociado al usuario (si existe)."""
         pass
 
     @abstractmethod
-    async def get_internal_user_id_by_user(
-        self, user_id: int
-    ) -> int | None:
+    async def get_internal_user_id_by_user(self, user_id: int) -> int | None:
         """Devolver el ID de la fila `internal_users` asociada al usuario."""
         pass
 
@@ -166,9 +154,7 @@ class ReviewRepositoryImpl(ReviewRepository):
         )
         return self.db.execute(stmt).first() is not None
 
-    async def get_by_id(
-        self, review_id: int, clinic_id: int
-    ) -> Review | None:
+    async def get_by_id(self, review_id: int, clinic_id: int) -> Review | None:
         """Obtener reseña por ID y clinic_id (tenant isolation)."""
         stmt = (
             select(ReviewModel)
@@ -180,9 +166,7 @@ class ReviewRepositoryImpl(ReviewRepository):
             return None
         return _domain_from_model(model, self._load_response(model.id))
 
-    async def exists_by_id(
-        self, review_id: int, clinic_id: int
-    ) -> bool:
+    async def exists_by_id(self, review_id: int, clinic_id: int) -> bool:
         """True si la reseña existe en el tenant."""
         stmt = (
             select(ReviewModel.id)
@@ -213,9 +197,7 @@ class ReviewRepositoryImpl(ReviewRepository):
         results = (
             self.db.execute(base_stmt.offset(offset).limit(page_size)).scalars().all()
         )
-        items = [
-            _domain_from_model(r, self._load_response(r.id)) for r in results
-        ]
+        items = [_domain_from_model(r, self._load_response(r.id)) for r in results]
         return items, total
 
     async def list_by_clinic(
@@ -242,9 +224,7 @@ class ReviewRepositoryImpl(ReviewRepository):
         results = (
             self.db.execute(base_stmt.offset(offset).limit(page_size)).scalars().all()
         )
-        items = [
-            _domain_from_model(r, self._load_response(r.id)) for r in results
-        ]
+        items = [_domain_from_model(r, self._load_response(r.id)) for r in results]
         return items, total
 
     async def create_response(self, response: ReviewResponse) -> ReviewResponse:
@@ -268,9 +248,7 @@ class ReviewRepositoryImpl(ReviewRepository):
             updated_at=model.updated_at,
         )
 
-    async def get_response_by_review(
-        self, review_id: int
-    ) -> ReviewResponse | None:
+    async def get_response_by_review(self, review_id: int) -> ReviewResponse | None:
         """Obtener la respuesta clínica (unica) de una reseña."""
         stmt = (
             select(ReviewResponseModel)
@@ -280,13 +258,9 @@ class ReviewRepositoryImpl(ReviewRepository):
         model = self.db.execute(stmt).scalar_one_or_none()
         return _response_from_model(model)
 
-    async def get_review_stats(
-        self, branch_id: int
-    ) -> tuple[int, dict[int, int]]:
+    async def get_review_stats(self, branch_id: int) -> tuple[int, dict[int, int]]:
         """Total de reseñas y distribucion por calificacion de la sucursal."""
-        stmt = select(ReviewModel.rating).where(
-            ReviewModel.branch_id == branch_id
-        )
+        stmt = select(ReviewModel.rating).where(ReviewModel.branch_id == branch_id)
         ratings = self.db.execute(stmt).scalars().all()
 
         distribution: dict[int, int] = {i: 0 for i in range(1, 6)}

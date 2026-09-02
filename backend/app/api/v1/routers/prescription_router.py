@@ -225,20 +225,23 @@ async def create_prescription(
 
     # BE-013-T06: emit notificacion al owner tras receta creada
     from app.api.v1.routers._notify import emit_notify
+    from app.infrastructure.database.models.owner import Owner
+    from app.infrastructure.database.models.pet import Pet
+
     try:
         pet = getattr(result, "pet", None)
         pet_obj = (
-            db.query(PetModel)
-            .filter(PetModel.id == pet.id if pet else 0)
-            .first()
+            db.query(Pet).filter(Pet.id == pet.id if pet else 0).first()
             if pet
             else None
         )
-        pet_display = getattr(pet_obj, "name", str(payload.pet_id)) if pet_obj else "mascota"
+        pet_display = (
+            getattr(pet_obj, "name", str(payload.pet_id)) if pet_obj else "mascota"
+        )
         owner_user_id = None
         owner_email = None
         if pet_obj:
-            owner = db.query(OwnerModel).filter(OwnerModel.id == pet_obj.owner_id).first()
+            owner = db.query(Owner).filter(Owner.id == pet_obj.owner_id).first()
             if owner:
                 owner_user_id = int(owner.user_id)
                 owner_email = owner.email

@@ -1,6 +1,6 @@
 ---
 description: Planifica slices MVP verticales desde IDs BE/FE/QA sin escribir codigo fuente.
-mode: subagent
+mode: primary
 permission:
   edit: allow
   bash:

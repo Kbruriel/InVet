@@ -11,7 +11,12 @@ from datetime import UTC, datetime
 
 from app.data.payment_repo import PaymentRepository
 from app.domain.entities.appointment import Appointment
-from app.domain.entities.payment import Payment, PaymentCreate, PaymentMethod, PaymentStatus
+from app.domain.entities.payment import (
+    Payment,
+    PaymentCreate,
+    PaymentMethod,
+    PaymentStatus,
+)
 from app.domain.entities.service import Service
 from app.domain.repositories.appointment_repository import AppointmentRepository
 from app.domain.repositories.slice006_repositories import ServiceRepository
@@ -36,21 +41,28 @@ class AppointmentNotFoundError(PaymentError):
 class ServiceNotFoundError(PaymentError):
     """El servicio no existe o no pertenece al tenant (map a 422)."""
 
-    def __init__(self, message: str = "El servicio no existe o no es accesible.") -> None:
+    def __init__(
+        self, message: str = "El servicio no existe o no es accesible."
+    ) -> None:
         super().__init__(message, status_code=422)
 
 
 class ServiceInactiveError(PaymentError):
     """El servicio no esta activo (map a 422)."""
 
-    def __init__(self, message: str = "Solo se puede registrar un pago con un servicio activo.") -> None:
+    def __init__(
+        self, message: str = "Solo se puede registrar un pago con un servicio activo."
+    ) -> None:
         super().__init__(message, status_code=422)
 
 
 class InvalidCashPaymentError(PaymentError):
     """Metodo CASH con importe recibido ausente o menor al cargo (map a 422)."""
 
-    def __init__(self, message: str = "El importe recibido debe ser mayor o igual al importe del pago.") -> None:
+    def __init__(
+        self,
+        message: str = "El importe recibido debe ser mayor o igual al importe del pago.",
+    ) -> None:
         super().__init__(message, status_code=422)
 
 
@@ -112,8 +124,8 @@ class CreatePaymentUseCase:
 
     async def execute(self, clinic_id: int, data: PaymentCreate) -> Payment:
         """Crear el pago validando cita, servicio y regla de cambio."""
-        appointment: Appointment | None = (
-            await self.appointment_repository.get_by_id(data.appointment_id, clinic_id)
+        appointment: Appointment | None = await self.appointment_repository.get_by_id(
+            data.appointment_id, clinic_id
         )
         if appointment is None:
             raise AppointmentNotFoundError()
@@ -126,7 +138,9 @@ class CreatePaymentUseCase:
         if not service.is_active:
             raise ServiceInactiveError()
 
-        change_amount = compute_change_amount(data.method, data.amount, data.amount_received)
+        change_amount = compute_change_amount(
+            data.method, data.amount, data.amount_received
+        )
         now = datetime.now(UTC)
 
         payment = Payment(

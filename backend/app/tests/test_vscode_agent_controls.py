@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[3]
@@ -15,9 +17,9 @@ def test_vscode_runtime_limits_agent_requests() -> None:
 
 
 def test_vscode_orchestrator_cannot_delegate() -> None:
-    orchestrator = (
-        REPO_ROOT / ".github/agents/invet-orchestrator.agent.md"
-    ).read_text(encoding="utf-8")
+    orchestrator = (REPO_ROOT / ".github/agents/invet-orchestrator.agent.md").read_text(
+        encoding="utf-8"
+    )
 
     assert "'agent'" not in orchestrator
     assert "\nagents:" not in orchestrator
@@ -29,9 +31,9 @@ def test_vscode_contract_uses_compact_context_and_mandatory_final_gate() -> None
     instructions = (REPO_ROOT / ".github/copilot-instructions.md").read_text(
         encoding="utf-8"
     )
-    orchestrator = (
-        REPO_ROOT / ".github/agents/invet-orchestrator.agent.md"
-    ).read_text(encoding="utf-8")
+    orchestrator = (REPO_ROOT / ".github/agents/invet-orchestrator.agent.md").read_text(
+        encoding="utf-8"
+    )
 
     assert "48,000 context tokens" in instructions
     assert "matching verified manifest" in instructions
@@ -68,3 +70,16 @@ def test_removed_generic_profiles_do_not_return() -> None:
     assert not removed.intersection(
         path.name for path in (REPO_ROOT / ".github/agents").glob("*.agent.md")
     )
+
+
+def test_cross_runtime_agent_catalog_is_valid_and_payload_is_synced() -> None:
+    result = subprocess.run(
+        [sys.executable, "backend/scripts/validate_agent_catalog.py"],
+        cwd=REPO_ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stdout + result.stderr
+    assert "[PASS] Agent catalog" in result.stdout

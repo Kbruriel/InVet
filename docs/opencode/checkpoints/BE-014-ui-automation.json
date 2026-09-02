@@ -1,0 +1,45 @@
+{
+  "slice": "BE-014",
+  "layer": "ui-automation",
+  "tasks": {
+    "UIA-014": {
+      "state_label": "finalizada / PASSED",
+      "outcome": "pass",
+      "finished_at": "2026-09-02T18:35:00+00:00",
+      "evidence": {
+        "command": "npx playwright test tests/e2e/fe-014-support.spec.ts --reporter=line",
+        "infra_status": {
+          "db": "healthy (docker compose ps healthy, port 5432)",
+          "backend": "healthy (docker compose ps healthy, port 8000)",
+          "frontend": "healthy (docker compose ps healthy, port 3000)"
+        },
+        "test_results": {
+          "total": 30,
+          "passed": 30,
+          "failed": 0,
+          "skipped": 0,
+          "browsers_covered": ["chromium", "firefox"],
+          "run_duration_seconds": 26.4,
+          "spec_file": "tests/e2e/fe-014-support.spec.ts",
+          "cases_summary": [
+            {"tc": "TC-UIA-014-01", "name": "listado tickets autenticacion muestra secciones", "browser": "chromium+firefox", "status": "pass"},
+            {"tc": "TC-UIA-014-02", "name": "crear ticket desde formulario (submit XHR)", "browser": "chromium+firefox", "status": "pass"},
+            {"tc": "TC-UIA-014-03", "name": "validacion cliente Rechaza titulo invalido", "browser": "chromium+firefox", "status": "pass"},
+            {"tc": "TC-UIA-014-04", "name": "empty state sin tickets", "browser": "chromium+firefox", "status": "pass"},
+            {"tc": "TC-UIA-014-05", "name": "detalle ticket muestra encabezado y datos", "browser": "chromium+firefox", "status": "pass"},
+            {"tc": "TC-UIA-014-06", "name": "formulario cambia estado solo para admin", "browser": "chromium+firefox", "status": "pass"},
+            {"tc": "TC-UIA-014-07", "name": "filtro por estado disponible en listado", "browser": "chromium+firefox", "status": "pass"},
+            {"tc": "TC-UIA-014-08", "name": "ruta soporte es publica sin auth", "browser": "chromium+firefox", "status": "pass"},
+            {"tc": "TC-UIA-014-09", "name": "select de categorias muestra opciones", "browser": "chromium+firefox", "status": "pass"},
+            {"tc": "TC-UIA-014-10", "name": "responsive form y listado en mobile 375x667", "browser": "chromium+firefox", "status": "pass"}
+          ]
+        }
+      },
+      "changed_files": [
+        "InVet_UI_Automation/tests/e2e/fe-014-support.spec.ts (rewritten TC-01,TC-03,TC-07)"
+      ],
+      "errors": []
+    }
+  },
+  "updated_at": "2026-09-02T18:35:00+00:00"
+}

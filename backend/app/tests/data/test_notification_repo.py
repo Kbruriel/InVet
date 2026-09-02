@@ -15,7 +15,9 @@ from __future__ import annotations
 import pytest
 
 from app.data.notification_repo import get_notification_repo
-from app.infrastructure.database.models.notification import Notification as NotificationModel
+from app.infrastructure.database.models.notification import (
+    Notification as NotificationModel,
+)
 
 USER_A = 1
 USER_B = 2
@@ -203,7 +205,9 @@ async def test_count_unread_tenant_isolation(db_session):
 @pytest.mark.asyncio
 async def test_get_notification_for_user_key_dedup_key(db_session):
     repo = get_notification_repo(db_session)
-    n = await _create(repo, event_type="payment_received", ref_type="payment", ref_id=555)
+    n = await _create(
+        repo, event_type="payment_received", ref_type="payment", ref_id=555
+    )
     assert n is not None
     found = await repo.get_notification_for_user_key(
         user_id=USER_A, event_type="payment_received", ref_type="payment", ref_id=555
@@ -212,14 +216,20 @@ async def test_get_notification_for_user_key_dedup_key(db_session):
     # clave distinta -> None
     assert (
         await repo.get_notification_for_user_key(
-            user_id=USER_A, event_type="payment_received", ref_type="payment", ref_id=556
+            user_id=USER_A,
+            event_type="payment_received",
+            ref_type="payment",
+            ref_id=556,
         )
         is None
     )
     # otro receptor con misma clave -> None
     assert (
         await repo.get_notification_for_user_key(
-            user_id=USER_B, event_type="payment_received", ref_type="payment", ref_id=555
+            user_id=USER_B,
+            event_type="payment_received",
+            ref_type="payment",
+            ref_id=555,
         )
         is None
     )
