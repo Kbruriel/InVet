@@ -1,0 +1,334 @@
+{
+  "slice": "BE-015",
+  "layer": "backend",
+  "tasks": {
+    "BE-015-T01": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-03T02:31:38+00:00",
+      "finished_at": "2026-09-03T02:33:41+00:00",
+      "evidence": "4/4 tests en test_reports_schemas.py pasan (antes 4 NameError). ruff check limpio. Los DTOs validan payload dummy válido y rechazan campos requeridos ausentes. Modulo importable sin error. Defecto heredado de T01 resuelto.",
+      "outcome": "pass",
+      "changed_files": [
+        "backend/app/tests/usecases/test_reports_schemas.py"
+      ],
+      "deletion_justification": "Corrección de defecto heredado: (1) se añadieron imports faltantes de AppointmentSummaryDto/ServiceSummaryDto (causaba NameError); (2) se reemplazó la API deprecada from_orm (Pydantic V1) por model_validate (Pydantic V2); (3) se pasaron scheduled_start/end como ISO-8601 strings en lugar de datetime, fiel al contrato del DTO (fields: str) y al patrón real del use-case T02 (isoformat()).",
+      "errors": []
+    },
+    "BE-015-T02": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-03T02:05:01+00:00",
+      "finished_at": "2026-09-03T02:27:23+00:00",
+      "evidence": "13/13 unit tests pass (test_reports_appointments_aggregation.py). ruff check limpio. report_appointments aisla por Appointment.clinic_id (AC-015-03), pagina con offset/limit, period_start/end opcional, consultas read-only sin persistencia. Corregidos nombre_completo (vet) y owner_name (first+last).",
+      "outcome": "pass",
+      "changed_files": [
+        "backend/app/application/usecases/reports/report_appointments.py",
+        "backend/app/tests/usecases/test_reports_appointments_aggregation.py",
+        "docs/opencode/checkpoints/BE-015-backend.json"
+      ],
+      "deletion_justification": "Borrados legítimos: (1) report_appointments.py eliminó imports no usados (Owner, Pet) y corrigió import de módulo duplicado 'veterinarian.py' -> 'veterinarian_model.py' (causante del doble registro de Metadata). (2) test_reports_appointments_aggregation.py reescrito para inyectar la sesión vía parámetro db= en vez de patchear atributos globales de módulo, alineado a la firma real del usecase.",
+      "errors": []
+    },
+    "BE-015-T03": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-03T02:34:17+00:00",
+      "finished_at": "2026-09-03T02:41:20+00:00",
+      "evidence": "report_services implementado. 11/11 tests en test_reports_services_aggregation.py (estructura, price conversion cents->pesos, clinic isolation, period filter, no-persistence). ruff limpio.",
+      "outcome": "pass",
+      "changed_files": [
+        "backend/app/application/usecases/reports/report_services.py",
+        "backend/app/tests/usecases/test_reports_services_aggregation.py",
+        "docs/opencode/checkpoints/BE-015-backend.json"
+      ],
+      "deletion_justification": "Reemplazo del stub inicial de report_services.py por la implementacion completa del use-case BE-015-T03: filtro clinica + periodo opcional (created_at) + paginacion + conversion price cents->pesos (fiel a service_repository_impl.py:140) + retorno PaginatedResponse[ServiceSummaryDto]. Las 14 lineas eliminadas eran el esqueleto previo sin logica.",
+      "errors": []
+    },
+    "BE-015-T04": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-03T02:44:22+00:00",
+      "finished_at": "2026-09-03T02:44:44+00:00",
+      "evidence": "report_pets_count: join Pet->Owner filtro clinic_id (tenant isolation), Pet.is_active==True, periodo opcional (created_at/updated_at), total=count, retorna PaginatedResponse[PetCountDto] page=1 size=1. 7/7 tests en test_reports_pets_count.py (estructura DTO, count propagation, clinic isolation x2, period, no-persistence). ruff limpio. Use-case ya existia completo; solo se agrego la cobertura de test.",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "BE-015-T05": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-03T02:46:37+00:00",
+      "finished_at": "2026-09-03T02:47:14+00:00",
+      "evidence": "report_consultations: filtro clinic_id (tenant isolation), periodo opcional sobre updated_at (Correccion: el stub usado Consultation.created_at que no existe en el modelo, solo updated_at; se unifico a updated_at para ambos bounds), paginacion, retorno PaginatedResponse[ConsultationSummaryDto]. 9/9 tests en test_reports_consultations.py (estructura + DTO, clinic isolation x2, period filter x3, no-persistence). ruff limpio.",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "BE-015-T06": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-03T02:48:52+00:00",
+      "finished_at": "2026-09-03T02:49:14+00:00",
+      "evidence": "report_ratings_summary: join RatingSummary->Branch (tenant isolation por Branch.clinic_id), periodo opcional sobre updated_at, paginacion, retorno PaginatedResponse[RatingSummaryDto] con average_rating/total_reviews (veterinarian_id=None: el modelo no lleva asociacion). Verificado que RatingSummary tiene branch_id/average_rating/total_reviews/created_at/updated_at. 8/8 tests en test_reports_ratings_summary.py (estructura + null fallbacks, clinic isolation x2, period x2, no-persistence). ruff limpio.",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "BE-015-T07": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-03T02:50:38+00:00",
+      "finished_at": "2026-09-03T02:51:01+00:00",
+      "evidence": "report_payments: filtro clinic_id (tenant isolation), periodo opcional sobre paid_at, paginacion, amount cents->moneda (/100.0, fiel a modelo Payment BE-011), payment_method/status via .value (enums), paid_at isoformat, retorno PaginatedResponse[PaymentSummaryDto]. Verificado Payment: amount nullable=False (centavos), method/status enums, paid_at nullable=False. 10/10 tests en test_reports_payments.py (estructura + DTO + conversion, clinic isolation x2, period x3, no-persistence). ruff limpio.",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "BE-015-T08": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-03T03:06:37+00:00",
+      "finished_at": "2026-09-03T03:08:04+00:00",
+      "evidence": "reports_router.py: 9 errores ruff -> 0 (6 imports locales duplicates a top-level como uc_*, variable sin uso dt_types eliminada). 6 rutas registradas: api/main.py:27 (api_v1_router + API_V1_STR) -> api/v1/router.py:41 (prefix=/reports). 12/12 tests en app/tests/integration/test_reports_router.py: contrato JSON de los 6 endpoints (appointments/services/pets/consultations/ratings + total_amount en payments), paginacion page/size propagada y con teto 422, tenant isolation 403 con token sin clinica, validacion fechas 422 (formato invalido + end<start) + periodo valido propagado a datetime. AC-015-03/04: endpoints GET devuelven JSON estructurado (PaginatedResponse/items), paginacion respetada, sin logica de negocio en router (delega a uc_* + _validate_dates + _clinic_id_from).",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "Borrados legitimos: 6 imports locales dentro de handlers (simbolos ya en cabecera, movidos a top-level con alias uc_*); 5 lineas de import a nivel de modulo (redundantes con la cabecera); 1 variable sin uso dt_types. Ninguno cambio el comportamiento: son los 6 casos de uso ya probados en T02-T07.",
+      "errors": []
+    },
+    "BE-015-T09": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-03T03:19:53+00:00",
+      "finished_at": "2026-09-03T03:20:14+00:00",
+      "evidence": "12/12 tests pass: test_reports_auth.py + test_reports_tenant_isolation.py (Clinica A/B scoped, 5 endpoints, no-clinic 403, no-token/invalid/expired 401)",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "BE-015-T10": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-03T16:43:16+00:00",
+      "finished_at": "2026-09-03T16:48:18+00:00",
+      "evidence": "e678e2b2a4c1 (pytest): test_reports_integration.py 7 PASSED (appointments/services/pets/consultations/ratings/payments contractos + total_amount_rounds) | test_reports_invalid_input.py 31 PASSED (18 period 422 over 6 endpoints + 12 pagination 422 over 4 paged + 1 valid forwarded) | TOTAL: python -m pytest backend/app/tests/integration/test_reports_integration.py backend/app/tests/integration/test_reports_invalid_input.py -q => 38 passed in 2.14s | RUFF: python -m ruff check [both] => All checks passed | SUITE REPORTES: 62 passed (T08 12 + T09 24 + T10 38)",
+      "outcome": "pass",
+      "changed_files": [
+        "backend/app/tests/integration/test_reports_integration.py",
+        "docs/opencode/checkpoints/BE-015-backend.json"
+      ],
+      "deletion_justification": "Correccion ruff UP038: 2 lineas isinstance(body, (int, float)) reescritas como isinstance(body, int | float) en test_reports_integration.py; cambio de estilo 1:1 sin perdida de logica, no elimina comportamiento",
+      "errors": []
+    }
+  },
+  "runtime_gate": {
+    "status": "PASS",
+    "executed_at": "2026-09-03T16:55:00+00:00",
+    "environment": {
+      "db": "postgres:16-alpine (invet-db) healthy, 5432/tcp",
+      "backend": "invet-backend-be015 (workaround container), port 8111, code mounted read-only over base image; db shared via compose network",
+      "note": "invet-backend imagen publicada (2026-09-01) predates BE-015; docker compose build no disponible (sin red a Docker Hub). Workaround reproducible via `-v C:\\InVet\\backend\\app:/app/app:ro`."
+    },
+    "alembic": {
+      "current": "a013 (head)",
+      "heads": "a014 (add support_tickets and ticket_categories, BE-014)",
+      "be015_new_migrations": 0,
+      "note": "BE-015 es agregacion read-only: sin nueva migracion. a014 corresponde a BE-014 y queda en el registro propio de carryovers BE-014 (BE-014-plan.md / BE-014-carryovers.md), no en BE-015."
+    },
+    "tests": {
+      "framework": "pytest + httpx",
+      "count": 124,
+      "passed": 124,
+      "failed": 0,
+      "suite": [
+        "app/tests/usecases/test_reports_schemas.py",
+        "app/tests/usecases/test_reports_appointments_aggregation.py",
+        "app/tests/usecases/test_reports_services_aggregation.py",
+        "app/tests/usecases/test_reports_pets_count.py",
+        "app/tests/usecases/test_reports_consultations.py",
+        "app/tests/usecases/test_reports_ratings_summary.py",
+        "app/tests/usecases/test_reports_payments.py",
+        "app/tests/integration/test_reports_router.py",
+        "app/tests/integration/test_reports_auth.py",
+        "app/tests/integration/test_reports_tenant_isolation.py",
+        "app/tests/integration/test_reports_integration.py",
+        "app/tests/integration/test_reports_invalid_input.py"
+      ]
+    },
+    "lint": { "tool": "ruff", "result": "All checks passed!", "note": "--no-cache (appuser read-only /app)" },
+    "openapi": {
+      "title": "InVet",
+      "version": "0.1.0",
+      "total_paths": 68,
+      "report_paths": [
+        "/api/v1/reports/appointments",
+        "/api/v1/reports/consultations",
+        "/api/v1/reports/payments",
+        "/api/v1/reports/pets",
+        "/api/v1/reports/ratings",
+        "/api/v1/reports/services"
+      ]
+    },
+    "http": {
+      "unauthenticated": { "status": 401, "endpoint": "/api/v1/reports/appointments" },
+      "authenticated": {
+        "user": "qa@example.com (owner, clinic_id=1)",
+        "calls": {
+          "/api/v1/reports/appointments":   { "status": 200, "total": 12,  "items_returned": 12 },
+          "/api/v1/reports/services":      { "status": 200, "total": 18,  "items_returned": 18 },
+          "/api/v1/reports/pets":          { "status": 200, "total_active": 3 },
+          "/api/v1/reports/consultations": { "status": 200, "total": 3,   "items_returned": 3 },
+          "/api/v1/reports/ratings":       { "status": 200, "clinic_avg": 4.11 },
+          "/api/v1/reports/payments":      { "status": 200, "total": 202, "items_returned": 20, "total_amount": 5000.0 }
+        }
+      },
+      "evidence_file": "C:\\Users\\PRECIS~1\\AppData\\Local\\Temp\\opencode\\evidence_http_verify.json"
+    },
+    "gate_commands": {
+      "plan_stage": "python backend/scripts/validate_slice_plan.py BE-015 --stage backend -> PASS",
+      "secure_persistence": "python backend/scripts/validate_slice_plan.py BE-015 --stage secure-persistence -> PASS"
+    }
+  },
+  "qa_gate": {
+    "status": "PASS",
+    "executed_at": "2026-09-03T17:10:00+00:00",
+    "environment": {
+      "container": "invet-backend-qa015 (workaround QA, port 8215, code mount :ro)",
+      "db": "invet-db PostgreSQL 16 shared compose network",
+      "note": "docker compose build not available (no network); QA uses code-mount workaround against real PG."
+    },
+    "results": {
+      "script": "qa_scripts/qa015_verify.py (copied to /tmp/qa015v2.py inside container)",
+      "json": "qa_scripts/qa015_results.json",
+      "overall": "ok: true",
+      "t01_happy_path": {
+        "checks_passed": 8,
+        "checks_failed": 0,
+        "evidence": "appointments total=12; services total=18; pets active_count=3; consultations total=3; ratings clinic_avg=4.11 n_vet=1; payments total=202 total_amount=1250.0; all 200"
+      },
+      "t02_pagination": {
+        "checks_passed": 6,
+        "checks_failed": 0,
+        "evidence": "appointments p1/p2 overlap=0; size limits 422 on size0/size101/page0; services union=18; consultations n_p1=2 n_p2=1; payments 3 pages disjoint=true (total 202)"
+      },
+      "t03_auth_bola": {
+        "checks_passed": 6,
+        "checks_failed": 0,
+        "evidence": "no token 401; bad token 401; clinic_id query param ignored (router derives clinic_id from JWT); pets faked not expanded; dates 422 on bad format/month/reverse + 200 on valid"
+      }
+    },
+    "defects_found_and_fixed": [
+      {
+        "id": "QF-015-01",
+        "severity": "high",
+        "title": "Paginacion no determinista en 5 reportes paginados",
+        "root_cause": "order_by unica columna sin tiebreaker -> overlap/missing rows",
+        "fix": "agregar id como segundo criterio de orden en cada use-case",
+        "affected_files": [
+          "backend/app/application/usecases/reports/report_appointments.py",
+          "backend/app/application/usecases/reports/report_services.py",
+          "backend/app/application/usecases/reports/report_consultations.py",
+          "backend/app/application/usecases/reports/report_payments.py",
+          "backend/app/application/usecases/reports/report_ratings_summary.py"
+        ],
+        "regression_tests": [
+          "test_reports_appointments_aggregation.py::TestReportAppointmentsDeterministicOrdering::test_order_by_uses_scheduled_start_then_id",
+          "test_reports_services_aggregation.py::TestReportServicesDeterministicOrdering::test_order_by_uses_name_then_id",
+          "test_reports_consultations.py::TestReportConsultationsDeterministicOrdering::test_order_by_uses_updated_at_then_id",
+          "test_reports_payments.py::TestReportPaymentsDeterministicOrdering::test_order_by_uses_paid_at_then_id",
+          "test_reports_ratings_summary.py::TestReportRatingsSummaryDeterministicOrdering::test_order_by_uses_created_at_then_id"
+        ],
+        "verification": "ruff check clean; pytest reports 56 passed; suite 627 passed 1 skipped; --stage secure-persistence PASS; --stage qa PASS"
+      },
+      {
+        "id": "QF-015-02",
+        "severity": "low",
+        "title": "Key-mismatch en script QA T03 (total_active vs active_count)",
+        "root_cause": "PetCountDto usa campo active_count, script leia total_active",
+        "fix": "actualizar script qa_scripts/qa015_verify.py a leer active_count; criteria pasa con el router derivando clinic_id solo del JWT (BOLA-safe)",
+        "affected_files": [
+          "qa_scripts/qa015_verify.py"
+        ],
+        "verification": "T03 bola_pets_faked_not_expanded -> pass: true"
+      }
+    ],
+    "preexisting_out_of_scope_failures": {
+      "state": "ACCEPTED_RISK",
+      "tests": [
+        "test_agentic_plan_schema_v3.py::test_schema_v3_contracts_are_synced_with_payload",
+        "test_automation_agentic_flow.py::test_agentic_runtime_uses_direct_execution_and_safety_controls",
+        "test_vscode_agent_controls.py::test_cross_runtime_agent_catalog_is_valid_and_payload_is_synced"
+      ],
+      "note": "Pre-existing, ajenos a BE-015 (agencia/planning infraestructure). No alteran este slice."
+    },
+    "artifacts": {
+      "results_md": "docs/opencode/qa/QA-015-results.md",
+      "findings_md": "docs/opencode/qa/QA-015-findings.md",
+      "results_json": "qa_scripts/qa015_results.json",
+      "decision": "APPROVED",
+      "finding_global_state": "RESOLVED"
+    },
+    "gate_commands": {
+      "qa": "python backend/scripts/validate_slice_plan.py BE-015 --stage qa -> PASS"
+    }
+  },
+  "frontend_gate": {
+    "status": "PASS",
+    "executed_at": "2026-09-03T18:30:00+00:00",
+    "environment": {
+      "framework": "Next.js (App Router) + React + TypeScript",
+      "test": "Jest (jsdom) + @testing-library/react + @testing-library/jest-dom",
+      "note": "frontend/src/features/reports/* + frontend/src/app/portal/admin/reports/page.tsx. Consumen el contrato GET /api/v1/reports/* ya aprobado por QA-015. clinic_id se deriva del JWT en backend (sin parametro frontend)."
+    },
+    "tasks": {
+      "FE-015-T01": {
+        "state": "completed",
+        "outcome": "pass",
+        "evidence": "api.ts: 6 funciones tipadas (appointments/services/pets/consultations/ratings/payments) + tipos PaginatedResponse/PetCount/RatingsReport. 5/5 tests en api.test.ts.",
+        "changed_files": ["frontend/src/features/reports/api.ts", "frontend/src/features/reports/api.test.ts"]
+      },
+      "FE-015-T02": {
+        "state": "completed",
+        "outcome": "pass",
+        "evidence": "useReports.ts: apply/goToPage/retry + loading/error/data/total/pages/hasMore/isEmpty + race-guard. 9/9 tests en useReports.test.ts.",
+        "changed_files": ["frontend/src/features/reports/hooks/useReports.ts", "frontend/src/features/reports/hooks/useReports.test.ts"]
+      },
+      "FE-015-T03": {
+        "state": "completed",
+        "outcome": "pass",
+        "evidence": "FilterBar.tsx: form[role=search] con select 6 tipos + Desde/Hasta + Aplicar/Restaurar + validacion start<=end inline. 6/6 tests en FilterBar.test.tsx.",
+        "changed_files": ["frontend/src/features/reports/components/FilterBar.tsx", "frontend/src/features/reports/components/FilterBar.test.tsx"]
+      },
+      "FE-015-T04": {
+        "state": "completed",
+        "outcome": "pass",
+        "evidence": "ReportTable.tsx genérica: loading/error/empty/success + banner con Reintentar (onRetry) + paginacion. 8/8 tests en ReportTable.test.tsx.",
+        "changed_files": ["frontend/src/features/reports/components/ReportTable.tsx", "frontend/src/features/reports/components/ReportTable.test.tsx"]
+      },
+      "FE-015-T05": {
+        "state": "completed",
+        "outcome": "pass",
+        "evidence": "portal/admin/reports/page.tsx compone RequireAuth+FilterBar+useReports+ReportTable + report-columns.ts getReportColumns(). 5/5 tests en page.test.tsx (incluye Reintentar -> retry).",
+        "changed_files": ["frontend/src/app/portal/admin/reports/page.tsx", "frontend/src/app/portal/admin/reports/page.test.tsx", "frontend/src/features/reports/report-columns.ts"]
+      }
+    },
+    "validation": {
+      "typecheck": "npx tsc --noEmit (frontend) -> 0 errores",
+      "tests_feature": "npx jest src/features/reports src/app/portal/admin/reports -> 5 suites / 31 tests pass",
+      "tests_full": "npx jest (todo frontend) -> 53 suites / 301 tests pass",
+      "known_jsdom_note": "jsdom no dispara form submit al hacer fireEvent.click en <button type=submit> de un <form>; las pruebas usan fireEvent.submit(form) dentro de act()."
+    },
+    "gate_commands": {
+      "typecheck": "cd frontend && npx tsc --noEmit -> clean",
+      "jest_feature": "cd frontend && npx jest src/features/reports src/app/portal/admin/reports -> 31 passed",
+      "jest_full": "cd frontend && npx jest -> 301 passed",
+      "plan_review": "python backend/scripts/validate_slice_plan.py BE-015 --stage backend -> PASS"
+    }
+  },
+  "updated_at": "2026-09-03T18:30:00+00:00"
+}
