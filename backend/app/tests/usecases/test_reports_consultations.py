@@ -103,9 +103,7 @@ class TestReportConsultationsClinicIsolation:
         session.query.return_value.filter.assert_called()
 
     def test_two_clinics_independent(self) -> None:
-        s1 = _make_session(
-            items=[_make_consultation(id=1, clinic_id=1)], total=1
-        )
+        s1 = _make_session(items=[_make_consultation(id=1, clinic_id=1)], total=1)
         s2 = _make_session(items=[], total=0)
         r1 = report_consultations(db=s1, clinic_id=1)
         r2 = report_consultations(db=s2, clinic_id=2)
@@ -115,9 +113,7 @@ class TestReportConsultationsClinicIsolation:
 
 class TestReportConsultationsPeriodFilter:
     def test_full_period(self) -> None:
-        items = [
-            _make_consultation(id=i + 1, clinic_id=1) for i in range(4)
-        ]
+        items = [_make_consultation(id=i + 1, clinic_id=1) for i in range(4)]
         session = _make_session(items=items, total=4)
         start = datetime(2025, 1, 1, tzinfo=UTC)
         end = datetime(2025, 12, 31, tzinfo=UTC)
@@ -186,7 +182,9 @@ class TestReportConsultationsDeterministicOrdering:
 
         session = _make_session(items=[], total=0)
         report_consultations(db=session, clinic_id=1)
-        args = session.query.return_value.filter.return_value.order_by.call_args_list[-1].args
+        args = session.query.return_value.filter.return_value.order_by.call_args_list[
+            -1
+        ].args
         assert len(args) == 2, (
             "report_consultations debe ordenar por updated_at + id "
             "para una paginación estable (QA-015)"

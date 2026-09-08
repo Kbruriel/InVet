@@ -228,15 +228,12 @@ class TestReportsRouterPaginationEndpoints:
 
     @pytest.mark.asyncio
     async def test_pets_200_contract(self, client_factory) -> None:
+        # El contrato HTTP de /reports/pets es un PetCountDto PLANO (un conteo
+        # por clinica), no un PaginatedResponse. El mock debe alinearse.
         with patch.object(
             reports_mod,
             "uc_pets",
-            return_value=PaginatedResponse(
-                items=[PetCountDto(clinic_id=CLINIC_ID, active_count=12)],
-                total=1,
-                page=1,
-                size=1,
-            ),
+            return_value=PetCountDto(clinic_id=CLINIC_ID, active_count=12),
         ):
             client = client_factory()
             async with client:
@@ -250,7 +247,9 @@ class TestReportsRouterPaginationEndpoints:
     @pytest.mark.asyncio
     async def test_ratings_200_contract_with_clinic_avg(self, client_factory) -> None:
         two = [
-            RatingSummaryDto(veterinarian_id=None, average_rating=4.0, total_reviews=10),
+            RatingSummaryDto(
+                veterinarian_id=None, average_rating=4.0, total_reviews=10
+            ),
             RatingSummaryDto(veterinarian_id=None, average_rating=5.0, total_reviews=5),
         ]
         with patch.object(
@@ -265,8 +264,9 @@ class TestReportsRouterPaginationEndpoints:
         assert resp.status_code == 200, resp.text
         body = resp.json()
         assert len(body["by_veterinarian"]) == 2
-        # clinic_avg = (4.0 + 5.0) / 2 = 4.5
-        assert body["clinic_avg"] == 4.5
+        # Media ponderada (F2): (4.0 * 10 + 5.0 * 5) / (10 + 5) = 65 / 15 = 4.333..
+        # round(4.3333, 2) = 4.33
+        assert body["clinic_avg"] == 4.33
 
 
 class TestReportsRouterPaginationParams:

@@ -35,9 +35,7 @@ from app.application.usecases.reports.report_appointments import (
 # ---------------------------------------------------------------------------
 
 
-def _make_session(
-    items: list[Any] | None = None, total: int = 0
-) -> MagicMock:
+def _make_session(items: list[Any] | None = None, total: int = 0) -> MagicMock:
     """Construye un ``MagicMock`` de ``Session`` SQLAlchemy idempotente.
 
     Cualquier cadena sobre el mock (``.filter()`` / ``.order_by()`` /
@@ -224,14 +222,17 @@ class TestReportAppointmentsClinicIsolation:
 class TestReportAppointmentsPeriodFilter:
     def test_with_full_period(self, period_start, period_end):
         items = [
-            _make_appointment(id=i + 1, clinic_id=1,
-                              start=datetime(2025, 1, i + 5, tzinfo=UTC))
+            _make_appointment(
+                id=i + 1, clinic_id=1, start=datetime(2025, 1, i + 5, tzinfo=UTC)
+            )
             for i in range(5)
         ]
         session = _make_session(items=items, total=5)
         resp = report_appointments(
-            db=session, clinic_id=1,
-            period_start=period_start, period_end=period_end,
+            db=session,
+            clinic_id=1,
+            period_start=period_start,
+            period_end=period_end,
         )
         assert isinstance(resp, PaginatedResponse)
         assert resp.total == 5
@@ -239,29 +240,28 @@ class TestReportAppointmentsPeriodFilter:
 
     def test_period_start_only(self, period_start):
         session = _make_session(items=[], total=0)
-        resp = report_appointments(
-            db=session, clinic_id=1, period_start=period_start
-        )
+        resp = report_appointments(db=session, clinic_id=1, period_start=period_start)
         assert isinstance(resp, PaginatedResponse)
 
     def test_period_end_only(self, period_end):
         session = _make_session(items=[], total=0)
-        resp = report_appointments(
-            db=session, clinic_id=1, period_end=period_end
-        )
+        resp = report_appointments(db=session, clinic_id=1, period_end=period_end)
         assert isinstance(resp, PaginatedResponse)
 
     def test_period_does_not_break_pagination_invariant(self, period_start, period_end):
         """Con items paginados, el total y len() siguen coincidiendo."""
         all_items = [
-            _make_appointment(id=i + 1, clinic_id=1,
-                              start=datetime(2025, 1, i + 5, tzinfo=UTC))
+            _make_appointment(
+                id=i + 1, clinic_id=1, start=datetime(2025, 1, i + 5, tzinfo=UTC)
+            )
             for i in range(7)
         ]
         session = _make_session(items=all_items, total=7)
         resp = report_appointments(
-            db=session, clinic_id=1,
-            period_start=period_start, period_end=period_end,
+            db=session,
+            clinic_id=1,
+            period_start=period_start,
+            period_end=period_end,
         )
         assert resp.total == 7
         assert len(resp.items) == 7
@@ -311,8 +311,12 @@ class TestReportAppointmentsCombined:
     def test_all_fields_consistent_with_input(self):
         items = [
             _make_appointment(
-                id=1, clinic_id=7, pet_name="Kitty", owner_name="Mar",
-                veterinarian_name="Dr. Ana", appt_type="vaccination",
+                id=1,
+                clinic_id=7,
+                pet_name="Kitty",
+                owner_name="Mar",
+                veterinarian_name="Dr. Ana",
+                appt_type="vaccination",
                 status="approved",
                 start=datetime(2025, 4, 1, 10, tzinfo=UTC),
                 end=datetime(2025, 4, 1, 11, tzinfo=UTC),
@@ -357,7 +361,9 @@ class TestReportAppointmentsDeterministicOrdering:
         # La cadena ``session.query(Model)`` returns mock A;
         # ``A.filter(...)`` returns mock B (el ``query`` interno del helper);
         # ``order_by`` es llamado sobre B (mock idempotente).
-        args = session.query.return_value.filter.return_value.order_by.call_args_list[-1].args
+        args = session.query.return_value.filter.return_value.order_by.call_args_list[
+            -1
+        ].args
         assert len(args) == 2, (
             "report_appointments debe ordenar por scheduled_start + id "
             "para una paginación estable (QA-015 overlap en appointments)"

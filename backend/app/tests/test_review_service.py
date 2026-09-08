@@ -41,34 +41,34 @@ USER = 100
 
 
 def _appointment(overrides=None) -> Appointment:
-    data = dict(
-        id=1,
-        owner_id=OWNER,
-        pet_id=7,
-        clinic_id=CLINIC,
-        branch_id=1,
-        appointment_type=AppointmentType.CONSULTATION,
-        scheduled_start=datetime.now(UTC) - timedelta(days=1),
-        scheduled_end=datetime.now(UTC),
-        status=AppointmentStatus.COMPLETED,
-    )
+    data = {
+        "id": 1,
+        "owner_id": OWNER,
+        "pet_id": 7,
+        "clinic_id": CLINIC,
+        "branch_id": 1,
+        "appointment_type": AppointmentType.CONSULTATION,
+        "scheduled_start": datetime.now(UTC) - timedelta(days=1),
+        "scheduled_end": datetime.now(UTC),
+        "status": AppointmentStatus.COMPLETED,
+    }
     if overrides:
         data.update(overrides)
     return Appointment(**data)
 
 
 def _review(overrides=None) -> Review:
-    data = dict(
-        id=10,
-        appointment_id=1,
-        branch_id=1,
-        clinic_id=CLINIC,
-        user_id=OWNER,
-        rating=5,
-        comment="Muy buena atenciÃ³n",
-        created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC),
-    )
+    data = {
+        "id": 10,
+        "appointment_id": 1,
+        "branch_id": 1,
+        "clinic_id": CLINIC,
+        "user_id": OWNER,
+        "rating": 5,
+        "comment": "Muy buena atenciÃ³n",
+        "created_at": datetime.now(UTC),
+        "updated_at": datetime.now(UTC),
+    }
     if overrides:
         data.update(overrides)
     return Review(**data)

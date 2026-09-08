@@ -126,6 +126,7 @@ class TestReportsAuth:
     async def test_valid_token_passes_auth(self, client_factory) -> None:
         """Con token válido la autenticacion no bloquea (delega en el use-case)."""
         from app.api.v1.schemas.report_schemas import PaginatedResponse
+
         with patch.object(
             reports_mod,
             "uc_appointments",

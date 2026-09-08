@@ -193,7 +193,9 @@ class TestReportPaymentsDeterministicOrdering:
 
         session = _make_session(items=[], total=0)
         report_payments(db=session, clinic_id=1)
-        args = session.query.return_value.filter.return_value.order_by.call_args_list[-1].args
+        args = session.query.return_value.filter.return_value.order_by.call_args_list[
+            -1
+        ].args
         assert len(args) == 2, (
             "report_payments debe ordenar por paid_at + id "
             "para una paginación estable (QA-015)"

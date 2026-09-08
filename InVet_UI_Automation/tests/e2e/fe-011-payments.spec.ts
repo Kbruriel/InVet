@@ -22,6 +22,9 @@ import { annotateTraceability, attachGherkinScenario } from "../helpers/traceabi
 
 const env = readAutomationEnv();
 
+const CROSS_CLINIC_OWNER_EMAIL = process.env.CROSS_CLINIC_OWNER_EMAIL || "owner-clinic2@invet.com";
+const CROSS_CLINIC_OWNER_PASSWORD = process.env.CROSS_CLINIC_OWNER_PASSWORD || "Pruebas";
+
 // Fixtures estables del slice 011 (sembrados en bootstrap del backend):
 // - cita 1000 de la clinica del vet (clicable en el formulario de pagos)
 // - servicio 17 activo (prellena el importe)
@@ -39,7 +42,7 @@ function actorCreds(actor: Actor): { email: string; password: string } {
     case "owner":
       return { email: env.ownerEmail, password: env.ownerPassword };
     case "owner-clinic2":
-      return { email: env.foreignOwnerEmail, password: env.foreignOwnerPassword };
+      return { email: CROSS_CLINIC_OWNER_EMAIL, password: CROSS_CLINIC_OWNER_PASSWORD };
   }
 }
 
@@ -440,7 +443,7 @@ test.describe("pagos operativos UI - UIA-011 (C1..C9)", () => {
       });
 
       const foreignId = await seedPayment(page);
-      await authenticateAs(page, env.foreignOwnerEmail, env.foreignOwnerPassword);
+      await authenticateAs(page, CROSS_CLINIC_OWNER_EMAIL, CROSS_CLINIC_OWNER_PASSWORD);
       await page.goto(`/clinic/payments/${foreignId}`);
 
       // La respuesta 404 superficieada como estado legible.

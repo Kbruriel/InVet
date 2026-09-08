@@ -161,8 +161,8 @@ class NotificationRepositoryImpl(NotificationRepository):
 
         if unread_only:
             base_stmt = base_stmt.where(
-                NotificationModel.is_read == False
-            )  # noqa: E712
+                NotificationModel.is_read == False  # noqa: E712
+            )
 
         total_stmt = select(func.count()).select_from(base_stmt.subquery())
         total = self.db.execute(total_stmt).scalar() or 0

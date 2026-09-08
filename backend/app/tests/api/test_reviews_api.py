@@ -38,32 +38,32 @@ def _now() -> datetime:
 
 
 def _review(overrides=None) -> Review:
-    data = dict(
-        id=1,
-        appointment_id=1,
-        branch_id=1,
-        clinic_id=CLINIC,
-        user_id=50,
-        rating=5,
-        comment="Muy buena atención",
-        created_at=_now(),
-        updated_at=_now(),
-    )
+    data = {
+        "id": 1,
+        "appointment_id": 1,
+        "branch_id": 1,
+        "clinic_id": CLINIC,
+        "user_id": 50,
+        "rating": 5,
+        "comment": "Muy buena atención",
+        "created_at": _now(),
+        "updated_at": _now(),
+    }
     if overrides:
         data.update(overrides)
     return Review(**data)
 
 
 def _response(overrides=None) -> ReviewResponse:
-    data = dict(
-        id=100,
-        review_id=1,
-        branch_id=1,
-        user_id=10,
-        body="Gracias por su feedback",
-        created_at=_now(),
-        updated_at=_now(),
-    )
+    data = {
+        "id": 100,
+        "review_id": 1,
+        "branch_id": 1,
+        "user_id": 10,
+        "body": "Gracias por su feedback",
+        "created_at": _now(),
+        "updated_at": _now(),
+    }
     if overrides:
         data.update(overrides)
     return ReviewResponse(**data)

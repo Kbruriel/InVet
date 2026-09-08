@@ -271,8 +271,11 @@ def qat03_auth_bola() -> dict:
     h = auth_headers()
     s_own_global, b_own_global = _get("appointments", h, page=1, size=5)
     s_faked, b_faked = _get("appointments", h, page=1, size=5, clinic_id=999)
-    # Si el endpoint no acepta clinic_id en query, debe ser el mismo total y 200 o 422/400 igual.
-    # La clave es que clinic_id=999 NO expande el alcance: total faked <= total own.
+    # El router no expone clinic_id como query param (BOLA-safe): la única falla
+    # por alcance es 403 (token sin clinica asociada). 422/400 NO se disparan
+    # (no existe el campo en la signature). Los 422/400/403 se aceptan aqui por
+    # tolerancia hacia variantes futuras, pero el caso real es 200 (ignorado)
+    # o 403 (sin clinica en el token). Clave: clinic_id=999 NO expande el alcance.
     t_own = b_own_global.get("total") if isinstance(b_own_global, dict) else None
     t_faked = b_faked.get("total") if isinstance(b_faked, dict) else None
     results.append(check(
@@ -281,7 +284,8 @@ def qat03_auth_bola() -> dict:
         or (t_own is None or t_faked is None)
         or (t_faked <= t_own),
         {"own_status": s_own_global, "own_total": t_own,
-         "faked_status": s_faked, "faked_total": t_faked},
+         "faked_status": s_faked, "faked_total": t_faked,
+         "note": "router BOLA-safe; clinic_id en query ignorado o 403 sin clinica"},
     ))
 
     # BOLA pet count: clinic_id=999 faked en /pets no debe dar datos de otro tenant

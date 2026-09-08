@@ -23,6 +23,9 @@ import { annotateTraceability } from "../helpers/traceability";
 
 const env = readAutomationEnv();
 
+const CROSS_CLINIC_OWNER_EMAIL = process.env.CROSS_CLINIC_OWNER_EMAIL || "owner-clinic2@invet.com";
+const CROSS_CLINIC_OWNER_PASSWORD = process.env.CROSS_CLINIC_OWNER_PASSWORD || "Pruebas";
+
 type AuthPayload = { access_token: string };
 type JsonRecord = Record<string, unknown>;
 
@@ -248,7 +251,7 @@ test.describe("Pagos API contractual — APIA-011", () => {
       expect(created.status()).toBe(201);
       const paymentId = ((await created.json()) as { id: number }).id;
 
-      const secondClinicToken = await loginAs(request, env.foreignOwnerEmail, env.foreignOwnerPassword);
+      const secondClinicToken = await loginAs(request, CROSS_CLINIC_OWNER_EMAIL, CROSS_CLINIC_OWNER_PASSWORD);
       const res = await request.get(`/api/v1/payments/${paymentId}`, {
         headers: authHeader(secondClinicToken),
       });

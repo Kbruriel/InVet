@@ -208,15 +208,47 @@ def _ensure_owner_consultation_fixtures(connection: Connection) -> None:
                        true, 1, NOW(), NOW()
                 FROM users u
                 WHERE u.email = :email
-                  AND NOT EXISTS (
-                      SELECT 1 FROM owners o WHERE o.user_id = u.id
-                  )
+                ON CONFLICT (email) DO UPDATE SET
+                    user_id = EXCLUDED.user_id,
+                    first_name = EXCLUDED.first_name,
+                    last_name = EXCLUDED.last_name,
+                    phone = EXCLUDED.phone,
+                    address = EXCLUDED.address,
+                    city = EXCLUDED.city,
+                    state = EXCLUDED.state,
+                    country = EXCLUDED.country,
+                    postal_code = EXCLUDED.postal_code,
+                    is_active = EXCLUDED.is_active,
+                    clinic_id = EXCLUDED.clinic_id,
+                    updated_at = EXCLUDED.updated_at
                 """
             ),
             {"email": email},
         )
 
-    connection.execute(text("UPDATE owners SET clinic_id = 1 WHERE clinic_id IS NULL"))
+    connection.execute(
+        text(
+            """
+            UPDATE owners
+            SET
+                user_id = u.id,
+                first_name = 'Due',
+                last_name = 'Owner',
+                phone = '555-0110',
+                address = 'Calle Due 1',
+                city = 'Ciudad de pruebas',
+                state = 'Estado de pruebas',
+                country = 'MX',
+                postal_code = '00000',
+                is_active = true,
+                clinic_id = 1,
+                updated_at = NOW()
+            FROM users u
+            WHERE owners.email = u.email
+              AND owners.email IN ('owner1@test.com', 'owner2@test.com')
+            """
+        )
+    )
 
     fixtures = (
         # (pet_id, owner_email, appt_id, consultation_id, day_offset)
@@ -239,7 +271,18 @@ def _ensure_owner_consultation_fixtures(connection: Connection) -> None:
                 FROM owners o
                 JOIN users u ON u.id = o.user_id
                 WHERE u.email = :owner_email
-                  AND NOT EXISTS (SELECT 1 FROM pets p WHERE p.id = :id)
+                ON CONFLICT (id) DO UPDATE SET
+                    owner_id = EXCLUDED.owner_id,
+                    name = EXCLUDED.name,
+                    species = EXCLUDED.species,
+                    breed = EXCLUDED.breed,
+                    color = EXCLUDED.color,
+                    gender = EXCLUDED.gender,
+                    weight = EXCLUDED.weight,
+                    date_of_birth = EXCLUDED.date_of_birth,
+                    has_medical_history = EXCLUDED.has_medical_history,
+                    is_active = EXCLUDED.is_active,
+                    updated_at = EXCLUDED.updated_at
                 """
             ),
             {"id": pet_id, "owner_email": owner_email},
@@ -261,7 +304,21 @@ def _ensure_owner_consultation_fixtures(connection: Connection) -> None:
                 FROM owners o
                 JOIN users u ON u.id = o.user_id
                 WHERE u.email = :owner_email
-                  AND NOT EXISTS (SELECT 1 FROM appointments a WHERE a.id = :appt_id)
+                ON CONFLICT (id) DO UPDATE SET
+                    owner_id = EXCLUDED.owner_id,
+                    pet_id = EXCLUDED.pet_id,
+                    veterinarian_id = EXCLUDED.veterinarian_id,
+                    clinic_id = EXCLUDED.clinic_id,
+                    branch_id = EXCLUDED.branch_id,
+                    appointment_type = EXCLUDED.appointment_type,
+                    status = EXCLUDED.status,
+                    scheduled_start = EXCLUDED.scheduled_start,
+                    scheduled_end = EXCLUDED.scheduled_end,
+                    duration_minutes = EXCLUDED.duration_minutes,
+                    reason = EXCLUDED.reason,
+                    notes = EXCLUDED.notes,
+                    created_by = EXCLUDED.created_by,
+                    updated_at = EXCLUDED.updated_at
                 """
             ),
             {
@@ -287,7 +344,17 @@ def _ensure_owner_consultation_fixtures(connection: Connection) -> None:
                     'Continuar con control de peso y refuerzo de vacunas.',
                     50, NOW()
                 )
-                ON CONFLICT (id) DO NOTHING
+                ON CONFLICT (id) DO UPDATE SET
+                    appointment_id = EXCLUDED.appointment_id,
+                    pet_id = EXCLUDED.pet_id,
+                    clinic_id = EXCLUDED.clinic_id,
+                    branch_id = EXCLUDED.branch_id,
+                    veterinarian_id = EXCLUDED.veterinarian_id,
+                    history = EXCLUDED.history,
+                    diagnosis = EXCLUDED.diagnosis,
+                    recommendations = EXCLUDED.recommendations,
+                    created_by = EXCLUDED.created_by,
+                    updated_at = EXCLUDED.updated_at
                 """
             ),
             {

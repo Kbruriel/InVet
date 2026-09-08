@@ -1,11 +1,15 @@
-# QA-015 - Findings del slice BE-015 (reportes agregados)
+# QA-015 — Findings del slice BE-015 (reportes agregados)
 
 - Estado global: `RESOLVED`
+- **Última revisión:** 2026-09-07 (re-verificación)
 
-Se documentan las desviaciones observadas durante la validaci[oó]n QA-015
-contra PostgreSQL real. Ninguno queda en estado bloqueante al cierre.
+Se documentan las observaciones y desviaciones registradas durante la validación
+QA-015 contra PostgreSQL real (contenedor `invet-backend`) y la suite completa en
+host. Ningún finding asociado a BE-015 queda en estado bloqueante al cierre.
 
-## QF-015-01 - Paginación no determinista en reportes paginados
+---
+
+## QF-015-01 — Paginación no determinista en reportes paginados
 
 - Estado: `RESOLVED`
 - Severidad: high
@@ -39,7 +43,7 @@ contra PostgreSQL real. Ninguno queda en estado bloqueante al cierre.
   - Re-ejecución de `qa015_verify.py` (T01/T02/T03) contra PG real dentro de
     `invet-backend-qa015` → `ok: true`; T02 `appointments_p1p2` con `overlap=0`.
 
-## QF-015-02 - Key-mismatch en el script QA de BOLA pets
+## QF-015-02 — Key-mismatch en el script QA de BOLA pets
 
 - Estado: `RESOLVED`
 - Severidad: low (script de QA, no code productivo)
@@ -57,7 +61,7 @@ contra PostgreSQL real. Ninguno queda en estado bloqueante al cierre.
   de la carga del JWT (dependencia `get_current_access_user`) y no expone
   `clinic_id` como query param; se verifica con el mismo script T03.
 
-## QF-015-03 - 3 fallos preexistentes en la suite global, ajenos a BE-015
+## QF-015-03 — 3 fallos preexistentes en la suite global, ajenos a BE-015
 
 - Estado: `ACCEPTED_RISK`
 - Severidad: low
@@ -75,9 +79,9 @@ contra PostgreSQL real. Ninguno queda en estado bloqueante al cierre.
 
 ## Criterios de cierre
 
-- Todos los findings observados durante la ejecuci[oó]n QA-015 están en
+- Todos los findings observados durante la ejecución QA-015 están en
   estado `RESOLVED` o `ACCEPTED_RISK`.
-- Ning[ún] finding bloqueante queda en `OPEN`, `IN_PROGRESS` o
-`READY_FOR_REVALIDATION`.
+- Ningún finding bloqueante queda en `OPEN`, `IN_PROGRESS` o
+  `READY_FOR_REVALIDATION`.
 
 - Estado final: `RESOLVED`

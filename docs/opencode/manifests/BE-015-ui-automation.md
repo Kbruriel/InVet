@@ -2,11 +2,11 @@
 manifest_version: 1
 slice: "015"
 layer: ui-automation
-generated_at: 2026-09-02T21:43:43+00:00
+generated_at: 2026-09-07T23:29:16+00:00
 source_plan: docs/opencode/plans/BE-015-plan.md
-source_plan_sha256: f2d8b7e3c7dbba5f0b9967c5a8e6998a36b593d1fda23b958ce78eda940cff6b
+source_plan_sha256: 2e65b3a8c877e97da8639d617e56613f701fa37ee145127a0da81ace38c52823
 source_task: docs/opencode/tasks/ui-automation/UIA-015.md
-source_task_sha256: 166fbf3045c3d825762444ff7697f04467c63033e2ae0ce58bebc38f277b1cfa
+source_task_sha256: 5bb591832e0de1c46d4faaee5a614839a5a2f25f9468016929a37904ee986b55
 ---
 
 # BE-015 - manifiesto compacto ui-automation
@@ -66,18 +66,26 @@ Ejecutar pruebas E2E con Playwright contra el frontend (`http://localhost:3000`)
 ## Rutas cubiertas
 - `/portal/admin/reports` — Panel principal de reportes.
 - `/portal/clinic/reports` — Vista alternativa para clinic admin (si existe ruta separada).
-## Evidencia pendiente
-| Caso | Estado evidencia | Comandos |
-| --- | --- | --- |
-| UIA-C1 | pending | npx playwright test tests/e2e/report-summary.spec.ts |
-| UIA-C2 | pending | npx playwright test tests/e2e/reports-pagination.spec.ts |
-| UIA-C3 | pending | npx playwright test tests/e2e/reports-services.spec.ts |
-| UIA-C4 | pending | npx playwright test tests/e2e/reports-pets.spec.ts |
-| UIA-C5 | pending | npx playwright test tests/e2e/reports-ratings.spec.ts |
-| UIA-C6 | pending | npx playwright test tests/e2e/reports-payments.spec.ts |
-| UIA-C7 | pending | npx playwright test tests/e2e/reports-invalid-input.spec.ts |
-| UIA-C8 | pending | npx playwright test tests/e2e/reports-auth.spec.ts |
-| UIA-C9 | pending | npx playwright test --project=chromium tests/e2e/reports-responsive.spec.ts |
+## Evidencia ejecutada
+Implementacion unica en `InVet_UI_Automation/tests/e2e/be-015-reports.spec.ts` (9 tests UIA-C1..UIA-C9).
+| Caso | US/AC | Estado evidencia | Resultado |
+| --- | --- | --- | --- |
+| UIA-C1 | US-015-01 AC-015-01 AC-015-02 | `npm run test:e2e` (chromium) | passed |
+| UIA-C2 | US-015-02 AC-015-03 | `npm run test:e2e` (chromium) | passed |
+| UIA-C3 | US-015-03 AC-015-04 | `npm run test:e2e` (chromium) | passed |
+| UIA-C4 | US-015-04 AC-015-06 | `npm run test:e2e` (chromium) | passed |
+| UIA-C5 | US-015-05 AC-015-07 | `npm run test:e2e` (chromium) | passed |
+| UIA-C6 | US-015-06 AC-015-08 | `npm run test:e2e` (chromium) | passed |
+| UIA-C7 | US-015-07 AC-015-04 AC-015-05 | `npm run test:e2e` (chromium) | passed |
+| UIA-C8 | US-015-08 AC-015-09 | `npm run test:e2e` (chromium) | passed |
+| UIA-C9 | US-015-09 AC-015-03 | `npm run test:e2e` (chromium) | passed |
+### Resumen de ejecucion
+- `npm run test:e2e` (`playwright test --project=chromium tests/e2e`): **112 passed, 7 skipped (JUSTIFIED_SKIP), 0 failed** (25.1s).
+- `npm run test:regression` (`playwright test tests/e2e --grep @regression --project=chromium`): **100 passed, 2 skipped, 0 failed** (20.7s).
+- Los 9 tests de `be-015-reports.spec.ts` (UIA-C1..UIA-C9) pasan en ambas corridas contra el stack Docker.
+- Stack Docker (3/3 healthy): `invet-backend` :8000 (healthy), `invet-db` :5432 (healthy), `invet-frontend` :3000 (healthy).
+- Frontend reusado del contenedor Docker (:3000, `reuseExistingServer` true en non-CI); no se levantó host alternativo.
+- Artefactos generados: `InVet_UI_Automation/playwright-report/index.html` (HTML reporter) + `test-results/`.
 ## Casos no automatizados en este slice
 - Integraciones con graficos/visualizaciones de reportes (fuerza externa).
 - Flujos multi-pagina complejos de navegacion dentro del reporte.

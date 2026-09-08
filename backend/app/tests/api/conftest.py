@@ -139,17 +139,17 @@ def payment_app() -> Iterator[dict[str, Any]]:
 def _review_entity(overrides=None):
     from app.domain.entities.review import Review
 
-    data = dict(
-        id=1,
-        appointment_id=1,
-        branch_id=1,
-        clinic_id=1,
-        user_id=50,
-        rating=5,
-        comment="Muy buena atención",
-        created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC),
-    )
+    data = {
+        "id": 1,
+        "appointment_id": 1,
+        "branch_id": 1,
+        "clinic_id": 1,
+        "user_id": 50,
+        "rating": 5,
+        "comment": "Muy buena atención",
+        "created_at": datetime.now(UTC),
+        "updated_at": datetime.now(UTC),
+    }
     if overrides:
         data.update(overrides)
     return Review(**data)
@@ -158,15 +158,15 @@ def _review_entity(overrides=None):
 def _response_entity(overrides=None):
     from app.domain.entities.review import ReviewResponse
 
-    data = dict(
-        id=100,
-        review_id=1,
-        branch_id=1,
-        user_id=10,
-        body="Gracias por su feedback",
-        created_at=datetime.now(UTC),
-        updated_at=datetime.now(UTC),
-    )
+    data = {
+        "id": 100,
+        "review_id": 1,
+        "branch_id": 1,
+        "user_id": 10,
+        "body": "Gracias por su feedback",
+        "created_at": datetime.now(UTC),
+        "updated_at": datetime.now(UTC),
+    }
     if overrides:
         data.update(overrides)
     return ReviewResponse(**data)

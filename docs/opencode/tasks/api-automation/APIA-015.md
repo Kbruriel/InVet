@@ -45,13 +45,26 @@ Ejecutar pruebas automatizadas contra endpoints del backend (Docker container `b
 | BOLA-C1 | GET por periodo sin clinic_id | Usuario admin propia clinica solo ve sus datos | 200 - solo datos propio tenant |
 | BOLA-C2 | GET con filtro clinic_id ajeno | Intentar acceder datos de clinica Diferente | 403 o sin datos filtrados |
 
-## Evidencia pendiente
+## Evidencia ejecutada (APIA-015)
 
-| Caso | Estado evidencia | Comandos |
+| Caso | Estado evidencia | Comando |
 | --- | --- | --- |
-| APIA-C1-APIA-C9 | pending | `python -m pytest backend/tests/integration/test_reports_api.py -v --timeout=60` |
-| AUTH-C1-AUTH-C4 | pending | Mismo archivo de prueba con parametrizaciones auth |
-| BOLA-C1-BOLA-C2 | pending | Mismo archivo de prueba con multi-tenant fixtures |
+| APIA-C1, C2, C3, C4, C5, C6 | passed (200 + contratos) | `npm run test:api -- --grep "APIA-015"` |
+| APIA-C7 (422 date/bounds) | passed (422) | `npm run test:api -- --grep "APIA-015"` |
+| APIA-C8 (401 no/bad token) | passed (401) | `npm run test:api -- --grep "APIA-015"` |
+| APIA-C9 (405/404 metodo/ruta) | passed (405/404) | `npm run test:api -- --grep "APIA-015"` |
+| AUTH-C1 (tenant valido) | passed | `npm run test:api -- --grep "APIA-015"` |
+| AUTH-C2 (tenant ajeno) | passed (solo datos propio tenant) | `npm run test:api -- --grep "APIA-015"` |
+| BOLA-C1, C2 | passed (tenant isolation por JWT clinic_id) | `npm run test:api -- --grep "APIA-015"` |
+| LEAK (sin stack/ORM/DB expuesto) | passed | `npm run test:api -- --grep "APIA-015"` |
+
+Resumen corrida APIA-015: 13/13 passed (2.6s) en `InVet_UI_Automation/tests/api/apia-015-reports.spec.ts` contra el backend Docker. En `npm run test:api` completo: 134 passed / 46 failed — los 46 fallos pertenecen a specs de OTROS slices (BE-006/008/009/012/003) con expectativas contractuales desactualizadas vs el backend actual; fuera del alcance de APIA-015 y fuera de su allowlist (no se corrigen en esta fase).
+
+## Contrato real observado (APIA-015)
+
+- Parametro de paginacion es `size` (ge 1, le 100), no `page_size`; fuera de rango → 422.
+- No existe param `clinic_id` de query; el tenant se deriva del JWT (`get_current_access_user` → clinic_id). Actores sin clinica → 403.
+- Los 6 endpoints son SOLO GET; metodo no permitido → 405, ruta desconocida → 404, sin token → 401, token invalido → 401.
 
 ## Riesgos IDOR/BOLA identificados
 

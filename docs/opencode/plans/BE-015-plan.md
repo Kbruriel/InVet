@@ -2,7 +2,7 @@
 schema_version: 3
 slice: "015"
 canonical_plan: BE-015
-status: PLANNED
+status: COMPLETED
 encoding: UTF-8
 ---
 
@@ -89,17 +89,17 @@ Fuente obligatoria: `docs/opencode/references/slice_task_context.md`.
 
 | ID | Fuente | Historia o criterio | Tarea planificada | Validacion | Evidencia esperada | Estado |
 | --- | --- | --- | --- | --- | --- | --- |
-| AC-015-01 | BE/FEMatrix/contexto | Filtro reportes por tipo y rango de fechas con totales agregados | BE-015-T03 (endpoint) + FE-015-T02 (UI filter) + QA-015-T01 | Endpoint devuelve 200 con datos correctos; UI muestra filtro activo | response_data.totals exist; query executed | OPEN |
-| AC-015-02 | BE/FE/QA | Paginacion en listados extensos | BE-015-T03 + FE-015-T04 (UI pagination) + QA-015-T02 | Page/page_size respetados; <= max_items devueltos | paginated_response.total, items_len | OPEN |
-| AC-015-03 | BE/FE/QA | Reporte citas con campos resumidos paginados | BE-015-T03 + QA-015-T03 | GET /reports/appointments valida contrato respuesta | response_schema match | OPEN |
-| AC-015-04 | BE/FE/QA | Reporte servicios realizados con campos resumidos | BE-015-T03 + QA-015-T04 | GET /reports/services valida contrato respuesta | response_schema match | OPEN |
-| AC-015-05 | BE/FE/QA | Conteo de mascotas activas por periodo/clinica | BE-015-T04 (pets report) + QA-015-T05 | GET /reports/pets devuelve conteo correcto | count == expected | OPEN |
-| AC-015-06 | BE/FE/QA | Reporte consultas medicas con campos resumidos | BE-015-T03 + QA-015-T06 | GET /reports/consultations valida contrato respuesta | response_schema match | OPEN |
-| AC-015-07 | BE/FE/QA | Resumen calificaciones promedio por veterinario/clinica | BE-015-T05 (ratings report) + QA-015-T07 | GET /reports/ratings devuelve resumen y promedios | averages match fixture data | OPEN |
-| AC-015-08 | BE/FE/QA | Reporte pagos operativos con campos resumidos | BE-015-T05 + QA-015-T08 | GET /reports/payments valida contrato respuesta | totals_sum == expected | OPEN |
-| AC-015-09 | BE/FE/QA/APIOA | Auth Bearer requerida en todos los endpoints de reportes | APIA-C8, QA-015-T06 | Sin token → 401; con token invalido/expirado → 401 | 401 HTTP status returned | OPEN |
-| AC-015-10 | BE/QA/APIA/APIOA | Tipo de reporte desconocido → 422 claro | APIA-C7, QA-015-T07 | Endpoint rechaza type invalido con mensaje legible | 422 status + error.message present | OPEN |
-| AC-015-11 | BE/QA/BOLA | Propietario solo ve datos de su propia clinica/tenant | BOLA-C1, QA-015-T08 | Datos cruzados por clinia ≠ se filtran fuera; usuario ve solo sus datos | response_items subset of own clinic data | OPEN |
+| AC-015-01 | BE/FEMatrix/contexto | Filtro reportes por tipo y rango de fechas con totales agregados | BE-015-T03 (endpoint) + FE-015-T02 (UI filter) + QA-015-T01 | Endpoint devuelve 200 con datos correctos; UI muestra filtro activo | response_data.totals exist; query executed | CLOSED |
+| AC-015-02 | BE/FE/QA | Paginacion en listados extensos | BE-015-T03 + FE-015-T04 (UI pagination) + QA-015-T02 | Page/page_size respetados; <= max_items devueltos | paginated_response.total, items_len | CLOSED |
+| AC-015-03 | BE/FE/QA | Reporte citas con campos resumidos paginados | BE-015-T03 + QA-015-T03 | GET /reports/appointments valida contrato respuesta | response_schema match | CLOSED |
+| AC-015-04 | BE/FE/QA | Reporte servicios realizados con campos resumidos | BE-015-T03 + QA-015-T04 | GET /reports/services valida contrato respuesta | response_schema match | CLOSED |
+| AC-015-05 | BE/FE/QA | Conteo de mascotas activas por periodo/clinica | BE-015-T04 (pets report) + QA-015-T05 | GET /reports/pets devuelve conteo correcto | count == expected | CLOSED |
+| AC-015-06 | BE/FE/QA | Reporte consultas medicas con campos resumidos | BE-015-T03 + QA-015-T06 | GET /reports/consultations valida contrato respuesta | response_schema match | CLOSED |
+| AC-015-07 | BE/FE/QA | Resumen calificaciones promedio por veterinario/clinica | BE-015-T05 (ratings report) + QA-015-T07 | GET /reports/ratings devuelve resumen y promedios | averages match fixture data | CLOSED |
+| AC-015-08 | BE/FE/QA | Reporte pagos operativos con campos resumidos | BE-015-T05 + QA-015-T08 | GET /reports/payments valida contrato respuesta | totals_sum == expected | CLOSED |
+| AC-015-09 | BE/FE/QA/APIOA | Auth Bearer requerida en todos los endpoints de reportes | APIA-C8, QA-015-T06 | Sin token → 401; con token invalido/expirado → 401 | 401 HTTP status returned | CLOSED |
+| AC-015-10 | BE/QA/APIA/APIOA | Tipo de reporte desconocido → 422 claro | APIA-C7, QA-015-T07 | Endpoint rechaza type invalido con mensaje legible | 422 status + error.message present | CLOSED |
+| AC-015-11 | BE/QA/BOLA | Propietario solo ve datos de su propia clinica/tenant | BOLA-C1, QA-015-T08 | Datos cruzados por clinia ≠ se filtran fuera; usuario ve solo sus datos | response_items subset of own clinic data | CLOSED |
 
 ## Endpoints esperados
 
@@ -288,17 +288,17 @@ Evidencia completa: C:\Users\PRECIS~1\AppData\Local\Temp\opencode\evidence_http_
 
 | Criterio | Riesgo | Nivel | Suite o archivo esperado | Estado |
 | --- | --- | --- | --- | --- |
-| AC-015-01 | Datos agregados incorrectos | integration | `app/tests/usecases/test_reports_aggregations.py` | OPEN |
-| AC-015-02 | Paginacion no respetada | contract | `app/tests/integration/test_reports_pagination.py` | OPEN |
-| AC-015-03 | Error endpoint citas | integration | `app/tests/usecases/test_reports_appointments.py` | OPEN |
-| AC-015-04 | Error endpoint servicios | integration | `app/tests/usecases/test_reports_services.py` | OPEN |
-| AC-015-05 | Conteo mascotas incorrecto | unit+integration | `app/tests/usecases/test_reports_pets_count.py` | OPEN |
-| AC-015-06 | Error endpoint consultas | integration | `app/tests/usecases/test_reports_consultations.py` | OPEN |
-| AC-015-07 | Promedio ratings incorrecto | integration | `app/tests/usecases/test_reports_ratings_summary.py` | OPEN |
-| AC-015-08 | Totales pagos incorrectos | integration | `app/tests/usecases/test_reports_payments.py` | OPEN |
-| AC-015-09 | Auth Bearer requerida | security | `app/tests/integration/test_reports_auth.py` | OPEN |
-| AC-015-10 | Tipo invalido 422 | contract | `app/tests/integration/test_reports_invalid_type.py` | OPEN |
-| AC-015-11 | IDOR/BOLA data leak | security | `app/tests/integration/test_reports_tenant_isolation.py` | OPEN |
+| AC-015-01 | Datos agregados incorrectos | integration | `app/tests/usecases/test_reports_appointments_aggregation.py` + `test_reports_integration.py` | CLOSED |
+| AC-015-02 | Paginacion no respetada | contract | `app/tests/integration/test_reports_invalid_input.py` (pagination 422) + `test_reports_integration.py` | CLOSED |
+| AC-015-03 | Error endpoint citas | integration | `app/tests/usecases/test_reports_appointments_aggregation.py` + `app/tests/integration/test_reports_router.py` | CLOSED |
+| AC-015-04 | Error endpoint servicios | integration | `app/tests/usecases/test_reports_services_aggregation.py` + `app/tests/integration/test_reports_router.py` | CLOSED |
+| AC-015-05 | Conteo mascotas incorrecto | unit+integration | `app/tests/usecases/test_reports_pets_count.py` + `app/tests/integration/test_reports_router.py` | CLOSED |
+| AC-015-06 | Error endpoint consultas | integration | `app/tests/usecases/test_reports_consultations.py` + `app/tests/integration/test_reports_router.py` | CLOSED |
+| AC-015-07 | Promedio ratings incorrecto | integration | `app/tests/usecases/test_reports_ratings_summary.py` + `app/tests/integration/test_reports_router.py` | CLOSED |
+| AC-015-08 | Totales pagos incorrectos | integration | `app/tests/usecases/test_reports_payments.py` + `app/tests/integration/test_reports_router.py` | CLOSED |
+| AC-015-09 | Auth Bearer requerida | security | `app/tests/integration/test_reports_auth.py` | CLOSED |
+| AC-015-10 | Tipo invalido 422 | contract | `app/tests/integration/test_reports_invalid_input.py` (period 422 over 6 endpoints) | CLOSED |
+| AC-015-11 | IDOR/BOLA data leak | security | `app/tests/integration/test_reports_tenant_isolation.py` | CLOSED |
 
 ## Riesgos de seguridad/IDOR/BOLA
 

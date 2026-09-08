@@ -235,7 +235,7 @@ def test_bola_prevention_on_unread_count(app_client):
     response = app_client.get("/api/v1/notifications/count/unread")
 
     assert response.status_code == 200
-    data = response.json()
+    response.json()
 
     # Solo debe contar notificaciones propias (en este caso, la de usuario 2)
     # Si hay una no leída para el usuario 2, el conteo debe ser al menos 1

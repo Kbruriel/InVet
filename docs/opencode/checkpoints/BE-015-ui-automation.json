@@ -1,0 +1,21 @@
+{
+  "slice": "BE-015",
+  "layer": "ui-automation",
+  "tasks": {
+    "UIA-015": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-07T00:55:22+00:00",
+      "finished_at": "2026-09-07T01:01:39+00:00",
+      "evidence": "UIA-015 9/9 specs passed (UIA-C1..C9) en InVet_UI_Automation/tests/e2e/be-015-reports.spec.ts. npm run test:e2e: 112 passed, 7 skipped (JUSTIFIED_SKIP), 0 failed (25.1s). npm run test:regression: 100 passed, 2 skipped, 0 failed (20.7s). Stack Docker 3/3 healthy: invet-backend :8000, invet-db :5432, invet-frontend :3000 (reuseExistingServer true, frontend reusado del contenedor, sin host alternativo). Artefactos: InVet_UI_Automation/playwright-report/index.html + test-results/ (HTML reporter). Coverage US-015-01..09 / AC-015-01..09: C1 aplica tipo y carga sin error, C2 citas paginado max 20, C3 servicios tabla, C4 mascotas conteo, C5 calificaciones promedio, C6 pagos columna monto, C7 rango de fechas invalido error, C8 sin token redirige a login, C9 responsive mobile+desktop. Evidencia documental: docs/opencode/tasks/ui-automation/UIA-015.md.",
+      "outcome": "pass",
+      "changed_files": [
+        "docs/opencode/checkpoints/BE-015-ui-automation.json",
+        "docs/opencode/tasks/ui-automation/UIA-015.md"
+      ],
+      "deletion_justification": "UIA-015.md: se reemplazo la tabla 'Evidencia pendiente' (12 filas 'pending' con rutas de spec inexistentes) por la evidencia ejecutada real (tabla 'passed' + resumen npm run test:e2e 112 passed / test:regression 100 passed). Cambio intencional y alineado al cierre.",
+      "errors": []
+    }
+  },
+  "updated_at": "2026-09-07T01:01:39+00:00"
+}

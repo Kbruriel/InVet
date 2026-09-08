@@ -82,34 +82,60 @@ from app.api.v1.schemas.report_schemas import (  # noqa: E402
 )
 
 
-def _paging_for(uc_name: str) -> PaginatedResponse[Any]:  # type: ignore[type-arg]
+def _mock_for(uc_name: str) -> Any:
+    """Devuelve el mock return_value correcto para cada use-case.
+
+    /reports/pets retorna un PetCountDto PLANO (no paginado).
+    """
+    if uc_name == "uc_pets":
+        return PetCountDto(clinic_id=CLINIC_A, active_count=3)
+
     items: list[Any]
     if uc_name == "uc_appointments":
-        items = [AppointmentSummaryDto(
-            id=1, clinic_id=CLINIC_A, appointment_type="consulta",
-            status="completada",
-            scheduled_start="2025-06-01T09:00:00+00:00",
-            scheduled_end="2025-06-01T09:30:00+00:00",
-        )]
+        items = [
+            AppointmentSummaryDto(
+                id=1,
+                clinic_id=CLINIC_A,
+                appointment_type="consulta",
+                status="completada",
+                scheduled_start="2025-06-01T09:00:00+00:00",
+                scheduled_end="2025-06-01T09:30:00+00:00",
+            )
+        ]
     elif uc_name == "uc_services":
-        items = [ServiceSummaryDto(
-            id=1, clinic_id=CLINIC_A, name="Consulta",
-            price=100.0, duration_minutes=30, is_active=True,
-        )]
+        items = [
+            ServiceSummaryDto(
+                id=1,
+                clinic_id=CLINIC_A,
+                name="Consulta",
+                price=100.0,
+                duration_minutes=30,
+                is_active=True,
+            )
+        ]
     elif uc_name == "uc_consultations":
-        items = [ConsultationSummaryDto(
-            id=1, clinic_id=CLINIC_A, diagnosis="Gastritis",
-        )]
+        items = [
+            ConsultationSummaryDto(
+                id=1,
+                clinic_id=CLINIC_A,
+                diagnosis="Gastritis",
+            )
+        ]
     elif uc_name == "uc_ratings":
         items = [RatingSummaryDto(average_rating=4.5, total_reviews=10)]
     elif uc_name == "uc_payments":
-        items = [PaymentSummaryDto(
-            id=1, clinic_id=CLINIC_A, amount=100.0,
-            payment_method="cash", status="paid",
-            paid_at="2025-06-01T12:00:00+00:00",
-        )]
-    else:  # uc_pets
-        items = [PetCountDto(clinic_id=CLINIC_A, active_count=3)]
+        items = [
+            PaymentSummaryDto(
+                id=1,
+                clinic_id=CLINIC_A,
+                amount=100.0,
+                payment_method="cash",
+                status="paid",
+                paid_at="2025-06-01T12:00:00+00:00",
+            )
+        ]
+    else:
+        items = []
     return PaginatedResponse[Any](  # type: ignore[call-overload]
         items=items, total=len(items), page=1, size=20
     )
@@ -170,7 +196,7 @@ class TestNoAmplificationOnOtherEndpoints:
         self, client_factory, endpoint, uc_name
     ) -> None:
         with patch.object(
-            reports_mod, uc_name, return_value=_paging_for(uc_name)
+            reports_mod, uc_name, return_value=_mock_for(uc_name)
         ) as uc:
             client = client_factory()
             async with client:
@@ -189,9 +215,8 @@ class TestUserWithoutClinic:
     async def test_token_without_clinic_403(self, client_factory) -> None:
         # Token válido de acceso pero SIN clinica resuelta -> 403 (no 401).
         from app.api.v1.schemas.report_schemas import PaginatedResponse
-        token = create_access_token(
-            {"sub": "501", "role": "owner"}
-        )  # sin clinic_id
+
+        token = create_access_token({"sub": "501", "role": "owner"})  # sin clinic_id
 
         with patch.object(
             reports_mod,

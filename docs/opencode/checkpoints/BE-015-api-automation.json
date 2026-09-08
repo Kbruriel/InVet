@@ -1,0 +1,18 @@
+{
+  "slice": "BE-015",
+  "layer": "api-automation",
+  "tasks": {
+    "APIA-015": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-07T03:37:51+00:00",
+      "finished_at": "2026-09-07T03:38:48+00:00",
+      "evidence": "APIA-015 cerrada. 13/13 tests passed en tests/api/apia-015-reports.spec.ts (scoped 'npm run test:api -- --grep APIA-015', 2.6s) contra /api/v1/reports/{appointments,services,pets,consultations,ratings,payments}; cubre C1..C9 + AUTH-C1..C4 + BOLA-C1/C2 + LEAK. Docker 3/3 healthy (backend :8000, db :5432, frontend :3000), Playwright API contra backend publicado por Docker, sin fallback host. Contrato real: 6 GET; size (ge1,le100, no page_size); tenant via JWT clinic_id (sin param clinic_id); 401/403/404/405/422 ejercitados; DTOs PaginatedResponse, PetCountDto, RatingsReportResponse, PaymentsReportResponse. Evidencia en APIA-015.md. Nota: npm run test:api completo 134 passed / 46 failed (fallos de OTROS slices BE-006/008/009/012/003 desactualizados), fuera de alcance de APIA-015.",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    }
+  },
+  "updated_at": "2026-09-07T03:38:48+00:00"
+}

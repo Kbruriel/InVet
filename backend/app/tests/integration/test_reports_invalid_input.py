@@ -97,9 +97,7 @@ class TestPeriodDateValidation:
         with patch.object(reports_mod, _UC_FOR[endpoint]) as uc:
             client = client_factory()
             async with client:
-                resp = await client.get(
-                    endpoint, params={"period_start": "01/06/2025"}
-                )
+                resp = await client.get(endpoint, params={"period_start": "01/06/2025"})
 
         assert resp.status_code == 422, (endpoint, resp.text)
         assert "YYYY-MM-DD" in resp.json()["detail"]
@@ -107,13 +105,13 @@ class TestPeriodDateValidation:
 
     @pytest.mark.parametrize("endpoint", ALL_ENDPOINTS)
     @pytest.mark.asyncio
-    async def test_invalid_period_end_format_422(self, client_factory, endpoint) -> None:
+    async def test_invalid_period_end_format_422(
+        self, client_factory, endpoint
+    ) -> None:
         with patch.object(reports_mod, _UC_FOR[endpoint]) as uc:
             client = client_factory()
             async with client:
-                resp = await client.get(
-                    endpoint, params={"period_end": "25-12-20"}
-                )
+                resp = await client.get(endpoint, params={"period_end": "25-12-20"})
 
         assert resp.status_code == 422, (endpoint, resp.text)
         assert "YYYY-MM-DD" in resp.json()["detail"]

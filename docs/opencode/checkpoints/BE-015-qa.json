@@ -1,0 +1,110 @@
+{
+  "slice": "BE-015",
+  "layer": "qa",
+  "reconciliation_note": "Este checkpoint se reconstruye en el stage docs a partir de la evidencia ya durable: `BE-015-backend.json#qa_gate` y `docs/opencode/qa/QA-015-results.md`. La fecha de re-verification final de QA-015 fue 2026-09-07; el anchor de ejecucion registrado como qa_gate fue 2026-09-03T17:10:00+00:00.",
+  "source": {
+    "qa_gate": "docs/opencode/checkpoints/BE-015-backend.json (bloque 'qa_gate')",
+    "results_md": "docs/opencode/qa/QA-015-results.md (decision APPROVED, 129/129 BE-015)",
+    "findings_md": "docs/opencode/qa/QA-015-findings.md (estado global RESOLVED)",
+    "script": "qa_scripts/qa015_verify.py + qa_scripts/qa015_results.json",
+    "transcribed_at": "2026-09-08"
+  },
+  "tasks": {
+    "QA-015-T01": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-03T17:10:00+00:00",
+      "finished_at": "2026-09-03T17:10:00+00:00",
+      "criterios": ["AC-015-01", "AC-015-03", "AC-015-04"],
+      "evidence": "qa015_verify.py T01 ok:true (8/8 checks): appointments total=12, services total=18, pets active_count=3, consultations total=3, ratings clinic_avg=4.11 n_vet=1, payments total=202 (total_amount 1250.0 en verificacion QA / 5000.0 en runtime_gate con seed distinta), 6 endpoints 200 autenticado. Corrobora `test_reports_integration.py` (contratos por campo) y `test_reports_router.py` (6/6 200). Suite BE-015 en contenedor: 67 use-cases + 62 integracion = 129/129 green (QA-015-results.md).",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "QA-015-T02": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-03T17:10:00+00:00",
+      "finished_at": "2026-09-03T17:10:00+00:00",
+      "criterios": ["AC-015-02", "AC-015-03"],
+      "evidence": "qa015_verify.py T02 ok:true (6/6 checks): appointments p1/p2 overlap=0 y rows union consistentes con total=12; size/page limites 422 (size0/size101/page0); services union=18; consultations n_p1=2 n_p2=1; payments 3 paginas disjoint=true (total 202). Determinismo ordenado por id como tiebreaker verificado por `TestReport[Appointments|Services|Consultations|Payments|RatingsSummary]DeterministicOrdering` (regresion de QF-015-01).",
+      "outcome": "pass",
+      "changed_files": [
+        "backend/app/application/usecases/reports/report_appointments.py",
+        "backend/app/application/usecases/reports/report_services.py",
+        "backend/app/application/usecases/reports/report_consultations.py",
+        "backend/app/application/usecases/reports/report_payments.py",
+        "backend/app/application/usecases/reports/report_ratings_summary.py"
+      ],
+      "deletion_justification": "Correccion de QF-015-01 (RESOLVED): se adiciono `id` como segundo criterio de orden (tiebreaker) en cada use-case paginado para eliminar overlap/falta de filas; no elimina logica productiva.",
+      "errors": []
+    },
+    "QA-015-T03": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-03T17:10:00+00:00",
+      "finished_at": "2026-09-03T17:10:00+00:00",
+      "criterios": ["AC-015-09", "AC-015-10", "AC-015-11"],
+      "evidence": "qa015_verify.py T03 ok:true (6/6 checks): no token 401; bad token 401; clinic_id derivado exclusivamente del JWT (query param ignorada, no existe en signature -> BOLA-safe); pets faked no se expanden; dates 422 (formato invalido/mezclado/invertido) y 200 con periodo valido. Corroborado por `test_reports_auth.py` (401 sin/invalido/expirado, WWW-Authenticate), `test_reports_router.py` (403 token sin clinic_id), `test_reports_tenant_isolation.py` (Clinica A/B scoped, sin clinic 403) y `test_reports_invalid_input.py` (18 period 422 + 12 pagination 422).",
+      "outcome": "pass",
+      "changed_files": [],
+      "deletion_justification": "",
+      "errors": []
+    }
+  },
+  "regression_tests": {
+    "framework": "pytest + httpx",
+    "backend_be015": {
+      "usecases": "67 passed (7 archivos `test_reports_*.py`) en contenedor invet-backend",
+      "integration": "62 passed (5 archivos `test_reports_*.py`) en contenedor invet-backend",
+      "total_be015": "129 passed / 0 failed / 0 skipped"
+    },
+    "frontend": "5 suites Jest / 32 tests pass (api, useReports, FilterBar, ReportTable, page)",
+    "full_suite_out_of_be015": "13 fallos pre-existentes (ACCEPTED_RISK, QF-015-03 / O1-O4): layout governance/meta-repo + payload-sync, ajenos a reportes/routers/use-cases/schemas de BE-015"
+  },
+  "gates": {
+    "qa": "python backend/scripts/validate_slice_plan.py BE-015 --stage qa -> PASS",
+    "secure_persistence": "python backend/scripts/validate_slice_plan.py BE-015 --stage secure-persistence -> PASS",
+    "docs": "python backend/scripts/validate_slice_plan.py BE-015 --stage docs -> [PASS] BE-015/FE-015/QA-015 stage=docs"
+  },
+  "artifacts": {
+    "results_md": "docs/opencode/qa/QA-015-results.md",
+    "findings_md": "docs/opencode/qa/QA-015-findings.md",
+    "results_json": "qa_scripts/qa015_results.json",
+    "script": "qa_scripts/qa015_verify.py",
+    "decision": "APPROVED",
+    "finding_global_state": "RESOLVED"
+  },
+  "findings": {
+    "QF-015-01": "RESOLVED (orden determinista + tiebreaker id, 5 pruebas de regresion)",
+    "QF-015-02": "RESOLVED (key-mismatch total_active -> active_count en script QA; BOLA-safe por router)",
+    "QF-015-03": "ACCEPTED_RISK (3 tests pre-existentes de agencia/planning, fuera de scope BE-015)"
+  },
+  "defects_found_and_fixed": [
+    {
+      "id": "QF-015-01",
+      "severity": "high",
+      "title": "Paginacion no determinista en 5 reportes paginados",
+      "root_cause": "order_by unica columna sin tiebreaker -> overlap/missing rows",
+      "fix": "agregar id como segundo criterio de orden en cada use-case",
+      "regression_tests": [
+        "test_reports_appointments_aggregation.py::TestReportAppointmentsDeterministicOrdering::test_order_by_uses_scheduled_start_then_id",
+        "test_reports_services_aggregation.py::TestReportServicesDeterministicOrdering::test_order_by_uses_name_then_id",
+        "test_reports_consultations.py::TestReportConsultationsDeterministicOrdering::test_order_by_uses_updated_at_then_id",
+        "test_reports_payments.py::TestReportPaymentsDeterministicOrdering::test_order_by_uses_paid_at_then_id",
+        "test_reports_ratings_summary.py::TestReportRatingsSummaryDeterministicOrdering::test_order_by_uses_created_at_then_id"
+      ],
+      "verification": "ruff check clean; pytest reports 56 passed; suite green; --stage secure-persistence PASS; --stage qa PASS"
+    },
+    {
+      "id": "QF-015-02",
+      "severity": "low",
+      "title": "Key-mismatch en script QA T03 (total_active vs active_count)",
+      "root_cause": "PetCountDto usa campo active_count, el script leia total_active",
+      "fix": "actualizar script qa_scripts/qa015_verify.py a leer active_count; router deriva clinic_id solo del JWT (BOLA-safe)",
+      "verification": "T03 bola_pets_faked_not_expanded -> pass: true"
+    }
+  ],
+  "updated_at": "2026-09-08T00:00:00+00:00"
+}

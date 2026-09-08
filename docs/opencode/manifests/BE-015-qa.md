@@ -2,11 +2,11 @@
 manifest_version: 1
 slice: "015"
 layer: qa
-generated_at: 2026-09-02T21:43:43+00:00
+generated_at: 2026-09-07T23:29:16+00:00
 source_plan: docs/opencode/plans/BE-015-plan.md
-source_plan_sha256: f2d8b7e3c7dbba5f0b9967c5a8e6998a36b593d1fda23b958ce78eda940cff6b
+source_plan_sha256: 2e65b3a8c877e97da8639d617e56613f701fa37ee145127a0da81ace38c52823
 source_task: docs/opencode/tasks/qa/QA-015.md
-source_task_sha256: f294e9bcc90fd5484fa189d94c5562e1200f00782c35316e3f52f48d0e6d324e
+source_task_sha256: 2a3977e504aedb7feaf9126d752214c798fa475ba0e67654cc0d2cbac498bd70
 ---
 
 # BE-015 - manifiesto compacto qa
@@ -36,7 +36,7 @@ source_task_sha256: f294e9bcc90fd5484fa189d94c5562e1200f00782c35316e3f52f48d0e6d
 
 ## Tareas
 
-### QA-015-T01 - PENDIENTE
+### QA-015-T01 - COMPLETADA
 - Tipo: qa
 - Criterio: AC-015-01, AC-015-03, AC-015-04
 - Objetivo: Verificar que los totales soncorrectos con datos de prueba controlados.
@@ -48,7 +48,7 @@ source_task_sha256: f294e9bcc90fd5484fa189d94c5562e1200f00782c35316e3f52f48d0e6d
 - Validacion: `python -m pytest backend/app/tests/integration/test_reports_integration.py -q --timeout=60`; complementario manual si aplica.
 - Resultado: Decision QA APPROVED o bloqueante documentada.
 
-### QA-015-T02 - PENDIENTE
+### QA-015-T02 - COMPLETADA
 - Tipo: qa
 - Criterio: AC-015-02, AC-015-03
 - Objetivo: Comprobar que page page_size se respetan en listados extensos.
@@ -60,7 +60,7 @@ source_task_sha256: f294e9bcc90fd5484fa189d94c5562e1200f00782c35316e3f52f48d0e6d
 - Validacion: Ejecutar endpoints iterando paginas desde Docker backend y comparar conteos.
 - Resultado: Decision QA APPROVED o bloqueante documentada.
 
-### QA-015-T03 - PENDIENTE
+### QA-015-T03 - COMPLETADA
 - Tipo: qa
 - Criterio: AC-015-09, AC-015-10, AC-015-11
 - Objetivo: Confirmar que sin token retorna 401 en endpoints de reportes.

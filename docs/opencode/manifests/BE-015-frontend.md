@@ -2,11 +2,11 @@
 manifest_version: 1
 slice: "015"
 layer: frontend
-generated_at: 2026-09-04T02:02:07+00:00
+generated_at: 2026-09-07T23:29:16+00:00
 source_plan: docs/opencode/plans/BE-015-plan.md
 source_plan_sha256: 2e65b3a8c877e97da8639d617e56613f701fa37ee145127a0da81ace38c52823
 source_task: docs/opencode/tasks/frontend/FE-015.md
-source_task_sha256: b3189f79d48035c0635e7648d6acc61f4d0b294aa64f4342e2c0ffff123d0c0e
+source_task_sha256: 31985546bffba827da012947532c712334d44c620367f8bdb1a5e8a1c7de4780
 ---
 
 # BE-015 - manifiesto compacto frontend
@@ -88,7 +88,7 @@ source_task_sha256: b3189f79d48035c0635e7648d6acc61f4d0b294aa64f4342e2c0ffff123d
 - Validacion: `npm test -- ReportTable.test.tsx`.
 - Resultado: Tabla generica lista para usar en cualquier tipo de reporte.
 
-### FE-015-T05 - COMPLETADA (revalidado: corrección de `PageProps` rechazados por Next 14; `npm run build` y `docker compose build --no-cache frontend` limpios)
+### FE-015-T05 - COMPLETADA
 - Tipo: ruta
 - Criterio: AC-015-01..AC-015-08
 - Objetivo: Construir pagina admin-reports con filtros.

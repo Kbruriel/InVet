@@ -182,7 +182,9 @@ class TestServicesContract:
         with patch.object(
             reports_mod,
             "uc_services",
-            return_value=PaginatedResponse(items=[_service()], total=1, page=1, size=20),
+            return_value=PaginatedResponse(
+                items=[_service()], total=1, page=1, size=20
+            ),
         ):
             client = client_factory()
             async with client:
@@ -214,12 +216,7 @@ class TestPetsContract:
         with patch.object(
             reports_mod,
             "uc_pets",
-            return_value=PaginatedResponse(
-                items=[PetCountDto(clinic_id=CLINIC_ID, active_count=25)],
-                total=1,
-                page=1,
-                size=1,
-            ),
+            return_value=PetCountDto(clinic_id=CLINIC_ID, active_count=25),
         ):
             client = client_factory()
             async with client:
@@ -268,9 +265,7 @@ class TestConsultationsContract:
 
 class TestRatingsContract:
     @pytest.mark.asyncio
-    async def test_returns_by_veterinarian_and_clinic_avg(
-        self, client_factory
-    ) -> None:
+    async def test_returns_by_veterinarian_and_clinic_avg(self, client_factory) -> None:
         with patch.object(
             reports_mod,
             "uc_ratings",
@@ -293,13 +288,18 @@ class TestRatingsContract:
         assert set(body.keys()) == {"by_veterinarian", "clinic_avg"}
 
         assert isinstance(body["clinic_avg"], int | float)
-        # clinic_avg = (4.0 + 5.0) / 2 = 4.5
-        assert body["clinic_avg"] == 4.5
+        # Media ponderada (F2): sum(avg_v * total_reviews_v) / sum(total_reviews_v)
+        # = (4.0 * 10 + 5.0 * 6) / (10 + 6) = 70 / 16 = 4.375 -> round(,2) = 4.38
+        assert body["clinic_avg"] == 4.38
 
         assert isinstance(body["by_veterinarian"], list)
         assert len(body["by_veterinarian"]) == 2
         for row in body["by_veterinarian"]:
-            assert set(row.keys()) == {"vet_id", "average_rating", "total_reviews"}
+            assert set(row.keys()) == {
+                "veterinarian_id",
+                "average_rating",
+                "total_reviews",
+            }
             assert isinstance(row["total_reviews"], int)
             assert isinstance(row["average_rating"], int | float)
 

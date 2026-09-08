@@ -2,9 +2,9 @@
 manifest_version: 1
 slice: "015"
 layer: backend
-generated_at: 2026-09-03T17:16:28+00:00
+generated_at: 2026-09-07T23:29:16+00:00
 source_plan: docs/opencode/plans/BE-015-plan.md
-source_plan_sha256: 4fa0fe7d2045859d27b217d05a7f1452f2c943e43365e347f157c5fce7a94c3c
+source_plan_sha256: 2e65b3a8c877e97da8639d617e56613f701fa37ee145127a0da81ace38c52823
 source_task: docs/opencode/tasks/backend/BE-015.md
 source_task_sha256: e83b59d332d0d70ba7a699f237f9fc83a137a0c2658f7169735b4f514fc021c3
 ---

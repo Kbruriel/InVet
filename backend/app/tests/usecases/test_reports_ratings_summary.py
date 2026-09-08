@@ -46,9 +46,7 @@ def _make_rating_tuple(rs: Any, branch: Any) -> tuple[Any, Any]:
     return (rs, branch)
 
 
-def _make_rating_summary(
-    average_rating: float = 4.5, total_reviews: int = 80
-) -> Any:
+def _make_rating_summary(average_rating: float = 4.5, total_reviews: int = 80) -> Any:
     rs: Any = MagicMock()
     rs.average_rating = average_rating
     rs.total_reviews = total_reviews
@@ -93,9 +91,7 @@ class TestReportRatingsSummaryStructure:
 
     def test_null_average_and_total(self) -> None:
         rs = _make_rating_summary(None, None)  # type: ignore[arg-type]
-        session = _make_session(
-            items=[_make_rating_tuple(rs, _make_branch())], total=1
-        )
+        session = _make_session(items=[_make_rating_tuple(rs, _make_branch())], total=1)
         resp = report_ratings_summary(db=session, clinic_id=1)
         assert resp.items[0].average_rating == 0.0
         assert resp.items[0].total_reviews == 0
@@ -118,8 +114,7 @@ class TestReportRatingsSummaryClinicIsolation:
 class TestReportRatingsSummaryPeriodFilter:
     def test_full_period(self) -> None:
         pairs = [
-            _make_rating_tuple(_make_rating_summary(), _make_branch())
-            for _ in range(3)
+            _make_rating_tuple(_make_rating_summary(), _make_branch()) for _ in range(3)
         ]
         session = _make_session(items=pairs, total=3)
         start = datetime(2025, 1, 1, tzinfo=UTC)
@@ -181,9 +176,7 @@ class TestReportRatingsSummaryDeterministicOrdering:
 
         session = _make_session(items=[], total=0)
         report_ratings_summary(db=session, clinic_id=1)
-        order_by = (
-            session.query.return_value.join.return_value.order_by
-        )
+        order_by = session.query.return_value.join.return_value.order_by
         args = order_by.call_args_list[-1].args
         assert len(args) == 2, (
             "report_ratings_summary debe ordenar por created_at + id "

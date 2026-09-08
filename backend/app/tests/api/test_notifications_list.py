@@ -1,7 +1,7 @@
 """Pruebas de listado de notificaciones (C1, C3, C9, C11).
 
 Cubren:
-- C1: Creación de notificación al crear una reseña 
+- C1: Creación de notificación al crear una reseña
 - C3: Listado paginado con metadata correcta
 - C9: Sin token se devuelve 401
 - C11: Listado vacío cuando no existen datos

@@ -16,7 +16,7 @@
 | 012 | US-012 | BE-012 | FE-012 | QA-012 | UIA-012 | APIA-012 | Calificaciones y comentarios | APPROVED |
 | 013 | US-013 | BE-013 | FE-013 | QA-013 | UIA-013 | APIA-013 | Notificaciones internas y correo |
 | 014 | US-014 | BE-014 | FE-014 | QA-014 | UIA-014 | APIA-014 | Soporte basico |
-| 015 | US-015 | BE-015 | FE-015 | QA-015 | UIA-015 | APIA-015 | Reportes operativos basicos |
+| 015 | US-015 | BE-015 | FE-015 | QA-015 | UIA-015 | APIA-015 | Reportes operativos basicos | APPROVED |
 | 016 | US-016 | BE-016 | FE-016 | QA-016 | UIA-016 | APIA-016 | Administracion inicial del sistema |
 | 017 | US-017 | BE-017 | FE-017 | QA-017 | UIA-017 | APIA-017 | Hardening E2E MVP |
 

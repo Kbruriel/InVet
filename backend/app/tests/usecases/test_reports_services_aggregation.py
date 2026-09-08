@@ -157,9 +157,7 @@ class TestReportServicesStructure:
 
 class TestReportServicesClinicIsolation:
     def test_data_separated_by_clinic(self):
-        session_1 = _make_session(
-            items=[_make_service(id=100, clinic_id=1)], total=1
-        )
+        session_1 = _make_session(items=[_make_service(id=100, clinic_id=1)], total=1)
         session_2 = _make_session(items=[], total=0)
 
         resp_1 = report_services(db=session_1, clinic_id=1)
@@ -189,15 +187,18 @@ class TestReportServicesPeriodFilter:
     def test_with_full_period(self, period_start, period_end):
         items = [
             _make_service(
-                id=i + 1, clinic_id=1,
+                id=i + 1,
+                clinic_id=1,
                 created=datetime(2025, 1, i + 5, tzinfo=UTC),
             )
             for i in range(5)
         ]
         session = _make_session(items=items, total=5)
         resp = report_services(
-            db=session, clinic_id=1,
-            period_start=period_start, period_end=period_end,
+            db=session,
+            clinic_id=1,
+            period_start=period_start,
+            period_end=period_end,
         )
         assert isinstance(resp, PaginatedResponse)
         assert resp.total == 5
@@ -205,23 +206,24 @@ class TestReportServicesPeriodFilter:
 
     def test_period_start_only(self, period_start):
         session = _make_session(items=[], total=0)
-        resp = report_services(
-            db=session, clinic_id=1, period_start=period_start
-        )
+        resp = report_services(db=session, clinic_id=1, period_start=period_start)
         assert isinstance(resp, PaginatedResponse)
 
     def test_period_does_not_break_pagination(self, period_start, period_end):
         all_items = [
             _make_service(
-                id=i + 1, clinic_id=1,
+                id=i + 1,
+                clinic_id=1,
                 created=datetime(2025, 1, i + 5, tzinfo=UTC),
             )
             for i in range(7)
         ]
         session = _make_session(items=all_items, total=7)
         resp = report_services(
-            db=session, clinic_id=1,
-            period_start=period_start, period_end=period_end,
+            db=session,
+            clinic_id=1,
+            period_start=period_start,
+            period_end=period_end,
         )
         assert resp.total == 7
         assert len(resp.items) == 7
@@ -275,7 +277,9 @@ class TestReportServicesDeterministicOrdering:
 
         session = _make_session(items=[], total=0)
         report_services(db=session, clinic_id=1)
-        args = session.query.return_value.filter.return_value.order_by.call_args_list[-1].args
+        args = session.query.return_value.filter.return_value.order_by.call_args_list[
+            -1
+        ].args
         assert len(args) == 2, (
             "report_services debe ordenar por name + id "
             "para una paginación estable (QA-015)"

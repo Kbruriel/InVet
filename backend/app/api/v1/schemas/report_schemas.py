@@ -1,6 +1,6 @@
 from typing import Generic, TypeVar
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 # ---------------------------------------------------------------------------
 # Paginated wrapper (reutilizable en cualquier endpoint)
@@ -74,3 +74,46 @@ class PaymentSummaryDto(BaseModel):
     payment_method: str
     status: str
     paid_at: str  # ISO-8601 string
+
+
+# ---------------------------------------------------------------------------
+# T08–T13 – Response models agregados (BE-015)
+#
+# Estos modelos agregan sobre `PaginatedResponse` o sobre un DTO propio con
+# campos de agregación. Antes vivían inline en `reports_router.py` (F1 de
+# la review BE-015); ahora están aquí para que el contrato HTTP completo esté
+# en una sola capa (schemas).
+# ---------------------------------------------------------------------------
+
+
+class RatingsReportResponse(BaseModel):
+    by_veterinarian: list[RatingSummaryDto] = Field(
+        description=(
+            "Resumen de calificaciones por veterinario. Cada elemento incluye "
+            "`veterinarian_id` (puede ser `None` si el modelo `RatingSummary` "
+            "no expone la relación), `average_rating` y `total_reviews`."
+        ),
+    )
+    clinic_avg: float = Field(
+        description=(
+            "Promedio de calificaciones de toda la clínica, **ponderado** por "
+            "el número de reseñas de cada veterinario "
+            "(`sum(avg_v * total_reviews_v) / sum(total_reviews_v)`; `0.0` si "
+            "no hay reseñas). Ver BE-015 F2."
+        ),
+    )
+
+
+class PaymentsReportResponse(BaseModel):
+    items: list[PaymentSummaryDto] = Field(
+        description="Listado paginado de pagos operativos de la clínica."
+    )
+    total: int = Field(description="Total de pagos encontrados (todas las páginas).")
+    page: int = Field(description="Página actual (1-indexed).")
+    size: int = Field(description="Elementos por página.")
+    total_amount: float = Field(
+        description=(
+            "Suma de `amount` en la página actual (`round(sum(items.amount), 2)`); "
+            "no es el total histórico de la clínica."
+        ),
+    )

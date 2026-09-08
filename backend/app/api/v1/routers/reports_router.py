@@ -6,17 +6,18 @@ Todos los endpoints dependen de get_current_access_user para tenant isolation co
 
 from collections.abc import Generator
 from datetime import datetime
-from typing import Any
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 
 from app.api.v1.schemas.report_schemas import (
     AppointmentSummaryDto,
     ConsultationSummaryDto,
     PaginatedResponse,
+    PaymentsReportResponse,
     PetCountDto,
+    RatingsReportResponse,
+    RatingSummaryDto,
     ServiceSummaryDto,
 )
 from app.application.usecases.reports.report_appointments import (
@@ -43,30 +44,6 @@ router = APIRouter(tags=["reports"])
 
 
 # ---------------------------------------------------------------------------
-# Respuestas personalizadas que no tienen model Pydantic en report_schemas.py
-# ---------------------------------------------------------------------------
-
-
-class RatingsReportResponse(BaseModel):
-    by_veterinarian: list[dict[str, Any]] = Field(
-        description="Lista de ratings agrupados por veterinario."
-    )
-    clinic_avg: float = Field(
-        description="Promedio de calificaciones de toda la clinica."
-    )
-
-
-class PaymentsReportResponse(BaseModel):
-    items: list[dict[str, Any]] = Field(description="Pagos paginados.")
-    total: int = Field(description="Total de pagos encontrados.")
-    page: int = Field(description="Pagina actual.")
-    size: int = Field(description="Elementos por pagina.")
-    total_amount: float = Field(
-        description="Suma del monto total de los pagos en esta pagina."
-    )
-
-
-# ---------------------------------------------------------------------------
 # Helpers internos (router only -- zero business logic)
 # ---------------------------------------------------------------------------
 
@@ -87,7 +64,9 @@ def _clinic_id_from(current_user: dict) -> int:
     return int(cid)
 
 
-def _validate_dates(ps: str | None, pe: str | None) -> tuple[datetime | None, datetime | None]:
+def _validate_dates(
+    ps: str | None, pe: str | None
+) -> tuple[datetime | None, datetime | None]:
     start: datetime | None = None
     end: datetime | None = None
 
@@ -151,6 +130,7 @@ def get_appointments_report(
 # GET /reports/services
 # ---------------------------------------------------------------------------
 
+
 @router.get(
     "/services",
     response_model=PaginatedResponse[ServiceSummaryDto],
@@ -179,6 +159,7 @@ def get_services_report(
 # GET /reports/pets
 # ---------------------------------------------------------------------------
 
+
 @router.get(
     "/pets",
     response_model=PetCountDto,
@@ -191,18 +172,18 @@ def get_pets_report(
     db: Session = Depends(_db),
 ) -> PetCountDto:
     start, end = _validate_dates(period_start, period_end)
-    result = uc_pets(  # type: ignore
+    return uc_pets(  # type: ignore
         db=db,
         clinic_id=_clinic_id_from(current_user),
         period_start=start,
         period_end=end,
     )
-    return result.items[0]  # type: ignore
 
 
 # ---------------------------------------------------------------------------
 # GET /reports/consultations
 # ---------------------------------------------------------------------------
+
 
 @router.get(
     "/consultations",
@@ -232,6 +213,7 @@ def get_consultations_report(
 # GET /reports/ratings
 # ---------------------------------------------------------------------------
 
+
 @router.get(
     "/ratings",
     response_model=RatingsReportResponse,
@@ -251,21 +233,32 @@ def get_ratings_report(
         period_end=end,
     )
 
-    by_vet: list[dict] = []
-    ratings_vals: list[float] = []
+    by_vet: list[RatingSummaryDto] = []
+    weighted_sum: float = 0.0
+    total_reviews_weight: int = 0
 
-    for item in result.items:  # type: ignore[attr-defined]
-        avg = item.average_rating  # type: ignore[attr-defined]
-        ratings_vals.append(avg)
+    for item in result.items:  # type: ignore[union-attr]
+        if not isinstance(item, RatingSummaryDto):
+            continue
+        avg = item.average_rating
+        reviews = item.total_reviews
+        # Media ponderada (F2): cada veterinario aporta (avg * reviews) al
+        # numerador para que una clinica con muchos reviews no se diluya la
+        # media por un veterinario con pocas reseñas.
+        if reviews > 0:
+            weighted_sum += avg * reviews
+            total_reviews_weight += reviews
         by_vet.append(
-            {
-                "vet_id": item.veterinarian_id,
-                "average_rating": avg,
-                "total_reviews": item.total_reviews,  # type: ignore[attr-defined]
-            }
+            RatingSummaryDto(
+                veterinarian_id=item.veterinarian_id,
+                average_rating=avg,
+                total_reviews=reviews,
+            )
         )
 
-    clinic_avg = sum(ratings_vals) / len(ratings_vals) if ratings_vals else 0.0
+    clinic_avg = (
+        weighted_sum / total_reviews_weight if total_reviews_weight > 0 else 0.0
+    )
 
     return RatingsReportResponse(
         by_veterinarian=by_vet,
@@ -276,6 +269,7 @@ def get_ratings_report(
 # ---------------------------------------------------------------------------
 # GET /reports/payments
 # ---------------------------------------------------------------------------
+
 
 @router.get(
     "/payments",
@@ -300,10 +294,10 @@ def get_payments_report(
         size=size,
     )
 
-    total_amount = sum((i.amount for i in result.items), 0)  # type: ignore[attr-defined]
+    total_amount = sum(i.amount for i in result.items)  # type: ignore[attr-defined, union-attr]
 
     return PaymentsReportResponse(
-        items=[i.model_dump() for i in result.items],
+        items=result.items,
         total=result.total,
         page=result.page,
         size=result.size,

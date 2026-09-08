@@ -86,6 +86,7 @@ export function FilterBar({
   return (
     <form
       onSubmit={handleSubmit}
+      noValidate
       className="grid gap-4 rounded-[32px] border border-sandy-300 bg-white p-6 sm:grid-cols-2 md:grid-cols-4"
       role="search"
       aria-label="Filtros de reportes"

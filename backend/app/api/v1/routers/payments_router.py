@@ -190,7 +190,7 @@ async def create_payment(
                 .first()
             )
             pet_obj = getattr(appt, "pet", None) if appt else None
-            pet_display = str(appt.pet_id) if appt else "servicio"
+            str(appt.pet_id) if appt else "servicio"
             owner_user_id = None
             owner_email = None
             if pet_obj:

@@ -362,10 +362,10 @@ def test_c10_auth_required(app_client: dict) -> None:
     _auth_key = "current_access_user"
     key = getattr(st_router_mod, "_access_user_dep_key", _auth_key)
     if hasattr(st_router_mod, key):
-        orig = app_client["app"].dependency_overrides.get(getattr(st_router_mod, key))
+        app_client["app"].dependency_overrides.get(getattr(st_router_mod, key))
     else:
         # Usar el atributo por defecto del router module
-        orig = app_client["app"].dependency_overrides.pop(
+        app_client["app"].dependency_overrides.pop(
             st_router_mod.get_current_access_user, None
         )
 

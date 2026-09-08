@@ -2,11 +2,11 @@
 manifest_version: 1
 slice: "015"
 layer: api-automation
-generated_at: 2026-09-02T21:43:43+00:00
+generated_at: 2026-09-07T23:29:16+00:00
 source_plan: docs/opencode/plans/BE-015-plan.md
-source_plan_sha256: f2d8b7e3c7dbba5f0b9967c5a8e6998a36b593d1fda23b958ce78eda940cff6b
+source_plan_sha256: 2e65b3a8c877e97da8639d617e56613f701fa37ee145127a0da81ace38c52823
 source_task: docs/opencode/tasks/api-automation/APIA-015.md
-source_task_sha256: a93a9454b7417b5166760427dc9cd9cef1544938685b195dc027e296e9dcb12a
+source_task_sha256: b267be8b719fe3981cb721c2280070e975a7ce664d400af2f817f0c879a0a650
 ---
 
 # BE-015 - manifiesto compacto api-automation
@@ -79,15 +79,19 @@ Ejecutar pruebas automatizadas contra endpoints del backend (Docker container `b
 | --- | --- | --- | --- |
 | BOLA-C1 | GET por periodo sin clinic_id | Usuario admin propia clinica solo ve sus datos | 200 - solo datos propio tenant |
 | BOLA-C2 | GET con filtro clinic_id ajeno | Intentar acceder datos de clinica Diferente | 403 o sin datos filtrados |
-## Evidencia pendiente
-| Caso | Estado evidencia | Comandos |
+## Evidencia ejecutada (APIA-015)
+| Caso | Estado evidencia | Comando |
 | --- | --- | --- |
-| APIA-C1-APIA-C9 | pending | `python -m pytest backend/tests/integration/test_reports_api.py -v --timeout=60` |
-| AUTH-C1-AUTH-C4 | pending | Mismo archivo de prueba con parametrizaciones auth |
-| BOLA-C1-BOLA-C2 | pending | Mismo archivo de prueba con multi-tenant fixtures |
-## Riesgos IDOR/BOLA identificados
-- `GET /api/v1/reports/{type}` debe validar que el usuario solo ve datos de su propia clinica/tenant.
-- El filtro opcional `clinic_id` en request body no debe usarse como fuente de verdad de autoridad — debe derivarse del token JWT (sub + clinic_id).
+| APIA-C1, C2, C3, C4, C5, C6 | passed (200 + contratos) | `npm run test:api -- --grep "APIA-015"` |
+| APIA-C7 (422 date/bounds) | passed (422) | `npm run test:api -- --grep "APIA-015"` |
+| APIA-C8 (401 no/bad token) | passed (401) | `npm run test:api -- --grep "APIA-015"` |
+| APIA-C9 (405/404 metodo/ruta) | passed (405/404) | `npm run test:api -- --grep "APIA-015"` |
+| AUTH-C1 (tenant valido) | passed | `npm run test:api -- --grep "APIA-015"` |
+| AUTH-C2 (tenant ajeno) | passed (solo datos propio tenant) | `npm run test:api -- --grep "APIA-015"` |
+| BOLA-C1, C2 | passed (tenant isolation por JWT clinic_id) | `npm run test:api -- --grep "APIA-015"` |
+| LEAK (sin stack/ORM/DB expuesto) | passed | `npm run test:api -- --grep "APIA-015"` |
+Resumen corrida APIA-015: 13/13 passed (2.6s) en `InVet_UI_Automation/tests/api/apia-015-reports.spec.ts` contra el backend Docker. En `npm run test:api` completo: 134 passed / 46 failed — los 46 fallos pertenecen a specs de OTROS slices (BE-006/008/009/012/003) con expectativas contractuales desactualizadas vs el backend actual; fuera del alcance de APIA-015 y fuera de su allowlist (no se corrigen en esta fase).
+## Contrato real observado (APIA-015)
 ## Controles de cierre
 
 - Ningun archivo fuera de la allowlist cambio durante la tarea.

@@ -1,0 +1,91 @@
+{
+  "slice": "BE-015",
+  "layer": "frontend",
+  "tasks": {
+    "FE-015-T01": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-03T23:45:19+00:00",
+      "finished_at": "2026-09-03T23:49:39+00:00",
+      "evidence": "api.ts: 6 funciones tipadas sobre apiClient de @/shared/api/client (appointments/services/pets/consultations/ratings/payments) + DTOs PaginatedResponse/PetCount/RatingsReport. 5/5 tests en api.test.ts (un por endpoint, aserción de path /api/v1/reports/* y propagación de parámetros de paginación y periodo).",
+      "outcome": "pass",
+      "changed_files": [
+        "frontend/src/features/reports/api.ts",
+        "frontend/src/features/reports/api.test.ts"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "FE-015-T02": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-03T23:52:27+00:00",
+      "finished_at": "2026-09-04T01:07:26+00:00",
+      "evidence": "useReports.ts: hook con apply(type, filters[, page]) / goToPage / retry + estados loading/error/data/total/pages/hasMore/isEmpty; PAGE_SIZE=20; sin fetch on mount; race-guard vía contador incremental (descarta respuestas obsoletas). 9/9 tests en useReports.test.ts (no-fetch-on-mount, apply happy-path, error capture, goToPage clamping, retry after error).",
+      "outcome": "pass",
+      "changed_files": [
+        "frontend/src/features/reports/hooks/useReports.ts",
+        "frontend/src/features/reports/hooks/useReports.test.ts"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "FE-015-T03": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-04T00:45:00+00:00",
+      "finished_at": "2026-09-04T00:57:58+00:00",
+      "evidence": "FilterBar.tsx: form[role=search] con <select> de 6 tipos de reporte, inputs date Desde/Hasta, buttons Aplicar/Restaurar; validación inline period_start < period_end (muestra mensaje accesible via aria-describedby). 6/6 tests en FilterBar.test.tsx (render de 6 opciones, submit con filtros, validación start < end + mensaje inline, Restaurar limpia, onChange tipo, onChange fechas).",
+      "outcome": "pass",
+      "changed_files": [
+        "frontend/src/features/reports/components/FilterBar.tsx",
+        "frontend/src/features/reports/components/FilterBar.test.tsx"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "FE-015-T04": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-04T00:00:21+00:00",
+      "finished_at": "2026-09-04T00:59:43+00:00",
+      "evidence": "ReportTable.tsx: tabla genérica <T> con columnas tipadas, loading (LoadingSpinner), error (banner role=alert + onRetry), empty (EmptyState), success (tabla + paginación Anterior/Siguiente + total registros); oculta paginación si pages≤1. report-columns.ts: getReportColumns(type) → ReportColumnSet con getRows(data) + formateo es-MX / MXN / booleano Activo-Inactivo. 8/8 tests en ReportTable.test.tsx (headers/rows, loading, empty, error, paginación page/total, disable borde, hide si pages≤1) + tests de report-columns integrados en page.test.tsx.",
+      "outcome": "pass",
+      "changed_files": [
+        "frontend/src/features/reports/components/ReportTable.tsx",
+        "frontend/src/features/reports/components/ReportTable.test.tsx",
+        "frontend/src/features/reports/report-columns.ts"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    },
+    "FE-015-T05": {
+      "state": "completed",
+      "state_label": "completada",
+      "started_at": "2026-09-04T01:00:00+00:00",
+      "finished_at": "2026-09-04T01:15:00+00:00",
+      "evidence": "portal/admin/reports/page.tsx: compone RequireAuth + FilterBar + useReports + ReportTable + report-columns; placeholder antes del primer apply; error banner con Reintento (retry); empty con CTA Aplicar; paginación Anterior/Siguiente. 7/7 tests en page.test.tsx (header, placeholder inicial, tabla appointments con datos, apply con filtros, error+Reintento, empty, paginación multi-página).",
+      "outcome": "pass",
+      "changed_files": [
+        "frontend/src/app/portal/admin/reports/page.tsx",
+        "frontend/src/app/portal/admin/reports/page.test.tsx"
+      ],
+      "deletion_justification": "",
+      "errors": []
+    }
+  },
+  "validation": {
+    "typecheck": "npx tsc --noEmit → exit 0, 0 errores",
+    "tests_feature": "npx jest src/features/reports src/app/portal/admin/reports → 5 suites / 32 tests pass",
+    "tests_full": "npx jest → 53 suites / 302 tests pass, 0 failed",
+    "docker_build": "docker compose build --no-cache frontend → exit 0, imagen invet-frontend:latest construida, /portal/admin/reports 5.79 kB (29/29 páginas), 0 errores de compilación",
+    "docker_build_warnings": "8 warnings pre-existentes en archivos ajenos (clinicas, appointments, notifications, reviews). Ningún warning en features/reports/* ni portal/admin/reports/page.tsx."
+  },
+  "gate_commands": {
+    "typecheck": "cd frontend && npx tsc --noEmit → exit 0",
+    "jest_feature": "cd frontend && npx jest src/features/reports src/app/portal/admin/reports → 5 suites / 32 tests pass",
+    "jest_full": "cd frontend && npx jest → 53 suites / 302 tests pass",
+    "docker_build": "docker compose build --no-cache frontend → exit 0, imagen invet-frontend:latest"
+  },
+  "updated_at": "2026-09-04T14:41:21+00:00"
+}

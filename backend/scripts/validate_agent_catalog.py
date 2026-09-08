@@ -10,6 +10,7 @@ import re
 import sys
 from pathlib import Path
 
+
 ROOT = Path(__file__).resolve().parents[2]
 REGISTRY_PATH = ROOT / "docs" / "opencode" / "agent_registry.json"
 
@@ -40,11 +41,7 @@ def fenced_inventory(text: str, heading: str) -> set[str]:
     match = re.search(pattern, text, re.DOTALL)
     if not match:
         return set()
-    return {
-        line.strip().removeprefix("/")
-        for line in match.group(1).splitlines()
-        if line.strip()
-    }
+    return {line.strip().removeprefix("/") for line in match.group(1).splitlines() if line.strip()}
 
 
 def main() -> int:
@@ -115,9 +112,7 @@ def main() -> int:
             continue
         metadata = frontmatter(path)
         if metadata.get("agent") != item["id"]:
-            errors.append(
-                f"{path.relative_to(ROOT)} points to {metadata.get('agent')!r}"
-            )
+            errors.append(f"{path.relative_to(ROOT)} points to {metadata.get('agent')!r}")
         if metadata.get("subtask") != "false":
             errors.append(f"{path.relative_to(ROOT)} must declare subtask: false")
 
@@ -143,16 +138,13 @@ def main() -> int:
         except (SyntaxError, ValueError):
             tools = set()
         if tools != {"read", "search", "edit", "execute"}:
-            errors.append(
-                f"{path.relative_to(ROOT)} has unexpected tools: {sorted(tools)}"
-            )
+            errors.append(f"{path.relative_to(ROOT)} has unexpected tools: {sorted(tools)}")
         if "agent" in tools:
             errors.append(f"{path.relative_to(ROOT)} enables agent delegation")
 
     github_prompts = ROOT / ".github" / "prompts"
     actual_prompts = {
-        path.name.removesuffix(".prompt.md")
-        for path in github_prompts.glob("*.prompt.md")
+        path.name.removesuffix(".prompt.md") for path in github_prompts.glob("*.prompt.md")
     }
     if actual_prompts != set(expected_commands):
         errors.append(
@@ -166,9 +158,7 @@ def main() -> int:
             continue
         match = re.search(r"(?m)^Use agent: `([^`]+)`\.$", read_text(path))
         if not match or match.group(1) != item["github_name"]:
-            errors.append(
-                f"{path.relative_to(ROOT)} does not select {item['github_name']}"
-            )
+            errors.append(f"{path.relative_to(ROOT)} does not select {item['github_name']}")
 
     manifest = read_text(ROOT / "docs" / "opencode" / "00_installation_manifest.md")
     manifest_commands = fenced_inventory(manifest, "Comandos instalados")
@@ -194,9 +184,7 @@ def main() -> int:
             continue
         for name in sorted(source_files):
             if sha256(source_dir / name) != sha256(mirror_dir / name):
-                errors.append(
-                    f"payload/{relative_dir / name} differs from the active file"
-                )
+                errors.append(f"payload/{relative_dir / name} differs from the active file")
 
     mirrored_files = [
         Path(".github/copilot-instructions.md"),

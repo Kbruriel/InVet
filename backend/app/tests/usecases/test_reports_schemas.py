@@ -23,17 +23,19 @@ def base_dt() -> datetime:
 
 class TestAppointmentSummaryDto:
     def test_valid_payload(self, base_dt: datetime) -> None:
-        dt = AppointmentSummaryDto.model_validate({
-            "id": 1,
-            "clinic_id": 42,
-            "pet_name": "Max",
-            "owner_name": "Juan Perez",
-            "veterinarian_name": "Dr. Lopez",
-            "appointment_type": "consultation",
-            "status": "completed",
-            "scheduled_start": base_dt.isoformat(),
-            "scheduled_end": base_dt.isoformat(),
-        })
+        dt = AppointmentSummaryDto.model_validate(
+            {
+                "id": 1,
+                "clinic_id": 42,
+                "pet_name": "Max",
+                "owner_name": "Juan Perez",
+                "veterinarian_name": "Dr. Lopez",
+                "appointment_type": "consultation",
+                "status": "completed",
+                "scheduled_start": base_dt.isoformat(),
+                "scheduled_end": base_dt.isoformat(),
+            }
+        )
         assert dt.clinic_id == 42
 
     def test_missing_required_field_raises(self) -> None:
@@ -48,25 +50,29 @@ class TestAppointmentSummaryDto:
 
 class TestServiceSummaryDto:
     def test_valid_payload(self) -> None:
-        dt = ServiceSummaryDto.model_validate({
-            "id": 10,
-            "clinic_id": 42,
-            "name": "Vacuna rabia",
-            "description": "Rabies vaccine",
-            "price": 50.0,
-            "duration_minutes": 30,
-            "is_active": True,
-        })
+        dt = ServiceSummaryDto.model_validate(
+            {
+                "id": 10,
+                "clinic_id": 42,
+                "name": "Vacuna rabia",
+                "description": "Rabies vaccine",
+                "price": 50.0,
+                "duration_minutes": 30,
+                "is_active": True,
+            }
+        )
         assert dt.name == "Vacuna rabia"
 
     def test_description_optional(self) -> None:
-        dt = ServiceSummaryDto.model_validate({
-            "id": 1,
-            "clinic_id": 1,
-            "name": "X",
-            "description": None,
-            "price": 1.0,
-            "duration_minutes": 1,
-            "is_active": False,
-        })
+        dt = ServiceSummaryDto.model_validate(
+            {
+                "id": 1,
+                "clinic_id": 1,
+                "name": "X",
+                "description": None,
+                "price": 1.0,
+                "duration_minutes": 1,
+                "is_active": False,
+            }
+        )
         assert dt.description is None
